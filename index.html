@@ -208,7 +208,6 @@ a{color:inherit}
 .claim-receipts{grid-column:2;display:flex;flex-wrap:wrap;gap:4px 20px;font-size:var(--fs-sm);color:var(--ink-1)}
 .claim-receipts a{min-height:44px;display:inline-flex;align-items:center}
 .claim-receipts > span{min-height:44px;display:inline-flex;align-items:center;gap:8px}
-.gh-stats{color:var(--ink-1)}
 @media (min-width:900px){.claim{grid-template-columns:64px minmax(0,7fr) minmax(0,5fr);align-items:baseline}.claim-receipts{grid-column:3;justify-content:flex-end}}
 
 /* Terminal (spec §6, §10) */
@@ -417,7 +416,7 @@ dialog::backdrop{background:rgba(7,3,4,0.92)}
         <li class="claim">
           <span class="claim-n" aria-hidden="true">04</span>
           <p class="claim-text">Code is public.</p>
-          <p class="claim-receipts"><a class="link" href="https://codeberg.org/bon3head" rel="noopener">codeberg.org/bon3head</a><span class="gh-stats" id="gh-stats" hidden></span></p>
+          <p class="claim-receipts"><a class="link" href="https://codeberg.org/bon3head" rel="noopener">codeberg.org/bon3head</a></p>
         </li>
       </ol>
     </div>
@@ -1026,26 +1025,6 @@ function boot() {
     });
   });
 
-  /* ---- GitHub stats (fail-soft, memory cache only, spec §10) ---- */
-  const ghEl = document.getElementById('gh-stats');
-  let ghCache = null;
-  async function loadGitHubStats() {
-    if (ghCache !== null) return;
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 6000);
-    try {
-      const res = await fetch('https://api.github.com/users/bon3head/repos?per_page=100', { signal: ctrl.signal, headers: { Accept: 'application/vnd.github+json' } });
-      if (!res.ok) throw new Error(String(res.status));
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error('shape');
-      ghCache = data.length;
-      ghEl.textContent = `${ghCache} public repos · via GitHub API`;
-      ghEl.hidden = false;
-    } catch {
-      ghEl.hidden = true; // non-critical enhancement: hide silently
-    } finally { clearTimeout(timer); }
-  }
-
   /* ---- terminal (spec §6, §10): registry, parsing, history ---- */
   const out = document.getElementById('term-out');
   const termForm = document.getElementById('term-form');
@@ -1234,7 +1213,6 @@ function boot() {
   route(true);
   const afterLoad = () => {
     const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
-    loadGitHubStats();
     idle(() => { Motion.init(); Scene.init(); });
   };
   if (document.readyState === 'complete') afterLoad(); else window.addEventListener('load', afterLoad, { once: true });
