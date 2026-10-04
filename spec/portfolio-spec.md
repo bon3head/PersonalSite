@@ -146,7 +146,7 @@ Anti-template re-check: these tokens produce editorial sections + full-bleed dos
 - Voice: terse, technically dense. Short lines. No em dashes, ever. No colons in headlines where avoidable is not required here (that rule is application prose); still prefer plain sentences.
 - Every factual claim about Justin hyperlinked to its receipt on first appearance (repo, commit, demo, transcript, certificate).
 - Banned: "passionate," "leverage," "cutting-edge," "seamless," "delve," "tapestry," "I am excited to announce" energy, superhero metaphors, "ninja/rockstar." All copy passes `~/workspace/distill/banned-slop-styles.md` before build.
-- Numbers: GPA, dates, team sizes must match MEMORY.md exactly (GPA 2.77, Dec 2027, etc.). No rounding that changes meaning.
+- Numbers: dates, team sizes must match MEMORY.md exactly (Dec 2027, etc.). No rounding that changes meaning. GPA is CUT from the site entirely (Justin's call 2026-10-04: subpar, would need a defense).
 - The copy deck (final strings for every section) must be locked before build; the builder does not invent copy.
 
 ## 14. SEO, meta, performance budgets
