@@ -91,7 +91,7 @@ contact
   email      justinf0829@gmail.com
   code       codeberg.org/bon3head
   mirror     github.com/bon3head
-  linkedin   [TBD]
+  linkedin   https://www.linkedin.com/in/justin-poli-15406030b
   phone      (631) 835-5490
 ```
 - `clear`: empties the screen, no output
@@ -126,7 +126,7 @@ contact
 - Body: `Full-time SWE roles starting 2027. Backend and systems. Email reaches me directly.`
 - Primary link: `justinf0829@gmail.com` (→ mailto:justinf0829@gmail.com)
 - Copy button: `Copy email` → `Copied` (reverts after 2s). Failure: `Copy failed. Select the address above.`
-- Links: `Codeberg` (→ https://codeberg.org/bon3head) · `GitHub` (→ https://github.com/bon3head) · `LinkedIn` (→ TBD)
+- Links: `Codeberg` (→ https://codeberg.org/bon3head) · `GitHub` (→ https://github.com/bon3head) · `LinkedIn` (→ https://www.linkedin.com/in/justin-poli-15406030b)
 
 ## 7. About (spec §1, §5.2)
 
@@ -152,7 +152,7 @@ Section labels: `01 HEADER` · `02 FAILURE CLASS` · `03 RECEIPT` · `04 FALSIFI
 ### 8.1 LeafLink
 - Name: `LeafLink`
 - One-liner: `Event discovery platform.`
-- Meta row: `SHIPPED [TBD date]` · `EVENT Week-long hackathon [TBD name]` · `RESULT 2nd place` · `TEAM Justin Poli, Julian Shuster, Devin Perez, [TBD fourth member]` · `ROLE [TBD]`
+- Meta row: `SHIPPED [TBD date]` · `EVENT Week-long hackathon [TBD name]` · `RESULT 2nd place` · `TEAM Justin Poli, Julian Shuster, Devin Perez, Colton A.` · `ROLE [TBD]`
 - Links: `Repo` (→ https://codeberg.org/bon3head/LeafLink) · `Live demo` (→ TBD)
 - Failure class: `[TBD: confirm]`
 - Receipt list: `Repo` (→ https://codeberg.org/bon3head/LeafLink) · `Commit at submission` (→ TBD) · `Demo recording` (→ TBD) · `2nd place proof` (→ TBD)
@@ -191,7 +191,7 @@ Section labels: `01 HEADER` · `02 FAILURE CLASS` · `03 RECEIPT` · `04 FALSIFI
 - Errors: `Enter your name.` · `Enter a valid email address.` (verbatim, standard-implementations) · `Write a message.`
 - After mailto (the only v1 path): `Your mail client should be open with the message ready. If it did not open, email justinf0829@gmail.com directly. Your text is still in the form.`
 - Mailto subject: `Portfolio contact from {name}`. Body: `{message}` + blank line + `From: {name} <{email}>`
-- Links: `Codeberg (primary)` (→ https://codeberg.org/bon3head) · `GitHub` (→ https://github.com/bon3head) · `LinkedIn` (→ TBD) · `Phone (631) 835-5490` (→ tel:+16318355490)
+- Links: `Codeberg (primary)` (→ https://codeberg.org/bon3head) · `GitHub` (→ https://github.com/bon3head) · `LinkedIn` (→ https://www.linkedin.com/in/justin-poli-15406030b) · `Phone (631) 835-5490` (→ tel:+16318355490)
 
 ## 10. 404 (spec §5.5)
 
