@@ -2,6 +2,8 @@
 
 v2.1: repo receipts filled (LeafLink, SideQuests); terminal projects lines use "name: description"; full-deck dash scan clean. 2026-10-04.
 
+v2.3 amendment: claim 4 is `Code is public.` plus the codeberg.org/bon3head link only. The live GitHub repo-count line and its GitHub API fetch are removed (the GitHub count contradicted the Codeberg profile). 2026-10-04.
+
 Facts come from spec/portfolio-spec.md plus the project facts Justin's review supplied on 2026-10-04 (LeafLink, SideQuests). Anything not stated is [TBD]. "(→ TBD)" marks a claim whose receipt URL is not yet known. GPA is cut (spec §13).
 
 ## 0. Global
@@ -37,7 +39,7 @@ Facts come from spec/portfolio-spec.md plus the project facts Justin's review su
 - Claim 1: `Two hackathon builds. Both placed 2nd.` Receipts: `LeafLink placement` (→ TBD) · `SideQuests placement` (→ TBD)
 - Claim 2: `SideQuests: working MVP in 24 hours at Hack New Paltz.` Receipts: `repo` (→ https://codeberg.org/bon3head/sidequests) · `demo` (→ TBD)
 - Claim 3: `LeafLink: event discovery platform, built by a team of four in a week-long hackathon.` Receipts: `repo` (→ https://codeberg.org/bon3head/LeafLink) · `demo` (→ TBD)
-- Claim 4: `Code is public.` Receipt: `codeberg.org/bon3head` (→ https://codeberg.org/bon3head). Live line: `{N} public repos · via GitHub API` (hidden if the API fails, spec §10)
+- Claim 4: `Code is public.` Receipt: `codeberg.org/bon3head` (→ https://codeberg.org/bon3head). No live line, no GitHub API (v2.3).
 
 ## 3. Terminal (spec §6, §10: exactly help, whoami, projects, verify, contact, clear)
 
