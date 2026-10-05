@@ -2685,7 +2685,7 @@ const Place = (() => {
 
     /* ---- camera poses (brief §1.4, §2.3, §2.4) ---- */
     const camState = { pos: new THREE.Vector3(0, 9, 9), target: new THREE.Vector3(0, 0, 0), flight: null };
-    const DIR = { home: [0, 1.15, 1], leaflink: [0, 1.05, 1], sidequests: [0, 1.05, 1], about: [0, 1, 0.06], contact: [0, 1, 1.15], notfound: [0, 0.5, 1] };
+    const DIR = { home: [0, 1.15, 1], leaflink: [0, 1.05, 1], sidequests: [0, 1.05, 1], about: [0, 1, 0.06], contact: [1, 0.62, 0.5], notfound: [0, 0.5, 1] };
     function focusIndex(view) {
       if (view === 'home') return S.scroll.current < 0.15 ? 0 : S.scroll.current < 0.6 ? 1 : 2;
       if (S.dossier[view]) { const s = S.dossier[view].state; return s >= 4 ? 2 : s >= 2 ? 1 : 0; }
@@ -2700,7 +2700,7 @@ const Place = (() => {
       } else if (view === 'about') {
         if (S.about.fab) { tx = A.fab.x / 100; tz = (A.fab.y - 400) / 100; fw = 6.4; fh = 2.6; }
         else { tx = S.about.focus >= 0 ? rig.ics[S.about.focus].position.x * 0.3 : 0; fw = 10.4; fh = 7; }
-      } else if (view === 'contact') { tx = A.j1.x / 100 - 1; tz = 3.1; fw = 7; fh = 3.6; } // the output trace arriving at J1
+      } else if (view === 'contact') { tx = A.j1.x / 100 - 3; tz = 2.1; fw = 6.5; fh = 7.5; } // looking back up the output trace: J1 whole in the foreground, the trace leading to the filler ICs
       else if (view === 'notfound') { tx = A.j1.x / 100; tz = -7; fw = 10; fh = 6; }
       const aspect = Math.max(0.2, stageRect.w / Math.max(1, stageRect.h));
       const vt = Math.tan((camera.fov * Math.PI) / 360), ht = vt * aspect;
