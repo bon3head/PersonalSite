@@ -215,8 +215,9 @@ a{color:inherit}
 
 /* The circuit (V3 spec §1.1): one fixed full-viewport canvas behind every route. Copy blocks carry
    data-scrim; the scene applies readability zones over the board as its last pipeline node (spec §1.2).
-   The canvas appears with a hard cut once the board under the camera is painted (spec §7.4). */
-#place{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0}
+   The canvas appears with a hard cut once the board under the camera is painted (spec §7.4). It is sized
+   to the large viewport, so a phone toolbar collapsing on scroll never resizes it or re-frames the camera. */
+#place{position:fixed;top:0;left:0;width:100%;height:100%;height:100lvh;z-index:0;pointer-events:none;opacity:0}
 .gl-on #place{opacity:1}
 /* No WebGL at all (spec §9.3): the same netlist as one two-tone engraving, never brighter than #141414 */
 #board-static{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:left center;z-index:0;pointer-events:none;transition:opacity 100ms linear}
@@ -1401,18 +1402,35 @@ const Motion = (() => {
       }
 
       if (v === 'home') {
-        // The home rail (V3 spec §7.1): one scrubbed ScrollTrigger per section writes the rail parameter.
-        // Each section holds its waypoint, then moves to the next over its last quarter; the frame loop
-        // eases toward the value (one smoothing source).
+        // The home rail (V3 spec §7.1): the rail parameter is a continuous, piecewise-linear function of scroll.
+        // Waypoint i is reached when section i's centre crosses the viewport centre (the hero's holds while it is
+        // pinned), so the camera travels at an even rate from section to section instead of holding and then
+        // lurching, and a momentum fling moves it smoothly. Section positions are measured on ScrollTrigger
+        // refresh, never per frame; the frame loop eases toward the value (one smoothing source).
         const railEls = ['#hero', '#proof', '#terminal', '.rows > .row:nth-child(1)', '.rows > .row:nth-child(2)', '#timeline', '#contact-band'].map((s) => root.querySelector(s));
-        railEls.forEach((el, i) => {
-          if (!el) return;
-          const last = i === railEls.length - 1;
-          const u = (p) => i + (last ? 0 : clamp01((p - 0.75) / 0.25));
-          ScrollTrigger.create({ trigger: el, start: i === 0 ? 'top top' : 'top center', end: 'bottom center', scrub: true,
-            onUpdate: (s) => { if (s.isActive) Place.setRail(u(s.progress)); },
-            onLeave: () => Place.setRail(last ? i : i + 1), onLeaveBack: () => Place.setRail(i) });
-        });
+        let railY = [];
+        const railMeasure = () => {
+          const vh = window.innerHeight, max = ScrollTrigger.maxScroll(window);
+          railY = [];
+          railEls.forEach((el, i) => {
+            if (!el) return;
+            const top = el.getBoundingClientRect().top + window.scrollY;
+            let y = i === 0 ? Math.max(0, top + el.offsetHeight - vh) : top + el.offsetHeight / 2 - vh / 2;
+            y = Math.min(y, max);
+            if (railY.length) y = Math.max(y, railY[railY.length - 1][0] + 1);
+            railY.push([y, i]);
+          });
+        };
+        const railAt = (y) => {
+          if (!railY.length) return 0;
+          if (y <= railY[0][0]) return railY[0][1];
+          for (let k = 1; k < railY.length; k++) {
+            const [y1, u1] = railY[k], [y0, u0] = railY[k - 1];
+            if (y <= y1) return u0 + (u1 - u0) * (y - y0) / (y1 - y0);
+          }
+          return railY[railY.length - 1][1];
+        };
+        ScrollTrigger.create({ start: 0, end: 'max', onRefresh: (s) => { railMeasure(); Place.setRail(railAt(s.scroll())); }, onUpdate: (s) => Place.setRail(railAt(s.scroll())) });
         // Timeline progress line, scrubbed (scrub: true, brief §5.3).
         gsap.fromTo('#tl-fill', { scaleY: 0 }, { scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#tl', start: 'top 75%', end: 'bottom 60%', scrub: true } });
         // Dossier row media parallax, capped at ±6% (vestibular-safe, spec §8).
@@ -3697,6 +3715,10 @@ const Place = (() => {
     const world = new THREE.Group();
     scene.add(world);
     let renderer = null, pipeline = null, canvas = null;
+    // The canvas is sized to the large viewport (CSS 100lvh), so a phone's toolbar collapsing on scroll changes
+    // neither the drawing buffer nor the camera framing. VP is that size, read on resize only.
+    const VP = { w: window.innerWidth, h: window.innerHeight };
+    function measureVP() { VP.w = window.innerWidth; VP.h = (canvas && canvas.clientHeight) || window.innerHeight; }
     let dprCap = S.tier === 2 ? 1.5 : 1.25, bloomOn = S.tier === 2, fringeOn = S.tier === 2 && FEATURES.fringe;
     let slotsOn = S.tier === 2 ? 8 : 4;
     const mem = { entries: new Map() }; // allocation registry (§8.3)
@@ -4179,7 +4201,7 @@ const Place = (() => {
       registerTargets();
     }
     function registerTargets() {
-      const pr = renderer.getPixelRatio(), w = Math.round(window.innerWidth * pr), h = Math.round(window.innerHeight * pr);
+      const pr = renderer.getPixelRatio(), w = Math.round(VP.w * pr), h = Math.round(VP.h * pr);
       reg('rt:scene', w, h, 8, 1, 'rt'); reg('rt:depth', w, h, 4, 1, 'rt');
       if (bloomOn) reg('rt:bloom', Math.round(w / 2), Math.round(h / 2), 8, 2 * 4 / 3 * 1.0, 'rt'); else unreg('rt:bloom');
       reg('rt:output', w, h, 4, 1, 'rt'); reg('rt:fxaa', w, h, 4, 1, 'rt');
@@ -4365,34 +4387,40 @@ const Place = (() => {
     // home rail waypoints are netlist anchors (§7.1)
     const RAIL = [
       { x: 0.3, z: 0, fw: 12.8, fh: 6 },                                 // hero: the rig
-      { x: P('U3').x + 1.2, z: 0.6, fw: 10, fh: 6 },                     // 01 receipts: U3 and the start of the backbone
+      // 01 receipts: U3 and the start of the backbone, from between the rig and U3. The terminal's anchor (J_DBG)
+      // sits left of the rig, so a waypoint past U3 made the camera run out and straight back on the way there.
+      { x: (P('U2').x + P('U3').x) / 2 - 0.2, z: 0.6, fw: 10, fh: 6 },
       { x: P('J_DBG').x, z: P('J_DBG').z - 0.4, fw: 7.5, fh: 5 },        // 02 terminal: the debug port
       { x: 30, z: 0, fw: 11, fh: 6.4 },                                  // 03 dossiers: LeafLink
       { x: 60, z: 0, fw: 11, fh: 6.4 },                                  //             SideQuests
-      { x: P('U_R3').x, z: 1.8, fw: 9, fh: 6 },                          // 04 timeline: the repeater at 88
-      { x: P('J1').x, z: 2.4, fw: 8, fh: 6 },                            // 05 contact: J1
+      // 04 timeline: the repeater at 88 (portrait: 2 units on, which puts it in the window band with its bus)
+      { x: P('U_R3').x, px: P('U_R3').x + 2, z: 1.8, fw: 9, fh: 6 },
+      // 05 contact: J1. In portrait (px) the window band under the copy holds the line driver and its filter, with
+      // the output traces running down to J1; centred on J1 itself it held the bare copper past the connector.
+      { x: P('J1').x, px: P('U_CD').x - 2, z: 2.4, fw: 8, fh: 6 },
     ];
     const railX = new THREE.CatmullRomCurve3(RAIL.map((w) => new THREE.Vector3(w.x, 0, w.z)), false, 'centripetal');
-    function railPose(u) {
+    const railXP = new THREE.CatmullRomCurve3(RAIL.map((w) => new THREE.Vector3(w.px ?? w.x, 0, w.z)), false, 'centripetal');
+    function railPose(u, portrait) {
       const n = RAIL.length - 1, uu = Math.min(n, Math.max(0, u));
-      const p = railX.getPoint(uu / n);
+      const p = (portrait ? railXP : railX).getPoint(uu / n);
       const i = Math.min(n - 1, Math.floor(uu)), f = uu - i;
       return { tx: p.x, tz: p.z, fw: lerp(RAIL[i].fw, RAIL[i + 1].fw, f), fh: lerp(RAIL[i].fh, RAIL[i + 1].fh, f) };
     }
     const focus = { x: 0, y: 0, w: 1, h: 1, init: false };
     function focusTarget() {
-      const vw = window.innerWidth, vh = window.innerHeight, navH = 56;
-      const el = document.querySelector(STAGE_SEL[S.view] || '#hero-stage');
-      const r = el && el.getBoundingClientRect();
+      const vw = VP.w, vh = VP.h, navH = 56;
       if (vw >= 1100) {
+        const el = document.querySelector(STAGE_SEL[S.view] || '#hero-stage');
+        const r = el && el.getBoundingClientRect();
         if (r && r.width > 0) return { x: r.left, y: navH, w: r.width, h: vh - navH };
         return { x: vw * 0.5, y: navH, w: vw * 0.5, h: vh - navH };
       }
-      if (r && r.width > 0) {
-        const top = Math.max(navH, r.top), bot = Math.min(vh, r.bottom);
-        if (bot - top > vh * 0.3) return { x: r.left, y: top, w: r.width, h: bot - top };
-      }
-      return { x: 0, y: navH, w: vw, h: vh - navH };
+      // Below 1100px the window band scrolls with the copy, so tracking it re-framed the camera on every scroll
+      // frame. The focus zone is the canvas below the nav, fixed while scrolling, with the subject at 72% of its
+      // height, in the window band under the copy.
+      const h = vh - navH;
+      return { x: 0, y: navH + h * 0.22, w: vw, h };
     }
     function stepFocus(dt) {
       const t = focusTarget();
@@ -4416,7 +4444,7 @@ const Place = (() => {
     function restPose(view) {
       let tx = 0, tz = 0, fw = 10.4, fh = 6, dolly = 1;
       if (view === 'home') {
-        const rp = railPose(FEATURES.scrollRail ? S.rail.current : 0);
+        const rp = railPose(FEATURES.scrollRail ? S.rail.current : 0, VP.w < 1100 && focus.w < focus.h);
         tx = rp.tx; tz = rp.tz; fw = rp.fw; fh = rp.fh;
         if (S.rail.current < 1) dolly = 1 - 0.1 * S.hero;
       } else if (AN.clusters[view]) {
@@ -4434,24 +4462,91 @@ const Place = (() => {
       if (camState.push && view === 'home') { const k = camState.push.k; tx = lerp(tx, P(AN.rig.U2).x, k); tz = lerp(tz, P(AN.rig.U2).z, k); fw = lerp(fw, 5.2, k); fh = lerp(fh, 3.4, k); }
       const aspect = Math.max(0.2, focus.w / Math.max(1, focus.h));
       const vt = Math.tan((camera.fov * Math.PI) / 360), ht = vt * aspect;
-      let dist = Math.max(fh / 2 / vt, fw / 2 / ht) * dolly;
-      const d = new THREE.Vector3(...(DIR[view] || DIR.home)).normalize();
+      const composed = (w, h) => Math.max(h / 2 / vt, w / 2 / ht);
+      let dist = composed(fw, fh) * dolly;
+      // Portrait phones and tablets: the camera turns a quarter so the board's long axis runs down the screen. The rail then moves
+      // the board the way the page scrolls (up), instead of panning it sideways across a narrow frame. (Not the
+      // 404: its void pose keeps the board edge level across the frame.)
+      const yaw = VP.w < 1100 && focus.w < focus.h && view !== 'notfound';
+      // Portrait contact is the home rail's last shot, J1 in the window band. Its desktop pose looks along the
+      // output trace past the board's end, which a narrow frame turns into a sliver of board in the void.
+      const railShot = view === 'home' || (yaw && view === 'contact');
+      if (yaw && view === 'contact') { tx = RAIL[RAIL.length - 1].px + (FEATURES.scrollRail ? (S.scroll.current - 0.5) * 0.5 : 0); tz = 0; }
+      const d0 = yaw && view === 'contact' ? DIR.home : DIR[view] || DIR.home;
+      const d = (yaw ? new THREE.Vector3(d0[2], d0[1], -d0[0]) : new THREE.Vector3(...d0)).normalize();
       const target = new THREE.Vector3(tx, 0, tz);
-      if (FILL_VIEWS.has(view)) { const f = fillCap(target, d, dist); dist = f.dist; target.z += f.dz; target.x += f.dx || 0; d.copy(f.d); }
+      if (FILL_VIEWS.has(view) || railShot) {
+        // one tilt per view (home: the whole rail), so scrolling never changes the camera's angle
+        const ref = railShot ? Math.max(...RAIL.map((w) => composed(w.fw, w.fh))) : view === 'about' ? composed(10.4, 7) : composed(fw, fh);
+        const f = fitFor(railShot ? 'home' : view, d, ref, yaw ? PORTRAIT_E : 0);
+        dist = Math.min(dist, f.maxDist); d.copy(f.dir);
+        const fp = f.fp, bx0 = NL.board.x0 / 100 + FIT_M, bx1 = NL.board.x1 / 100 - FIT_M, bz = NL.board.h / 200 - 0.05 - FIT_M;
+        target.x = Math.min(Math.max(target.x, bx0 - fp.x0 * dist), bx1 - fp.x1 * dist);
+        target.z = Math.min(Math.max(target.z, -bz - fp.z0 * dist), bz - fp.z1 * dist);
+        lastFit.fp = fp; lastFit.dist = dist;
+      }
       return { target, pos: target.clone().addScaledVector(d, dist) };
     }
-    // Full bleed (§1.1, R4.1): the board, not the void past its edge, fills the viewport. The pose distance is
-    // capped so all four viewport corners land on the board (binary search with a probe camera that carries the
-    // same focus-zone view offset). Cached per input, so the frame loop does no search at rest.
+    // Full bleed (§1.1, R4.1): the board, not the void past its edge, fills the viewport. For a fixed camera angle
+    // the viewport's footprint on the board is one quadrilateral that scales with distance and moves with the look
+    // target, so fill is solved in closed form: the distance is capped where the footprint fits the board, and the
+    // target is clamped so it stays inside. Both are continuous in the rail position, and per frame it is one min
+    // and two clamps. The angle is chosen once per view, focus zone and canvas size (cached).
     const FILL_VIEWS = new Set(['home', 'leaflink', 'sidequests', 'about']);
+    const FIT_M = 0.05;
     const probeCam = new THREE.PerspectiveCamera(35, 1, 0.1, 400);
-    const fillMemo = { key: '', out: 0 };
-    const cornerHit = new THREE.Vector3(), cornerDir = new THREE.Vector3();
-    function cornersOnBoard(pos, target) {
+    const fitMemo = new Map();
+    const cornerHit = new THREE.Vector3(), cornerDir = new THREE.Vector3(), ORIGIN = new THREE.Vector3();
+    function setProbe(pos, target) {
       probeCam.aspect = focus.w / Math.max(1, focus.h);
       probeCam.position.copy(pos); probeCam.lookAt(target);
-      probeCam.setViewOffset(focus.w, focus.h, -focus.x, -focus.y, window.innerWidth, window.innerHeight);
+      probeCam.setViewOffset(focus.w, focus.h, -focus.x, -focus.y, VP.w, VP.h);
       probeCam.updateProjectionMatrix(); probeCam.updateMatrixWorld();
+    }
+    // the viewport corners' hits on the board plane, relative to the look target, per unit of distance (null when
+    // a corner looks above the horizon)
+    function footprint(dir) {
+      setProbe(dir, ORIGIN);
+      const fp = { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity };
+      for (const [nx, ny] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+        cornerHit.set(nx, ny, 0.5).unproject(probeCam);
+        cornerDir.copy(cornerHit).sub(dir);
+        if (cornerDir.y >= -1e-6) return null;
+        const t = -dir.y / cornerDir.y, x = dir.x + cornerDir.x * t, z = dir.z + cornerDir.z * t;
+        fp.x0 = Math.min(fp.x0, x); fp.x1 = Math.max(fp.x1, x); fp.z0 = Math.min(fp.z0, z); fp.z1 = Math.max(fp.z1, z);
+      }
+      return fp;
+    }
+    // The composed angle is kept when the footprint fits at 25% of the composed distance or more; otherwise the
+    // camera tilts toward plan view, 1 degree at a time, until it does (or takes the angle that gets closest).
+    function fitFor(view, d, ref, eMin) {
+      const key = [view, eMin, d.x.toFixed(3), d.y.toFixed(3), d.z.toFixed(3), ref.toFixed(2), focus.x | 0, focus.y | 0, focus.w | 0, focus.h | 0, VP.w, VP.h].join(',');
+      const hit = fitMemo.get(key);
+      if (hit) return hit;
+      const W = (NL.board.x1 - NL.board.x0) / 100 - 2 * FIT_M, H = NL.board.h / 100 - 0.1 - 2 * FIT_M;
+      const h = Math.hypot(d.x, d.z) || 1, e0 = Math.max(eMin, Math.atan2(d.y, h)), eMax = Math.max(e0, Math.PI * 0.47);
+      let best = null;
+      for (let e = e0; e <= eMax + 1e-6; e += Math.PI / 180) {
+        const dir = new THREE.Vector3((d.x / h) * Math.cos(e), Math.sin(e), (d.z / h) * Math.cos(e)).normalize();
+        const fp = footprint(dir);
+        if (!fp) continue;
+        const c = { dir, fp, maxDist: Math.min(W / (fp.x1 - fp.x0), H / (fp.z1 - fp.z0)), e };
+        if (!best || c.maxDist > best.maxDist) best = c;
+        if (c.maxDist >= ref * FIT_FRAC) { best = c; break; }
+      }
+      if (!best) { const dir = new THREE.Vector3(0, 1, 1e-3).normalize(), fp = footprint(dir) || { x0: -1, x1: 1, z0: -1, z1: 1 }; best = { dir, fp, maxDist: Math.min(W / (fp.x1 - fp.x0), H / (fp.z1 - fp.z0)), e: Math.PI / 2 }; }
+      if (fitMemo.size > 64) fitMemo.clear();
+      fitMemo.set(key, best);
+      return best;
+    }
+    let FIT_FRAC = 0.25;
+    // portrait shots look down at 55 degrees or steeper, so the far field (which a phone's copy covers anyway)
+    // never outruns the streamed chunks and every view is circuit from edge to edge
+    const PORTRAIT_E = (55 * Math.PI) / 180;
+    const lastFit = { fp: null, dist: 0 };
+    // QA: are all four viewport corners on the board for this pose?
+    function cornersOnBoard(pos, target) {
+      setProbe(pos, target);
       const bx0 = NL.board.x0 / 100, bx1 = NL.board.x1 / 100, bz = NL.board.h / 200 - 0.05;
       for (const [nx, ny] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
         cornerHit.set(nx, ny, 0.5).unproject(probeCam);
@@ -4459,68 +4554,25 @@ const Place = (() => {
         if (cornerDir.y >= -1e-6) return false;
         const t = -pos.y / cornerDir.y;
         const x = pos.x + cornerDir.x * t, z = pos.z + cornerDir.z * t;
-        if (x < bx0 || x > bx1 || z < -bz || z > bz) return false;
+        if (x < bx0 - 1e-3 || x > bx1 + 1e-3 || z < -bz - 1e-3 || z > bz + 1e-3) return false;
       }
       return true;
-    }
-    function fillCap(target, d, dist) {
-      const key = [target.x.toFixed(4), target.z.toFixed(4), d.x.toFixed(3), d.y.toFixed(3), dist.toFixed(4), focus.x | 0, focus.y | 0, focus.w | 0, focus.h | 0, window.innerWidth, window.innerHeight].join(',');
-      if (key === fillMemo.key) return fillMemo.out;
-      // the look target may slide across the board (up to 2.5 units) so near and far edges share the slack
-      const pos = new THREE.Vector3(), tgt = new THREE.Vector3(), dir = new THREE.Vector3();
-      const DZ = [0, 0.4, -0.4, 0.8, -0.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.5, -2.5];
-      // near the board's left or right edge the look target slides inward too, within the same slack
-      const DX = [0, 0.4, -0.4, 0.8, -0.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.5, -2.5];
-      const bxLo = NL.board.x0 / 100 + 0.5, bxHi = NL.board.x1 / 100 - 0.5;
-      const okAt = (k) => {
-        for (const dx of DX) {
-          const x = target.x + dx;
-          if (x < bxLo || x > bxHi) continue;
-          for (const dz of DZ) {
-            tgt.set(x, 0, target.z + dz);
-            if (Math.abs(tgt.z) > 3.6) continue;
-            if (cornersOnBoard(pos.copy(tgt).addScaledVector(dir, k), tgt)) return { dz, dx };
-          }
-        }
-        return null;
-      };
-      // largest distance (at most dist) at which every corner lands on the board, or null
-      const search = (minFrac) => {
-        const first = okAt(dist);
-        if (first !== null) return { dist, ...first };
-        let lo = dist * minFrac, hi = dist, at = okAt(lo);
-        if (at === null) return null;
-        for (let i = 0; i < 16; i++) { const mid = (lo + hi) / 2; const r = okAt(mid); if (r !== null) { lo = mid; at = r; } else hi = mid; }
-        return { dist: lo, ...at };
-      };
-      // when the viewport's top edge looks past the horizon (a focus zone low in a tall viewport), no distance can
-      // fill the frame, so the camera tilts down toward plan view in 6 degree steps until one can
-      const h = Math.hypot(d.x, d.z) || 1, e0 = Math.atan2(d.y, h);
-      // (first keeping at least 30% of the composed distance, then allowing a closer pose: phones need it)
-      let out = null;
-      for (const minFrac of [0.3, 0.08, 0.02]) for (let e = e0; e <= Math.max(e0, Math.PI * 0.47) + 1e-6 && !out; e += Math.PI / 30) {
-        dir.set((d.x / h) * Math.cos(e), Math.sin(e), (d.z / h) * Math.cos(e)).normalize();
-        const r = search(minFrac);
-        if (r) out = { ...r, d: dir.clone() };
-      }
-      if (!out) out = { dist: dist * 0.02, dz: 0, dx: 0, d: dir.lengthSq() > 0 ? dir.clone() : d.clone() };
-      fillMemo.key = key; fillMemo.out = out;
-      return out;
     }
     function applyCamera() {
       camera.aspect = focus.w / Math.max(1, focus.h);
       camera.position.copy(camState.pos);
       camera.lookAt(camState.target);
       // focus zone (§7.3): the subject lands in the open area while the frame stays full bleed
-      camera.setViewOffset(focus.w, focus.h, -focus.x, -focus.y, window.innerWidth, window.innerHeight);
+      camera.setViewOffset(focus.w, focus.h, -focus.x, -focus.y, VP.w, VP.h);
       camera.updateProjectionMatrix();
     }
     function resize() {
       if (!renderer) return;
+      measureVP();
       let pr = Math.min(window.devicePixelRatio || 1, dprCap);
-      if (S.tier === 2) pr = Math.min(pr, Math.sqrt(4.2e6 / Math.max(1, window.innerWidth * window.innerHeight)));
+      if (S.tier === 2) pr = Math.min(pr, Math.sqrt(4.2e6 / Math.max(1, VP.w * VP.h)));
       renderer.setPixelRatio(pr);
-      renderer.setSize(window.innerWidth, window.innerHeight, false);
+      renderer.setSize(VP.w, VP.h, false);
       uDpr.value = renderer.getPixelRatio();
       registerTargets();
       updateStage();
@@ -4591,7 +4643,7 @@ const Place = (() => {
       }
       function upload() {
         if (dirty) doMeasure();
-        const pr = uDpr.value, sy = window.scrollY, vh = window.innerHeight;
+        const pr = uDpr.value, sy = window.scrollY, vh = VP.h;
         let n = 0;
         const put = (x, y, w, h) => { if (n >= SCRIM_MAX) return; uScrim.array[n].set(x * pr, y * pr, w * pr, h * pr); n++; };
         fixed.forEach((r) => put(r[0], r[1], r[2], r[3]));
@@ -4765,7 +4817,7 @@ const Place = (() => {
     });
     const ndc = new THREE.Vector3(), rayDir = new THREE.Vector3();
     function boardPoint(cx, cy) {
-      ndc.set((cx / window.innerWidth) * 2 - 1, -(cy / window.innerHeight) * 2 + 1, 0.5).unproject(camera);
+      ndc.set((cx / VP.w) * 2 - 1, -(cy / VP.h) * 2 + 1, 0.5).unproject(camera);
       rayDir.copy(ndc).sub(camera.position).normalize();
       if (Math.abs(rayDir.y) < 1e-6) return null;
       const t = -camera.position.y / rayDir.y;
@@ -5218,7 +5270,7 @@ const Place = (() => {
       S.lastScrollY = y; S.lastScrollT = t;
       if (S.reduced || S.tier === 0) renderOnce(); else wake();
     }, { passive: true });
-    window.addEventListener('resize', throttle(() => { resize(); focus.init = false; if (S.reduced || S.tier === 0) renderOnce(); else wake(); }, 100));
+    window.addEventListener('resize', throttle(() => { const w0 = VP.w, h0 = VP.h; resize(); if (VP.w !== w0 || VP.h !== h0) focus.init = false; if (S.reduced || S.tier === 0) renderOnce(); else wake(); }, 100));
     document.addEventListener('visibilitychange', () => { if (document.hidden) stopLoop(); else wake(); });
     if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => Scrim.measure()).observe(document.querySelector('main'));
     document.fonts && document.fonts.ready.then(() => Scrim.measure());
@@ -5326,7 +5378,7 @@ const Place = (() => {
       debug: {
         THREE, ctx, NL, SIM, S, FEATURES, camState, segMesh, perf, texStats, chunks, camera, scene, world, focus, slots, walkLog, bootLog, layers, ledState, disps, lanes, RECEIPTS, Scrim,
         get renderer() { return renderer; }, get pipeline() { return pipeline; }, get particles() { return particles; }, NPART,
-        get api() { return api; }, fillCap, cornersOnBoard, fillMemo, chipPulse, boardPoint, netsOf, subNetsOf: (v) => subNets[v], backbonePath,
+        get api() { return api; }, fitFor, footprint, cornersOnBoard, fitMemo, VP, setFitFrac: (f) => { FIT_FRAC = f; fitMemo.clear(); }, chipPulse, boardPoint, netsOf, subNetsOf: (v) => subNets[v], backbonePath,
         running: () => running, tweens: () => tweens.length, booting: () => !!booting, active: () => activeNow(nowMs()), events: () => events.length,
         uniforms: () => ({ now: uNow.value, fade: uFade.value, band: uBand.value, backdrop: uBackdrop.value, bootMs: uBootMs.value, expo: uExpo.value, dim: uDim.value, scrimCount: uScrimCount.value, pad: uPad.value, feather: uFeather.value, fringe: uFringe.value }),
         slotState: () => slots.map((s, i) => ({ i, busy: s.busy, end: s.end, kind: s.kind, u: uSlots.array[i].toArray() })),
@@ -5400,7 +5452,7 @@ const Place = (() => {
         },
         arrivals: (si) => { const row = si * TEXW * 4; const out = new Float32Array(nS * 2); for (let i = 0; i < nS; i++) { out[i * 2] = slotData[row + i * 4]; out[i * 2 + 1] = slotData[row + i * 4 + 1]; } return out; },
         hitTest: (x, y) => { const c = hitTest(x, y); return c ? c.ref : null; },
-        project(ref) { const c = C(ref); const v = new THREE.Vector3(c.x / 100, 0.12, (c.y - 400) / 100).project(camera); return { x: (v.x + 1) / 2 * window.innerWidth, y: (1 - v.y) / 2 * window.innerHeight, z: v.z }; },
+        project(ref) { const c = C(ref); const v = new THREE.Vector3(c.x / 100, 0.12, (c.y - 400) / 100).project(camera); return { x: (v.x + 1) / 2 * VP.w, y: (1 - v.y) / 2 * VP.h, z: v.z }; },
         setTime(ms) { uNow.value = ms / 1000; },
         async setComponents(on) {
           componentsOn = on;
