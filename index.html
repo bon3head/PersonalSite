@@ -1430,7 +1430,7 @@ const Motion = (() => {
           }
           return railY[railY.length - 1][1];
         };
-        ScrollTrigger.create({ start: 0, end: 'max', onRefresh: (s) => { railMeasure(); Place.setRail(railAt(s.scroll())); }, onUpdate: (s) => Place.setRail(railAt(s.scroll())) });
+        ScrollTrigger.create({ start: 0, end: 'max', onRefresh: (s) => { railMeasure(); Place.setRailAnchors(railY); Place.setRail(railAt(s.scroll())); }, onUpdate: (s) => Place.setRail(railAt(s.scroll())) });
         // Timeline progress line, scrubbed (scrub: true, brief §5.3).
         gsap.fromTo('#tl-fill', { scaleY: 0 }, { scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#tl', start: 'top 75%', end: 'bottom 60%', scrub: true } });
         // Dossier row media parallax, capped at ±6% (vestibular-safe, spec §8).
@@ -3551,13 +3551,13 @@ const Place = (() => {
   const S = {
     view: 'home', tier: 2, reduced: false, live: false, renderer: 'pending',
     scroll: { current: 0, target: 0 }, flow: 0, flowTarget: 0, lastScrollY: 0, lastScrollT: 0,
-    rail: { current: 0, target: 0 }, hero: 0,
+    rail: { current: 0, target: 0 }, railY: { current: 0, target: 0 }, hero: 0,
     dossier: { leaflink: { state: 0, tps: 0 }, sidequests: { state: 0, tps: 0 } },
     about: { focus: -1, fab: false },
     probe: null, hover: null, dim: 1,
   };
   const tweens = [];
-  let api = null;
+  let api = null, pendingAnchors = null;
   function tween(dur, fn, done) {
     const tw = { t0: nowMs(), dur: dur * 1000, fn, done };
     if (S.reduced || dur <= 0) { fn(1, 1); if (done) done(); return tw; }
@@ -4164,11 +4164,14 @@ const Place = (() => {
     const SCRIM_MAX = 32;
     const uScrim = uniformArray(Array.from({ length: SCRIM_MAX }, () => new THREE.Vector4(-10, -10, 0, 0)), 'vec4');
     const uScrimCount = uniform(0);
-    const uPad = uniform(24), uFeather = uniform(96), uScrimK = uniform(1);
+    const uPad = uniform(24), uFeather = uniform(96), uScrimK = uniform(1), uSeat = uniform(0);
+    const SILK = vec3(0.16, 0.16, 0.16);
     const BG0s = vec3(7 / 255, 3 / 255, 4 / 255), BG1s = vec3(20 / 255, 20 / 255, 20 / 255);
-    const scrimNode = Fn(([col]) => {
+    // the seating terms are compiled in only below 1100px (the pipeline is rebuilt when the canvas crosses it), so
+    // the desktop shader is the one it was
+    const scrimNode = (seat) => Fn(([col]) => {
       const p = screenCoordinate.xy;
-      const r = float(0).toVar();
+      const r = float(0).toVar(), dMin = float(1e6).toVar();
       const pad = uPad.mul(uDpr), feather = max(uFeather.mul(uDpr).mul(uScrimK), 0.001), rad = float(3).mul(uDpr);
       Loop(SCRIM_MAX, ({ i }) => {
         If(float(i).lessThan(uScrimCount), () => {
@@ -4177,6 +4180,7 @@ const Place = (() => {
           const q = abs(p.sub(c)).sub(half).add(rad);
           const d = length(max(q, 0)).add(min(max(q.x, q.y), 0)).sub(rad);
           r.assign(max(r, float(1).sub(smoothstep(0, feather, d))));
+          if (seat) dMin.assign(min(dMin, d));
         });
       });
       const lum = dot(col.rgb, vec3(0.2126, 0.7152, 0.0722));
@@ -4184,11 +4188,25 @@ const Place = (() => {
       const outside = col.rgb.mul(uExpo).mul(uDim);
       const o = mix(outside, inked, r);
       const core = step(0.999, r);
-      const capped = select(core.greaterThan(0.5), min(o, BG1s), o);
+      const capped0 = select(core.greaterThan(0.5), min(o, BG1s), o);
+      let capped = capped0;
+      if (seat) {
+        // Seating (below 1100px): each box is a footprint on the board. A silkscreen outline runs just outside its
+        // core, and where copper meets that outline it lands on a pad, lit at the copper's own colour, so traces
+        // run into the box instead of fading out under it. Both sit outside the core: the copy's ground is
+        // unchanged (#141414 cap).
+        const px1 = uDpr, outC = dMin.greaterThan(0);
+        const silk = select(outC, float(1).sub(smoothstep(px1.mul(1.25), px1.mul(2.25), dMin)), float(0)).mul(uSeat).mul(uScrimK);
+        const copper = smoothstep(0.08, 0.2, lum);
+        const padBand = select(outC, float(1).sub(smoothstep(px1.mul(3), px1.mul(4.5), dMin)), float(0)).mul(copper).mul(uSeat).mul(uScrimK);
+        const seated = mix(max(capped0, SILK.mul(silk)), max(capped0, min(col.rgb.mul(1.6), vec3(1))), padBand);
+        capped = select(core.greaterThan(0.5), capped0, seated);
+      }
       // fullBleed kill (§1.5): outside the v2 windows the copy sits over flat #070304
       return vec4(select(uFull.greaterThan(0.5), capped, mix(BG0s, capped, inStage)), 1);
     });
 
+    let seatBuilt = false;
     function buildPipeline() {
       if (pipeline) { try { pipeline.dispose(); } catch {} }
       pipeline = new THREE.RenderPipeline(renderer);
@@ -4197,7 +4215,8 @@ const Place = (() => {
       const col = scenePass.getTextureNode('output');
       const lit = bloomOn ? col.add(bloom(col, 0.35, 0.2, 0.9)) : col;
       const display = fxaa(renderOutput(lit));
-      pipeline.outputNode = scrimNode(display);
+      seatBuilt = VP.w < 1100;
+      pipeline.outputNode = scrimNode(seatBuilt)(display);
       registerTargets();
     }
     function registerTargets() {
@@ -4390,14 +4409,17 @@ const Place = (() => {
       // 01 receipts: U3 and the start of the backbone, from between the rig and U3. The terminal's anchor (J_DBG)
       // sits left of the rig, so a waypoint past U3 made the camera run out and straight back on the way there.
       { x: (P('U2').x + P('U3').x) / 2 - 0.2, z: 0.6, fw: 10, fh: 6 },
-      { x: P('J_DBG').x, z: P('J_DBG').z - 0.4, fw: 7.5, fh: 5 },        // 02 terminal: the debug port
+      // 02 terminal: the debug port. Below 1100px (px) the rail runs down the screen and must not turn back, so the
+      // shot sits 6 units on, which puts J_DBG just above the terminal box with its lines running down into it.
+      { x: P('J_DBG').x, px: P('J_DBG').x + 6, z: P('J_DBG').z - 0.4, fw: 7.5, fh: 5 },
       { x: 30, z: 0, fw: 11, fh: 6.4 },                                  // 03 dossiers: LeafLink
       { x: 60, z: 0, fw: 11, fh: 6.4 },                                  //             SideQuests
       // 04 timeline: the repeater at 88 (portrait: 2 units on, which puts it in the window band with its bus)
       { x: P('U_R3').x, px: P('U_R3').x + 2, z: 1.8, fw: 9, fh: 6 },
-      // 05 contact: J1. In portrait (px) the window band under the copy holds the line driver and its filter, with
-      // the output traces running down to J1; centred on J1 itself it held the bare copper past the connector.
-      { x: P('J1').x, px: P('U_CD').x - 2, z: 2.4, fw: 8, fh: 6 },
+      // 05 contact: J1. Below 1100px (px) the shot opens on the line driver's feed and its filter, and the contact
+      // page then carries the board on down the output traces to J1; centred on J1 itself it held only the long
+      // finger traces, with no part in frame on a landscape phone.
+      { x: P('J1').x, px: P('U_CD').x - 8, z: 2.4, fw: 8, fh: 6 },
     ];
     const railX = new THREE.CatmullRomCurve3(RAIL.map((w) => new THREE.Vector3(w.x, 0, w.z)), false, 'centripetal');
     const railXP = new THREE.CatmullRomCurve3(RAIL.map((w) => new THREE.Vector3(w.px ?? w.x, 0, w.z)), false, 'centripetal');
@@ -4407,6 +4429,24 @@ const Place = (() => {
       const i = Math.min(n - 1, Math.floor(uu)), f = uu - i;
       return { tx: p.x, tz: p.z, fw: lerp(RAIL[i].fw, RAIL[i + 1].fw, f), fh: lerp(RAIL[i].fh, RAIL[i + 1].fh, f) };
     }
+    // Phones and tablets (below 1100px): the rail is a function of scrollY itself, read in the frame that draws it,
+    // so the board cannot lag a momentum fling or catch up after it. Between the section anchors it is a monotone
+    // cubic (Fritsch-Carlson) whose slope at each anchor is the page's own speed: a section's circuit docks under
+    // it moving 1:1 with the copy, and the board covers the distance to the next waypoint between sections, never
+    // reversing. Before the first anchor and past the last it keeps its end speed.
+    let railAnchors = (pendingAnchors || []).filter((a) => a && Number.isFinite(a[0])).map((a) => [a[0], a[1]]);
+    const railXs = () => railAnchors.map(([, i]) => RAIL[i].px ?? RAIL[i].x);
+    function railHermite(y, pxPerUnit) {
+      const A = railAnchors, n = A.length, X = railXs(), r1 = 1 / Math.max(1e-3, pxPerUnit);
+      const dl = (k) => (X[k + 1] - X[k]) / (A[k + 1][0] - A[k][0]);
+      const slope = (k) => { const a = k > 0 ? dl(k - 1) : r1, b = k < n - 1 ? dl(k) : r1; return a <= 0 || b <= 0 ? 0 : Math.min(r1, 3 * a, 3 * b); };
+      if (y <= A[0][0]) return X[0] + (y - A[0][0]) * slope(0);
+      if (y >= A[n - 1][0]) return X[n - 1] + (y - A[n - 1][0]) * slope(n - 1);
+      let k = 0; while (k < n - 2 && y > A[k + 1][0]) k++;
+      const h = A[k + 1][0] - A[k][0], t = (y - A[k][0]) / h, t2 = t * t, t3 = t2 * t;
+      return (2 * t3 - 3 * t2 + 1) * X[k] + (t3 - 2 * t2 + t) * h * slope(k) + (-2 * t3 + 3 * t2) * X[k + 1] + (t3 - t2) * h * slope(k + 1);
+    }
+    const mobileLock = () => VP.w < 1100 && FEATURES.scrollRail && !S.reduced;
     const focus = { x: 0, y: 0, w: 1, h: 1, init: false };
     function focusTarget() {
       const vw = VP.w, vh = VP.h, navH = 56;
@@ -4416,11 +4456,10 @@ const Place = (() => {
         if (r && r.width > 0) return { x: r.left, y: navH, w: r.width, h: vh - navH };
         return { x: vw * 0.5, y: navH, w: vw * 0.5, h: vh - navH };
       }
-      // Below 1100px the window band scrolls with the copy, so tracking it re-framed the camera on every scroll
-      // frame. The focus zone is the canvas below the nav, fixed while scrolling, with the subject at 72% of its
-      // height, in the window band under the copy.
-      const h = vh - navH;
-      return { x: 0, y: navH + h * 0.22, w: vw, h };
+      // Below 1100px the focus zone is the whole canvas, fixed while scrolling: the subject sits at the viewport
+      // centre, where the section that owns it is centred when its anchor is reached, so the box is seated on its
+      // circuit instead of above an empty band.
+      return { x: 0, y: 0, w: vw, h: vh };
     }
     function stepFocus(dt) {
       const t = focusTarget();
@@ -4443,9 +4482,29 @@ const Place = (() => {
     };
     function restPose(view) {
       let tx = 0, tz = 0, fw = 10.4, fh = 6, dolly = 1;
+      const aspect = Math.max(0.2, focus.w / Math.max(1, focus.h));
+      const vt = Math.tan((camera.fov * Math.PI) / 360), ht = vt * aspect;
+      const composed = (w, h) => Math.max(h / 2 / vt, w / 2 / ht);
+      // Below 1100px the camera turns a quarter so the board's long axis runs down the screen: the rail then moves
+      // the board the way the page scrolls (up), instead of panning it sideways. Contact is the rail's last shot,
+      // J1 under the copy, on every viewport below 1100px (its desktop pose looks along the output trace past the
+      // board's end, which a narrow frame turns into a sliver of board in the void). Not the 404: its void pose
+      // keeps the board edge level across the frame.
+      const mob = VP.w < 1100;
+      const yaw = mob && view !== 'notfound';
+      const railShot = view === 'home' || (mob && view === 'contact');
+      const d0 = railShot ? DIR.home : DIR[view] || DIR.home;
+      const d = (yaw ? new THREE.Vector3(d0[2], d0[1], -d0[0]) : new THREE.Vector3(...d0)).normalize();
+      const fill = FILL_VIEWS.has(view) || railShot;
+      // one tilt per view (home: the whole rail), so scrolling never changes the camera's angle
+      const ref = railShot ? Math.max(...RAIL.map((w) => composed(w.fw, w.fh))) : view === 'about' ? composed(10.4, 7) : composed(7.4, 6.2);
+      const f = fill ? fitFor(railShot ? 'home' : view, d, ref, yaw ? MOBILE_E : 0) : null;
+      const lock = railShot && mobileLock() && railAnchors.length > 1;
+      // screen px per board unit along the rail (yawed, the rail runs down the screen)
+      const pxPerUnit = lock ? VP.h / ((f.fp.x1 - f.fp.x0) * f.maxDist) : 1;
       if (view === 'home') {
-        const rp = railPose(FEATURES.scrollRail ? S.rail.current : 0, VP.w < 1100 && focus.w < focus.h);
-        tx = rp.tx; tz = rp.tz; fw = rp.fw; fh = rp.fh;
+        if (lock) { tx = railHermite(S.railY.current, pxPerUnit); tz = 0; }
+        else { const rp = railPose(FEATURES.scrollRail ? S.rail.current : 0, yaw); tx = rp.tx; tz = rp.tz; fw = rp.fw; fh = rp.fh; }
         if (S.rail.current < 1) dolly = 1 - 0.1 * S.hero;
       } else if (AN.clusters[view]) {
         const cl = AN.clusters[view];
@@ -4455,38 +4514,28 @@ const Place = (() => {
       } else if (view === 'about') {
         if (S.about.fab) { tx = AN.rig.fab.x / 100; tz = (AN.rig.fab.y - 400) / 100; fw = 6.4; fh = 3.4; }
         else { const ics = [AN.rig.U1, AN.rig.U2, AN.rig.U3]; tx = S.about.focus >= 0 ? P(ics[S.about.focus]).x * 0.3 : 0; fw = 10.4; fh = 7; }
+      } else if (view === 'contact' && mob) {
+        // the rail's last waypoint at the top of the page, then moving 1:1 with it toward J1 and the board's end
+        const last = RAIL[RAIL.length - 1];
+        tx = (last.px ?? last.x) + (lock ? S.railY.current / pxPerUnit : FEATURES.scrollRail ? (S.scroll.current - 0.5) * 0.5 : 0); tz = 0;
+        fw = last.fw; fh = last.fh;
       } else if (view === 'contact') {
         const drift = FEATURES.scrollRail ? (S.scroll.current - 0.5) * (S.tier === 1 ? 0.5 : 1) : 0;
         tx = P('J1').x - 3 + drift; tz = 2.1; fw = 6.5; fh = 7.5;
       } else if (view === 'notfound') { tx = P('J1').x; tz = -7; fw = 10; fh = 6; }
       if (camState.push && view === 'home') { const k = camState.push.k; tx = lerp(tx, P(AN.rig.U2).x, k); tz = lerp(tz, P(AN.rig.U2).z, k); fw = lerp(fw, 5.2, k); fh = lerp(fh, 3.4, k); }
-      const aspect = Math.max(0.2, focus.w / Math.max(1, focus.h));
-      const vt = Math.tan((camera.fov * Math.PI) / 360), ht = vt * aspect;
-      const composed = (w, h) => Math.max(h / 2 / vt, w / 2 / ht);
       let dist = composed(fw, fh) * dolly;
-      // Portrait phones and tablets: the camera turns a quarter so the board's long axis runs down the screen. The rail then moves
-      // the board the way the page scrolls (up), instead of panning it sideways across a narrow frame. (Not the
-      // 404: its void pose keeps the board edge level across the frame.)
-      const yaw = VP.w < 1100 && focus.w < focus.h && view !== 'notfound';
-      // Portrait contact is the home rail's last shot, J1 in the window band. Its desktop pose looks along the
-      // output trace past the board's end, which a narrow frame turns into a sliver of board in the void.
-      const railShot = view === 'home' || (yaw && view === 'contact');
-      if (yaw && view === 'contact') { tx = RAIL[RAIL.length - 1].px + (FEATURES.scrollRail ? (S.scroll.current - 0.5) * 0.5 : 0); tz = 0; }
-      const d0 = yaw && view === 'contact' ? DIR.home : DIR[view] || DIR.home;
-      const d = (yaw ? new THREE.Vector3(d0[2], d0[1], -d0[0]) : new THREE.Vector3(...d0)).normalize();
       const target = new THREE.Vector3(tx, 0, tz);
-      if (FILL_VIEWS.has(view) || railShot) {
-        // one tilt per view (home: the whole rail), so scrolling never changes the camera's angle
-        const ref = railShot ? Math.max(...RAIL.map((w) => composed(w.fw, w.fh))) : view === 'about' ? composed(10.4, 7) : composed(fw, fh);
-        const f = fitFor(railShot ? 'home' : view, d, ref, yaw ? PORTRAIT_E : 0);
+      if (fill) {
         dist = Math.min(dist, f.maxDist); d.copy(f.dir);
         const fp = f.fp, bx0 = NL.board.x0 / 100 + FIT_M, bx1 = NL.board.x1 / 100 - FIT_M, bz = NL.board.h / 200 - 0.05 - FIT_M;
         target.x = Math.min(Math.max(target.x, bx0 - fp.x0 * dist), bx1 - fp.x1 * dist);
         target.z = Math.min(Math.max(target.z, -bz - fp.z0 * dist), bz - fp.z1 * dist);
-        lastFit.fp = fp; lastFit.dist = dist;
+        lastFit.fp = fp; lastFit.dist = dist; lastFit.pxPerUnit = pxPerUnit;
       }
       return { target, pos: target.clone().addScaledVector(d, dist) };
     }
+    const railMaxY = () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
     // Full bleed (§1.1, R4.1): the board, not the void past its edge, fills the viewport. For a fixed camera angle
     // the viewport's footprint on the board is one quadrilateral that scales with distance and moves with the look
     // target, so fill is solved in closed form: the distance is capped where the footprint fits the board, and the
@@ -4540,10 +4589,12 @@ const Place = (() => {
       return best;
     }
     let FIT_FRAC = 0.25;
-    // portrait shots look down at 55 degrees or steeper, so the far field (which a phone's copy covers anyway)
-    // never outruns the streamed chunks and every view is circuit from edge to edge
-    const PORTRAIT_E = (55 * Math.PI) / 180;
-    const lastFit = { fp: null, dist: 0 };
+    // Below 1100px the camera looks down at 80 degrees or steeper: the board reads as the sheet the copy is seated
+    // on, flat enough that a trace keeps its screen speed from the top of the frame to the bottom (so it can move
+    // 1:1 with the copy), with enough perspective left to stay a place. The far field never outruns the streamed
+    // chunks, and every view is circuit from edge to edge.
+    const MOBILE_E = (80 * Math.PI) / 180;
+    const lastFit = { fp: null, dist: 0, pxPerUnit: 1 };
     // QA: are all four viewport corners on the board for this pose?
     function cornersOnBoard(pos, target) {
       setProbe(pos, target);
@@ -4569,6 +4620,7 @@ const Place = (() => {
     function resize() {
       if (!renderer) return;
       measureVP();
+      if (pipeline && (VP.w < 1100) !== seatBuilt) buildPipeline();
       let pr = Math.min(window.devicePixelRatio || 1, dprCap);
       if (S.tier === 2) pr = Math.min(pr, Math.sqrt(4.2e6 / Math.max(1, VP.w * VP.h)));
       renderer.setPixelRatio(pr);
@@ -4654,7 +4706,9 @@ const Place = (() => {
         const v = document.documentElement.getAttribute('data-view');
         const pre = v === 'home' ? (sy < window.innerHeight * 0.9 ? PRESET.home : PRESET.sections) : PRESET[v] || PRESET.sections;
         const mobile = window.innerWidth < 820;
-        uPad.value = mobile ? 12 : pre[0]; uFeather.value = mobile ? 32 : pre[1]; uExpo.value = mobile ? 0.9 : pre[2];
+        // below 1100px (the single-column layout, where the camera rides the scroll) the boxes are seated on the board
+        const seat = seatBuilt;
+        uPad.value = mobile ? 12 : pre[0]; uFeather.value = seat ? 6 : pre[1]; uExpo.value = mobile ? 0.9 : pre[2]; uSeat.value = seat ? 1 : 0;
         return n;
       }
       return { measure, upload, get rects() { return rects; }, get fixed() { return fixed; } };
@@ -4882,15 +4936,16 @@ const Place = (() => {
       touchProbe = c.ref; touchScrollY = window.scrollY;
       chipPulse(c.ref); probe(c.ref);
     }, { passive: true });
-    window.addEventListener('scroll', () => { if (touchProbe && Math.abs(window.scrollY - touchScrollY) > window.innerHeight) { touchProbe = null; probe(null); } }, { passive: true });
+    window.addEventListener('scroll', () => { if (touchProbe && Math.abs(window.scrollY - touchScrollY) > window.innerHeight) { touchProbe = null; probe(null); } if (mobileLock()) wake(); }, { passive: true });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.probe) probe(null); });
 
     /* ==== frame loop: on demand, idle 30 fps, perf ladder (§8.1) ==== */
-    let lastFrame = 0, lastRender = 0, running = false, firstFrameDone = false, camMoving = false, prevActive = false;
+    let lastFrame = 0, lastRender = 0, running = false, firstFrameDone = false, camMoving = false, prevActive = false, camLocked = false;
     const perf = { samples: [], steps: [], hold: !!QA.holdTier, settle: 0, frameMs: [], lastMedian: null, frames: 0 };
     function activeNow(now) {
       return tweens.length > 0 || !!camState.flight || camMoving || !!booting || events.length > 0 ||
         Math.abs(S.rail.target - S.rail.current) > 1e-4 || Math.abs(S.scroll.target - S.scroll.current) > 1e-4 || S.flow > 1e-3 ||
+        (mobileLock() && window.scrollY !== S.railY.current) ||
         slots.some((s) => s.busy && s.end > now) || ledsTiming(now) || Object.values(dispState).some((t) => t > now);
     }
     function frame() {
@@ -4905,8 +4960,14 @@ const Place = (() => {
         if (!ambientOn) { stopLoop(); return; }
       }
       perf.frames++;
-      // one smoothing source for scroll (v2 §1.3)
-      const k = S.reduced ? 1 : 1 - Math.pow(0.9, dt / 16.67);
+      // one smoothing source for scroll (v2 §1.3). Below 1100px there is none: the board is drawn from the scroll
+      // position of the frame it is drawn in (with the scrims, which read the same scrollY), so under a momentum
+      // fling it rides the page instead of trailing it and catching up.
+      const lockNow = mobileLock();
+      const prevRailY = S.railY.current, prevScroll = S.scroll.current, prevRail = S.rail.current;
+      if (lockNow) { S.railY.target = window.scrollY; S.scroll.target = clamp01(window.scrollY / railMaxY()); }
+      S.railY.current = S.railY.target;
+      const k = S.reduced || lockNow ? 1 : 1 - Math.pow(0.9, dt / 16.67);
       S.scroll.current += (S.scroll.target - S.scroll.current) * k; if (Math.abs(S.scroll.target - S.scroll.current) < 1e-4) S.scroll.current = S.scroll.target;
       S.rail.current += (S.rail.target - S.rail.current) * k; if (Math.abs(S.rail.target - S.rail.current) < 1e-4) S.rail.current = S.rail.target;
       const fk = 1 - Math.pow(0.92, dt / 16.67);
@@ -4925,10 +4986,21 @@ const Place = (() => {
       Scrim.upload();
       if (!camState.flight) {
         const rp = restPose(S.view);
+        if (lockNow && camLocked) {
+          // the scroll-driven part of the pose moves the camera directly, the same frame; only the rest (a route's
+          // focus change, the hero push) goes through the spring
+          const cur = [S.railY.current, S.scroll.current, S.rail.current];
+          S.railY.current = prevRailY; S.scroll.current = prevScroll; S.rail.current = prevRail;
+          const rp0 = restPose(S.view);
+          [S.railY.current, S.scroll.current, S.rail.current] = cur;
+          restPose(S.view); // lastFit back to the current pose
+          camState.pos.add(rp.pos).sub(rp0.pos); camState.target.add(rp.target).sub(rp0.target);
+        }
+        camLocked = lockNow;
         const gap = camState.pos.distanceTo(rp.pos) + camState.target.distanceTo(rp.target);
         if (S.reduced || gap < 1e-4) { camState.pos.copy(rp.pos); camState.target.copy(rp.target); camState.vel.set(0, 0, 0); camState.velT.set(0, 0, 0); camMoving = false; }
         else { springVec(camState.pos, camState.vel, rp.pos, 0.12 * 3, dt / 1000); springVec(camState.target, camState.velT, rp.target, 0.12 * 3, dt / 1000); camMoving = true; }
-      } else stepFlight(now, dt);
+      } else { camLocked = false; stepFlight(now, dt); }
       camMoving = camMoving || fm;
       applyCamera();
       flushLayers(); flushLeds(now); flushDisps(now);
@@ -5322,6 +5394,7 @@ const Place = (() => {
       wake, go, renderOnce, term, wiringFor, menu, spawn, probe, scrim: () => Scrim.measure(),
       setScroll: ignoreWhenReduced((p) => { S.scroll.target = clamp01(p); wake(); }),
       setRail: (u) => { S.rail.target = u; if (S.reduced) { S.rail.current = u; renderOnce(); } else wake(); },
+      setRailAnchors: (ys) => { railAnchors = (ys || []).filter((a) => a && Number.isFinite(a[0])).map((a) => [a[0], a[1]]); if (S.reduced) renderOnce(); else wake(); },
       setHero: (p) => { heroProgress(p); wake(); },
       setDossier: (id, state, tps) => {
         const st = S.dossier[id];
@@ -5378,9 +5451,9 @@ const Place = (() => {
       debug: {
         THREE, ctx, NL, SIM, S, FEATURES, camState, segMesh, perf, texStats, chunks, camera, scene, world, focus, slots, walkLog, bootLog, layers, ledState, disps, lanes, RECEIPTS, Scrim,
         get renderer() { return renderer; }, get pipeline() { return pipeline; }, get particles() { return particles; }, NPART,
-        get api() { return api; }, fitFor, footprint, cornersOnBoard, fitMemo, VP, setFitFrac: (f) => { FIT_FRAC = f; fitMemo.clear(); }, chipPulse, boardPoint, netsOf, subNetsOf: (v) => subNets[v], backbonePath,
+        get api() { return api; }, fitFor, footprint, cornersOnBoard, fitMemo, VP, railHermite, get railAnchors() { return railAnchors; }, lastFit, mobileLock, setFitFrac: (f) => { FIT_FRAC = f; fitMemo.clear(); }, chipPulse, boardPoint, netsOf, subNetsOf: (v) => subNets[v], backbonePath,
         running: () => running, tweens: () => tweens.length, booting: () => !!booting, active: () => activeNow(nowMs()), events: () => events.length,
-        uniforms: () => ({ now: uNow.value, fade: uFade.value, band: uBand.value, backdrop: uBackdrop.value, bootMs: uBootMs.value, expo: uExpo.value, dim: uDim.value, scrimCount: uScrimCount.value, pad: uPad.value, feather: uFeather.value, fringe: uFringe.value }),
+        uniforms: () => ({ now: uNow.value, fade: uFade.value, band: uBand.value, backdrop: uBackdrop.value, bootMs: uBootMs.value, expo: uExpo.value, dim: uDim.value, scrimCount: uScrimCount.value, pad: uPad.value, feather: uFeather.value, seat: uSeat.value, fringe: uFringe.value }),
         slotState: () => slots.map((s, i) => ({ i, busy: s.busy, end: s.end, kind: s.kind, u: uSlots.array[i].toArray() })),
         ledsOn: () => [...ledState.entries()].filter(([r]) => dLed[ledIndex.get(r)] > 0).map(([r]) => r),
         steady: () => ({ segs: [...segSteady].reduce((a, v, i) => (v > 0 ? (a.push([i, v]), a) : a), []), rings: ringLevels.slice() }),
@@ -5515,6 +5588,7 @@ const Place = (() => {
     go(view, opts) { if (api) api.go(view, opts); },
     setScroll(p) { if (api && api.setScroll) api.setScroll(p); },
     setRail(u) { if (api && api.setRail) api.setRail(u); },
+    setRailAnchors(ys) { pendingAnchors = ys; if (api && api.setRailAnchors) api.setRailAnchors(ys); },
     setHero(p) { if (api && api.setHero) api.setHero(p); },
     setDossier(id, state, tps) { if (api && api.setDossier) api.setDossier(id, state, tps); },
     setAbout(focus, fab) { if (api && api.setAbout) api.setAbout(focus, fab); },
