@@ -302,7 +302,7 @@ main,.footer{position:relative;z-index:1}
 .sl-cu .nc{color:var(--ckt-pad)}
 .sl-mod{padding:24px;width:100%}
 @media (min-width:900px){.sl-mod{width:calc((100% - 264px) / 2 + 120px)}}
-.sl-title{font-size:var(--ckt-fs-sm);font-weight:600;line-height:24px;letter-spacing:0;color:var(--ckt-text-primary)}
+.sl-title{margin:0;font-family:var(--ckt-font-code);font-size:var(--ckt-fs-sm);font-weight:600;line-height:24px;letter-spacing:0;color:var(--ckt-text-primary)}
 .sl-lbl{font-size:12px;line-height:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--ckt-silkscreen);white-space:nowrap}
 a.sl-lbl{text-decoration:underline;text-underline-offset:3px}
 .sl-pins{display:flex;gap:20px;padding-left:26px}
@@ -316,11 +316,15 @@ a.sl-lbl{text-decoration:underline;text-underline-offset:3px}
 .sl[data-cu="on"][data-rowbreak] .sl-proof{top:calc(var(--y) * 1px - 12px);padding-top:36px}
 .sl:has(.sl-node:hover,a.sl-proof:hover,a.sl-proof:focus-visible) [data-net="RCPT"],
 .sl:has(.sl-pin[data-pin="2"]:is(a:hover,a:focus-visible)) [data-ref="MOD1.2"],
-.sl:has(.sl-pin[data-pin="3"]:is(a:hover,a:focus-visible)) [data-ref="MOD1.3"],
 .sl:has(.sl-title:hover) .pd[data-ref^="MOD1."]{--sl-c:var(--ckt-trace-hot)}
 .sl:has(.sl-node:active,a.sl-proof:active) [data-net="RCPT"] .pd:not(.nc) .core,
-.sl:has(.sl-pin[data-pin="2"]:is(a:active)) [data-ref="MOD1.2"] .core,
-.sl:has(.sl-pin[data-pin="3"]:is(a:active)) [data-ref="MOD1.3"] .core{fill:var(--ckt-trace-hot)}
+.sl:has(.sl-pin[data-pin="2"]:is(a:active)) [data-ref="MOD1.2"] .core{fill:var(--ckt-trace-hot)}
+
+/* Close the loop (iPhone review 2026-10-12): a falsifiability item is the keyboard twin of its test point on the
+   board. Probed, its rule turns into a copper tick; no text changes. */
+.falsify .tp-key{display:block;min-height:var(--ckt-touch-min);cursor:default}
+.falsify .tp-key:focus-visible{outline:2px solid var(--ckt-accent);outline-offset:3px;border-radius:var(--ckt-radius)}
+.falsify li[data-probed]::before{top:.38em;width:10px;height:5px;background:none;border-left:2px solid var(--ckt-accent);border-bottom:2px solid var(--ckt-accent);transform:rotate(-45deg)}
 
 /* Timeline (spec §5.1.4) */
 .tl{position:relative;padding-left:28px;max-width:880px}
@@ -530,15 +534,14 @@ dialog::backdrop{background:rgba(14,16,19,0.92)}
     <ol class="rows">
       <li class="row">
         <div class="wrap">
-          <div class="sl" data-scrim data-seat="module">
+          <div class="sl" data-scrim data-seat="module" data-project="leaflink">
             <!-- LeafLink slice (integration spec 2026-10-11). Its copper is drawn by moduleSVG() from the Module() netlist; no geometry is written here. -->
             <div class="sl-mod">
-              <p class="sl-title" data-sl="title">LeafLink</p>
+              <h3 class="sl-title" data-sl="title">LeafLink</h3>
               <!-- [owner fills]: LeafLink detail. When filled, the title becomes a disclosure button (aria-expanded, aria-controls) -->
             </div>
             <ul class="sl-pins">
-              <li><span class="sl-pin sl-lbl" data-pin="2">Live</span><!-- receipt TBD: Live link target (live demo URL) --></li>
-              <li><a class="sl-pin sl-lbl" data-sl="pin" data-pin="3" href="https://codeberg.org/bon3head/LeafLink" rel="noopener">Code</a></li>
+              <li><a class="sl-pin sl-lbl" data-sl="pin" data-pin="2" href="https://codeberg.org/bon3head/LeafLink" rel="noopener">Code</a></li>
             </ul>
             <div class="sl-row">
               <span class="sl-node sl-lbl" data-sl="node">Shipped</span>
@@ -551,11 +554,9 @@ dialog::backdrop{background:rgba(14,16,19,0.92)}
             <span class="row-num" data-parallax>01</span>
           </div>
           <div class="row-body" data-scrim>
-            <h3 class="row-title">LeafLink</h3>
             <dl class="facts">
               <div><dt class="micro">WHAT IT IS</dt><dd>Event discovery platform. Week-long hackathon, team of four, 2nd place.</dd></div>
               <!-- TBD: LeafLink failure class (pending Justin's confirmation) -->
-              <div><dt class="micro">RECEIPT</dt><dd><a class="link" href="https://codeberg.org/bon3head/LeafLink" rel="noopener">repo</a></dd></div>
             </dl>
             <p class="row-cta"><a class="btn" href="#/work/leaflink" aria-label="Read the dossier: LeafLink">Read the dossier</a></p>
           </div>
@@ -563,16 +564,29 @@ dialog::backdrop{background:rgba(14,16,19,0.92)}
       </li>
       <li class="row">
         <div class="wrap">
+          <div class="sl" data-scrim data-seat="module" data-project="sidequests">
+            <!-- SideQuests slice (integration spec 2026-10-11). Its copper is drawn by moduleSVG() from the Module() netlist; no geometry is written here. -->
+            <div class="sl-mod">
+              <h3 class="sl-title" data-sl="title">SideQuests</h3>
+              <!-- [owner fills]: SideQuests detail. When filled, the title becomes a disclosure button (aria-expanded, aria-controls) -->
+            </div>
+            <ul class="sl-pins">
+              <li><a class="sl-pin sl-lbl" data-sl="pin" data-pin="2" href="https://codeberg.org/bon3head/sidequests" rel="noopener">Code</a></li>
+            </ul>
+            <div class="sl-row">
+              <span class="sl-node sl-lbl" data-sl="node">Shipped</span>
+              <!-- [owner fills]: Shipped detail. When filled, Shipped becomes a disclosure button -->
+              <span class="sl-proof sl-lbl">Proof</span><!-- receipt TBD: Proof link target, flagged for Justin (which receipt: 2nd place proof or demo recording) -->
+            </div>
+          </div>
           <div class="row-media" aria-hidden="true" data-scrim>
             <svg viewBox="0 0 120 60" focusable="false"><g fill="none" stroke-width="1"><path d="M10 46 L60 14 L110 46" stroke="#e8a33d"/><circle cx="10" cy="46" r="5" stroke="#9aa3ad"/><circle cx="60" cy="14" r="5" stroke="#9aa3ad"/><circle cx="110" cy="46" r="5" stroke="#9aa3ad"/></g></svg>
             <span class="row-num" data-parallax>02</span>
           </div>
           <div class="row-body" data-scrim>
-            <h3 class="row-title">SideQuests</h3>
             <dl class="facts">
               <div><dt class="micro">WHAT IT IS</dt><dd>Peer-to-peer quest matching. Hack New Paltz, working MVP in 24 hours, 2nd place.</dd></div>
               <div><dt class="micro">FAILURE CLASS SURVIVED</dt><dd>Scope collapse under timebox</dd></div>
-              <div><dt class="micro">RECEIPT</dt><dd><a class="link" href="https://codeberg.org/bon3head/sidequests" rel="noopener">repo</a></dd></div>
             </dl>
             <p class="row-cta"><a class="btn" href="#/work/sidequests" aria-label="Read the dossier: SideQuests">Read the dossier</a></p>
           </div>
@@ -1361,49 +1375,53 @@ function boot() {
   };
   if (document.readyState === 'complete') afterLoad(); else window.addEventListener('load', afterLoad, { once: true });
 
-  /* ---- LeafLink slice (integration spec D5): Module() lays the copper out from three measured numbers (module width,
-     content height, receipt row width), moduleSVG() paints it, CSS reads the positions back. Core, so it stands when
-     three.js or GSAP never load. A failed validation draws no copper and counts a repair. ---- */
+  /* ---- Project slices (integration spec D5, one per row): Module() lays the copper out from three measured numbers
+     (module width, content height, receipt row width), moduleSVG() paints it, CSS reads the positions back. Core, so
+     it stands when three.js or GSAP never load. A failed validation draws no copper and counts a repair. ---- */
   const Slice = (() => {
-    const el = document.querySelector('.sl');
-    const debug = { layout: null, mnl: null, canon: null, hash: null, repairs: 0, why: null, ms: [] };
-    if (!el) return { debug };
-    const ENG = NETLIST_ENGINE(), mod = el.querySelector('.sl-mod'), down8 = (v) => Math.floor(v / 8) * 8;
-    const pin = (n) => el.querySelector(`.sl-pin[data-pin="${n}"]`), proofEl = el.querySelector('.sl-proof'), nodeEl = el.querySelector('.sl-node');
-    let last = '';
-    function layout() {
-      const rowW = el.clientWidth;
-      if (!rowW) return;
-      const t0 = performance.now();
-      const W = mod.getBoundingClientRect().width, contentH = mod.getBoundingClientRect().height - 48;
-      const hrefs = { live: pin(2).matches('a[href]'), code: pin(3).matches('a[href]'), proof: proofEl.matches('a[href]') };
-      const res = ENG.Module({ W, contentH, rowW, hrefs }, { grid: 8 });
-      const old = el.querySelector('svg.sl-cu');
-      debug.mnl = res.mnl; debug.why = res.why || null; debug.layout = res.mnl.layout;
-      if (!res.ok) { debug.repairs += 1; if (old) old.remove(); el.dataset.cu = 'off'; last = ''; return; }
-      const L = res.mnl.layout, cs = getComputedStyle(el);
-      const svg = NETLIST_PAINT(res.mnl).moduleSVG({ hole: cs.getPropertyValue('--ckt-bg-body').trim(), fill: cs.getPropertyValue('--ckt-bg-surface').trim() });
-      if (svg !== last || !old) { if (old) old.remove(); el.insertAdjacentHTML('afterbegin', svg); last = svg; }
-      const P = L.nodes.proof;
-      el.style.setProperty('--sl-e', L.E); el.style.setProperty('--sl-r', L.R); el.style.setProperty('--sl-h', P.y + (L.rowBreak ? 48 : 24));
-      pin(2).style.setProperty('--x', L.pins[1].x); pin(3).style.setProperty('--x', L.pins[2].x);
-      nodeEl.style.setProperty('--x', L.nodes.shipped.x); proofEl.style.setProperty('--x', P.x); proofEl.style.setProperty('--y', P.y);
-      el.toggleAttribute('data-rowbreak', L.rowBreak);
-      el.dataset.cu = 'on';
-      debug.canon = ENG.canonical(res.mnl); debug.hash = ENG.cyrb53(debug.canon).toString(16);
-      debug.ms.push(+(performance.now() - t0).toFixed(3)); if (debug.ms.length > 50) debug.ms.shift();
-    }
-    // a filled detail turns its label into a disclosure: the toggle is a synchronous attribute write, then a relayout
-    el.addEventListener('click', (e) => {
-      const b = e.target.closest('[aria-expanded][aria-controls]');
-      if (!b || !el.contains(b)) return;
-      const open = b.getAttribute('aria-expanded') !== 'true', d = document.getElementById(b.getAttribute('aria-controls'));
-      b.setAttribute('aria-expanded', String(open)); if (d) d.hidden = !open;
+    const ENG = NETLIST_ENGINE();
+    const all = [...document.querySelectorAll('.sl')].map((el) => {
+      const debug = { project: el.dataset.project, layout: null, mnl: null, canon: null, hash: null, repairs: 0, why: null, ms: [] };
+      const mod = el.querySelector('.sl-mod'), code = el.querySelector('.sl-pin[data-pin="2"]'), proofEl = el.querySelector('.sl-proof'), nodeEl = el.querySelector('.sl-node');
+      let last = '';
+      function layout() {
+        const rowW = el.clientWidth;
+        if (!rowW) return;
+        const t0 = performance.now();
+        const W = mod.getBoundingClientRect().width, contentH = mod.getBoundingClientRect().height - 48;
+        const hrefs = { code: code.matches('a[href]'), proof: proofEl.matches('a[href]') };
+        const res = ENG.Module({ W, contentH, rowW, hrefs, anchor: el.dataset.project }, { grid: 8 });
+        const old = el.querySelector('svg.sl-cu');
+        debug.mnl = res.mnl; debug.why = res.why || null; debug.layout = res.mnl.layout;
+        if (!res.ok) { debug.repairs += 1; if (old) old.remove(); el.dataset.cu = 'off'; last = ''; return; }
+        const L = res.mnl.layout, cs = getComputedStyle(el);
+        const svg = NETLIST_PAINT(res.mnl).moduleSVG({ hole: cs.getPropertyValue('--ckt-bg-body').trim(), fill: cs.getPropertyValue('--ckt-bg-surface').trim() });
+        if (svg !== last || !old) { if (old) old.remove(); el.insertAdjacentHTML('afterbegin', svg); last = svg; }
+        const P = L.nodes.proof;
+        el.style.setProperty('--sl-e', L.E); el.style.setProperty('--sl-r', L.R); el.style.setProperty('--sl-h', P.y + (L.rowBreak ? 48 : 24));
+        code.style.setProperty('--x', L.pins[1].x);
+        nodeEl.style.setProperty('--x', L.nodes.shipped.x); proofEl.style.setProperty('--x', P.x); proofEl.style.setProperty('--y', P.y);
+        el.toggleAttribute('data-rowbreak', L.rowBreak);
+        el.dataset.cu = 'on';
+        debug.canon = ENG.canonical(res.mnl); debug.hash = ENG.cyrb53(debug.canon).toString(16);
+        debug.ms.push(+(performance.now() - t0).toFixed(3)); if (debug.ms.length > 50) debug.ms.shift();
+      }
+      // a filled detail turns its label into a disclosure: the toggle is a synchronous attribute write, then a relayout
+      el.addEventListener('click', (e) => {
+        const b = e.target.closest('[aria-expanded][aria-controls]');
+        if (!b || !el.contains(b)) return;
+        const open = b.getAttribute('aria-expanded') !== 'true', d = document.getElementById(b.getAttribute('aria-controls'));
+        b.setAttribute('aria-expanded', String(open)); if (d) d.hidden = !open;
+        layout();
+      });
+      new ResizeObserver(() => layout()).observe(el);
       layout();
+      return { el, debug, layout };
     });
-    new ResizeObserver(() => layout()).observe(el);
-    layout();
-    return { debug, layout };
+    // the first slice's record stays the top-level debug object (harness compatibility); every slice is in .all
+    const debug = all.length ? all[0].debug : { layout: null, mnl: null, canon: null, hash: null, repairs: 0, why: null, ms: [] };
+    Object.defineProperty(debug, 'all', { value: all.map((x) => x.debug), enumerable: false });
+    return { debug, layout: () => all.forEach((x) => x.layout()) };
   })();
 
   window.__jp = { route, run, refreshGalleries, place: () => Place.debug, motion: () => Motion.debug, slice: () => Slice.debug }; // read-only hooks for the QA harness
@@ -1801,6 +1819,7 @@ function NETLIST_ENGINE() {
     return { pads, body: { w: 0, h: 0 }, kind: 'module', keep: false };
   }
   FP.CAST3 = castle(3, 64);
+  FP.CAST2 = castle(2, 64);
   FP.TPV = { pads: [{ n: 1, dx: 0, dy: 0, dir: -1, w: 20, h: 20, shape: 'round', th: true }], body: { w: 28, h: 28 }, kind: 'tp', keep: false };
 
   // exact pad copper: a circle for round pads, the true rectangle otherwise (fingers hang down from the pin point)
@@ -3148,10 +3167,10 @@ function NETLIST_ENGINE() {
   }
 
   /* ======================================================================
-     Module (integration spec D2): the LeafLink slice as a module netlist in the board's schema, laid out in CSS px
+     Module (integration spec D2): a project slice (LeafLink, SideQuests) as a module netlist in the board's schema, laid out in CSS px
      on an 8px lattice from three measured numbers (module width, content height, receipt row width). One driver
      (castellated pin 1) feeds net RCPT down, one 45-degree jog, east to the Shipped junction and on to Proof.
-     Live and Code are edge pins: their mating side is the link target, so each sits alone on its net with no copper
+     Code is an edge pin: its mating side is the link target, so it sits alone on its net with no copper
      beyond the pad (the one named V7 exemption). Validation mirrors V1 to V4 and V7; a failure returns ok: false and
      the slice draws no copper. Not merged into the board netlist: the board hash, K3 and the seed battery are untouched.
      ====================================================================== */
@@ -3163,7 +3182,7 @@ function NETLIST_ENGINE() {
     // the receipt row sits 80 below the edge: pin labels (E+8 to E+24) and row labels (R-40 to R-24) keep the label
     // clearance to every pad, Proof's 10px ring included, and the 44px hit boxes never meet
     const R = E + 80;
-    const fpC = FP.CAST3, pins = fpC.pads.map((f) => ({ n: f.n, x: f.dx, y: E }));
+    const fpC = FP.CAST2, anchor = layout.anchor || 'leaflink', pins = fpC.pads.map((f) => ({ n: f.n, x: f.dx, y: E }));
     const rowBreak = rowW - 48 - 22 < JX + 40 + 8;
     const Xp = rowBreak ? JX + 64 : rowW - 48, Ry = rowBreak ? R + 64 : R;
     const pts = [[48, E], [48, E + 56], [72, R], [JX, R]];
@@ -3171,23 +3190,24 @@ function NETLIST_ENGINE() {
     const segs = [];
     for (let i = 1; i < pts.length; i++) segs.push({ l: 'F', a: pts[i - 1], b: pts[i] });
     for (let i = 1; i < tail.length; i++) segs.push({ l: 'F', a: tail[i - 1], b: tail[i] });
-    const live = !!hrefs.live, code = !!hrefs.code, proof = !!hrefs.proof;
+    // two castellations (iPhone review 2026-10-12: the Live pin is cut, no project is live): pin 1 drives the
+    // receipt net, pin 2 is the Code edge pin
+    const code = !!hrefs.code, proof = !!hrefs.proof;
     const comps = [
-      { ref: 'MOD1', fp: 'CAST3', x: 0, y: E, rot: 0, role: 'module', anchor: 'leaflink', pins: [{ n: 1, fn: 'out', net: 'RCPT' }, { n: 2, fn: 'edge', net: 'LIVE' }, { n: 3, fn: 'edge', net: 'CODE' }] },
-      { ref: 'JN1', fp: 'TP', x: JX, y: R, rot: 0, role: 'junction', anchor: 'leaflink', pins: [{ n: 1, fn: 'pass', net: 'RCPT' }] },
-      { ref: 'PRF1', fp: 'TPV', x: Xp, y: Ry, rot: 0, role: 'proof', anchor: 'leaflink', pins: [{ n: 1, fn: 'in', net: 'RCPT' }] },
+      { ref: 'MOD1', fp: 'CAST2', x: 0, y: E, rot: 0, role: 'module', anchor, pins: [{ n: 1, fn: 'out', net: 'RCPT' }, { n: 2, fn: 'edge', net: 'CODE' }] },
+      { ref: 'JN1', fp: 'TP', x: JX, y: R, rot: 0, role: 'junction', anchor, pins: [{ n: 1, fn: 'pass', net: 'RCPT' }] },
+      { ref: 'PRF1', fp: 'TPV', x: Xp, y: Ry, rot: 0, role: 'proof', anchor, pins: [{ n: 1, fn: 'in', net: 'RCPT' }] },
     ];
     const nets = [
       { id: 'RCPT', cls: 'signal', width: W_SIG, pins: ['MOD1.1', 'JN1.1', 'PRF1.1'], segs, vias: [] },
-      { id: 'LIVE', cls: 'signal', width: W_SIG, pins: ['MOD1.2'], segs: [], vias: [], nc: !live },
-      { id: 'CODE', cls: 'signal', width: W_SIG, pins: ['MOD1.3'], segs: [], vias: [], nc: !code },
+      { id: 'CODE', cls: 'signal', width: W_SIG, pins: ['MOD1.2'], segs: [], vias: [], nc: !code },
     ];
-    const footprints = { CAST3: { ...fpC, body: { w: W, h: E } }, TP: FP.TP, TPV: FP.TPV };
+    const footprints = { CAST2: { ...fpC, body: { w: W, h: E } }, TP: FP.TP, TPV: FP.TPV };
     // labels are DOM text; their boxes (12px mono caps, nominal 9px advance) are keep-outs for copper
     const box = (cx, top, s) => ({ x0: cx - LW(s) / 2, y0: top, x1: cx + LW(s) / 2, y1: top + LBL + 4 });
-    const labels = [box(pins[1].x, E + 8, 'Live'), box(pins[2].x, E + 8, 'Code'), box(JX, R - 40, 'Shipped'), rowBreak ? box(Xp, Ry + 24, 'Proof') : box(Xp, R - 40, 'Proof')];
+    const labels = [box(pins[1].x, E + 8, 'Code'), box(JX, R - 40, 'Shipped'), rowBreak ? box(Xp, Ry + 24, 'Proof') : box(Xp, R - 40, 'Proof')];
     const mnl = { version: 3, kind: 'module', grid: G, footprints, components: comps, nets, labels: [],
-      layout: { W, E, R, rowW, pins, outline: { x0: 0, y0: 0, x1: W, y1: E, k: 8 }, nodes: { shipped: { x: JX, y: R }, proof: { x: Xp, y: Ry } }, rowBreak, keepouts: labels, hrefs: { live, code, proof } },
+      layout: { W, E, R, rowW, pins, outline: { x0: 0, y0: 0, x1: W, y1: E, k: 8 }, nodes: { shipped: { x: JX, y: R }, proof: { x: Xp, y: Ry } }, rowBreak, keepouts: labels, hrefs: { code, proof } },
       meta: { repairs: 0 } };
     const why = moduleCheck(mnl);
     if (why) { mnl.meta.repairs = 1; return { ok: false, why, mnl }; }
@@ -3892,10 +3912,16 @@ const Place = (() => {
     if (!reducedNow() && img.getAttribute('src')) { img.style.opacity = '0'; setTimeout(() => { swap(); img.style.opacity = ''; }, 100); } else swap();
   }
 
+  // WebKit (Safari, and every iOS browser) runs on the WebGL2 backend: on iPhone the WebGPU path showed the whole
+  // frame encoded to sRGB twice (canvas #0e1013 read back as #42474d, iPhone review 2026-10-12), and WebGL2 is the
+  // backend every QA lane measures. ?gpu=webgpu or ?gpu=webgl overrides the choice for on-device comparison.
+  const isWebKit = () => { const ua = navigator.userAgent || ''; return /iPhone|iPad|iPod/.test(ua) || (/AppleWebKit/.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Android/.test(ua)); };
   async function detect() {
     if (QA.noGL) return { webgpu: false, webgl2: false };
+    let gpuPref = null;
+    try { gpuPref = new URLSearchParams(location.search).get('gpu'); } catch {}
     let webgpu = false;
-    try { if (navigator.gpu) webgpu = !!(await navigator.gpu.requestAdapter()); } catch { webgpu = false; }
+    try { if (navigator.gpu && gpuPref !== 'webgl' && (gpuPref === 'webgpu' || QA.webgpu || !isWebKit())) webgpu = !!(await navigator.gpu.requestAdapter()); } catch { webgpu = false; }
     let webgl2 = false;
     try { webgl2 = !!document.createElement('canvas').getContext('webgl2'); } catch { webgl2 = false; }
     return { webgpu, webgl2 };
@@ -4006,10 +4032,40 @@ const Place = (() => {
       return mix(float(0.25), float(1), smoothstep(pt, pt.add(250), uBootMs));
     });
     const inStage = step(uStage.x, screenCoordinate.x).mul(step(screenCoordinate.x, uStage.x.add(uStage.z))).mul(step(uStage.y, screenCoordinate.y)).mul(step(screenCoordinate.y, uStage.y.add(uStage.w)));
+    // chunk materials are pooled: a released chunk hands its material to the next one and only the texture node's
+    // value changes, so streaming never compiles a shader mid-scroll (a fresh material per chunk linked a new
+    // program each time, a visible hitch on phones)
+    const matPool = [];
     function chunkMat(tex) {
+      const pooled = matPool.pop();
+      if (pooled) { pooled.userData.texNode.value = tex; return pooled; }
       const m = new THREE.MeshBasicNodeMaterial({ depthWrite: true });
-      m.colorNode = texture(tex).rgb.mul(boardExpo()).mul(uFade);
+      const texNode = texture(tex);
+      m.colorNode = texNode.rgb.mul(boardExpo()).mul(uFade);
+      m.userData.texNode = texNode;
       return m;
+    }
+    // two spare chunk materials, linked in the first idle moment after the board appears (iPhone review 2026-10-12:
+    // a material linked mid-scroll is a stall, and crossing a chunk border on the phone briefly keeps one more chunk
+    // live than the pool holds). Each renders once as a sub-pixel quad under the board, then waits in the pool.
+    let warm = false;
+    function warmUp(tex) {
+      if (warm || S.tier < 1) return;
+      warm = true;
+      const idle = window.requestIdleCallback || ((f) => setTimeout(f, 200));
+      const go = () => {
+        if (!renderer || S.tier < 1) return;
+        if (!S.live) { setTimeout(go, 250); return; }
+        const spares = S.tier !== 1 ? [] : [0, 1].map(() => {
+          const m = new THREE.Mesh(new THREE.PlaneGeometry(0.001, 0.001).rotateX(-Math.PI / 2), chunkMat(tex));
+          m.position.set(camState.target.x, -0.01, camState.target.z);
+          world.add(m);
+          return m;
+        });
+        renderOnce();
+        setTimeout(() => spares.forEach((m) => { world.remove(m); m.geometry.dispose(); matPool.push(m.material); }), 250);
+      };
+      idle(go, { timeout: 2000 });
     }
     function wantChunk(k, prio = false) {
       const key = 'c' + k;
@@ -4032,7 +4088,7 @@ const Place = (() => {
       const c = chunks.get(key);
       if (!c) return;
       world.remove(c.mesh);
-      c.mesh.geometry.dispose(); c.mesh.material.dispose(); c.tex.dispose();
+      c.mesh.geometry.dispose(); matPool.push(c.mesh.material); c.tex.dispose();
       if (c.kind === 'detail') texStats.detailBytes -= c.bytes; else { texStats.chunkBytes -= c.bytes; texStats.chunks--; }
       unreg('chunk:' + key);
       chunks.delete(key);
@@ -4071,22 +4127,56 @@ const Place = (() => {
         reg('chunk:' + job.key, size[0], size[1], 4, 4 / 3, detail ? 'detail' : 'chunk');
         chunks.set(job.key, { mesh, tex, bytes, kind: job.kind, ms: dt, size });
         if (!detail && x0 <= camState.target.x * 100 && camState.target.x * 100 < x1 && firstChunk.resolve) { firstChunk.resolve(); firstChunk.resolve = null; }
+        if (!detail) warmUp(tex);
         // a static board (reduced motion, tier 0) redraws once for the new chunk; a live one wakes its loop
         if (S.reduced || S.tier === 0) renderOnce(); else if (api) api.wake();
       } catch (err) {
         console.warn('[place] chunk raster failed:', err && err.message);
       } finally {
         rasterBusy = false; inflight = null;
-        if (rasterQueue.length) (window.requestIdleCallback || setTimeout)(() => pump());
+        // the next job waits for idle time, but never longer than 120ms: a page that renders every frame never goes
+        // idle, and the chunk under the camera sat in the queue (void band and black chips, iPhone review 2026-10-12)
+        if (rasterQueue.length) { if (window.requestIdleCallback) requestIdleCallback(() => pump(), { timeout: 120 }); else setTimeout(() => pump(), 16); }
       }
+    }
+    let destWant = null;
+    // take-off on a route jump (tier 1): the destination's three chunks go to the front of the queue now, so they
+    // are painted while the camera is still in the air and the descent lands on a finished board
+    // keep only these chunks resident (tier 1): what the frame shows now plus the destination's. A jump that interrupts
+    // a jump would otherwise keep its first destination's chunks too, and hop after hop the phone held ten of them
+    function purgeChunks(keep) {
+      [...chunks.keys()].filter((k) => k[0] === 'c' && !keep.includes(Number(k.slice(1)))).forEach((k) => disposeChunk(k));
+    }
+    function prefetchDest(view) {
+      const cur = S.tier === 1 && uFade.value > 0.02 ? wantList().want : [];
+      const bx = restPose(view).target.x * 100, j0 = Math.floor((bx - X0) / CHUNK_W);
+      if (S.tier === 2) { [j0 + 1, j0 - 1, j0].forEach((j) => { const i = rasterQueue.findIndex((q) => q.kind === 'chunk' && q.k === j); if (i > 0) rasterQueue.unshift(rasterQueue.splice(i, 1)[0]); }); return; }
+      if (S.tier !== 1) return;
+      destWant = [j0, j0 - 1, j0 + 1];
+      for (let i = rasterQueue.length - 1; i >= 0; i--) if (rasterQueue[i].kind === 'chunk') rasterQueue.splice(i, 1);
+      purgeChunks([...cur, ...destWant]);
+      [j0 + 1, j0 - 1, j0].forEach((j) => wantChunk(j, true));
+    }
+    function wantList(camBoardX = camState.target.x * 100) {
+      const j0 = Math.floor((camBoardX - X0) / CHUNK_W);
+      const want = [j0 - 1, j0, j0 + 1];
+      // plus every chunk the viewport's footprint touches (the pulled-back phone frame can reach past j0 +- 1)
+      if (lastFit.fp && lastFit.dist) {
+        const a = Math.floor((camBoardX + lastFit.fp.x0 * lastFit.dist * 100 - X0) / CHUNK_W), b = Math.floor((camBoardX + lastFit.fp.x1 * lastFit.dist * 100 - X0) / CHUNK_W);
+        for (let j = a; j <= b; j++) if (!want.includes(j)) want.push(j);
+      }
+      return { j0, want: want.filter((j) => j >= 0 && j < NCHUNK) };
     }
     function stream(force) {
       const camBoardX = camState.target.x * 100;
       if (S.tier === 2) { for (let k = 0; k < NCHUNK; k++) wantChunk(k, k === Math.floor((camBoardX - X0) / CHUNK_W)); return; }
-      const j0 = Math.floor((camBoardX - X0) / CHUNK_W);
-      const want = [j0 - 1, j0, j0 + 1];
-      want.forEach((j) => wantChunk(j, j === j0));
-      [...chunks.keys()].filter((k) => k[0] === 'c' && !want.includes(Number(k.slice(1)))).forEach((k) => { if (force !== 'keep') disposeChunk(k); });
+      const { j0, want } = wantList();
+      // a route jump keeps its destination's chunks wanted (prefetched at take-off), and queued jobs nobody wants
+      // any more are dropped, so the board under the camera never waits behind chunks it has already left
+      const keepSet = destWant ? want.concat(destWant) : want;
+      for (let i = rasterQueue.length - 1; i >= 0; i--) if (rasterQueue[i].kind === 'chunk' && !keepSet.includes(rasterQueue[i].k)) rasterQueue.splice(i, 1);
+      want.slice().sort((p, q) => Math.abs(p - j0) - Math.abs(q - j0)).forEach((j) => wantChunk(j, j === j0));
+      [...chunks.keys()].filter((k) => k[0] === 'c' && !keepSet.includes(Number(k.slice(1)))).forEach((k) => { if (force !== 'keep') disposeChunk(k); });
     }
 
     /* ==== the live overlay: one instance per netlist segment, pad, via and LED (§4.3) ==== */
@@ -4300,6 +4390,9 @@ const Place = (() => {
       const mesh = new THREE.Mesh(geo, m);
       mesh.position.set((b.x0 + 20 + 120) / 100, 0.13, (b.y0 + 13 + 17.5 - 400) / 100);
       mesh.renderOrder = 5;
+      // never culled: a display first entering the frame mid-scroll linked its shader there, a visible stall on the
+      // phone (iPhone review 2026-10-12); dark, it draws nothing (opacity follows uLvl)
+      mesh.frustumCulled = false;
       world.add(mesh);
       disps[id] = { ref: c.ref, text, lit, uLvl, mesh };
     });
@@ -4394,7 +4487,10 @@ const Place = (() => {
     const BG0s = vec3(14 / 255, 16 / 255, 19 / 255), BG1s = vec3(20 / 255, 20 / 255, 20 / 255);
     // the seating terms are compiled in only below 1100px (the pipeline is rebuilt when the canvas crosses it), so
     // the desktop shader is the one it was
-    const scrimNode = (seat) => Fn(([col]) => {
+    const scrimNode = (seat) => Fn(([colIn]) => {
+      // evaluate the post chain once: every reference to a call node below would otherwise inline its own copy
+      // (FXAA was compiled ten times into this shader, ten edge searches per pixel and ten uniform buffers)
+      const col = vec4(colIn).toVar('postIn');
       const p = screenCoordinate.xy;
       const r = float(0).toVar(), dMin = float(1e6).toVar();
       const pad = uPad.mul(uDpr), feather = max(uFeather.mul(uDpr).mul(uScrimK), 0.001), rad = float(3).mul(uDpr);
@@ -4491,7 +4587,7 @@ const Place = (() => {
     }
     // spawn a pulse: o = { sources, opts, kind, strength, period, count, at (ms, default now), hold }
     function spawn(o) {
-      const w = SIM.walk(o.sources, o.opts || {});
+      const w = o.walk || SIM.walk(o.sources, o.opts || {});
       const t0 = o.at ?? nowMs();
       const rec = { kind: o.kind || 'pulse', t0, reached: w.reachedSegs.slice(), events: w.events.map((e) => ({ ...e })), end: w.end, count: o.count || 1, period: o.period || 0 };
       walkLog.push(rec); if (walkLog.length > 200) walkLog.shift();
@@ -4726,16 +4822,19 @@ const Place = (() => {
       const f = fill ? fitFor(railShot ? 'home' : view, d, ref, yaw ? MOBILE_E : 0) : null;
       const lock = railShot && mobileLock() && railAnchors.length > 1;
       // screen px per board unit along the rail (yawed, the rail runs down the screen)
-      const pxPerUnit = lock ? VP.h / ((f.fp.x1 - f.fp.x0) * f.maxDist) : 1;
+      // phone pull-back (iPhone review 2026-10-12): 20% past the full-bleed cap, so the board's long edges show as a
+      // thin margin and the circuit reads smaller under the copy
+      const pull = yaw ? MOBILE_PULL : 1, capD = f ? f.maxDist * pull : 0;
+      const pxPerUnit = lock ? VP.h / ((f.fp.x1 - f.fp.x0) * capD) : 1;
       if (view === 'home') {
         if (lock) { tx = railHermite(S.railY.current, pxPerUnit); tz = 0; }
         else { const rp = railPose(FEATURES.scrollRail ? S.rail.current : 0, yaw); tx = rp.tx; tz = rp.tz; fw = rp.fw; fh = rp.fh; }
-        if (S.rail.current < 1) dolly = 1 - 0.1 * S.hero;
+        if (S.rail.current < 1) dolly = 1 - 0.05 * S.hero;
       } else if (AN.clusters[view]) {
         const cl = AN.clusters[view];
         const ic = [cl.U1, cl.U2, cl.U3][focusIC(view)];
         const drift = FEATURES.scrollRail ? (S.scroll.current - 0.5) * 2 * (S.tier === 1 ? 0.5 : 1) : 0;
-        tx = P(ic).x + drift; fw = 7.4; fh = 6.2; dolly = S.dossier[view].state === 0 ? 1 : 0.94;
+        tx = P(ic).x + drift; fw = 7.4; fh = 6.2; dolly = S.dossier[view].state === 0 ? 1 : 0.985;
       } else if (view === 'about') {
         if (S.about.fab) { tx = AN.rig.fab.x / 100; tz = (AN.rig.fab.y - 400) / 100; fw = 6.4; fh = 3.4; }
         else { const ics = [AN.rig.U1, AN.rig.U2, AN.rig.U3]; tx = S.about.focus >= 0 ? P(ics[S.about.focus]).x * 0.3 : 0; fw = 10.4; fh = 7; }
@@ -4749,13 +4848,17 @@ const Place = (() => {
         tx = P('J1').x - 3 + drift; tz = 2.1; fw = 6.5; fh = 7.5;
       } else if (view === 'notfound') { tx = P('J1').x; tz = -7; fw = 10; fh = 6; }
       if (camState.push && view === 'home') { const k = camState.push.k; tx = lerp(tx, P(AN.rig.U2).x, k); tz = lerp(tz, P(AN.rig.U2).z, k); fw = lerp(fw, 5.2, k); fh = lerp(fh, 3.4, k); }
-      let dist = composed(fw, fh) * dolly;
+      // scroll-driven depth changes are halved (review 2026-10-12: scroll zoom too deep): each home waypoint and each
+      // about focus shot sits halfway between its own framing and the view's widest
+      const halve = (view === 'home' && !lock) || view === 'about';
+      let dist = (halve ? ref - (ref - composed(fw, fh)) * RAIL_DEPTH : composed(fw, fh)) * dolly * pull;
       const target = new THREE.Vector3(tx, 0, tz);
       if (fill) {
-        dist = Math.min(dist, f.maxDist); d.copy(f.dir);
+        dist = Math.min(dist, capD); d.copy(f.dir);
         const fp = f.fp, bx0 = NL.board.x0 / 100 + FIT_M, bx1 = NL.board.x1 / 100 - FIT_M, bz = NL.board.h / 200 - 0.05 - FIT_M;
-        target.x = Math.min(Math.max(target.x, bx0 - fp.x0 * dist), bx1 - fp.x1 * dist);
-        target.z = Math.min(Math.max(target.z, -bz - fp.z0 * dist), bz - fp.z1 * dist);
+        const clampC = (v, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.min(Math.max(v, lo), hi));
+        target.x = clampC(target.x, bx0 - fp.x0 * dist, bx1 - fp.x1 * dist);
+        target.z = clampC(target.z, -bz - fp.z0 * dist, bz - fp.z1 * dist);
         lastFit.fp = fp; lastFit.dist = dist; lastFit.pxPerUnit = pxPerUnit;
       }
       return { target, pos: target.clone().addScaledVector(d, dist) };
@@ -4813,7 +4916,10 @@ const Place = (() => {
       fitMemo.set(key, best);
       return best;
     }
-    let FIT_FRAC = 0.25;
+    // 0.4 (was 0.25): the camera keeps its composed angle only while it can stand at 40% of the composed distance
+    // or more, else it tilts toward plan until it can (review 2026-10-12: camera too deep)
+    let FIT_FRAC = 0.4;
+    const MOBILE_PULL = 1.2, RAIL_DEPTH = 0.5;
     // Below 1100px the camera looks down at 80 degrees or steeper: the board reads as the sheet the copy is seated
     // on, flat enough that a trace keeps its screen speed from the top of the frame to the bottom (so it can move
     // 1:1 with the copy), with enough perspective left to stay a place. The far field never outruns the streamed
@@ -5085,6 +5191,107 @@ const Place = (() => {
       wake();
     }
 
+    /* ==== Close the loop (iPhone review 2026-10-12): the dossier game ====
+       Each dossier circuit's VERIFY chip (U2) drives one test point per falsifiability item over its STATUS net. Tap a
+       test point on the board (or focus its item and press Enter): a probe pulse runs from U2 along that branch
+       only, and the point latches lit with its branch. With every point latched, U2 runs its check: the receipt
+       connectors and the input header fire together through U1, U2 and U3, the RESULT LED latches and the display flashes the result. Receipt
+       links are never involved. State lives for the page load. Reduced motion and tier 0 latch instantly. */
+    const Game = (() => {
+      const st = {}, paths = new Map();
+      Object.keys(AN.clusters).forEach((id) => { st[id] = { probed: new Set(), done: false }; });
+      const ptKey = (x, y) => x + ',' + y;
+      // the branch from U2's STATUS pin to test point j, as ordered segments with arrival times (constant speed)
+      function branch(id, j) {
+        const k = id + ':' + j;
+        if (paths.has(k)) return paths.get(k);
+        const cl = AN.clusters[id], tp = C(cl.tps[j]);
+        const netName = tp.pins[0].net, n = ni(netName);
+        const drv = NL.nets[n].pins.find((p) => p.split('.')[0] === cl.U2);
+        const pts = drv ? SIM.netPath(netName, drv, cl.tps[j] + '.1') : null;
+        const w = { segT: new Float64Array(nS * 2).fill(Infinity), padT: new Float64Array(nP).fill(Infinity), viaT: new Float64Array(nV).fill(Infinity), events: [], reachedSegs: [], end: 0 };
+        if (pts && pts.length > 1) {
+          const bySeg = new Map();
+          SIM.netSegs[n].forEach((si) => { const g = SIM.segs[si]; bySeg.set(ptKey(g.ax, g.ay) + '|' + ptKey(g.bx, g.by), si); bySeg.set(ptKey(g.bx, g.by) + '|' + ptKey(g.ax, g.ay), si); });
+          let t = 0;
+          for (let i = 1; i < pts.length; i++) {
+            const [ax, ay] = pts[i - 1], [bx, by] = pts[i], si = bySeg.get(ptKey(ax, ay) + '|' + ptKey(bx, by));
+            const t1 = t + Math.hypot(bx - ax, by - ay) / V_MS;
+            if (si !== undefined) { const g = SIM.segs[si], fwd = g.ax === ax && g.ay === ay; w.segT[si * 2] = fwd ? t : t1; w.segT[si * 2 + 1] = fwd ? t1 : t; w.reachedSegs.push(si); }
+            SIM.netVias[n].forEach((vi) => { const v = SIM.vias[vi]; if (v.x === ax && v.y === ay) w.viaT[vi] = t; });
+            t = t1;
+          }
+          w.padT[SIM.pinIndex.get(drv)] = 0; w.padT[SIM.pinIndex.get(cl.tps[j] + '.1')] = t; w.end = t;
+        }
+        paths.set(k, w);
+        return w;
+      }
+      const items = (id) => [...document.querySelectorAll(`.view[data-view="${id}"] .falsify li`)];
+      function apply(id) {
+        const cl = AN.clusters[id], s = st[id];
+        if (!cl || !s) return;
+        const segs = [];
+        s.probed.forEach((j) => segs.push(...branch(id, j).reachedSegs));
+        setLayerSegs('tps:' + id, segs, 0.6, { pads: false });
+        // only the probed test points' pads (the STATUS net's other pads stay dark)
+        const m = layers.get('tps:' + id);
+        s.probed.forEach((j) => { const pi = SIM.pinIndex.get(cl.tps[j] + '.1'); if (pi !== undefined) m.set(-1 - pi, 0.6); });
+        ledHold(cl.led, 'loop', s.done);
+        items(id).forEach((li, j) => { li.toggleAttribute('data-probed', s.probed.has(j)); const k = li.querySelector('.tp-key'); if (k) k.setAttribute('aria-pressed', String(s.probed.has(j))); });
+        ledsDirty = true; layersDirty = true;
+      }
+      function check(id) {
+        const cl = AN.clusters[id], s = st[id];
+        s.done = true;
+        // the whole circuit runs once: the receipt connectors and the input header together into U1 and U2 (U2's
+        // and-window needs both paths), then U2 through U3 to the RESULT LED and the display
+        const lanesSrc = cl.lanes.map((_, i) => ({ pin: cl.header + '.' + (i + 1) }));
+        const rec = spawn({ kind: 'loop-check', sources: [...cl.receipts.map((r) => ({ pin: r + '.1' })), ...lanesSrc], opts: { allow: new Set([cl.U1, cl.U2, cl.U3, ...compsOfAnchor(id).filter((r) => C(r).logic && ['pass', 'led', 'display'].includes(C(r).logic.mode))]) } });
+        const at = S.reduced || S.tier === 0 || !FEATURES.pulses ? 0 : rec.end + 60;
+        setTimeout(() => { apply(id); dispFlash(id, 2400); wake(); renderOnce(); }, at);
+      }
+      function probeTest(id, j) {
+        const cl = AN.clusters[id], s = st[id];
+        if (!cl || !s || j < 0 || j >= cl.tps.length) return null;
+        const w = branch(id, j);
+        const rec = spawn({ kind: 'loop-probe', walk: w });
+        const first = !s.probed.has(j);
+        s.probed.add(j);
+        const instant = S.reduced || S.tier === 0 || !FEATURES.pulses;
+        setTimeout(() => {
+          apply(id); wake(); renderOnce();
+          if (first && !s.done && s.probed.size === cl.tps.length) check(id);
+        }, instant ? 0 : w.end + 40);
+        if (instant) { apply(id); renderOnce(); }
+        S.lastResponse = { t: performance.now(), kind: 'loop-probe' };
+        return rec;
+      }
+      // keyboard path (WCAG 2.1.1): each falsifiability item holds the test point's equivalent control, a toggle
+      // button wrapped around its text (the item stays a list item). Enter or Space probes it; a pointer press on the
+      // text does nothing (the game is played on the board)
+      Object.keys(AN.clusters).forEach((id) => items(id).forEach((li, j) => {
+        if (j >= AN.clusters[id].tps.length) return;
+        const k = document.createElement('span');
+        k.className = 'tp-key'; k.setAttribute('role', 'button'); k.tabIndex = 0; k.setAttribute('aria-pressed', 'false');
+        k.append(...li.childNodes); li.append(k); li.dataset.tp = String(j);
+        k.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); probeTest(id, j); } });
+      }));
+      // a tap on a test point probes it. Where the points sit closer than 44 CSS px on screen (the phone frame puts
+      // them about 26px apart), the row is one target and each tap probes the next unprobed point in order, so no
+      // tap can land on the wrong point (Fitts, 44px)
+      function tap(c, cx, cy) {
+        const id = c.anchor, cl = AN.clusters[id], s = st[id];
+        const p = boardPoint(cx, cy), q = boardPoint(cx + 44, cy);
+        const px44 = p && q ? Math.hypot(q.x - p.x, q.y - p.y) : Infinity;
+        const tps = cl.tps.map(C), gap = Math.min(...tps.slice(1).map((t, i) => Math.hypot(t.x - tps[i].x, t.y - tps[i].y)));
+        if (gap >= px44) return probeTest(id, c.test);
+        const next = tps.findIndex((t, j) => !s.probed.has(j));
+        return probeTest(id, next < 0 ? c.test : next);
+      }
+      return { apply, probeTest, tap, branch, state: () => Object.fromEntries(Object.entries(st).map(([k, v]) => [k, { probed: [...v.probed].sort(), done: v.done }])), reset: (id) => { st[id].probed.clear(); st[id].done = false; apply(id); renderOnce(); } };
+    })();
+    const loopTarget = (c) => c && c.role === 'tp' && AN.clusters[c.anchor] && S.view === c.anchor && Number.isInteger(c.test) ? c : null;
+
     /* ==== interaction: chips on the board (§5.1) ==== */
     const HASH = 200, hash = new Map();
     NL.components.forEach((c) => {
@@ -5152,11 +5359,13 @@ const Place = (() => {
       if (!S.live || interactive(e.target)) return;
       if (e.pointerType === 'touch') return;
       const c = hitTest(e.clientX, e.clientY);
+      if (loopTarget(c)) { Game.tap(c, e.clientX, e.clientY); return; }
       probe(c ? (S.probe === c.ref ? null : c.ref) : null);
     });
     document.addEventListener('pointerup', (e) => {
       if (e.pointerType !== 'touch' || !S.live || interactive(e.target)) return;
       const c = hitTest(e.clientX, e.clientY);
+      if (loopTarget(c)) { Game.tap(c, e.clientX, e.clientY); return; }
       if (!c || (touchProbe === c.ref)) { touchProbe = null; probe(null); return; }
       touchProbe = c.ref; touchScrollY = window.scrollY;
       chipPulse(c.ref); probe(c.ref);
@@ -5294,8 +5503,15 @@ const Place = (() => {
         const alt = Math.max(f.p0.y, rp.pos.y) * 1.6;
         const hi0 = new THREE.Vector3(f.p0.x, alt, f.p0.z), hi1 = new THREE.Vector3(rp.pos.x, alt, rp.pos.z);
         if (f.raw < 1 / 3) { const q = f.raw * 3; tgtPos = f.p0.clone().lerp(hi0, ease(q)); tgtLook = f.t0.clone(); uFade.value = Math.min(1, 1 - ease(clamp01((q - 0.5) * 2))); }
-        else if (f.raw < 2 / 3) { const q = ease((f.raw - 1 / 3) * 3); tgtPos = hi0.clone().lerp(hi1, q); tgtLook = f.t0.clone().lerp(rp.target, q); uFade.value = 0; stream('keep'); }
-        else { const q = (f.raw - 2 / 3) * 3; tgtPos = hi1.clone().lerp(rp.pos, ease(q)); tgtLook = rp.target.clone(); uFade.value = ease(clamp01(q * 2)); }
+        else if (f.raw < 2 / 3 || (f.desc === undefined && !landingReady(f, rp, now))) {
+          // the board is dissolved: the chunks left behind can go
+          if (!f.purged) { f.purged = true; purgeChunks(destWant || []); }
+          const q = ease(Math.min(1, (f.raw - 1 / 3) * 3)); tgtPos = hi0.clone().lerp(hi1, q); tgtLook = f.t0.clone().lerp(rp.target, q); uFade.value = 0; }
+        else {
+          // the descent runs on its own 0.6 s clock from the moment the board under the landing is painted
+          if (f.desc === undefined) f.desc = now;
+          const q = Math.min(1, (now - f.desc) / 600); tgtPos = hi1.clone().lerp(rp.pos, ease(q)); tgtLook = rp.target.clone(); uFade.value = ease(clamp01(q * 2));
+        }
         camState.pos.copy(tgtPos); camState.target.copy(tgtLook);
       } else {
         const mid = f.p0.clone().lerp(rp.pos, 0.5);
@@ -5306,10 +5522,21 @@ const Place = (() => {
         springVec(camState.target, camState.velT, tgtLook, 0.12, dt / 1000);
       }
       uBackdrop.value = f.raw < 0.1 ? lerp(1, 0.6, ease(f.raw / 0.1)) : f.raw > 0.9 ? lerp(0.6, 1, ease((f.raw - 0.9) / 0.1)) : 0.6;
-      if (f.raw >= 1) {
+      if (f.raw >= 1 && (!mobile || (f.desc !== undefined && now - f.desc >= 600))) {
         const gap = camState.pos.distanceTo(tgtPos) + camState.target.distanceTo(tgtLook);
-        if (gap < 1e-4 || mobile) { camState.pos.copy(tgtPos); camState.target.copy(tgtLook); camState.flight = null; uFade.value = 1; uBackdrop.value = 1; dropDetails(['d' + ANCHOR_X[f.to]]); if (mobile) stream(); }
+        if (gap < 1e-4 || mobile) { camState.pos.copy(tgtPos); camState.target.copy(tgtLook); camState.flight = null; uFade.value = 1; uBackdrop.value = 1; dropDetails(['d' + ANCHOR_X[f.to]]); if (mobile) { destWant = null; stream(); } }
       }
+    }
+    // the phone holds at altitude, board dissolved, until every chunk the landing frame needs is painted (a chunk
+    // paints in tens of ms on a phone; the 3 s cap only guards a failed paint): the prefetch at take-off reads the destination before the page has scrolled to its section, so a menu
+    // jump to a home section could land on chunks still in the queue and show them black (iPhone review 2026-10-12)
+    function landingReady(f, rp, now) {
+      if (f.holdT === undefined) f.holdT = now;
+      const need = wantList(rp.target.x * 100).want;
+      if (need.every((j) => chunks.has('c' + j))) return true;
+      destWant = [...new Set([...(destWant || []), ...need])];
+      need.forEach((j) => wantChunk(j, true));
+      return now - f.holdT > 3000;
     }
     let flightTw = null;
     function go(view, opts = {}) {
@@ -5342,6 +5569,7 @@ const Place = (() => {
       camState.flight = f;
       wantDetail(view);
       if (S.tier === 2) stream();
+      prefetchDest(view);
       // circuit track: a signal pulse runs the backbone from the old anchor to the new one; it leads the camera
       pulseBackbone(from, view);
       if (opts.tl) {
@@ -5380,8 +5608,9 @@ const Place = (() => {
       cl.tps.forEach((r, i) => ledHold(r, 'state', false));
       ledHold(cl.led, 'state', s >= 4);
       dispHeld[id] = s >= 4;
-      const tpN = s >= 4 ? cl.tps.length : s === 3 ? st.tps : 0;
-      setLayerSegs('tps:' + id, SIM.segsOfNets(netsOf(cl.tps.slice(0, tpN))), 0.6);
+      // Close the loop (iPhone review 2026-10-12): a test point is lit only once it has been probed, and the RESULT
+      // LED latches once all of them have
+      Game.apply(id);
       ledsDirty = true;
       if (quiet) return;
     }
@@ -5460,6 +5689,10 @@ const Place = (() => {
       if (!el || !el.closest) return null;
       const a = el.closest('a[href]');
       const claim = el.closest('.claim');
+      // Close the loop: a falsifiability item lights its test point's STATUS net on hover or focus; Enter or Space
+      // probes it (Game's own key handler)
+      const tpLi = el.closest('.falsify li[data-tp]');
+      if (tpLi) { const id = tpLi.closest('.view').dataset.view, cl = AN.clusters[id], tp = cl && C(cl.tps[+tpLi.dataset.tp]); if (tp) return { kind: 'loop-item', hl: () => [ni(tp.pins[0].net)] }; }
       if (el.closest('.skip')) return { kind: 'skip', hl: () => subNets[S.view], act: () => { setLayerNets('wire', subNets[S.view], 0.6); setTimeout(() => { clearLayer('wire'); wake(); renderOnce(); }, 1200); } };
       if (a) {
         const href = a.getAttribute('href');
@@ -5485,12 +5718,14 @@ const Place = (() => {
         return entries[n] || null;
       }
       if (el.closest('#term-input')) return { kind: 'terminal', hl: () => netsOf([J]) };
-      // the LeafLink slice (integration spec D6): the designator powers the cluster; the Shipped junction lights the
+      // the project slices (integration spec D6, one per row): the designator powers the cluster; the Shipped junction lights the
       // receipt connectors and fires a pulse from each one's pin 1 (the claim-04 and receipt patterns). Unfilled pins
       // are not controls and fall through to the row.
       const sl = el.closest('[data-sl]');
-      if (sl && sl.dataset.sl === 'title') return { kind: 'slice-title', hl: () => clusterFanout('leaflink') };
-      if (sl && sl.dataset.sl === 'node') { const rcs = AN.clusters.leaflink.receipts; return { kind: 'slice-node', hl: () => netsOf(rcs), press: () => spawn({ kind: 'receipt', sources: rcs.map((r) => ({ pin: r + '.1' })), opts: { maxHops: 0 } }) }; }
+      const slp = sl && (sl.closest('.sl[data-project]') || {}).dataset;
+      const proj = slp && AN.clusters[slp.project] ? slp.project : 'leaflink';
+      if (sl && sl.dataset.sl === 'title') return { kind: 'slice-title', hl: () => clusterFanout(proj) };
+      if (sl && sl.dataset.sl === 'node') { const rcs = AN.clusters[proj].receipts; return { kind: 'slice-node', hl: () => netsOf(rcs), press: () => spawn({ kind: 'receipt', sources: rcs.map((r) => ({ pin: r + '.1' })), opts: { maxHops: 0 } }) }; }
       if (el.closest('.row')) { const id = el.closest('.row').querySelector('a[href*="#/work/"]'); const r = id && routeOf(id.getAttribute('href')); if (r) return { kind: 'row', hl: () => clusterFanout(r) }; }
       if (el.closest('[data-copy]')) return { kind: 'copy', hl: () => AN.contact.fingers.map(ni), act: () => spawn({ kind: 'copy', sources: [...Array.from({ length: 8 }, (_, i) => ({ pin: 'U_R3.' + (9 + i) })), { pin: AN.contact.driver + '.9' }], opts: { allow: new Set(['J1']) } }) };
       const field = el.closest('#cf-name, #cf-email, #cf-message');
@@ -5532,7 +5767,7 @@ const Place = (() => {
       if (!S.live || e.pointerType === 'touch' || !canHover) return;
       const ent = wiringFor(e.target);
       if (!ent) { if (hlEl && !hlEl.el.contains(e.target)) hlOff(); return; }
-      const host = e.target.closest('a, button, input, textarea, [data-sl], .claim, .row, [data-copy]') || e.target;
+      const host = e.target.closest('a, button, input, textarea, [data-sl], .claim, .row, [data-copy], .falsify li[data-tp]') || e.target;
       if (hlEl && hlEl.el === host) return;
       hlOn(host, ent);
       if (ent.kind === 'claim-02' && ent.act) ent.act();
@@ -5681,9 +5916,11 @@ const Place = (() => {
         return true;
       },
       debug: {
+        loop: () => Game.state(), loopProbe: (id, j) => Game.probeTest(id, j), loopReset: (id) => Game.reset(id), loopBranch: (id, j) => Game.branch(id, j).reachedSegs.slice(),
+        stream: () => ({ need: S.tier === 2 ? null : wantList().want, have: [...chunks.keys()], queue: rasterQueue.map((j) => j.key), inflight, destWant, pool: matPool.length, ms: [...chunks.values()].map((c) => Math.round(c.ms)) }),
         THREE, ctx, NL, SIM, S, FEATURES, camState, segMesh, perf, texStats, chunks, camera, scene, world, focus, slots, walkLog, bootLog, layers, ledState, disps, lanes, RECEIPTS, Scrim,
         get renderer() { return renderer; }, get pipeline() { return pipeline; }, get particles() { return particles; }, NPART,
-        get api() { return api; }, fitFor, footprint, cornersOnBoard, fitMemo, VP, railHermite, get railAnchors() { return railAnchors; }, lastFit, mobileLock, setFitFrac: (f) => { FIT_FRAC = f; fitMemo.clear(); }, chipPulse, boardPoint, netsOf, subNetsOf: (v) => subNets[v], backbonePath,
+        get api() { return api; }, fitFor, footprint, cornersOnBoard, fitMemo, VP, railHermite, get railAnchors() { return railAnchors; }, lastFit, MOBILE_PULL, RAIL_DEPTH, mobileLock, setFitFrac: (f) => { FIT_FRAC = f; fitMemo.clear(); }, chipPulse, boardPoint, netsOf, subNetsOf: (v) => subNets[v], backbonePath,
         running: () => running, tweens: () => tweens.length, booting: () => !!booting, active: () => activeNow(nowMs()), events: () => events.length,
         uniforms: () => ({ now: uNow.value, fade: uFade.value, band: uBand.value, backdrop: uBackdrop.value, bootMs: uBootMs.value, expo: uExpo.value, dim: uDim.value, scrimCount: uScrimCount.value, pad: uPad.value, feather: uFeather.value, seat: uSeat.value, fringe: uFringe.value, scrimFlags: uScrimFlag.array.slice(0, uScrimCount.value) }),
         slotState: () => slots.map((s, i) => ({ i, busy: s.busy, end: s.end, kind: s.kind, u: uSlots.array[i].toArray() })),
