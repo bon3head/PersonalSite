@@ -418,6 +418,14 @@ dialog::backdrop{background:rgba(14,16,19,0.92)}
 /* The one motion reduced motion keeps: the canvas crossfades on a route change (opacity is not vestibular, brief §7.3) */
 @media (prefers-reduced-motion: reduce){#place{transition:opacity 100ms linear!important}}
 .reduced-motion #place{transition:opacity 100ms linear!important}
+
+/* silkscreen rebuild: while the board draws the copy, the DOM is the semantic layer only (screen readers,
+   crawlers, keyboard focus). It is clipped, not removed, so every control keeps its role and its focus. */
+html.silk-on .nav, html.silk-on main, html.silk-on .footer{position:fixed!important;top:0;left:0;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap;opacity:0;pointer-events:none}
+html.silk-on #silk-scroll{display:block;width:1px;pointer-events:none}
+#silk-scroll{display:none}
+html.silk-on body{min-height:0}
+html.silk-on canvas#place{touch-action:pan-y}
 </style>
 </head>
 <body>
@@ -1104,7 +1112,9 @@ function boot() {
       root.setAttribute('data-view', r.view);
       Motion.onRoute(r.view);
       Place.scrim();
-      if (r.anchor) {
+      if (r.anchor && document.documentElement.classList.contains('silk-on')) {
+        requestAnimationFrame(() => { if (!Place.silkAnchor(r.anchor)) window.scrollTo(0, 0); if (!initial) document.getElementById('work-title').focus({ preventScroll: true }); });
+      } else if (r.anchor) {
         const target = document.getElementById(r.anchor);
         requestAnimationFrame(() => {
           target.scrollIntoView({ block: 'start', behavior: 'auto' });
@@ -3712,7 +3722,7 @@ function NETLIST_PAINT(NL) {
       // components off (K2 pair): bare pads stay, so the copper still terminates somewhere
       body += pads.filter((p) => p.x > x0 - 20 && p.x < x1 + 20).map(paintPad).join('');
     }
-    body += NL.labels.filter((t) => t.x > x0 - 200 && t.x < x1 + 200).map(paintSilkText).join('');
+    if (opts.labels !== false) body += NL.labels.filter((t) => t.x > x0 - 200 && t.x < x1 + 200).map(paintSilkText).join('');
     const inner = opts.twoTone ? `<g filter='url(#twoTone)'>${body}</g>` : body;
     return `<svg xmlns='http://www.w3.org/2000/svg' width='${Math.round((x1 - x0) * scale)}' height='${Math.round(H * scale)}' viewBox='${x0} 0 ${x1 - x0} ${H}'>${style}${defs}${inner}</svg>`;
   }
@@ -3756,6 +3766,300 @@ function NETLIST_PAINT(NL) {
     return { nodes, tracePoints, bytes: svg.length };
   }
   return { chunkSVG, moduleSVG, stats, traces, comps, pads, PALETTE: { PCB_MASK, PCB_DARK, COPPER, COPPER_TRACE, SILK, PAD } };
+}
+
+/* ==========================================================================
+   Silkscreen layout (silkscreen rebuild 2026-10-14): every visible string on the site is ink on the board.
+   The engine places copy into the board's copper-free area and enforces the integration rules itself:
+   - ink never sits on copper: each line's box is a keep-out checked against top and bottom traces, vias, pads,
+     bodies, top pours and the ink already placed, on a 5px occupancy grid; a box that touches any of it moves on
+   - a size floor tied to the grid: no line renders below floor (a whole number of grid steps); a smaller request
+     is refused and reported, never drawn
+   - 0 or 90 degrees only, reading left to right along the scroll axis: 'x' (desktop) lines run along the board,
+     'y' (phones: the camera turns a quarter, so the board's long axis runs down the screen) lines are turned -90
+   - tags sit beside their part at fixed offsets, like reference designators
+   - hierarchy through ink and size only: no boxes, no fills
+   The board netlist is read, never written: its canonical form and hash are untouched. Pure and deterministic.
+   ========================================================================== */
+function NETLIST_SILK(NL) {
+  'use strict';
+  const C = 5, GRID = NL.grid || 10, X0 = NL.board.x0, X1 = NL.board.x1, H = NL.board.h, EDGE = NL.board.edge;
+  const GX = Math.ceil((X1 - X0) / C) + 1, GY = Math.ceil(H / C) + 1;
+  const ADV = 0.72;          // advance per em: 0.6 glyph + 0.12 letterspacing; the painter forces it with textLength
+  const ASC = 0.8, DESC = 0.25; // caps box around the baseline, per em
+  const CU = 6;              // ink to copper clearance (board px)
+  const INK = GRID;          // ink to ink clearance
+  const M = 2 * GRID;        // ink to board edge (inside the edge strip)
+  const rot = (x, y, r) => (r === 90 ? [-y, x] : r === 180 ? [-x, -y] : r === 270 ? [y, -x] : [x, y]);
+
+  /* ---- copper occupancy: what ink may not touch ---- */
+  const base = new Uint8Array(GX * GY);
+  const mark = (g, x0, y0, x1, y1, v = 1) => {
+    const a = Math.max(0, Math.floor((x0 - X0) / C)), b = Math.min(GX - 1, Math.floor((x1 - X0) / C));
+    const c = Math.max(0, Math.floor(y0 / C)), d = Math.min(GY - 1, Math.floor(y1 / C));
+    for (let gy = c; gy <= d; gy++) for (let gx = a; gx <= b; gx++) g[gy * GX + gx] = v;
+  };
+  NL.nets.forEach((n) => {
+    const r = n.width / 2 + CU;
+    n.segs.forEach((s) => {
+      const L = Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]), k = Math.max(1, Math.ceil(L / C));
+      for (let i = 0; i <= k; i++) { const x = s.a[0] + ((s.b[0] - s.a[0]) * i) / k, y = s.a[1] + ((s.b[1] - s.a[1]) * i) / k; mark(base, x - r, y - r, x + r, y + r); }
+    });
+    n.vias.forEach((v) => mark(base, v.x - 6 - CU, v.y - 6 - CU, v.x + 6 + CU, v.y + 6 + CU));
+  });
+  (NL.pours || []).forEach((p) => { if (p.l === 'F') mark(base, p.poly[0][0] - CU, p.poly[0][1] - CU, p.poly[2][0] + CU, p.poly[2][1] + CU); });
+  const bodies = new Map();
+  NL.components.forEach((c) => {
+    const fp = NL.footprints[c.fp], [bw, bh] = c.rot % 180 ? [fp.body.h, fp.body.w] : [fp.body.w, fp.body.h];
+    const b = { x0: c.x - bw / 2, y0: c.y - bh / 2, x1: c.x + bw / 2, y1: c.y + bh / 2 };
+    fp.pads.forEach((q) => {
+      const [dx, dy] = rot(q.dx, q.dy, c.rot), [w, h] = c.rot % 180 && q.shape !== 'finger' ? [q.h, q.w] : [q.w, q.h];
+      const y0 = c.y + dy - (q.shape === 'finger' ? 0 : h / 2), y1 = c.y + dy + (q.shape === 'finger' ? h : h / 2);
+      b.x0 = Math.min(b.x0, c.x + dx - w / 2); b.x1 = Math.max(b.x1, c.x + dx + w / 2); b.y0 = Math.min(b.y0, y0); b.y1 = Math.max(b.y1, y1);
+    });
+    bodies.set(c.ref, b);
+    mark(base, b.x0 - CU, b.y0 - CU, b.x1 + CU, b.y1 + CU);
+  });
+  // the edge strip
+  mark(base, X0, 0, X1, EDGE + M); mark(base, X0, H - EDGE - M, X1, H);
+  mark(base, X0, 0, X0 + M, H); mark(base, X1 - M, 0, X1, H);
+
+  const bodyOf = (ref) => { if (typeof ref === 'string' && ref[0] === '@') { const [x, y] = ref.slice(1).split(',').map(Number); return { x0: x, y0: y, x1: x, y1: y }; } return bodies.get(ref); };
+  const clear = (g, r) => {
+    if (r.x0 < X0 || r.x1 > X1 || r.y0 < 0 || r.y1 > H) return false;
+    const a = Math.floor((r.x0 - X0) / C), b = Math.floor((r.x1 - X0) / C), c = Math.floor(r.y0 / C), d = Math.floor(r.y1 / C);
+    for (let gy = c; gy <= d; gy++) { const row = gy * GX; for (let gx = a; gx <= b; gx++) if (g[row + gx]) return false; }
+    return true;
+  };
+
+  /* ---- the reading frame: u along the line, v across lines (the scroll axis on phones) ---- */
+  function frame(orient, band) {
+    const yLo = Math.max(EDGE + M, band ? band[0] : 0), yHi = Math.min(H - EDGE - M, band ? band[1] : H);
+    if (orient === 'x') return {
+      box: (u0, u1, v0, v1) => ({ x0: u0, x1: u1, y0: v0, y1: v1 }),
+      at: (u, v) => [u, v], rot: 0,
+      uMin: X0 + M, uMax: X1 - M, vMin: yLo, vMax: yHi,
+      body: (b) => ({ u0: b.x0, u1: b.x1, v0: b.y0, v1: b.y1 }),
+      scroll: (r) => [r.x0, r.x1],
+    };
+    // turned a quarter: u = -y (screen left to right), v = x (down the screen)
+    return {
+      box: (u0, u1, v0, v1) => ({ x0: v0, x1: v1, y0: -u1, y1: -u0 }),
+      at: (u, v) => [v, -u], rot: -90,
+      uMin: -yHi, uMax: -yLo, vMin: X0 + M, vMax: X1 - M,
+      body: (b) => ({ u0: -b.y1, u1: -b.y0, v0: b.x0, v1: b.x1 }),
+      scroll: (r) => [r.x0, r.x1],
+    };
+  }
+
+  /* ---- type scale: every size a whole number of half grid steps at or above the floor ---- */
+  function scale(floor) {
+    const g = (v) => Math.ceil(v / (GRID / 2)) * (GRID / 2);
+    return { micro: floor, body: floor, h2: g(floor * 1.4), h1: g(floor * 2) };
+  }
+  const pitchOf = (size) => Math.ceil((size * 1.6) / GRID) * GRID;
+
+  /* ---- layout ----
+     deck: { floor, sections: [{ id, view, layer: 'base' | 'view', at: x, anchorV?, blocks }] }
+     block: { kind: 'flow', role, ink, text, act?, group? } | { kind: 'tag', ref, role, ink, text, act? }
+          | { kind: 'reserve', role, chars, lines, id } (a dynamic text area: terminal output, copy status)
+     Returns { items, refused, extents, reserves, floor, orient }. */
+  function layout(deck, orient) {
+    const F = frame(orient, deck.band), S = scale(deck.floor), floor = deck.floor;
+    const items = [], refused = [], extents = {}, reserves = {};
+    const occBase = base.slice();
+    const occView = new Map(); // per view, a copy of base copper + base ink
+    let lastBaseV = -Infinity;
+    const occFor = (sec) => {
+      if (sec.layer === 'base') return occBase;
+      if (!occView.has(sec.view)) occView.set(sec.view, occBase.slice());
+      return occView.get(sec.view);
+    };
+    const inkOut = (occ, r) => mark(occ, r.x0 - INK, r.y0 - INK, r.x1 + INK, r.y1 + INK);
+    const sizeOf = (role) => S[role] || S.body;
+    const lenOf = (text, size) => text.length * size * ADV;
+    // the order matters: base sections first (the view layers avoid their ink), each in deck order
+    const order = deck.sections.filter((s) => s.layer === 'base').concat(deck.sections.filter((s) => s.layer !== 'base'));
+    const vCursor = {}; // per layer key, where the previous section ended
+    for (const sec of order) {
+      const occ = occFor(sec);
+      const key = sec.layer === 'base' ? 'base' : 'view:' + sec.view;
+      const ext = { v0: Infinity, v1: -Infinity, x0: Infinity, x1: -Infinity };
+      const grow = (r) => { const [a, b] = F.scroll(r); ext.x0 = Math.min(ext.x0, a); ext.x1 = Math.max(ext.x1, b); };
+      const put = (blk, text, size, u0, vBase) => {
+        const len = Math.round(lenOf(text, size));
+        const r = F.box(u0, u0 + len, vBase - size * ASC, vBase + size * DESC);
+        const [x, y] = F.at(u0, vBase);
+        const it = { sec: sec.id, view: sec.view, layer: sec.layer, role: blk.role, ink: blk.ink || 'w', text, size, len, x, y, rot: F.rot, box: r, act: blk.act || null, group: blk.group || null };
+        items.push(it); inkOut(occ, r); grow(r);
+        return it;
+      };
+      // tags first: they belong to parts, so the flow goes around them
+      for (const blk of sec.blocks.filter((b) => b.kind === 'tag')) {
+        const size = sizeOf(blk.role);
+        if (size < floor) { refused.push({ sec: sec.id, text: blk.text, size, why: 'below floor' }); continue; }
+        const refs = [].concat(blk.ref);
+        let placed = null;
+        for (const ref of refs) {
+          const b0 = bodyOf(ref);
+          if (!b0) continue;
+          const b = F.body(b0), len = lenOf(blk.text, size);
+          const mid = (b.v0 + b.v1) / 2, cu = (b.u0 + b.u1) / 2;
+          for (const d of [GRID, 2 * GRID, 4 * GRID, 6 * GRID, 9 * GRID]) {
+            // right, left, below, above (in reading terms): the designator convention, nearest first
+            const cands = [
+              [b.u1 + d, mid + size * (ASC - DESC) / 2],
+              [b.u0 - d - len, mid + size * (ASC - DESC) / 2],
+              [cu - len / 2, b.v1 + d + size * ASC],
+              [cu - len / 2, b.v0 - d - size * DESC],
+            ];
+            for (const [u0, vb] of cands) {
+              const q = (v) => Math.round(v);
+              const r = F.box(q(u0), q(u0 + len), q(vb - size * ASC), q(vb + size * DESC));
+              if (clear(occ, r) && r.x0 >= X0 + M && r.x1 <= X1 - M && q(u0) >= F.uMin && q(u0 + len) <= F.uMax && q(vb - size * ASC) >= (orient === 'x' ? F.vMin : -Infinity) && q(vb + size * DESC) <= (orient === 'x' ? F.vMax : Infinity)) { placed = put(blk, blk.text, size, q(u0), q(vb)); placed.ref = ref; break; }
+            }
+            if (placed) break;
+          }
+          if (placed) break;
+        }
+        // no fixed offset is clear: the nearest clear spot within 20 grid steps of the first part, nearest first
+        for (const ref of refs) {
+          if (placed) break;
+          const b0 = bodyOf(ref);
+          if (b0) {
+            const b = F.body(b0), len = lenOf(blk.text, size), cands = [];
+            for (let du = -20; du <= 20; du++) for (let dv = -20; dv <= 20; dv++) cands.push([du * GRID, dv * GRID]);
+            const cu0 = (b.u0 + b.u1) / 2 - len / 2, cv0 = (b.v0 + b.v1) / 2 + size * (ASC - DESC) / 2;
+            cands.sort((p, q) => Math.hypot(p[0], p[1]) - Math.hypot(q[0], q[1]) || p[1] - q[1] || p[0] - q[0]);
+            for (const [du, dv] of cands) {
+              const u0 = Math.round(cu0 + du), vb = Math.round(cv0 + dv);
+              if (u0 < F.uMin || u0 + len > F.uMax) continue;
+              if (orient === 'x' && (vb - size * ASC < F.vMin || vb + size * DESC > F.vMax)) continue;
+              const r = F.box(u0, Math.round(u0 + len), Math.round(vb - size * ASC), Math.round(vb + size * DESC));
+              if (clear(occ, r)) { placed = put(blk, blk.text, size, u0, vb); placed.ref = ref; break; }
+            }
+          }
+        }
+        const hgt = 0;
+        void hgt;
+        if (!placed) refused.push({ sec: sec.id, text: blk.text, why: 'no clear offset beside ' + refs.join('/') });
+      }
+      // the flow: paragraphs of words, wrapped to the run of clear board at each line position
+      const prevEnd = vCursor[key] ?? -Infinity;
+      // each section starts at its own place on the board (reading order is the order of those places); ink already
+      // laid down is a keep-out like copper, so a section that runs long flows around the next one, never over it
+      let v = sec.chain ? Math.max(sec.at, prevEnd + (sec.gap ?? 4 * GRID)) : sec.at;
+      if (orient === 'x') v = sec.at; // desktop: v is across the board; sections advance along u (below)
+      let uStart = orient === 'x' ? (sec.chain ? Math.max(sec.at, prevEnd + (sec.gap ?? 4 * GRID)) : sec.at) : null;
+      let colTop = F.vMin, colU0 = uStart, colU1 = uStart;
+      if (orient === 'x') v = colTop;
+      let prefU0 = orient === 'x' ? colU0 : (sec.prefU0 ?? null);
+      const flowBlocks = sec.blocks.filter((b) => b.kind === 'flow' || b.kind === 'reserve');
+      for (let bi = 0; bi < flowBlocks.length; bi++) {
+        const blk = flowBlocks[bi];
+        const size = sizeOf(blk.role), pitch = pitchOf(size);
+        if (size < floor) { refused.push({ sec: sec.id, text: blk.text, size, why: 'below floor' }); continue; }
+        const words = blk.kind === 'reserve' ? null : String(blk.text).split(/\s+/).filter(Boolean);
+        const maxLen = Math.min(F.uMax - F.uMin, (blk.maxChars || deck.maxChars || 999) * size * ADV);
+        const minLen = Math.min(maxLen, Math.max(...(words || ['xxxxxxxx']).map((w) => w.length), 6) * size * ADV);
+        // simulate a paragraph from u0 at v: returns lines [{ text, u0, v }] and the v after it, or null
+        const sim = (u0, vStart, vLimit) => {
+          const out = [];
+          let vv = vStart + size * ASC, wi = 0, lines = 0;
+          const need = blk.kind === 'reserve' ? blk.lines : Infinity;
+          while (blk.kind === 'reserve' ? lines < need : wi < words.length) {
+            if (vv + size * DESC > vLimit) return null;
+            // the clear run from u0 along the line, in grid steps, up to maxLen
+            let run = 0;
+            const band = (a, b) => F.box(u0 + a, u0 + b, Math.round(vv - size * ASC), Math.round(vv + size * DESC));
+            const lim = Math.min(maxLen, F.uMax - u0);
+            while (run < lim && clear(occ, band(run, Math.min(lim, run + GRID)))) run = Math.min(lim, run + GRID);
+            if (blk.kind === 'reserve') {
+              const want = blk.chars * size * ADV;
+              if (run >= want) { out.push({ text: '', u0, v: vv, len: want }); lines++; vv += pitch; }
+              else { if (lines) { out.length = 0; lines = 0; } vv += GRID; }
+              continue;
+            }
+            if (run < minLen) { if (out.length && out.length < 2 && run < size * ADV * 3) { /* keep going */ } vv += GRID; continue; }
+            const cap = Math.floor(run / (size * ADV));
+            let line = '';
+            while (wi < words.length) {
+              const nx = line ? line + ' ' + words[wi] : words[wi];
+              if (nx.length > cap) break;
+              line = nx; wi++;
+            }
+            if (!line) { vv += GRID; continue; }
+            out.push({ text: line, u0, v: vv });
+            vv += pitch;
+          }
+          return { lines: out, vEnd: vv - pitch + size * DESC };
+        };
+        const vLimit = orient === 'x' ? F.vMax : F.vMax;
+        const tryAt = (vStart, u0Lo, u0Hi) => {
+          let best = null;
+          const lo = Math.ceil(u0Lo / GRID) * GRID, hi = Math.floor(u0Hi / GRID) * GRID;
+          for (let u0 = lo; u0 <= hi; u0 += GRID) {
+            const r = sim(u0, vStart, vLimit);
+            if (!r || !r.lines.length) continue;
+            const cost = r.vEnd - vStart + (prefU0 === null ? 0 : Math.abs(u0 - prefU0) * 0.15);
+            if (!best || cost < best.cost) best = { ...r, u0, cost };
+          }
+          return best;
+        };
+        let res = null;
+        if (orient === 'y') {
+          // phones: one long column down the board; the left edge stays where the paragraph reads best
+          res = tryAt(v, F.uMin, F.uMax - minLen);
+        } else {
+          // desktop: columns across the board's height, left to right along it
+          for (let tries = 0; tries < 40 && !res; tries++) {
+            res = tryAt(v, colU0, colU0 + 12 * GRID);
+            if (!res) { colU0 = colU1 + 4 * GRID; colU1 = colU0; v = colTop; prefU0 = colU0; }
+          }
+        }
+        if (!res) { refused.push({ sec: sec.id, text: blk.text || blk.id, why: 'no clear run' }); continue; }
+        res.lines.forEach((ln, i) => {
+          if (blk.kind === 'reserve') {
+            const r = F.box(ln.u0, ln.u0 + Math.round(ln.len), Math.round(ln.v - size * ASC), Math.round(ln.v + size * DESC));
+            const [x, y] = F.at(ln.u0, ln.v);
+            (reserves[blk.id] = reserves[blk.id] || { id: blk.id, sec: sec.id, view: sec.view, layer: sec.layer, size, rot: F.rot, chars: blk.chars, lines: [] }).lines.push({ x, y, box: r, len: Math.round(ln.len) });
+            inkOut(occ, r); grow(r);
+            return;
+          }
+          const it = put(blk, ln.text, size, ln.u0, Math.round(ln.v));
+          it.line = i;
+          if (orient === 'x') colU1 = Math.max(colU1, it.box.x1);
+        });
+        prefU0 = res.u0;
+        v = res.vEnd + (blk.after ?? pitch * 0.5);
+        if (orient === 'y') v = Math.round(v);
+      }
+      if (ext.x0 === Infinity) { ext.x0 = sec.at; ext.x1 = sec.at; }
+      extents[sec.id] = { view: sec.view, layer: sec.layer, x0: Math.round(ext.x0), x1: Math.round(ext.x1) };
+      if (!sec.flowless) vCursor[key] = Math.max(prevEnd === -Infinity ? ext.x1 : prevEnd, ext.x1);
+      if (sec.layer === 'base') lastBaseV = Math.max(lastBaseV, ext.x1);
+    }
+    return { items, refused, extents, reserves, floor, orient, scale: S };
+  }
+
+  /* ---- audit (QA and the scene's own self-check): every ink box clear of copper and of every other ink box on
+     its layer, every size at or above the floor ---- */
+  function audit(res) {
+    const bad = [];
+    res.items.forEach((it) => {
+      if (it.size < res.floor) bad.push(['floor', it.text]);
+      if (!clear(base, { x0: it.box.x0 - 0 , y0: it.box.y0, x1: it.box.x1, y1: it.box.y1 })) bad.push(['copper', it.text]);
+      if (it.rot !== 0 && it.rot !== -90) bad.push(['angle', it.text]);
+    });
+    const vis = (a, b) => a.layer === 'base' || b.layer === 'base' || a.view === b.view;
+    for (let i = 0; i < res.items.length; i++) for (let j = i + 1; j < res.items.length; j++) {
+      const a = res.items[i], b = res.items[j];
+      if (!vis(a, b)) continue;
+      if (a.box.x0 < b.box.x1 && b.box.x0 < a.box.x1 && a.box.y0 < b.box.y1 && b.box.y0 < a.box.y1) bad.push(['overlap', a.text, b.text]);
+    }
+    return bad;
+  }
+  return { layout, audit, scale, clear: (r) => clear(base, r), bodies, ADV, ASC, DESC, GRID };
 }
 
 /* ==========================================================================
@@ -4103,7 +4407,9 @@ const Place = (() => {
         const [x0, x1] = detail ? [job.x0, job.x1] : chunkRange(job.k);
         const scale = detail ? 2 : 1;
         const t0 = performance.now();
-        const svg = PT.chunkSVG(x0, x1, { fontCSS: FONT, grain, scale, components: componentsOn });
+        // the netlist's own labels are ink too: with the silkscreen layer on, the layout places them (to read along the
+        // scroll axis on every screen), so the copper chunk leaves them out
+        const svg = PT.chunkSVG(x0, x1, { fontCSS: FONT, grain, scale, components: componentsOn, labels: !silk.res && FEATURES.silk === false });
         const img = await rasterize(svg);
         const cv = document.createElement('canvas');
         cv.width = Math.round((x1 - x0) * scale); cv.height = Math.round(NL.board.h * scale);
@@ -4791,6 +5097,7 @@ const Place = (() => {
       return moving;
     }
     function updateStage() {
+      if (silk.res) { uStage.value.set(0, 0, VP.w * 4, VP.h * 4); return; }
       const el = document.querySelector(STAGE_SEL[S.view] || '#hero-stage');
       const r = el && el.getBoundingClientRect();
       const pr = renderer ? renderer.getPixelRatio() : 1;
@@ -4802,6 +5109,23 @@ const Place = (() => {
       return S.about.focus >= 0 ? S.about.focus : 1;
     };
     function restPose(view) {
+      if (silk.res) return readPose(view);
+      return restPoseV5(view);
+    }
+    // the reading pose: the route's pan position under a fixed camera; the frame never leaves the board
+    function readPose(view) {
+      const R = readFrame(), pan = panFor(view);
+      const readX = scrollToReadX(pan, S.reduced ? window.scrollY : window.scrollY);
+      let dist = R.dist, tx = readX / 100 - R.fp.x0 * dist, tz = (-(R.fp.z0 + R.fp.z1) / 2) * dist;
+      if (camState.push && view === 'home') { const k = camState.push.k; tx = lerp(tx, P(AN.rig.U2).x, k); dist *= 1 - 0.35 * k; tz = lerp(tz, (-(R.fp.z0 + R.fp.z1) / 2) * dist, 1); }
+      const bx0 = NL.board.x0 / 100 + FIT_M, bx1 = NL.board.x1 / 100 - FIT_M;
+      const lo = bx0 - R.fp.x0 * dist, hi = bx1 - R.fp.x1 * dist;
+      tx = lo > hi ? (lo + hi) / 2 : Math.min(Math.max(tx, lo), hi);
+      lastFit.fp = R.fp; lastFit.dist = dist; lastFit.pxPerUnit = R.pxAlong * 100;
+      const target = new THREE.Vector3(tx, 0, tz);
+      return { target, pos: target.clone().addScaledVector(R.dir, dist) };
+    }
+    function restPoseV5(view) {
       let tx = 0, tz = 0, fw = 10.4, fh = 6, dolly = 1;
       const aspect = Math.max(0.2, focus.w / Math.max(1, focus.h));
       const vt = Math.tan((camera.fov * Math.PI) / 360), ht = vt * aspect;
@@ -4971,6 +5295,464 @@ const Place = (() => {
       for (const k of ['x', 'y', 'z']) { const [x, v] = spring(cur[k], vel[k], tgt[k], hl, dt); cur[k] = x; vel[k] = v; }
     }
 
+
+    /* ==== silkscreen layer (silkscreen rebuild 2026-10-14) ====
+       The page's copy is read from the DOM (the semantic layer stays there for screen readers, crawlers and the
+       static path) and drawn as ink on the board: NETLIST_SILK lays it out in the copper-free area, each layer is
+       rasterised through the same SVG-to-texture path as the copper chunks, and the board is the only surface.
+       base: always on (the home page's copy and the parts' designators); view: one layer per route, faded in
+       while that route has the camera (the dossier's detail, About, Contact, the 404). */
+    const SLK = NETLIST_SILK(NL);
+    const INK = { w: [1, 1, 1], d: [0.78, 0.8, 0.82], y: [1, 0.7, 0.26] };
+    const MIN_PX = 12, PERSP = 1.15; // desktop's 82 degree view foreshortens the far rows by up to 15 percent // the smallest rendered font size in CSS px; the floor is the grid step that keeps it
+    const MONO = "ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace";
+    const silk = { res: null, key: '', groups: new Map(), dyn: new Map(), targets: [], hl: new Map(), ring: null, pans: new Map(), err: null, ms: 0 };
+    const up = (s) => String(s || '').replace(/\s+/g, ' ').trim().toUpperCase();
+    const txt = (el) => (el ? up(el.textContent) : '');
+    let sidN = 0;
+    const sid = (el) => { if (!el) return null; if (!el.dataset.silk) el.dataset.silk = 's' + (++sidN); return el.dataset.silk; };
+    const q1 = (sel, root = document) => root.querySelector(sel), qa = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+    /* ---- the deck: which DOM strings become ink, in what role, anchored where ---- */
+    function silkDeck() {
+      const F = (role, ink, text, el, extra) => ({ kind: 'flow', role, ink, text, act: el ? sid(el) : null, ...(extra || {}) });
+      const T = (ref, role, ink, text, act) => ({ kind: 'tag', ref, role, ink, text, act });
+      const secs = [];
+      const hero = q1('#hero');
+      const navInk = () => qa('.nav-links a').map((a) => F('micro', 'y', up(txt(a)), a));
+      secs.push({ id: 'nav', view: 'home', layer: 'base', at: X0 + 140, flowless: true, blocks: navInk() });
+      secs.push({ id: 'nav-end', view: 'home', layer: 'base', at: C('J1').x + 300, flowless: true, blocks: navInk() });
+      secs.push({ id: 'hero', view: 'home', layer: 'view', at: X0 + 140, blocks: [
+        F('micro', 'd', txt(q1('.micro', hero))), F('h1', 'w', txt(q1('#hero-name'))), F('body', 'w', txt(q1('.hero-thesis'))), F('body', 'd', txt(q1('.hero-facts'))),
+        ...qa('.hero-links a', hero).map((a) => F('body', 'y', up((a.firstElementChild || a).textContent), a)),
+        F('micro', 'd', txt(q1('.scroll-cue', hero))),
+      ] });
+      secs.push({ id: 'labels', view: 'home', layer: 'base', at: X0, flowless: true, blocks: NL.labels.map((l) => T('@' + l.x + ',' + (l.y - l.size * 0.3), 'micro', 'd', l.text, null)) });
+      const proof = q1('#proof'), pb = [F('micro', 'd', txt(q1('.eyebrow', proof))), F('h2', 'w', txt(q1('.section-title', proof)))];
+      qa('.claim', proof).forEach((li) => {
+        pb.push(F('body', 'w', (txt(q1('.claim-n', li)) + ' ' + txt(q1('.claim-text', li))).trim(), li));
+        qa('.claim-receipts a', li).forEach((a) => pb.push(F('micro', 'y', txt(a), a)));
+      });
+      secs.push({ id: 'proof', view: 'home', layer: 'view', at: 200, after: 'hero', blocks: pb });
+      const term = q1('#terminal'), tin = q1('#term-input');
+      secs.push({ id: 'terminal', view: 'home', layer: 'view', at: 1200, after: 'proof', blocks: [
+        F('micro', 'd', txt(q1('.eyebrow', term))), F('h2', 'w', txt(q1('.section-title', term))), F('body', 'd', txt(q1('.lede', term))),
+        { kind: 'reserve', id: 'term-in', role: 'body', chars: 22, lines: 1, act: sid(tin) },
+        { kind: 'reserve', id: 'term-out', role: 'body', chars: 22, lines: VP.w < 1100 ? 3 : 5, act: sid(tin) },
+      ] });
+      const work = document.getElementById('/work');
+      secs.push({ id: 'work', view: 'home', layer: 'view', at: 2200, after: 'terminal', blocks: [F('micro', 'd', txt(q1('.eyebrow', work))), F('h2', 'w', txt(q1('.section-title', work)))] });
+      qa('.row', work).forEach((row) => {
+        const proj = (q1('.sl', row) || {}).dataset?.project, cl = AN.clusters[proj];
+        if (!cl) return;
+        const cta = q1('.row-cta a', row), code = q1('.sl-pin', row), node = q1('.sl-node', row), proofEl = q1('.sl-proof', row);
+        const blocks = [
+          T([cl.U2, cl.disp, cl.U3, cl.U1], 'h2', 'y', (txt(q1('.sl-title', row)) + ' ' + txt(q1('.row-num', row))).trim(), sid(cta)),
+          T([...cl.receipts, cl.header], 'micro', 'y', txt(code), sid(code)),
+          T([cl.led, cl.U3], 'micro', 'w', txt(node), sid(node)),
+          T([cl.disp, cl.U3], 'micro', 'd', txt(proofEl), proofEl && proofEl.matches('a[href]') ? sid(proofEl) : null),
+          T(cl.tps.slice().reverse(), 'micro', 'y', 'CLOSE THE LOOP', 'loop:' + proj),
+        ];
+        qa('.facts > div', row).forEach((d) => { blocks.push(F('micro', 'd', txt(q1('dt', d)))); blocks.push(F('body', 'd', txt(q1('dd', d)))); });
+        secs.push({ id: 'row-' + proj, view: 'home', layer: 'base', at: C(cl.U1).x - 260, blocks });
+      });
+      const tl = q1('#timeline'), tb = [F('micro', 'd', txt(q1('.eyebrow', tl))), F('h2', 'w', txt(q1('.section-title', tl)))];
+      qa('.tl-item', tl).forEach((li) => tb.push(F('body', 'w', (txt(q1('.tl-when', li)) + ' ' + txt(q1('.tl-what', li))).trim())));
+      secs.push({ id: 'timeline', view: 'home', layer: 'view', at: C('U_R3').x - 700, blocks: tb });
+      const cb = q1('#contact-band'), cbb = [F('micro', 'd', txt(q1('.eyebrow', cb))), F('h2', 'w', txt(q1('.section-title', cb))), F('body', 'd', txt(q1('.prose', cb)))];
+      const cbEmail = q1('.email', cb), cbCopy = q1('[data-copy]', cb);
+      cbb.push(F('body', 'y', txt(cbEmail), cbEmail), F('body', 'y', txt(cbCopy), cbCopy), { kind: 'reserve', id: 'copy-home', role: 'micro', chars: 16, lines: 1 });
+      qa('.linklist a', cb).forEach((a) => cbb.push(F('body', 'y', txt(a), a)));
+      secs.push({ id: 'contact-band', view: 'home', layer: 'view', at: C('U_CD').x - 1400, blocks: cbb });
+      secs.push({ id: 'footer', view: 'home', layer: 'view', at: C('J1').x + 300, blocks: [...qa('.footer .md-6-12 p').map((p) => F('micro', 'd', txt(p)))] });
+
+      // route layers
+      ['leaflink', 'sidequests'].forEach((id) => {
+        const v = q1(`.view[data-view="${id}"]`), b = [];
+        if (!v) return;
+        b.push(F('micro', 'd', txt(q1('.page-head .eyebrow', v))));
+        qa('.meta-row > div', v).forEach((d) => b.push(F('body', 'w', txt(q1('dt', d)) + ' ' + txt(q1('dd', d)))));
+        qa('.d-section', v).forEach((sec) => {
+          b.push(F('micro', 'd', txt(q1('h2', sec))));
+          [...sec.children].forEach((ch) => {
+            if (ch.matches('h2, .gallery')) return;
+            if (ch.matches('.receipts')) qa('a', ch).forEach((a) => b.push(F('body', 'y', txt(a), a)));
+            else if (ch.matches('.falsify')) qa('li', ch).forEach((li, j) => b.push(F('body', 'w', txt(li), q1('.tp-key', li) || li, { group: 'tp:' + id + ':' + j })));
+            else if (ch.matches('.gallery-empty') && getComputedStyle(ch).display === 'none') return;
+            else b.push(F('body', 'w', txt(ch)));
+          });
+        });
+        qa('.dossier-nav a', v).forEach((a) => b.push(F('body', 'y', txt(a), a)));
+        secs.push({ id: 'v-' + id, view: id, layer: 'view', after: 'row-' + id, blocks: b });
+      });
+      const ab = q1('.view[data-view="about"]');
+      if (ab) {
+        const b = [F('h1', 'w', txt(q1('.page-title', ab))), F('body', 'w', txt(q1('.page-head .lede', ab)))];
+        qa('.dl-rows > div', ab).forEach((d) => { b.push(F('micro', 'd', txt(q1('dt', d)))); qa('dd > p', d).forEach((p) => b.push(F('body', 'w', txt(p)))); });
+        secs.push({ id: 'v-about', view: 'about', layer: 'view', at: X0 + 140, blocks: b });
+      }
+      const ct = q1('.view[data-view="contact"]');
+      if (ct) {
+        const em = q1('.email', ct), cp = q1('[data-copy]', ct);
+        const b = [F('h1', 'w', txt(q1('.page-title', ct))), F('body', 'd', txt(q1('.lede', ct))), F('body', 'y', txt(em), em), F('body', 'y', txt(cp), cp), { kind: 'reserve', id: 'copy-contact', role: 'micro', chars: 16, lines: 1 }];
+        qa('.linklist a', ct).forEach((a) => b.push(F('body', 'y', txt(a), a)));
+        secs.push({ id: 'v-contact', view: 'contact', layer: 'view', at: C('U_CD').x - 1400, blocks: b });
+      }
+      const nf = q1('.view[data-view="notfound"] .term-404');
+      if (nf) {
+        const b = [F('h2', 'w', txt(q1('h1', nf))), { kind: 'reserve', id: 'nf-hash', role: 'body', chars: 28, lines: 1 }];
+        qa('a', nf).forEach((a) => b.push(F('body', 'y', txt(a), a)));
+        secs.push({ id: 'v-notfound', view: 'notfound', layer: 'view', at: C('U_CD').x - 1400, blocks: b });
+      }
+      return secs;
+    }
+
+    /* ---- reading frame: one camera model for every route. Phones turn a quarter (the board's long axis runs down
+       the screen) and look down at 80 degrees; desktop looks along the board at 60. The across-axis framing sets
+       the screen scale, and the floor is the grid step that keeps the smallest ink at MIN_PX or more. ---- */
+    let readMemo = { key: '', v: null };
+    function readFrame() {
+      const mob = VP.w < 1100, key = [mob, VP.w, VP.h].join(',');
+      if (readMemo.key === key) return readMemo.v;
+      Object.assign(focus, { x: 0, y: 0, w: VP.w, h: VP.h, init: true });
+      const e = ((mob ? 80 : 82) * Math.PI) / 180;
+      const dir = mob ? new THREE.Vector3(Math.cos(e), Math.sin(e), 0) : new THREE.Vector3(0, Math.sin(e), Math.cos(e));
+      const fp = footprint(dir) || { x0: -1, x1: 1, z0: -1, z1: 1 };
+      const across = fp.z1 - fp.z0, along = fp.x1 - fp.x0;
+      // board units across the screen: a phone shows 600 board px of the 800 (the floor stays at two grid steps on
+      // a 390px screen); desktop shows the board's whole height
+      const cover = mob ? Math.min(7.0, Math.max(3.6, VP.w / 65)) : 7.5;
+      const dist = cover / across;
+      const pxAcross = (mob ? VP.w : VP.h) / (cover * 100), pxAlong = (mob ? VP.h : VP.w) / (along * dist * 100);
+      const hg = NL.grid / 2, floor = hg * Math.max(2, Math.ceil((mob ? MIN_PX : MIN_PX * PERSP) / (pxAcross * hg) - 1e-9));
+      const half = cover * 50, hudB = 56 / pxAcross;
+      const band = mob ? [Math.round(400 - half + 40), Math.round(400 + half - 40)] : [Math.round(400 - half + hudB), Math.round(400 + half - 16)];
+      const v = { mob, e, dir, fp, dist, pxAcross, pxAlong, floor, band, orient: mob ? 'y' : 'x', lead: (mob ? 64 : 32) / pxAlong, tail: (mob ? 96 : 48) / pxAlong };
+      readMemo = { key, v };
+      return v;
+    }
+
+    /* ---- layout: per reading frame (orientation, floor, band), memoised ---- */
+    function silkLayout() {
+      const R = readFrame(), key = [R.orient, R.floor, R.band.join('-')].join('|');
+      if (silk.key === key && silk.res) return silk.res;
+      const t0 = performance.now();
+      const sections = silkDeck();
+      // a section that follows another starts where that section's ink ends (never before its own mark), so two
+      // sections never interleave lines; chains settle in a few passes
+      const deckOf = (secs) => ({ floor: R.floor, band: R.band, sections: secs, maxChars: R.mob ? 40 : 34 });
+      const at0 = new Map(sections.map((s) => [s, s.at]));
+      let res = SLK.layout(deckOf(sections.filter((s) => s.layer === 'base' || !s.after)), R.orient);
+      for (let pass = 0; pass < 4; pass++) {
+        let moved = false;
+        sections.filter((s) => s.after).forEach((s) => { const e = res.extents[s.after]; const at = Math.max(at0.get(s) ?? -Infinity, e ? e.x1 + 3 * NL.grid : -Infinity); if (at !== s.at && Number.isFinite(at)) { s.at = at; moved = true; } });
+        res = SLK.layout(deckOf(sections), R.orient);
+        if (!moved && pass > 0) break;
+      }
+      res.audit = SLK.audit(res);
+      silk.ms = performance.now() - t0;
+      silk.res = res; silk.key = key;
+      buildSilkMeshes(res, R);
+      silk.pans.clear();
+      return res;
+    }
+
+    /* ---- raster: each layer's lines packed into an atlas, drawn as SVG text with every glyph at its grid
+       position (the advance the layout reserved), rasterised like a copper chunk ---- */
+    const silkK = () => (S.tier === 2 ? 2 : 1);
+    function glyphText(text, size, k, ox, oy, extra = '') {
+      const adv = size * SLK.ADV * k, pad = size * 0.06 * k;
+      const xs = [...text].map((_, i) => (ox + pad + i * adv).toFixed(1)).join(' ');
+      const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      return `<text x='${xs}' y='${oy.toFixed(1)}' font-size='${(size * k).toFixed(1)}' ${extra}>${esc(text)}</text>`;
+    }
+    function packLines(lines, k, W) {
+      let x = 0, y = 0, rowH = 0;
+      const out = lines.map((ln) => {
+        const w = Math.ceil(ln.len * k) + 6, h = Math.ceil(ln.size * (SLK.ASC + SLK.DESC) * k) + 6;
+        if (x + w > W) { x = 0; y += rowH; rowH = 0; }
+        const r = { ln, ax: x, ay: y, aw: w, ah: h };
+        x += w; rowH = Math.max(rowH, h);
+        return r;
+      });
+      return { rects: out, H: Math.max(1, y + rowH) };
+    }
+    const silkMats = [];
+    function silkMaterial(tex, uOp) {
+      const m = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false });
+      m.toneMapped = false;
+      const ink = T.attribute('ink', 'vec3'), hl = T.attribute('hl', 'float');
+      const a = texture(tex).a;
+      // a highlighted line (tap, focus) brightens toward the copper accent; ink is printed, so it never takes the
+      // board's power-front exposure
+      m.colorNode = mix(ink, vec3(1.0, 0.78, 0.42), hl.mul(0.55)).mul(uFade).mul(uDim);
+      m.opacityNode = a.mul(uOp).mul(clamp(float(1).add(hl), 0, 1));
+      silkMats.push(m);
+      return m;
+    }
+    function lineQuad(it, pad) {
+      // board-space corners of a line's ink box (with pad), in reading order: start-top, end-top, end-bottom, start-bottom
+      const a = it.size * SLK.ASC + pad, b = it.size * SLK.DESC + pad, s0 = -pad, s1 = it.len + pad;
+      if (it.rot === 0) return [[it.x + s0, it.y - a], [it.x + s1, it.y - a], [it.x + s1, it.y + b], [it.x + s0, it.y + b]];
+      // turned -90: reading direction is -y, glyph up is -x
+      return [[it.x - a, it.y - s0], [it.x - a, it.y - s1], [it.x + b, it.y - s1], [it.x + b, it.y - s0]];
+    }
+    function disposeGroup(g) { world.remove(g.mesh); g.mesh.geometry.dispose(); g.tex.dispose(); unreg('silk:' + g.key); }
+    async function rasterGroup(key, lines, uOp) {
+      const k = silkK(), W = 2048;
+      const { rects, H: AH } = packLines(lines, k, W);
+      const AHp = Math.min(4096, AH);
+      let svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${AHp}' viewBox='0 0 ${W} ${AHp}'><g font-family="${MONO}" font-weight='700' fill='#fff'>`;
+      rects.forEach((r) => { svg += glyphText(r.ln.text, r.ln.size, k, r.ax + 3, r.ay + 3 + r.ln.size * SLK.ASC * k); });
+      svg += `</g></svg>`;
+      const img = await rasterize(svg);
+      const cv = document.createElement('canvas'); cv.width = W; cv.height = AHp;
+      cv.getContext('2d').drawImage(img, 0, 0);
+      const tex = new THREE.CanvasTexture(cv);
+      tex.anisotropy = maxAniso;
+      tex.onUpdate = () => { cv.width = cv.height = 1; };
+      const pos = [], uvs = [], inks = [], hls = [], idx = [];
+      rects.forEach((r, i) => {
+        const it = r.ln, pad = 3 / k, cs = lineQuad(it, pad);
+        const u0 = r.ax / W, u1 = (r.ax + r.aw) / W, v0 = 1 - r.ay / AHp, v1 = 1 - (r.ay + r.ah) / AHp;
+        const uv = [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];
+        cs.forEach(([x, y], j) => { pos.push(x / 100, 0.004, (y - 400) / 100); uvs.push(...uv[j]); inks.push(...INK[it.ink] || INK.w); hls.push(0); });
+        const o = i * 4; idx.push(o, o + 2, o + 1, o, o + 3, o + 2);
+        it._g = key; it._i = i;
+      });
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setAttribute('ink', new THREE.Float32BufferAttribute(inks, 3));
+      const hlAttr = new THREE.Float32BufferAttribute(hls, 1); hlAttr.setUsage(THREE.DynamicDrawUsage);
+      geo.setAttribute('hl', hlAttr);
+      geo.setIndex(idx);
+      geo.computeBoundingSphere();
+      const mesh = new THREE.Mesh(geo, silkMaterial(tex, uOp));
+      mesh.renderOrder = 5; mesh.frustumCulled = false;
+      reg('silk:' + key, W, AHp, 4, 4 / 3, 'silk');
+      return { key, mesh, tex, geo, hlAttr, uOp, lines: rects.map((r) => r.ln) };
+    }
+    let silkBuild = 0;
+    async function buildSilkMeshes(res, R) {
+      const build = ++silkBuild;
+      const byKey = new Map();
+      res.items.forEach((it) => { const key = it.layer === 'base' ? 'base' : 'view:' + it.view; (byKey.get(key) || byKey.set(key, []).get(key)).push(it); });
+      const made = [];
+      for (const [key, lines] of byKey) {
+        const old = silk.groups.get(key);
+        const uOp = old ? old.uOp : uniform(key === 'base' ? 1 : key === 'view:' + S.view ? 1 : 0);
+        made.push(await rasterGroup(key, lines, uOp));
+        if (build !== silkBuild) { made.forEach(disposeGroup); return; }
+      }
+      silk.groups.forEach((g) => disposeGroup(g));
+      silk.groups.clear();
+      made.forEach((g) => { silk.groups.set(g.key, g); world.add(g.mesh); });
+      buildDynamic(res);
+      silkTargets(res);
+      silkSpacer();
+      if (S.reduced || S.tier === 0) renderOnce(); else wake();
+    }
+
+    /* ---- dynamic ink: the terminal, the copy status and the 404's requested route are live text, redrawn into
+       the lines the layout reserved for them whenever the DOM text changes ---- */
+    function buildDynamic(res) {
+      silk.dyn.forEach((d) => { world.remove(d.mesh); d.mesh.geometry.dispose(); d.tex.dispose(); unreg('silkdyn:' + d.id); });
+      silk.dyn.clear();
+      const k = silkK();
+      Object.values(res.reserves).forEach((rv) => {
+        const lineH = Math.ceil(rv.size * (SLK.ASC + SLK.DESC) * k) + 6, W = Math.ceil(rv.lines[0].len * k) + 6;
+        const cv = document.createElement('canvas'); cv.width = W; cv.height = lineH * rv.lines.length;
+        const tex = new THREE.CanvasTexture(cv);
+        const pos = [], uvs = [], inks = [], hls = [], idx = [];
+        rv.lines.forEach((ln, i) => {
+          const it = { x: ln.x, y: ln.y, size: rv.size, len: ln.len, rot: rv.rot };
+          const cs = lineQuad(it, 3 / k), v0 = 1 - (i * lineH) / cv.height, v1 = 1 - ((i + 1) * lineH) / cv.height;
+          const uv = [[0, v0], [1, v0], [1, v1], [0, v1]];
+          cs.forEach(([x, y], j) => { pos.push(x / 100, 0.004, (y - 400) / 100); uvs.push(...uv[j]); inks.push(...INK.w); hls.push(0); });
+          const o = i * 4; idx.push(o, o + 2, o + 1, o, o + 3, o + 2);
+        });
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        geo.setAttribute('ink', new THREE.Float32BufferAttribute(inks, 3));
+        geo.setAttribute('hl', new THREE.Float32BufferAttribute(hls, 1));
+        geo.setIndex(idx);
+        const g = silk.groups.get(rv.layer === 'base' ? 'base' : 'view:' + rv.view);
+        const mesh = new THREE.Mesh(geo, silkMaterial(tex, g ? g.uOp : uniform(1)));
+        mesh.renderOrder = 6; mesh.frustumCulled = false;
+        world.add(mesh);
+        reg('silkdyn:' + rv.id, cv.width, cv.height, 4, 1, 'silk');
+        const d = { id: rv.id, rv, cv, tex, mesh, k, lineH, last: null };
+        silk.dyn.set(rv.id, d);
+        drawDynamic(d);
+      });
+    }
+    function dynLines(id, chars, n) {
+      const wrap = (s) => { const out = []; String(s).split('\n').forEach((para) => { let line = ''; para.split(/(\s+)/).forEach((w) => { if (!w) return; if ((line + w).length > chars) { if (line.trim()) out.push(line.trimEnd()); line = w.trimStart(); while (line.length > chars) { out.push(line.slice(0, chars)); line = line.slice(chars); } } else line += w; }); out.push(line.trimEnd()); }); return out; };
+      if (id === 'term-out') { const el = q1('#term-out'); const all = el ? [...el.children].map((c) => up(c.textContent)) : []; return wrap(all.join('\n')).filter((l, i, a) => l || i < a.length - 1).slice(-n); }
+      if (id === 'term-in') { const el = q1('#term-input'); const on = document.activeElement === el; return [up('guest@jp:~$ ' + (el ? el.value : '')).slice(-chars + 1) + (on ? '_' : '')]; }
+      if (id === 'copy-home') return [txt(q1('#contact-band .copy-status'))];
+      if (id === 'copy-contact') return [txt(q1('.view[data-view="contact"] .copy-status'))];
+      if (id === 'nf-hash') return [up('$ requested: ' + txt(q1('#nf-hash')))].map((s) => s.slice(0, chars));
+      return [];
+    }
+    function drawDynamic(d) {
+      const lines = dynLines(d.id, d.rv.chars, d.rv.lines.length), sig = lines.join('\n');
+      if (sig === d.last) return;
+      d.last = sig;
+      const g = d.cv.getContext('2d'), k = d.k, size = d.rv.size, adv = size * SLK.ADV * k;
+      g.clearRect(0, 0, d.cv.width, d.cv.height);
+      g.fillStyle = '#fff'; g.font = `700 ${size * k}px ${MONO}`; g.textBaseline = 'alphabetic';
+      lines.forEach((l, i) => { [...l].forEach((ch, j) => g.fillText(ch, 3 + size * 0.06 * k + j * adv, i * d.lineH + 3 + size * SLK.ASC * k)); });
+      d.tex.needsUpdate = true;
+      if (S.reduced || S.tier === 0) renderOnce(); else wake();
+    }
+    const dynWatch = () => silk.dyn.forEach(drawDynamic);
+    new MutationObserver(dynWatch).observe(document.body, { childList: true, subtree: true, characterData: true });
+    ['input', 'focusin', 'focusout'].forEach((ev) => document.addEventListener(ev, () => setTimeout(dynWatch, 0)));
+
+    /* ---- route fade: a route's layer comes up while it has the camera ---- */
+    function silkView(view, instant) {
+      silk.groups.forEach((g, key) => {
+        if (key === 'base') return;
+        const on = key === 'view:' + view ? 1 : 0;
+        if (instant || S.reduced) { g.uOp.value = on; return; }
+        const from = g.uOp.value;
+        tween(0.41, (kk) => { g.uOp.value = from + (on - from) * kk; });
+      });
+    }
+
+    /* ---- targets: every line with an action is a tap target; a target is at least 44 CSS px square ---- */
+    function silkTargets(res) {
+      const t = new Map();
+      res.items.forEach((it) => { if (!it.act) return; (t.get(it.act) || t.set(it.act, { act: it.act, items: [], view: it.view, layer: it.layer }).get(it.act)).items.push(it); });
+      Object.values(res.reserves).forEach((rv) => {
+        const deckAct = rv.id === 'term-out' || rv.id === 'term-in' ? (q1('#term-input') || {}).dataset?.silk : null;
+        if (deckAct) (t.get(deckAct) || t.set(deckAct, { act: deckAct, items: [], view: rv.view, layer: rv.layer }).get(deckAct)).items.push(...rv.lines.map((l) => ({ box: l.box, x: l.x, y: l.y, size: rv.size, len: l.len, rot: rv.rot, layer: rv.layer, view: rv.view })));
+      });
+      silk.targets = [...t.values()];
+    }
+    const pv = new THREE.Vector3();
+    function screenRect(box) {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const [x, y] of [[box.x0, box.y0], [box.x1, box.y0], [box.x0, box.y1], [box.x1, box.y1]]) {
+        pv.set(x / 100, 0, (y - 400) / 100).project(camera);
+        const sx = ((pv.x + 1) / 2) * VP.w, sy = ((1 - pv.y) / 2) * VP.h;
+        x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+      }
+      return { x0, y0, x1, y1 };
+    }
+    const visibleIn = (tg, view) => tg.layer === 'base' || tg.view === view;
+    function silkHit(cx, cy) {
+      let best = null, bestD = Infinity;
+      for (const tg of silk.targets) {
+        if (!visibleIn(tg, S.view)) continue;
+        for (const it of tg.items) {
+          const r = screenRect(it.box);
+          const gx = Math.max(0, 22 - (r.x1 - r.x0) / 2), gy = Math.max(0, 22 - (r.y1 - r.y0) / 2);
+          if (cx < r.x0 - gx || cx > r.x1 + gx || cy < r.y0 - gy || cy > r.y1 + gy) continue;
+          const d = Math.hypot(Math.max(r.x0 - cx, 0, cx - r.x1), Math.max(r.y0 - cy, 0, cy - r.y1));
+          if (d < bestD) { bestD = d; best = tg; }
+        }
+      }
+      return best;
+    }
+    function silkFlash(act, ms = 360) {
+      const on = [];
+      silk.groups.forEach((g) => g.lines.forEach((ln, i) => { if (ln.act === act) on.push([g, i]); }));
+      const set = (v) => { const touched = new Set(); on.forEach(([g, i]) => { for (let j = 0; j < 4; j++) g.hlAttr.array[i * 4 + j] = v; touched.add(g); }); touched.forEach((g) => { g.hlAttr.needsUpdate = true; }); };
+      set(1);
+      clearTimeout(silk.hl.get(act));
+      if (ms > 0) silk.hl.set(act, setTimeout(() => { set(silk.focusAct === act ? 0.6 : 0); wake(); renderOnce(); }, ms));
+      S.lastResponse = { t: performance.now(), kind: 'silk:' + act };
+      wake(); renderOnce();
+    }
+    // a tap on ink acts as the DOM control it was drawn from: links navigate, buttons press, the terminal takes the
+    // keyboard; the claim rows and the slice nodes light their circuits through the wiring table
+    function silkActivate(tg, e) {
+      silkFlash(tg.act);
+      if (tg.act.startsWith('loop:')) { loopNav(tg.act.slice(5), null); return true; }
+      const el = document.querySelector(`[data-silk="${tg.act}"]`);
+      if (!el) return true;
+      const ent = wiringFor(el);
+      if (ent && ent.hl) { hlOn(el, ent); setTimeout(hlOff, 1200); }
+      if (ent && ent.press) ent.press();
+      if (el.matches('#term-input')) { el.focus({ preventScroll: true }); return true; }
+      if (el.matches('.tp-key')) { el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); return true; }
+      if (el.matches('a[href], button')) { el.click(); return true; }
+      if (ent && ent.act) ent.act();
+      return true;
+    }
+
+    /* ---- focus: keyboard focus on a semantic control draws a copper ring round its ink and brings it on screen ---- */
+    function silkFocus(el) {
+      const act = el && el.dataset ? el.dataset.silk : null;
+      const prev = silk.focusAct;
+      silk.focusAct = act || null;
+      if (prev && prev !== act) silkFlash(prev, 1);
+      if (!act) return;
+      const tg = silk.targets.find((t) => t.act === act);
+      if (!tg) return;
+      silkFlash(act, 0);
+      // scroll the page so the ink sits in the reading window
+      const x = Math.min(...tg.items.map((it) => it.box.x0)), x1 = Math.max(...tg.items.map((it) => it.box.x1));
+      const pan = panFor(S.view);
+      const R = readFrame(), vis = (R.mob ? VP.h : VP.w) / R.pxAlong;
+      const cur = scrollToReadX(pan, window.scrollY);
+      if (x < cur || x1 > cur + vis - R.lead - R.tail) window.scrollTo(0, Math.max(0, readXToScroll(pan, x - R.lead * 0.5)));
+    }
+
+    /* ---- the pan: a route's scroll is the board passing under the camera, 1:1 over ink, three times faster over
+       the bare board between sections ---- */
+    function panFor(view) {
+      if (silk.pans.has(view)) return silk.pans.get(view);
+      const res = silk.res, R = readFrame();
+      const secs = Object.entries(res ? res.extents : {}).filter(([id, e]) => (view === 'home' ? e.view === 'home' && id !== 'nav' && id !== 'nav-end' && id !== 'labels' : e.view === view || (AN.clusters[view] && e.view === 'home' && false)));
+      let spans = secs.map(([, e]) => [e.x0, e.x1]);
+      if (AN.clusters[view] && res) { const r = res.extents['row-' + view]; if (r) spans.push([r.x0, r.x1]); }
+      if (view === 'contact' && res) { const r = res.extents['contact-band']; if (r) spans.push([r.x0, r.x1]); }
+      if (!spans.length) spans = [[0, 1000]];
+      spans.sort((a, b) => a[0] - b[0]);
+      const merged = [];
+      spans.forEach((s) => { const m = merged[merged.length - 1]; if (m && s[0] <= m[1] + 200) m[1] = Math.max(m[1], s[1]); else merged.push(s.slice()); });
+      const vis = (R.mob ? VP.h : VP.w) / R.pxAlong;
+      const knots = [[0, merged[0][0] - R.lead]];
+      let s = 0;
+      merged.forEach((m, i) => {
+        if (i) { const g = m[0] - merged[i - 1][1]; s += (g * R.pxAlong) / 3; knots.push([s, m[0]]); }
+        s += (m[1] - (i ? m[0] : knots[0][1])) * R.pxAlong;
+        knots.push([s, m[1]]);
+      });
+      // the last ink reaches the bottom (phones) or right edge (desktop) of the screen at full scroll
+      const endX = merged[merged.length - 1][1] + R.tail - vis;
+      const len = Math.max(0, s - (vis - R.tail - R.lead) * R.pxAlong);
+      const pan = { knots, len, endX, x0: merged[0][0], x1: merged[merged.length - 1][1], spans: merged };
+      silk.pans.set(view, pan);
+      return pan;
+    }
+    function scrollToReadX(pan, y) {
+      const K = pan.knots;
+      if (y <= 0) return K[0][1];
+      for (let i = 1; i < K.length; i++) if (y <= K[i][0]) { const [s0, x0] = K[i - 1], [s1, x1] = K[i]; return x0 + ((x1 - x0) * (y - s0)) / Math.max(1e-6, s1 - s0); }
+      const [s1, x1] = K[K.length - 1], R = readFrame();
+      return x1 + (y - s1) / R.pxAlong;
+    }
+    function readXToScroll(pan, x) {
+      const K = pan.knots;
+      if (x <= K[0][1]) return 0;
+      for (let i = 1; i < K.length; i++) if (x <= K[i][1]) { const [s0, x0] = K[i - 1], [s1, x1] = K[i]; return s0 + ((s1 - s0) * (x - x0)) / Math.max(1e-6, x1 - x0); }
+      return pan.len;
+    }
+    let spacer = null;
+    function silkSpacer() {
+      if (!spacer) { spacer = document.createElement('div'); spacer.id = 'silk-scroll'; spacer.setAttribute('aria-hidden', 'true'); document.body.append(spacer); }
+      const pan = panFor(S.view);
+      spacer.style.height = Math.ceil(pan.len + VP.h) + 'px';
+    }
+    // the route's place along its pan, 0 to 1 (drives the hero method, the dossier states and the About stages)
+    function panProgress() { const pan = panFor(S.view); return pan.len > 0 ? clamp01(window.scrollY / pan.len) : 0; }
+
     /* ==== scrims: rects measured off the frame loop (§1.2) ==== */
     const Scrim = (() => {
       let rects = [], fixed = [], dirty = true, raf = 0;
@@ -5012,6 +5794,7 @@ const Place = (() => {
         dirty = false;
         const sy = window.scrollY;
         rects = []; fixed = [];
+        if (silk.res) return; // no DOM boxes: the copy is ink on the board
         const view = document.querySelector(`.view[data-view="${document.documentElement.getAttribute('data-view')}"]`);
         const blocks = [...(view ? view.querySelectorAll('[data-scrim]') : []), ...document.querySelectorAll('.footer [data-scrim]')];
         blocks.forEach((el) => {
@@ -5239,6 +6022,7 @@ const Place = (() => {
         ledHold(cl.led, 'loop', s.done);
         items(id).forEach((li, j) => { li.toggleAttribute('data-probed', s.probed.has(j)); const k = li.querySelector('.tp-key'); if (k) k.setAttribute('aria-pressed', String(s.probed.has(j))); });
         ledsDirty = true; layersDirty = true;
+        if (typeof syncTpMarks === 'function') syncTpMarks();
       }
       function check(id) {
         const cl = AN.clusters[id], s = st[id];
@@ -5290,6 +6074,99 @@ const Place = (() => {
       }
       return { apply, probeTest, tap, branch, state: () => Object.fromEntries(Object.entries(st).map(([k, v]) => [k, { probed: [...v.probed].sort(), done: v.done }])), reset: (id) => { st[id].probed.clear(); st[id].done = false; apply(id); renderOnce(); } };
     })();
+
+    /* ==== silkscreen: route state from the pan, test point marks, loop navigation, nearest-copper feedback ==== */
+    function silkDrive() {
+      const res = silk.res; if (!res) return;
+      const pan = panFor(S.view), y = window.scrollY;
+      if (S.view === 'home') {
+        const h = res.extents.hero, s1 = h ? readXToScroll(pan, h.x1) : 1;
+        const p = clamp01(y / Math.max(1, s1));
+        if (Math.abs(p - S.hero) > 1e-3) heroProgress(p);
+      } else if (AN.clusters[S.view]) {
+        const p = panProgress(), st = S.dossier[S.view];
+        const state = p < 0.12 ? 0 : p < 0.35 ? 1 : p < 0.55 ? 2 : p < 0.8 ? 3 : 4;
+        if (st && st.state !== state) { const prev = st.state; st.state = state; st.tps = 99; dossierEnter(S.view, prev, state); applyDossier(S.view); }
+      } else if (S.view === 'about') {
+        const f = Math.min(2, Math.floor(panProgress() * 3));
+        if (S.about.focus !== f) { const prev = S.about.focus; S.about.focus = f; S.about.fab = false; if (f > prev && api && api.setAboutStage) api.setAboutStage(f); }
+      }
+    }
+    // test point marks: an unprobed point pulses (a steady glow under reduced motion); probed, it is solid copper
+    const tpMarks = [];
+    const uPulseOn = uniform(S.reduced ? 0 : 1);
+    Object.entries(AN.clusters).forEach(([id, cl]) => cl.tps.forEach((ref, j) => {
+      const c = C(ref);
+      const uState = uniform(0), uFlash = uniform(0);
+      const m = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false });
+      const wave = float(0.3).add(float(0.3).mul(T.sin(uNow.mul(3.9).add(j * 0.5))));
+      const idle = mix(float(0.55), wave, uPulseOn);
+      m.colorNode = vec3(0.91, 0.639, 0.239).mul(uFade).mul(uDim);
+      m.opacityNode = clamp(select(uState.greaterThan(0.5), float(1), idle).add(uFlash), 0, 1);
+      const geo = new THREE.RingGeometry(0.11, 0.17, 32).rotateX(-Math.PI / 2);
+      const mesh = new THREE.Mesh(geo, m);
+      mesh.position.set(c.x / 100, 0.006, (c.y - 400) / 100); mesh.renderOrder = 7;
+      world.add(mesh);
+      tpMarks.push({ id, j, ref, uState, uFlash, mesh });
+    }));
+    function tpPulsing() { return tpMarks.some((t) => t.uState.value < 0.5); }
+    function syncTpMarks() {
+      const st = Game.state();
+      tpMarks.forEach((t) => { t.uState.value = st[t.id] && st[t.id].probed.includes(t.j) ? 1 : 0; });
+    }
+    function tpFlash(id, j) {
+      const t = tpMarks.find((m) => m.id === id && m.j === j); if (!t) return;
+      t.uFlash.value = 0.6; setTimeout(() => { t.uFlash.value = 0; wake(); renderOnce(); }, 220);
+    }
+    // Close the loop as dossier navigation: a point probed outside its dossier takes the camera there; inside, it
+    // probes (the next unprobed point when the row is tighter than a 44px target) and brings its test's ink on screen
+    function loopNav(id, j) {
+      const cl = AN.clusters[id]; if (!cl) return;
+      if (S.view !== id) { location.hash = '#/work/' + id; return; }
+      const st = Game.state()[id], jj = Number.isInteger(j) ? j : cl.tps.findIndex((_, k) => !st.probed.includes(k));
+      const pick = jj < 0 ? 0 : jj;
+      tpFlash(id, pick);
+      Game.probeTest(id, pick);
+      const tg = silk.targets.find((t) => t.items.some((it) => it.group === 'tp:' + id + ':' + pick));
+      if (tg) { silkFlash(tg.act, 900); const x = Math.min(...tg.items.map((it) => it.box.x0)); const R = readFrame(); window.scrollTo(0, Math.max(0, readXToScroll(panFor(id), x - R.lead))); }
+    }
+    // a tap on bare copper still answers: the nearest trace within 22 CSS px lights its net for a moment
+    function copperTap(cx, cy, rad = 22) {
+      const p = boardPoint(cx, cy), q = rad === Infinity ? p : boardPoint(cx + rad, cy);
+      if (!p || !q) return false;
+      const r = rad === Infinity ? Infinity : Math.hypot(q.x - p.x, q.y - p.y);
+      let best = -1, bd = r;
+      for (let i = 0; i < SIM.segs.length; i++) {
+        const g = SIM.segs[i];
+        if (Math.max(g.ax, g.bx) < p.x - r || Math.min(g.ax, g.bx) > p.x + r || Math.max(g.ay, g.by) < p.y - r || Math.min(g.ay, g.by) > p.y + r) continue;
+        const dx = g.bx - g.ax, dy = g.by - g.ay, L2 = dx * dx + dy * dy || 1, t = clamp01(((p.x - g.ax) * dx + (p.y - g.ay) * dy) / L2);
+        const d = Math.hypot(p.x - g.ax - t * dx, p.y - g.ay - t * dy);
+        if (d < bd) { bd = d; best = i; }
+      }
+      if (best < 0) return false;
+      setLayerNets('tap', [SIM.segs[best].net], 0.5);
+      clearTimeout(copperTap.t); copperTap.t = setTimeout(() => { clearLayer('tap'); wake(); renderOnce(); }, 450);
+      S.lastResponse = { t: performance.now(), kind: 'copper' };
+      wake(); renderOnce();
+      return true;
+    }
+    function boardTap(cx, cy) {
+      const tg = silkHit(cx, cy);
+      if (tg) { silkActivate(tg); return 'silk'; }
+      const c = hitTest(cx, cy);
+      if (c && c.role === 'tp' && AN.clusters[c.anchor]) {
+        if (S.view !== c.anchor) { tpFlash(c.anchor, c.test); loopNav(c.anchor, c.test); return 'loop-nav'; }
+        const crowded = (() => { const pp = boardPoint(cx, cy), qq = boardPoint(cx + 44, cy); const px44 = pp && qq ? Math.hypot(qq.x - pp.x, qq.y - pp.y) : Infinity; const tps = AN.clusters[c.anchor].tps.map(C); return Math.min(...tps.slice(1).map((t, i) => Math.hypot(t.x - tps[i].x, t.y - tps[i].y))) < px44; })();
+        loopNav(c.anchor, crowded ? null : c.test); return 'loop';
+      }
+      if (c) { if (S.probe === c.ref) probe(null); else { chipPulse(c.ref); probe(c.ref); } return 'chip'; }
+      if (copperTap(cx, cy)) return 'copper';
+      // bare substrate is not dead either: the nearest net answers the tap, however far
+      if (copperTap(cx, cy, Infinity)) return 'copper';
+      if (S.probe) probe(null);
+      return null;
+    }
+
     const loopTarget = (c) => c && c.role === 'tp' && AN.clusters[c.anchor] && S.view === c.anchor && Number.isInteger(c.test) ? c : null;
 
     /* ==== interaction: chips on the board (§5.1) ==== */
@@ -5345,8 +6222,10 @@ const Place = (() => {
     }
     const interactive = (el) => el && el.closest && el.closest('[data-scrim], a, button, input, textarea, label, select, dialog, [tabindex]:not(main), .nav');
     let lastHoverRef = null, touchProbe = null, touchScrollY = 0;
+    document.addEventListener('pointerdown', (e) => { S.touchY = window.scrollY; }, { passive: true, capture: true });
     document.addEventListener('pointermove', (e) => {
       if (e.pointerType === 'touch' || !S.live) return;
+      if (silk.res) { const tg = silkHit(e.clientX, e.clientY); document.body.style.cursor = tg || hitTest(e.clientX, e.clientY) ? 'pointer' : ''; if (tg) { const el = document.querySelector(`[data-silk="${tg.act}"]`); const ent = el && wiringFor(el); if (ent && (!hlEl || hlEl.el !== el)) hlOn(el, ent); return; } else if (hlEl && !hlEl.el.matches(':focus')) hlOff(); }
       if (interactive(e.target)) { if (lastHoverRef) { lastHoverRef = null; } return; }
       const c = hitTest(e.clientX, e.clientY);
       const ref = c ? c.ref : null;
@@ -5358,12 +6237,14 @@ const Place = (() => {
     document.addEventListener('click', (e) => {
       if (!S.live || interactive(e.target)) return;
       if (e.pointerType === 'touch') return;
+      if (silk.res) { if (!e.isTrusted && e.detail === 0) return; boardTap(e.clientX, e.clientY); return; }
       const c = hitTest(e.clientX, e.clientY);
       if (loopTarget(c)) { Game.tap(c, e.clientX, e.clientY); return; }
       probe(c ? (S.probe === c.ref ? null : c.ref) : null);
     });
     document.addEventListener('pointerup', (e) => {
       if (e.pointerType !== 'touch' || !S.live || interactive(e.target)) return;
+      if (silk.res) { if (Math.abs(window.scrollY - (S.touchY ?? window.scrollY)) > 10) return; boardTap(e.clientX, e.clientY); return; }
       const c = hitTest(e.clientX, e.clientY);
       if (loopTarget(c)) { Game.tap(c, e.clientX, e.clientY); return; }
       if (!c || (touchProbe === c.ref)) { touchProbe = null; probe(null); return; }
@@ -5379,7 +6260,7 @@ const Place = (() => {
     function activeNow(now) {
       return tweens.length > 0 || !!camState.flight || camMoving || !!booting || events.length > 0 ||
         Math.abs(S.rail.target - S.rail.current) > 1e-4 || Math.abs(S.scroll.target - S.scroll.current) > 1e-4 || S.flow > 1e-3 ||
-        (mobileLock() && window.scrollY !== S.railY.current) ||
+        (mobileLock() && window.scrollY !== S.railY.current) || (!!silk.res && window.scrollY !== S.drawnY) ||
         slots.some((s) => s.busy && s.end > now) || ledsTiming(now) || Object.values(dispState).some((t) => t > now);
     }
     function frame() {
@@ -5387,7 +6268,7 @@ const Place = (() => {
       const dt = Math.min(64, now - (lastFrame || now));
       lastFrame = now;
       const active = activeNow(now);
-      const ambientOn = !S.reduced && S.tier > 0 && FEATURES.pulses && laneSources(S.view).src.length > 0;
+      const ambientOn = !S.reduced && S.tier > 0 && ((FEATURES.pulses && laneSources(S.view).src.length > 0) || tpPulsing());
       if (!active && firstFrameDone) {
         if (S.reduced || S.tier === 0) { stopLoop(); return; }
         if (now - lastRender < 33) return; // idle pulse at 30 fps: DATA packets are the only rest loop (§14.3)
@@ -5418,7 +6299,13 @@ const Place = (() => {
       const fm = stepFocus(dt);
       updateStage();
       Scrim.upload();
-      if (!camState.flight) {
+      if (!camState.flight && silk.res) {
+        // reading: the board is drawn from the scroll position of the frame it is drawn in (1:1, never trailing)
+        const rp = restPose(S.view);
+        camState.pos.copy(rp.pos); camState.target.copy(rp.target); camState.vel.set(0, 0, 0); camState.velT.set(0, 0, 0);
+        camMoving = false; S.drawnY = window.scrollY;
+        silkDrive();
+      } else if (!camState.flight) {
         const rp = restPose(S.view);
         if (lockNow && camLocked) {
           // the scroll-driven part of the pose moves the camera directly, the same frame; only the rest (a route's
@@ -5545,6 +6432,7 @@ const Place = (() => {
       S.view = view;
       laneVisibility(view);
       probe(null);
+      if (silk.res) { silkView(view, S.reduced || opts.instant || S.tier === 0); silkSpacer(); }
       if (S.reduced || opts.instant || S.tier === 0) {
         const apply = () => {
           camState.flight = null;
@@ -5775,6 +6663,7 @@ const Place = (() => {
     document.addEventListener('pointerout', (e) => { if (hlEl && (!e.relatedTarget || !hlEl.el.contains(e.relatedTarget))) hlOff(); });
     document.addEventListener('focusin', (e) => {
       if (!S.live) return;
+      if (silk.res) silkFocus(e.target);
       const ent = wiringFor(e.target);
       if (ent && ent.kind === 'terminal') { term('focus'); S.lastResponse = { t: performance.now(), kind: 'terminal-focus' }; wake(); renderOnce(); return; }
       if (ent) hlOn(e.target, ent);
@@ -5809,7 +6698,7 @@ const Place = (() => {
       S.lastScrollY = y; S.lastScrollT = t;
       if (S.reduced || S.tier === 0) renderOnce(); else wake();
     }, { passive: true });
-    window.addEventListener('resize', throttle(() => { const w0 = VP.w, h0 = VP.h; resize(); if (VP.w !== w0 || VP.h !== h0) focus.init = false; if (S.reduced || S.tier === 0) renderOnce(); else wake(); }, 100));
+    window.addEventListener('resize', throttle(() => { const w0 = VP.w, h0 = VP.h; resize(); if (silk.res) { silk.pans.clear(); silkLayout(); silkSpacer(); } if (VP.w !== w0 || VP.h !== h0) focus.init = false; if (S.reduced || S.tier === 0) renderOnce(); else wake(); }, 100));
     document.addEventListener('visibilitychange', () => { if (document.hidden) stopLoop(); else wake(); });
     if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => Scrim.measure()).observe(document.querySelector('main'));
     document.fonts && document.fonts.ready.then(() => Scrim.measure());
@@ -5819,6 +6708,10 @@ const Place = (() => {
     const firstRender = async () => {
       S.view = document.documentElement.getAttribute('data-view') || 'home';
       if (!STAGE_SEL[S.view]) S.view = 'home';
+      if (FEATURES.silk !== false) {
+        try { silkLayout(); root.classList.add('silk-on'); silkView(S.view, true); silkSpacer(); }
+        catch (err) { silk.err = String(err && err.message); console.warn('[place] silkscreen failed:', silk.err); silk.res = null; root.classList.remove('silk-on'); }
+      }
       laneVisibility(S.view);
       powerRoute(S.view, true);
       resolveRouteState(S.view);
@@ -5859,11 +6752,14 @@ const Place = (() => {
     try { seenBoot = sessionStorage.getItem('jp.boot') === '1'; } catch {}
     api = {
       wake, go, renderOnce, term, wiringFor, menu, spawn, probe, scrim: () => Scrim.measure(),
-      setScroll: ignoreWhenReduced((p) => { S.scroll.target = clamp01(p); wake(); }),
-      setRail: (u) => { S.rail.target = u; if (S.reduced) { S.rail.current = u; renderOnce(); } else wake(); },
-      setRailAnchors: (ys) => { railAnchors = (ys || []).filter((a) => a && Number.isFinite(a[0])).map((a) => [a[0], a[1]]); if (S.reduced) renderOnce(); else wake(); },
-      setHero: (p) => { heroProgress(p); wake(); },
+      setScroll: ignoreWhenReduced((p) => { if (silk.res) return; S.scroll.target = clamp01(p); wake(); }),
+      setRail: (u) => { if (silk.res) return; S.rail.target = u; if (S.reduced) { S.rail.current = u; renderOnce(); } else wake(); },
+      setRailAnchors: (ys) => { if (silk.res) return; railAnchors = (ys || []).filter((a) => a && Number.isFinite(a[0])).map((a) => [a[0], a[1]]); if (S.reduced) renderOnce(); else wake(); },
+      setHero: (p) => { if (silk.res) return; heroProgress(p); wake(); },
+      silkAnchor: (id) => { if (!silk.res) return false; const map = { '/work': 'work' }; const e = silk.res.extents[map[id] || id]; if (!e) return false; const R = readFrame(); window.scrollTo(0, Math.max(0, readXToScroll(panFor(S.view), e.x0 - R.lead))); return true; },
+      setAboutStage: (f) => { const stage = [() => spawn({ kind: 'about-data', sources: AN.rig.lanes.map((_, i) => ({ pin: 'J2.' + (i + 1) })), opts: { allow: allRig(['pass']) } }), () => term('verify'), () => spawn({ kind: 'about-determine', sources: [{ pin: AN.rig.U2 + '.22' }, { pin: AN.rig.U2 + '.21' }], opts: { allow: new Set([AN.rig.U3, ...allRig(['pass', 'led'])]) } })][f]; if (stage) stage(); wake(); },
       setDossier: (id, state, tps) => {
+        if (silk.res) return;
         const st = S.dossier[id];
         if (!st || (st.state === state && st.tps === tps)) return;
         const prev = st.state;
@@ -5872,6 +6768,7 @@ const Place = (() => {
         wake(); renderOnce();
       },
       setAbout: (focusI, fab) => {
+        if (silk.res) return;
         if (S.about.focus === focusI && S.about.fab === fab) return;
         const prev = S.about.focus;
         S.about.focus = focusI; S.about.fab = fab;
@@ -5906,6 +6803,7 @@ const Place = (() => {
           events.length = 0;
           stopLoop();
           applyReducedDiorama();
+          if (typeof uPulseOn !== 'undefined') uPulseOn.value = 0;
           S.scroll.current = S.scroll.target; S.rail.current = S.rail.target;
           renderOnce();
         } else if (was) { [...ledState.values()].forEach((st) => st.held.delete('rm')); ledsDirty = true; wake(); }
@@ -5916,6 +6814,7 @@ const Place = (() => {
         return true;
       },
       debug: {
+        silk: () => ({ res: silk.res, key: silk.key, ms: silk.ms, err: silk.err, groups: [...silk.groups.keys()], dyn: [...silk.dyn.keys()], targets: silk.targets.map((t) => ({ act: t.act, view: t.view, layer: t.layer, n: t.items.length })), read: readFrame(), pan: (v) => panFor(v || S.view), screenRect, silkHit: (x, y) => { const t = silkHit(x, y); return t ? t.act : null; }, boardTap, opacity: Object.fromEntries([...silk.groups].map(([k, g]) => [k, g.uOp.value])), tp: tpMarks.map((t) => ({ id: t.id, j: t.j, state: t.uState.value })) }),
         loop: () => Game.state(), loopProbe: (id, j) => Game.probeTest(id, j), loopReset: (id) => Game.reset(id), loopBranch: (id, j) => Game.branch(id, j).reachedSegs.slice(),
         stream: () => ({ need: S.tier === 2 ? null : wantList().want, have: [...chunks.keys()], queue: rasterQueue.map((j) => j.key), inflight, destWant, pool: matPool.length, ms: [...chunks.values()].map((c) => Math.round(c.ms)) }),
         THREE, ctx, NL, SIM, S, FEATURES, camState, segMesh, perf, texStats, chunks, camera, scene, world, focus, slots, walkLog, bootLog, layers, ledState, disps, lanes, RECEIPTS, Scrim,
@@ -6055,6 +6954,7 @@ const Place = (() => {
       }
     },
     go(view, opts) { if (api) api.go(view, opts); },
+    silkAnchor(id) { return !!(api && api.silkAnchor && api.silkAnchor(id)); },
     setScroll(p) { if (api && api.setScroll) api.setScroll(p); },
     setRail(u) { if (api && api.setRail) api.setRail(u); },
     setRailAnchors(ys) { pendingAnchors = ys; if (api && api.setRailAnchors) api.setRailAnchors(ys); },
