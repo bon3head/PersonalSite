@@ -2,6 +2,11 @@
 
 v2.1: repo receipts filled (LeafLink, SideQuests); terminal projects lines use "name: description"; full-deck dash scan clean. 2026-10-04.
 
+v2.3 amendment: claim 4 is `Code is public.` plus the codeberg.org/bon3head link only. The live GitHub repo-count line and its GitHub API fetch are removed (the GitHub count contradicted the Codeberg profile). 2026-10-04.
+
+v2.4 amendment: the LeafLink slice strings `Shipped`, `Proof`, `LeafLink`, `Live` and `Code` are approved copy (Justin, 2026-10-11), not placeholders. See §4.1. 2026-10-12.
+v2.5 amendment: `Live` is cut (no project is live, iPhone review 2026-10-12). SideQuests gets the same module, so the project rows lose their own name line and `repo` receipt line: the module title is the row heading and its `Code` pin is the repo receipt. See §4.1. 2026-10-12.
+
 Facts come from spec/portfolio-spec.md plus the project facts Justin's review supplied on 2026-10-04 (LeafLink, SideQuests). Anything not stated is [TBD]. "(→ TBD)" marks a claim whose receipt URL is not yet known. GPA is cut (spec §13).
 
 ## 0. Global
@@ -37,7 +42,7 @@ Facts come from spec/portfolio-spec.md plus the project facts Justin's review su
 - Claim 1: `Two hackathon builds. Both placed 2nd.` Receipts: `LeafLink placement` (→ TBD) · `SideQuests placement` (→ TBD)
 - Claim 2: `SideQuests: working MVP in 24 hours at Hack New Paltz.` Receipts: `repo` (→ https://codeberg.org/bon3head/sidequests) · `demo` (→ TBD)
 - Claim 3: `LeafLink: event discovery platform, built by a team of four in a week-long hackathon.` Receipts: `repo` (→ https://codeberg.org/bon3head/LeafLink) · `demo` (→ TBD)
-- Claim 4: `Code is public.` Receipt: `codeberg.org/bon3head` (→ https://codeberg.org/bon3head). Live line: `{N} public repos · via GitHub API` (hidden if the API fails, spec §10)
+- Claim 4: `Code is public.` Receipt: `codeberg.org/bon3head` (→ https://codeberg.org/bon3head). No live line, no GitHub API (v2.3).
 
 ## 3. Terminal (spec §6, §10: exactly help, whoami, projects, verify, contact, clear)
 
@@ -103,9 +108,19 @@ contact
 
 - Eyebrow: `03 / DOSSIERS`
 - Heading: `Shipped Work`
-- Row labels: `WHAT IT IS` · `FAILURE CLASS SURVIVED` · `RECEIPT`
-- LeafLink: `LeafLink` / `Event discovery platform. Week-long hackathon, team of four, 2nd place.` / `[TBD: confirm]` / `repo` (→ https://codeberg.org/bon3head/LeafLink) / `Read the dossier`
-- SideQuests: `SideQuests` / `Peer-to-peer quest matching. Hack New Paltz, working MVP in 24 hours, 2nd place.` / `Proposed: scope collapse under timebox [TBD: confirm]` / `repo` (→ https://codeberg.org/bon3head/sidequests) / `Read the dossier`
+- Row labels: `WHAT IT IS` · `FAILURE CLASS SURVIVED` (`RECEIPT` cut 2026-10-12: the module's `Code` pin is the receipt, §4.1)
+- LeafLink: `Event discovery platform. Week-long hackathon, team of four, 2nd place.` / `[TBD: confirm]` / `Read the dossier` (name and `repo` now live in the module, §4.1)
+- SideQuests: `Peer-to-peer quest matching. Hack New Paltz, working MVP in 24 hours, 2nd place.` / `Proposed: scope collapse under timebox [TBD: confirm]` / `Read the dossier` (name and `repo` now live in the module, §4.1)
+
+### 4.1 Project slices (home, one per dossier row; approved 2026-10-11, amended 2026-10-12)
+
+The receipt row and module drawn as a circuit at the top of each project row. Labels render in silkscreen caps; the words are these, exactly.
+
+- Module designator (the row heading): `LeafLink` · `SideQuests`
+- Castellated pin: `Code` (LeafLink → https://codeberg.org/bon3head/LeafLink; SideQuests → https://codeberg.org/bon3head/sidequests; each is the row's repo receipt)
+- Receipt row: `Shipped` (junction) · `Proof` (→ TBD: which receipt, Justin's call)
+- A node without a link renders as plain label text with no link and a grey pad, per the zero-visible-TBD rule.
+- Cut: `Live` (2026-10-12). Cut from the rows: the second name line and the `RECEIPT` / `repo` line, which repeated the module.
 
 ## 5. Timeline (spec §5.1.4: education, campus roles, hackathons, job-hunt filings, nothing else)
 

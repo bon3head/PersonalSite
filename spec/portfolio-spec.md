@@ -8,7 +8,7 @@ Owner: Justin Poli (justinf0829@gmail.com, (631) 835-5490, Smithtown, NY)
 2. Single self-contained HTML file (inline CSS/JS, embedded font subset, CDN-pinned three.js r186 + GSAP via importmap). Rationale: byte-verifiable deploy, zero build step, matches the proven vercel-demo-launch pipeline. Trade-off: no framework; all component logic is hand-rolled and must pass the standard-implementations reference.
 3. Project roster stays locked to LeafLink + SideQuests per GOAL.md. A third "lab shelf" slot (e.g., playable sudoku lie detector) is specced as OPTIONAL and clearly marked; adding it needs Justin's explicit call.
 4. Contact form ships with a pluggable endpoint adapter and a mailto + copy-email fallback. No backend is wired at launch; wiring needs Justin's explicit approval (Day-1 trust boundary: no outbound without absolute approval).
-5. Codeberg (https://codeberg.org/bon3head) is the canonical code URL on the site, per his 2026-10-02 recruiting preference. GitHub bon3head is linked secondarily. Live repo stats come from the GitHub public API (Codeberg's anti-AI tooling blocks programmatic fetch); stats are fail-soft and labeled with their source.
+5. Codeberg (https://codeberg.org/bon3head) is the canonical code URL on the site, per his 2026-10-02 recruiting preference. GitHub bon3head is linked secondarily. No live repo stats: the GitHub API repo count was removed (copy deck v2.3 amendment, 2026-10-04) because it contradicted the Codeberg profile.
 
 ## 1. Goal and audience
 Primary audience: technical hiring managers and senior engineers evaluating a new-grad SWE (backend/systems leaning, graduating Dec 2027) for full-time roles starting 2027.
@@ -119,15 +119,14 @@ async function submitContact(data) {
   // every path ends in visible confirmation
 }
 ```
-- GitHub stats (fail-soft): fetch `https://api.github.com/users/bon3head/repos` client-side, cache in memory only, render "N public repos" style counts; on failure, hide the stats block silently (no error UI for a non-critical enhancement). Label source: "via GitHub API".
+- No GitHub stats (copy deck v2.3 amendment, 2026-10-04): proof claim 04 is "Code is public." with the codeberg.org/bon3head link only. The site makes no GitHub API calls.
 - No cookies, no tracking, no analytics v1 (cut for privacy posture; Vercel analytics is Justin's call post-launch).
 
 ## 11. Backend / API surface
 v1 has no custom backend. The only network calls:
 1. CDN: three.js r186 + GSAP (pinned versions, importmap; SRI hashes where the CDN provides them).
 2. Fonts: embedded subset (no Google Fonts request at runtime; fonts inlined as woff2 data URIs).
-3. GitHub public API (fail-soft, §10).
-4. Contact endpoint: null at launch (mailto fallback).
+3. Contact endpoint: null at launch (mailto fallback).
 Future (needs Justin approval): contact form endpoint (Vercel serverless or form service), view counter. Specced as adapters, not built.
 
 ## 12. Design tokens (filled 2026-10-04 from design-extract v2: corentinbernadou.com + bruno-simon.com)
@@ -162,7 +161,6 @@ Anti-template re-check: these tokens produce editorial sections + full-bleed dos
 - 393px width: single column; nav collapses to accessible overlay menu; hero copy stacks above a minimized scene or static backdrop; tap targets ≥44px.
 - Offline after first load: n/a (no service worker v1; cut).
 - CDN failure: if three.js fails to load, scene init is skipped silently and the static hero stands. The page never shows a broken canvas or an error to the visitor.
-- GitHub API failure: stats block hidden (§10).
 - Form with no endpoint: mailto fallback (§5.4, §10).
 
 ## 16. QA gates (all must pass before Claude's final review)
