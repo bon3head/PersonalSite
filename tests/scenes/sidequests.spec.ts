@@ -339,12 +339,11 @@ test('T-SQ-3: readout contrast', async ({ page }) => {
 test('T-SQ-6: hue budget', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await loadHarness(page);
-  // Light all three trails by keyboard: marker 2 projects below the
-  // 900px viewport at the spec fine pose (engine projection (1392, 1259)
-  // for (16, 10)), so no pointer click can reach it. Keyboard walking is
-  // a first-class interaction (T-SQ-5) and the gate here is the pixel
-  // budget with all trails lit, not the input device. The off-screen
-  // marker itself is flagged in BUILD-STATE.md for the coordinator.
+  // Light all three trails by keyboard. (B6c-fix: markers are now
+  // constrained to the fine viewport, so pointer clicks can also reach
+  // all three twins; keyboard walking is kept here because it is a
+  // first-class interaction (T-SQ-5) and the gate here is the pixel
+  // budget with all trails lit, not the input device.)
   await page.keyboard.press('Tab');
   await page.keyboard.press('Enter');
   await page.keyboard.press('Tab');

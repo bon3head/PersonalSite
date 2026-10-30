@@ -16,7 +16,7 @@ buildSync({
   logLevel: 'silent',
 });
 const mod = await import('/tmp/sq-bundle.mjs');
-const { generate } = mod;
+const { generate, readoutClearZone, projectToFineScreen } = mod;
 import tokens from '../../../themes/lane/tokens.generated.json' with { type: 'json' };
 
 const W = tokens.world;
@@ -170,6 +170,36 @@ for (const m of side1.markers) {
   }
 }
 check('markers clear of footprints by margin', clearanceOk, `min clearance ${minClear.toFixed(3)}`);
+
+// B6c-fix: readout clear zone (S07 section 3.2 / K-SQ-5). No non-grid lane
+// point may fall inside the fine readout box projected to the ground.
+const zone = readoutClearZone();
+let zoneBad = 0;
+let zoneFirst = null;
+for (let lane = 0; lane < W.laneCount; lane++) {
+  if (laneClass(out1, lane) === 4) continue;
+  for (let k = 0; k < 8; k++) {
+    const [x, , z] = texel(out1, lane, k);
+    if (x >= zone[0] && x <= zone[2] && z >= zone[1] && z <= zone[3]) {
+      zoneBad++;
+      if (zoneFirst === null) zoneFirst = `lane ${lane} point ${k} (${x.toFixed(2)}, ${z.toFixed(2)})`;
+    }
+  }
+}
+check('no non-grid lane point inside readout clear zone', zoneBad === 0, zoneFirst ?? `zone [${zone.map((v) => v.toFixed(2)).join(', ')}]`);
+
+// B6c-fix: marker visibility at the fine pose. Every marker head must
+// project inside the 1440x900 viewport with a 50px margin.
+const headY = W.sidequests.marker.poleHeight + W.sidequests.marker.radius * W.sidequests.marker.squashY;
+let visOk = true;
+let visDetail = '';
+for (let i = 0; i < side1.markers.length; i++) {
+  const [mx, mz] = side1.markers[i];
+  const [sx, sy] = projectToFineScreen(mx, headY, mz);
+  visDetail += `m${i}=(${sx.toFixed(0)},${sy.toFixed(0)}) `;
+  if (sx < 50 || sx > 1390 || sy < 50 || sy > 850) visOk = false;
+}
+check('markers project inside fine viewport with 50px margin', visOk, visDetail);
 
 // Trails: lane ids ordered, arc starts increasing, dash lengths sane, trails curved.
 check('trails 3', side1.trails.length === 3, `got ${side1.trails.length}`);

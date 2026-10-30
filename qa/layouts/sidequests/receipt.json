@@ -1,46 +1,46 @@
 {
-  "ms": 74.9,
+  "ms": 16.9,
   "warmSamples": [
-    180.4,
-    61,
-    100.8,
-    67.6,
-    74.9
+    23.1,
+    16.9,
+    13.3,
+    9.9,
+    32.3
   ],
-  "coldMs": 105.4,
+  "coldMs": 99.6,
   "counts": {
     "4": 2080,
-    "5": 376,
-    "6": 3403,
-    "7": 146,
-    "8": 139
+    "5": 361,
+    "6": 3423,
+    "7": 140,
+    "8": 140
   },
   "total": 6144,
-  "hash": "5fe3fe09c6e02217a6b0848afd89f085651e20e80079004335251f4dc0b32e18",
+  "hash": "9677011ce9145b335d14119b28133090440475ea8b63a9f2efe9ff5934e00aa3",
   "markers": [
     [
-      -13,
-      -4
+      1,
+      -1
     ],
     [
-      16,
-      10
+      15,
+      3
     ],
     [
-      9,
-      -12
+      -12,
+      -7
     ]
   ],
   "trailLanes": [
-    48,
-    37,
-    54
+    40,
+    44,
+    56
   ],
   "checks": [
     {
       "name": "generation under 150ms (warm median of 5)",
       "ok": true,
-      "detail": "74.9ms"
+      "detail": "16.9ms"
     },
     {
       "name": "all lanes written with valid classes",
@@ -70,7 +70,7 @@
     {
       "name": "hatch N matches remainder",
       "ok": true,
-      "detail": "hatch=3403 remainder=3403"
+      "detail": "hatch=3423 remainder=3423"
     },
     {
       "name": "class emission order grid,outlines,walkways,trails,hatch",
@@ -85,17 +85,27 @@
     {
       "name": "markers 3",
       "ok": true,
-      "detail": "[[-13,-4],[16,10],[9,-12]]"
+      "detail": "[[1,-1],[15,3],[-12,-7]]"
     },
     {
       "name": "markers apart and away from start",
       "ok": true,
-      "detail": "[[-13,-4],[16,10],[9,-12]]"
+      "detail": "[[1,-1],[15,3],[-12,-7]]"
     },
     {
       "name": "markers clear of footprints by margin",
       "ok": true,
-      "detail": "min clearance 1.867"
+      "detail": "min clearance 0.909"
+    },
+    {
+      "name": "no non-grid lane point inside readout clear zone",
+      "ok": true,
+      "detail": "zone [5.24, -19.23, 17.02, -0.68]"
+    },
+    {
+      "name": "markers project inside fine viewport with 50px margin",
+      "ok": true,
+      "detail": "m0=(652,391) m1=(1349,790) m2=(240,70) "
     },
     {
       "name": "trails 3",
@@ -105,22 +115,22 @@
     {
       "name": "trail lanes ordered, dashed, curved, endpoints exact",
       "ok": true,
-      "detail": "trail0: lanes=48 maxDev=2.57; trail1: lanes=37 maxDev=2.59; trail2: lanes=54 maxDev=0.77; "
+      "detail": "trail0: lanes=40 maxDev=2.90; trail1: lanes=44 maxDev=3.78; trail2: lanes=56 maxDev=2.95; "
     },
     {
       "name": "trail lane total matches class count",
       "ok": true,
-      "detail": "139 vs 139"
+      "detail": "140 vs 140"
     },
     {
       "name": "no trail overlap over 2 units",
       "ok": true,
-      "detail": "trails 0-1: maxRunUnits~0.45; trails 0-2: maxRunUnits~0.45; trails 1-2: maxRunUnits~1.70; "
+      "detail": "trails 0-1: maxRunUnits~0.50; trails 0-2: maxRunUnits~0.80; trails 1-2: maxRunUnits~0.45; "
     },
     {
       "name": "deterministic hash across runs",
       "ok": true,
-      "detail": "5fe3fe09c6e02217"
+      "detail": "9677011ce9145b33"
     },
     {
       "name": "side data deterministic",
@@ -130,7 +140,7 @@
     {
       "name": "different seed differs",
       "ok": true,
-      "detail": "9f352671e27648b4"
+      "detail": "0f03060d81a8fb67"
     }
   ]
 }

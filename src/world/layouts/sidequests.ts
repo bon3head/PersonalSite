@@ -399,7 +399,10 @@ function fits(cand: Footprint, placed: Footprint[]): boolean {
 }
 
 // Rejection-sampled footprints; restarts on a fresh stream when the count misses.
-function placeBuildings(mainR: () => number, base: number): Footprint[] {
+// Footprints intersecting the readout clear zone are rejected (kill criterion:
+// outlines and hatch live inside footprints, so keeping footprints out
+// keeps their lanes out too).
+function placeBuildings(mainR: () => number, base: number, zone: Zone): Footprint[] {
   const b = T.world.sidequests.buildings;
   let attempt = 0;
   for (;;) {
@@ -408,6 +411,7 @@ function placeBuildings(mainR: () => number, base: number): Footprint[] {
     const placed: Footprint[] = [];
     for (let t = 0; t < b.maxAttempts && placed.length < b.count; t++) {
       const cand = sampleBuilding(r);
+      if (rectHitsZone(cand.rect, zone)) continue;
       if (fits(cand, placed)) placed.push(cand);
     }
     if (placed.length === b.count) return placed;
@@ -469,6 +473,180 @@ function nudgeOut(p: Vec, poly: Vec[], margin: number): Vec {
     q = [q[0] + dx * 0.1, q[1] + dz * 0.1]; // lit-ok: nudge step size
   }
   return q;
+}
+
+// ---- Fine-camera model for the readout clear zone (S07 readability rule) ----
+// Pure math, no three import: the generator runs in a worker. Verified
+// against THREE's PerspectiveCamera worldToScreen/screenToGround for the
+// spec fine pose (agreement within rounding; B6c-fix receipts).
+// The readout box is the live DOM measurement at 1440x900 (B4 S04
+// section 6 placement): x 1012..1392, y 88..508. // lit-ok: measured box
+// The zone is that box projected to y=0 through the fine camera, as an
+// AABB expanded by a 1-unit margin (about 40px on screen, far above lane
+// width + antialiasing). Only grid lanes may fall inside it (kill criterion).
+
+type Vec3 = [number, number, number];
+
+function norm3(v: Vec3): Vec3 {
+  const len = Math.hypot(v[0], v[1], v[2]);
+  return [v[0] / len, v[1] / len, v[2] / len];
+}
+
+function cross3(a: Vec3, b: Vec3): Vec3 {
+  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+}
+
+interface FineCam {
+  pos: Vec3;
+  forward: Vec3;
+  right: Vec3;
+  camUp: Vec3;
+  p0: number;
+  p5: number;
+  p8: number;
+  p9: number;
+}
+
+function fineCamera(): FineCam {
+  const cam = T.world.camera.sidequests.fine;
+  const pos: Vec3 = [cam.pos[0], cam.pos[1], cam.pos[2]];
+  const tgt: Vec3 = [cam.target[0], cam.target[1], cam.target[2]];
+  const f = 1 / Math.tan(((cam.fovDeg * Math.PI) / 180) / 2); // lit-ok: degrees to radians
+  const aspect = 1440 / 900; // lit-ok: T-SQ-3 reference viewport
+  const forward = norm3([tgt[0] - pos[0], tgt[1] - pos[1], tgt[2] - pos[2]]);
+  let right = cross3(forward, [0, 1, 0]);
+  if (Math.hypot(right[0], right[1], right[2]) < 1e-6) right = [1, 0, 0]; // lit-ok: degenerate-view guard
+  right = norm3(right);
+  const camUp = cross3(right, forward);
+  return {
+    pos,
+    forward,
+    right,
+    camUp,
+    p0: f / aspect,
+    p5: f,
+    p8: -cam.shiftNdc[0],
+    p9: -cam.shiftNdc[1],
+  };
+}
+
+// Project a world point to CSS px at the 1440x900 fine reference viewport.
+export function projectToFineScreen(x: number, y: number, z: number): [number, number] {
+  const cam = fineCamera();
+  const rx = x - cam.pos[0];
+  const ry = y - cam.pos[1];
+  const rz = z - cam.pos[2];
+  const xr = rx * cam.right[0] + ry * cam.right[1] + rz * cam.right[2];
+  const yu = rx * cam.camUp[0] + ry * cam.camUp[1] + rz * cam.camUp[2];
+  const zv = -(rx * cam.forward[0] + ry * cam.forward[1] + rz * cam.forward[2]);
+  const nx = (cam.p0 * xr + cam.p8 * zv) / -zv;
+  const ny = (cam.p5 * yu + cam.p9 * zv) / -zv;
+  return [((nx + 1) / 2) * 1440, ((1 - ny) / 2) * 900]; // lit-ok: T-SQ-3 reference viewport
+}
+
+// Unproject a fine-viewport screen point to the ground plane y=0.
+function screenToGroundFine(cam: FineCam, sx: number, sy: number): [number, number] | null {
+  const nx = (sx / 1440) * 2 - 1; // lit-ok: T-SQ-3 reference viewport
+  const ny = -(sy / 900) * 2 + 1; // lit-ok: T-SQ-3 reference viewport
+  const xv = (nx + cam.p8) / cam.p0;
+  const yv = (ny + cam.p9) / cam.p5;
+  const dx = cam.right[0] * xv + cam.camUp[0] * yv + cam.forward[0];
+  const dy = cam.right[1] * xv + cam.camUp[1] * yv + cam.forward[1];
+  const dz = cam.right[2] * xv + cam.camUp[2] * yv + cam.forward[2];
+  const len = Math.hypot(dx, dy, dz);
+  const uy = dy / len;
+  if (uy >= 0) return null;
+  const t = -cam.pos[1] / uy;
+  return [cam.pos[0] + (dx / len) * t, cam.pos[2] + (dz / len) * t];
+}
+
+// The readout clear zone as a world AABB [x0, z0, x1, z1].
+export function readoutClearZone(): [number, number, number, number] {
+  const cam = fineCamera();
+  const xs = [1012, 1392]; // lit-ok: measured readout box at 1440x900
+  const ys = [88, 508]; // lit-ok: measured readout box at 1440x900
+  const corners: Array<[number, number]> = [];
+  for (const sx of xs) {
+    for (const sy of ys) {
+      const g = screenToGroundFine(cam, sx, sy);
+      if (g !== null) corners.push(g);
+    }
+  }
+  if (corners.length !== 4) throw new Error('sidequests: readout box does not hit the ground'); // lit-ok: corner count
+  let x0 = Infinity;
+  let z0 = Infinity;
+  let x1 = -Infinity;
+  let z1 = -Infinity;
+  for (const [x, z] of corners) {
+    if (x < x0) x0 = x;
+    if (z < z0) z0 = z;
+    if (x > x1) x1 = x;
+    if (z > z1) z1 = z;
+  }
+  const m = 1; // lit-ok: clear-zone margin in world units
+  return [x0 - m, z0 - m, x1 + m, z1 + m];
+}
+
+type Zone = [number, number, number, number];
+
+function inZone(p: Vec, zone: Zone): boolean {
+  return p[0] >= zone[0] && p[0] <= zone[2] && p[1] >= zone[1] && p[1] <= zone[3];
+}
+
+function rectHitsZone(rect: [number, number, number, number], zone: Zone): boolean {
+  return rect[0] <= zone[2] && rect[2] >= zone[0] && rect[1] <= zone[3] && rect[3] >= zone[1];
+}
+
+// Dense sample so no dash-length incursion is missed.
+function curveHitsZone(curve: Curve, zone: Zone): boolean {
+  const steps = Math.max(200, Math.ceil(curve.length / 0.1)); // lit-ok: zone sampling density
+  for (let i = 0; i <= steps; i++) {
+    const p = curve.pointAt((curve.length * i) / steps);
+    if (inZone(p, zone)) return true;
+  }
+  return false;
+}
+
+// Push a point inside the zone to the nearest face plus the margin.
+function pushOutOfZone(p: Vec, zone: Zone, margin: number): Vec {
+  const [zx0, zz0, zx1, zz1] = zone;
+  const dx0 = p[0] - zx0;
+  const dx1 = zx1 - p[0];
+  const dz0 = p[1] - zz0;
+  const dz1 = zz1 - p[1];
+  const m = Math.min(dx0, dx1, dz0, dz1);
+  if (m === dx0) return [zx0 - margin, p[1]];
+  if (m === dx1) return [zx1 + margin, p[1]];
+  if (m === dz0) return [p[0], zz0 - margin];
+  return [p[0], zz1 + margin];
+}
+
+// Detour a walkway around the zone: try each side, first curve that clears
+// the zone wins; among those prefer one that also clears footprints
+// (footprint crossing is the spec's straight-line fallback, zone crossing
+// is never allowed per the kill criterion).
+function detourWalkway(A: Vec, B: Vec, zone: Zone, footprints: Footprint[]): Curve {
+  const [zx0, zz0, zx1, zz1] = zone;
+  const m = 1; // lit-ok: detour clearance beyond the zone edge
+  const ex = T.world.sidequests.extent[0] / 2;
+  const ez = T.world.sidequests.extent[1] / 2;
+  const sides: Vec[][] = [
+    [[A[0], zz0 - m], [B[0], zz0 - m]],
+    [[A[0], zz1 + m], [B[0], zz1 + m]],
+    [[zx0 - m, A[1]], [zx0 - m, B[1]]],
+    [[zx1 + m, A[1]], [zx1 + m, B[1]]],
+  ];
+  let fallback: Curve | null = null;
+  for (const [d1, d2] of sides) {
+    if (d1[0] < -ex || d1[0] > ex || d1[1] < -ez || d1[1] > ez) continue;
+    if (d2[0] < -ex || d2[0] > ex || d2[1] < -ez || d2[1] > ez) continue;
+    const c = makeCurve([A, d1, d2, B]);
+    if (curveHitsZone(c, zone)) continue;
+    if (fallback === null) fallback = c;
+    if (!curveHitsFootprint(c, footprints)) return c;
+  }
+  if (fallback !== null) return fallback;
+  throw new Error('sidequests: no walkway detour around the readout zone');
 }
 
 // Diagonal hatch segments clipped to every footprint polygon.
@@ -560,8 +738,12 @@ export function generate(
   }
   if (lane !== sq.allocation.grid) throw new Error('sidequests: grid lane count mismatch');
 
+  // Readout clear zone (S07 readability rule / kill criterion): no non-grid
+  // lane may fall inside it. Computed from the fine camera + measured readout box.
+  const zone = readoutClearZone();
+
   // Buildings, entrances, outlines.
-  const footprints = placeBuildings(r, base);
+  const footprints = placeBuildings(r, base, zone);
   const entrances: Vec[] = [];
   for (let i = 0; i < footprints.length; i++) {
     const others = footprints.filter((_, j) => j !== i);
@@ -622,12 +804,17 @@ export function generate(
     const c1: Vec = [A[0] + abx * 0.33 + nx * o1, A[1] + abz * 0.33 + nz * o1]; // lit-ok: walkway control fractions
     const c2: Vec = [A[0] + abx * 0.66 + nx * o2, A[1] + abz * 0.66 + nz * o2]; // lit-ok: walkway control fractions
     let curve = makeCurve([A, c1, c2, B]);
-    if (curveHitsFootprint(curve, footprints)) {
+    if (curveHitsFootprint(curve, footprints) || curveHitsZone(curve, zone)) {
       const f1: Vec = [A[0] + abx * 0.33 - nx * o1, A[1] + abz * 0.33 - nz * o1]; // lit-ok: walkway control fractions
       const f2: Vec = [A[0] + abx * 0.66 - nx * o2, A[1] + abz * 0.66 - nz * o2]; // lit-ok: walkway control fractions
       curve = makeCurve([A, f1, f2, B]);
-      if (curveHitsFootprint(curve, footprints)) {
+      if (curveHitsFootprint(curve, footprints) || curveHitsZone(curve, zone)) {
         curve = makeStraightCurve(A, B);
+        // Straight through a footprint is the spec fallback, but straight
+        // through the readout zone is never allowed (kill criterion): detour.
+        if (curveHitsZone(curve, zone)) {
+          curve = detourWalkway(A, B, zone, footprints);
+        }
       }
     }
     const count = Math.max(1, Math.round(curve.length / sq.walkwayLaneLength));
@@ -639,16 +826,23 @@ export function generate(
     }
   }
 
-  // Markers: integer points clear of footprints and the trailhead, far apart.
+  // Markers: integer points clear of footprints and the trailhead, far apart,
+  // outside the readout clear zone, and visible at the fine pose (head
+  // projection inside the viewport with a 50px margin, so the 44px twin
+  // is fully on screen and clickable by pointer).
   const start: Vec = [sq.trails.start[0], sq.trails.start[2]];
   const bld = sq.buildings;
   const [rx0, rx1] = bld.region[0];
   const [rz0, rz1] = bld.region[1];
+  const headY = sq.marker.poleHeight + sq.marker.radius * sq.marker.squashY;
   const candidates: Vec[] = [];
   for (let gx = Math.ceil(rx0); gx <= Math.floor(rx1); gx++) {
     for (let gz = Math.ceil(rz0); gz <= Math.floor(rz1); gz++) {
       const p: Vec = [gx, gz];
       if (Math.hypot(p[0] - start[0], p[1] - start[1]) < sq.markerMinFromStart) continue;
+      if (inZone(p, zone)) continue;
+      const [sx, sy] = projectToFineScreen(p[0], headY, p[1]);
+      if (sx < 50 || sx > 1390 || sy < 50 || sy > 850) continue; // lit-ok: 50px visibility margin at 1440x900
       let clear = true;
       for (const fp of footprints) {
         if (!clearOfFootprint(p, fp, sq.footprintMargin)) {
@@ -699,11 +893,40 @@ export function generate(
             moved = true;
           }
         }
+        if (inZone(wp, zone)) {
+          wp = pushOutOfZone(wp, zone, sq.footprintMargin);
+          moved = true;
+        }
         if (!moved) break;
       }
       wps.push(wp);
     }
-    const curve = makeCurve([start, ...wps, marker]);
+    let curve = makeCurve([start, ...wps, marker]);
+    // The curve can still bulge into the zone between control points:
+    // push the nearest waypoint away from the zone center and rebuild.
+    for (let iter = 0; iter < 20; iter++) { // lit-ok: trail zone-avoidance iterations
+      if (!curveHitsZone(curve, zone)) break;
+      const cx = (zone[0] + zone[2]) / 2;
+      const cz = (zone[1] + zone[3]) / 2;
+      let best = -1;
+      let bestD = Infinity;
+      for (let i = 0; i < wps.length; i++) {
+        const d = Math.hypot(wps[i][0] - cx, wps[i][1] - cz);
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      }
+      const wp = wps[best];
+      let vx = wp[0] - cx;
+      let vz = wp[1] - cz;
+      const vlen = Math.hypot(vx, vz) || 1;
+      vx /= vlen;
+      vz /= vlen;
+      wps[best] = [wp[0] + vx * 1, wp[1] + vz * 1]; // lit-ok: trail re-route step
+      curve = makeCurve([start, ...wps, marker]);
+    }
+    if (curveHitsZone(curve, zone)) throw new Error('sidequests: trail cannot avoid the readout zone');
     const dash = sq.trails.dashLength;
     const gap = sq.trails.gapLength;
     const laneIds: number[] = [];

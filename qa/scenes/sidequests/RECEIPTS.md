@@ -1,9 +1,56 @@
 # B6c SideQuests scene receipts
 
-Card: B6c SideQuests scene (S07). Status: BLOCKED (one gate item
-unsatisfiable with the current layout/camera/readout combination; see
-BLOCKED below). Everything in this card's lane is built and measured;
-5 of 6 spec tests pass.
+Card: B6c SideQuests scene (S07). Status: DONE (B6c-fix resolved the
+one blocked item; see B6c-fix below). All 6 spec tests pass.
+
+## B6c-fix (2026-10-30): readout clear zone + marker visibility
+
+Fix: generator-only change in `src/world/layouts/sidequests.ts` (no
+camera, readout, S04, or S07 change; no threshold lowered). The
+controller regenerates side data via `generate(seed, scratch, 2)`, so
+the fix flows to the harness and the live App automatically.
+
+- Clear zone: fine readout box measured from the live DOM at 1440x900
+  (x 1012..1392, y 88..508) projected to y=0 through the spec fine
+  camera (pos (6,24,16), fov 36, shift -0.18 x) with pure math verified
+  against THREE to 0.001px / 0.001 units. Zone AABB + 1-unit margin:
+  x [5.239, 17.021], z [-19.232, -0.681]. Buildings intersecting it are
+  rejected; walkways flip/straighten/detour around it; trail waypoints
+  are nudged out and trail curves re-routed until clear. Verified: 0
+  non-grid lane points (of 6144 x 8) inside the zone.
+- New markers: (1,-1), (15,3), (-12,-7). Head projections at fine:
+  (652, 391), (1349, 790), (240, 70) — all inside 1440x900 with 50px
+  margin, so all three twins are pointer-clickable. Old marker 2
+  (16,10) projected to (1392, 1259); the new set has no off-screen twin
+  at the fine pose.
+- New layout hash:
+  `9677011ce9145b335d14119b28133090440475ea8b63a9f2efe9ff5934e00aa3`
+  (was `5fe3fe09c6e02217a6b0848afd89f085651e20e80079004335251f4dc0b32e18`).
+  Counts: grid 2080, outlines 361, walkways 140, trails 140, hatch
+  3423, total 6144, buildings 11. Run-test: 21/21 (19 original + 2 new:
+  zone exclusion, marker visibility).
+- Test results (full file, Playwright-owned webServer, exit 0, 5.6m):
+  - T-SQ-2 walk feedback: PASS (1.6m).
+  - T-SQ-4 spring numbers (mock): PASS (1.9s). Trail 0 length 11.83
+    (was 14.40), claimStart 0.850, minDrop -0.0276, settleErr 0.0000.
+  - T-SQ-5 keyboard: PASS (40.8s).
+  - T-SQ-3 readout contrast: PASS (53.6s). H1 7.49, P1 7.39, FACTS
+    4.85, VENUE 5.17, HINT 5.00 (was 7.52, 2.37, 1.24, 1.48, 1.24).
+    Max background luminance now 0.067-0.076 (field + faint grid)
+    instead of up to 0.842 (chalk lanes).
+  - T-SQ-6 hue budget: PASS (2.1m). Signal fraction 0.0013 (was
+    0.0006), far under 0.06. (Kept keyboard lighting; the stale
+    off-screen-marker comment in the test was corrected.)
+  - Reduced-motion extra: PASS (13.0s).
+- Coarse limitation (not gated, for the coordinator): the zone covers
+  the FINE readout only. The coarse readout box (16,16)-(374,400) at
+  390x844 projects to a west-north ground region the fine zone does
+  not cover, and markers (15,3) and (-12,-7) project off-screen at the
+  coarse pose (x 669 and x -88 at 390 wide). A union zone would cover
+  40% of the plan and likely break placement; the coarse camera/readout
+  question belongs to the coordinator. T-SQ-3 gates fine only.
+- Repo checks: `npx tsc --noEmit` exit 0. `node tools/lint-tokens.mjs`
+  clean. `node tools/banned-scan.mjs` clean for B6c-fix files.
 
 ## Files
 
@@ -151,19 +198,13 @@ widen fov), or accept keyboard-only for trail 2 on fine viewports.
   timeouts; T-SQ-6 must wait for all three claims in ONE waitForFunction
   (three sequential 150s waits exceed the 180s test timeout).
 
-## BLOCKED
+## BLOCKED (resolved by B6c-fix above)
 
-- BLOCKED: T-SQ-3 readability rule unsatisfiable (S07 sections 3.1/3.2).
-  S07 section 3.2 requires only grid lanes behind the readout box and
-  T-SQ-3 requires >= 4.5 contrast, but S07 section 3.1 places buildings,
-  walkways, and trails with no readout clear zone, and the real readout
-  footprint (1024-1380, 100-470 at 1440x900) sits over bright lanes:
-  P1 2.37, FACTS 1.24, VENUE 1.48, HINT 1.24 (only H1 passes at 7.52).
-  Question: which fix does the coordinator want: (a) layout clear zone
-  behind the readout footprint (B5c generator change + layout hash +
-  receipt updates), (b) camera change so the footprint lands on empty
-  ground, or (c) readout change (fill/scrim, contradicts S04 "no fill")?
-  Test threshold not lowered.
+- Was BLOCKED: T-SQ-3 readability rule unsatisfiable (S07 sections
+  3.1/3.2). Resolution: generator clear zone (option (a) from the
+  original question). No camera, readout, S04, or S07 change; no
+  threshold lowered. The old marker-2 off-screen finding is likewise
+  resolved by the marker visibility constraint.
 
 ## Wiring request (coordinator, App.tsx, same pattern as B6a)
 
