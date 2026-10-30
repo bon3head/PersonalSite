@@ -127,6 +127,7 @@ notes:
 - Coordinator note 2026-10-30 (preserved): T-S03-3 (history back/forward) fails on goBack in the current env; forward navigations pass. Investigation ongoing; failure may be environmental (B4's concurrent test runs occupying port 5173, IPv6-only vite bind) rather than a router bug. Clean gates rerun after B4 lands will settle it. Playwright config now binds webServer to 0.0.0.0; travel tests use ?world=0 to keep the real engine from racing the harness on SwiftShader.
 - Coordinator resolutions 2026-10-30: (2) jp-live fixed, S00 v1.0.4, banned-scan clean. (3) Travel wiring fixed via lanefield-ready event + travel.setLanefield. (4) Prerender SSR fixed, full App per route, React 418 gone, zero console errors on served routes verified manually. (1) Keymap 320px overflow OPEN, needs Justin.
 - Wave 2 gate G-WORLD rerun with real generators: 9 passed, 1 skipped (T-S02-8 SwiftShader). Real layouts deterministic, engine works.
+- Wave 2 verification 2026-10-30 (clean clone: rm node_modules/dist, npm ci, npm run gates): GATES_EXIT=0, 40 passed, 1 skipped (T-S02-8), 0 failed. T-S03-3 ROOT-CAUSED AND FIXED: the real App's router/hotkeys survived setupHarness's DOM replacement (window listeners), pushing duplicate history entries, so goBack landed on a duplicate. Fix: main.tsx exposes __unmountApp, setupHarness calls it before replacing #root; test URL expectation corrected for the ?world=0 initial entry. T-S03-5 passes (SSR prerender). Wave 2 gate fully green.
 
 ## B5a Server scene
 status: done
