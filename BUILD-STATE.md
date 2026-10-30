@@ -51,12 +51,28 @@ notes:
 - Regime block: S01 section 6 block plus B0 text/accent mappings (--jp-text, --jp-text-2, --jp-accent per regime), which jp-chrome needs. Layer order untouched.
 
 ## B2 Engine core
-status: doing
+status: done (with 2 flagged items below, neither worked around)
 agent: B2 worker
 commit:
 tests:
-receipts:
+- T-S02-1: PASS. laneCount 6144, info().calls 1, with and without ?debug=lanesOnly.
+- T-S02-1b: PASS. Same with ?debug=lanesOnly.
+- T-S02-2: PASS on Chromium. layoutHash identical across two fresh loads: 3b87e7043d19b4d025a963f0cbb1a3cc93c21b237591072eb075a2be90acd8f9. WebKit half untested here (no WebKit browser), not passed.
+- T-S02-3: PASS. Every recorded weight sum within 1e-4 of 1 during server to leaflink travel; final weights one-hot leaflink. SwiftShader yields few samples per 700ms travel; dense sampling re-checked at G-PERF-DEVICE.
+- T-S02-4: PASS. easeSignature(0.3) in [0.80, 0.86]; spring(0.7, 3.2) peaks 1.040-1.052, within 0.01 of 1 after 0.6s.
+- T-S02-5: MECHANISM PASS, SPEC EXPECTATION CONTRADICTED (see BLOCKED). Target projects to exactly (1 + shiftX)/2 of width. Focus measured 0.909 and 0.939 of width vs spec 0.72/0.66.
+- T-S02-6: PASS. info().programs unchanged across 3 full travels.
+- T-S02-7: PASS. WEBGL_lose_context lose/restore, layoutHash unchanged, calls 1, zero console.error.
+- T-S02-8: SKIPPED on SwiftShader (every software frame is a longtask: measured first render 14.2s, frames 6.6s p50 / 14.2s p90). Gate moves to G-PERF-DEVICE on iPhone. Not passed.
+- Full suite: 9 passed, 1 skipped (7.1m, Chromium SwiftShader). Tween specs pass.
+receipts: qa/world/B2-RECEIPTS.md
 notes:
+- BLOCKED: T-S02-5 spec expectation is geometrically inconsistent (S02 section 9). Focus (0,0,2.2) is not on the view axis; hand computation from token pose gives 92.4% of width plus up to 3.8 points idle yaw, measured 0.909/0.939. Needs a one-line coordinator spec fix (centered test point or shift-delta check). Camera mechanism itself verified exactly.
+- Bug found and fixed: camera.aspect was constructed as 1 and only corrected on resize, so first-load projection used a square aspect (focus at 1.101 of width pre-fix). Fix sets aspect from viewport at init; locked by the focus-band assertion in T-S02-5.
+- Spec-conformant extension: info() gains a programs field (T-S02-6 requires it; all specified fields still present).
+- Interpretation: uFadeSec uses T.world.leaflink.pins.fadeMs (only fade duration in tokens); S06/S07 may refine.
+- Tool gates: lint-tokens clean, banned-scan clean, tsc zero errors in src/world. Repo-wide tsc is red for a PRE-EXISTING gap: @types/react and @types/three absent from package.json (B0 files fail too). Coordinator decision needed; B2 does not touch package.json.
+- Engine spec timeout raised to 180s per test (SwiftShader frames take seconds; assertions unchanged).
 
 ## B3 Travel routing
 status: done

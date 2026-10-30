@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>B2 engine harness</title></head>
+<body>
+<div id="world"></div>
+<script type="module">
+import { createLanefield } from '/src/world/lanefield.ts';
+import { T } from '/src/tokens.generated.ts';
+
+// Longtask entries are recorded before the field is created so T-S02-8
+// can check that no task during startup reached the 50ms longtask floor.
+const longtasks = [];
+try {
+  const obs = new PerformanceObserver((list) => {
+    for (const e of list.getEntries()) {
+      longtasks.push({ name: e.name, duration: e.duration, startTime: e.startTime });
+    }
+  });
+  obs.observe({ entryTypes: ['longtask'] });
+} catch (e) {
+  // Longtask observer unsupported in this browser; test notes it.
+}
+
+const weightSums = [];
+const params = new URLSearchParams(window.location.search);
+const field = createLanefield(document.getElementById('world'), {
+  seed: T.world.seed,
+  reducedMotion: params.get('reduced') === '1',
+  initial: params.get('initial') || 'server',
+});
+if (field) {
+  field.onFrame(() => {
+    const w = window.__lanefield.weights();
+    weightSums.push(w[0] + w[1] + w[2] + w[3]);
+    if (weightSums.length > 20000) weightSums.splice(0, weightSums.length - 20000);
+  });
+}
+window.__test = { field, longtasks, weightSums, T };
+window.__testReady = field
+  ? field.ready.then(() => true).catch((e) => {
+      window.__testError = String(e);
+      return false;
+    })
+  : Promise.resolve(false);
+</script>
+</body>
+</html>
