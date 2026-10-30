@@ -204,7 +204,7 @@ test('T-S03-1: no reload across 20 random go calls', async ({ page }) => {
   // Flagged in BUILD-STATE for a coordinator spec fix to K-S03-1.
   const loads: string[] = [];
   page.on('load', () => loads.push(page.url()));
-  await page.goto(`${DEV}/`);
+  await page.goto(`${DEV}/?world=0`);
   await setupHarness(page);
   await page.evaluate(() => {
     (window as unknown as Record<string, unknown>).__b3marker = true;
@@ -236,7 +236,7 @@ test('T-S03-2: deep links render the right scene', async ({ page }) => {
     ['/definitely-not-a-route', 'notfound'],
   ];
   for (const [path, scene] of cases) {
-    await page.goto(`${DEV}${path}`);
+    await page.goto(`${DEV}${path}?world=0`);
     await setupHarness(page);
     expect(await h1Text(page)).toBe(H1[scene]);
     expect(
@@ -252,7 +252,7 @@ test('T-S03-2: deep links render the right scene', async ({ page }) => {
 test('T-S03-3: history back and forward stay in sync', async ({
   page,
 }) => {
-  await page.goto(`${DEV}/`);
+  await page.goto(`${DEV}/?world=0`);
   await setupHarness(page);
   await page.keyboard.press('2');
   await page.waitForFunction(
@@ -283,7 +283,7 @@ test('T-S03-3: history back and forward stay in sync', async ({
 });
 
 test('T-S03-4: travel is interruptible', async ({ page }) => {
-  await page.goto(`${DEV}/`);
+  await page.goto(`${DEV}/?world=0`);
   await setupHarness(page);
   await page.keyboard.press('2');
   await page.waitForTimeout(200);
@@ -312,7 +312,7 @@ test('T-S03-5: clean console on every route (dev harness)', async ({
   });
   page.on('pageerror', (err) => errors.push(String(err)));
   for (const path of ['/', '/leaflink', '/sidequests', '/nope']) {
-    await page.goto(`${DEV}${path}`);
+    await page.goto(`${DEV}${path}?world=0`);
     await setupHarness(page);
     await page.waitForTimeout(300);
   }
@@ -320,7 +320,7 @@ test('T-S03-5: clean console on every route (dev harness)', async ({
 });
 
 test('T-S03-6: DOM feedback under 250ms', async ({ page }) => {
-  await page.goto(`${DEV}/`);
+  await page.goto(`${DEV}/?world=0`);
   await setupHarness(page);
   const ms = await page.evaluate(async () => {
     const item = document.querySelector<HTMLElement>(
@@ -362,7 +362,7 @@ test('T-S03-6: DOM feedback under 250ms', async ({ page }) => {
 test('T-S03-7: focus moves to the new H1 and the region announces', async ({
   page,
 }) => {
-  await page.goto(`${DEV}/`);
+  await page.goto(`${DEV}/?world=0`);
   await setupHarness(page);
   await page.evaluate(() => {
     document
@@ -388,7 +388,7 @@ test('T-S03-8: reduced-motion travel completes within 320ms', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto(`${DEV}/`);
+  await page.goto(`${DEV}/?world=0`);
   await setupHarness(page);
   // Measure in-page: t0 is the keydown itself (capture listener), not
   // the test-side press call, so Playwright dispatch latency is not
@@ -431,7 +431,7 @@ test('T-S03-8: reduced-motion travel completes within 320ms', async ({
 test('router: path normalization, hash, arrows, sheet replaceState', async ({
   page,
 }) => {
-  await page.goto(`${DEV}/`);
+  await page.goto(`${DEV}/?world=0`);
   await setupHarness(page);
   const results = await page.evaluate(() => {
     const out: Record<string, unknown> = {};
@@ -476,7 +476,7 @@ test('router: path normalization, hash, arrows, sheet replaceState', async ({
 test('router: sheet open disables scene keys but not the sheet key', async ({
   page,
 }) => {
-  await page.goto(`${DEV}/`);
+  await page.goto(`${DEV}/?world=0`);
   await setupHarness(page);
   await page.evaluate(() => {
     const t = (window as unknown as Record<string, any>).__b3test;

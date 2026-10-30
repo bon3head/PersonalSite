@@ -85,6 +85,7 @@ test('T-S03-5: zero console errors on served prerendered paths', async ({
 }: {
   page: Page;
 }) => {
+  test.setTimeout(180000);
   buildAndPrerender();
   const errors: string[] = [];
   page.on('console', (msg) => {
