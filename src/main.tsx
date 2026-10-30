@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { createLanefield } from './world/stub';
+import { createLanefield } from './world/lanefield';
 import { T } from './tokens.generated';
 import './styles/global.css';
 import './lib/reducedMotion';
