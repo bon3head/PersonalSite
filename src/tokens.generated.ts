@@ -750,7 +750,8 @@ export const T = {
   "hueBudgetPct": {
     "server": 30,
     "leaflink": 10,
-    "sidequestsSignal": 6
+    "sidequestsSignal": 6,
+    "scatter": 6
   },
   "budgets": {
     "lcpMs": 2000,

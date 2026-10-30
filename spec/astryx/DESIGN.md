@@ -704,7 +704,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
     "coarseOrNarrowBelowPx": 768,
     "desktopFromPx": 1024
   },
-  "hueBudgetPct": {"server": 30, "leaflink": 10, "sidequestsSignal": 6},
+  "hueBudgetPct": {"server": 30, "leaflink": 10, "sidequestsSignal": 6, "scatter": 6},
   "budgets": {
     "lcpMs": 2000,
     "ttiMs": 3000,
@@ -764,4 +764,5 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.0.1, 2026-10-30: hueBudgetPct gains scatter 6. B6d measured the 404 scatter scene at 0.175% (chroma over 0.04) at 1280x800; 6% matches the sidequestsSignal budget and leaves 30x headroom. S08 sets no numeric budget, so this fills the gap rather than changing a spec value.
 - 1.0.0, 2026-10-30: initial. Server lane alpha (0.08), SM pitch (0.95, 0.85), depth fog (7 to 30) and camera poses were set from real renders of the S02 shaders in headless Chromium; the first guess (alpha 0.34, pitch 0.64) saturated into a solid block. Blue chosen by OKLab distance against 51 reference blues; three regimes; Commit Mono; 6,144-lane world; travel 700ms expo-out with feedback under 250ms; Astryx 0.7.1 mapping verified by a probe `theme build`. Hue budgets moved into `hueBudgetPct`: the server budget is 30% because the verification render measured 24% (the first draft's 12% was a guess the render disproved).
