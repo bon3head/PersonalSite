@@ -1,0 +1,17 @@
+{
+  "apiVersion": 1,
+  "type": "theme.targets",
+  "data": {
+    "filter": "BottomSheet",
+    "componentCount": 1,
+    "targets": [
+      {
+        "key": "bottom-sheet",
+        "className": "astryx-bottom-sheet",
+        "component": "BottomSheet",
+        "props": [],
+        "states": []
+      }
+    ]
+  }
+}

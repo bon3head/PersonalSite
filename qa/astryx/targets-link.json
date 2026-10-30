@@ -1,0 +1,19 @@
+{
+  "apiVersion": 1,
+  "type": "theme.targets",
+  "data": {
+    "filter": "Link",
+    "componentCount": 1,
+    "targets": [
+      {
+        "key": "link",
+        "className": "astryx-link",
+        "component": "Link",
+        "props": [
+          "color"
+        ],
+        "states": []
+      }
+    ]
+  }
+}

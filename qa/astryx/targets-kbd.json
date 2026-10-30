@@ -1,0 +1,17 @@
+{
+  "apiVersion": 1,
+  "type": "theme.targets",
+  "data": {
+    "filter": "Kbd",
+    "componentCount": 1,
+    "targets": [
+      {
+        "key": "kbd",
+        "className": "astryx-kbd",
+        "component": "Kbd",
+        "props": [],
+        "states": []
+      }
+    ]
+  }
+}

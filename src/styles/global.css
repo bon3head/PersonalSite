@@ -6,7 +6,8 @@
 @import "./fonts.css" layer(jp-tokens);
 
 @layer jp-regime {
-  :root {
+  :root[data-regime="void"] {
+    color-scheme: dark;
     --jp-ground: var(--jp-void-ground);
     --jp-raised: var(--jp-void-raised);
     --jp-text: var(--jp-void-text);
@@ -15,7 +16,8 @@
     --jp-hairline: var(--jp-void-hairline);
   }
 
-  html[data-regime="paper"] {
+  :root[data-regime="paper"] {
+    color-scheme: light;
     --jp-ground: var(--jp-paper-ground);
     --jp-raised: var(--jp-paper-raised);
     --jp-text: var(--jp-paper-text);
@@ -24,13 +26,28 @@
     --jp-hairline: var(--jp-paper-hairline);
   }
 
-  html[data-regime="field"] {
+  :root[data-regime="field"] {
+    color-scheme: dark;
     --jp-ground: var(--jp-field-ground);
     --jp-raised: var(--jp-field-raised);
     --jp-text: var(--jp-field-text);
     --jp-text-2: var(--jp-field-text2);
     --jp-accent: var(--jp-field-accent);
     --jp-hairline: var(--jp-field-hairline);
+  }
+
+  :root[data-regime="field"] [data-astryx-theme="lane"] {
+    --color-background-body: var(--jp-field-ground);
+    --color-background-surface: var(--jp-field-raised);
+    --color-background-card: var(--jp-field-raised);
+    --color-background-popover: var(--jp-field-raised);
+    --color-text-primary: var(--jp-field-text);
+    --color-text-secondary: var(--jp-field-text2);
+    --color-border: var(--jp-field-hairline);
+  }
+
+  body {
+    background: var(--jp-ground);
   }
 }
 

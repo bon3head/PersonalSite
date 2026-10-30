@@ -1,0 +1,21 @@
+{
+  "apiVersion": 1,
+  "type": "theme.targets",
+  "data": {
+    "filter": "Button",
+    "componentCount": 1,
+    "targets": [
+      {
+        "key": "button",
+        "className": "astryx-button",
+        "component": "Button",
+        "props": [
+          "size",
+          "variant",
+          "elevation"
+        ],
+        "states": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "apiVersion": 1,
+  "type": "theme.targets",
+  "data": {
+    "filter": "Toast",
+    "componentCount": 1,
+    "targets": [
+      {
+        "key": "toast",
+        "className": "astryx-toast",
+        "component": "Toast",
+        "props": [
+          "type"
+        ],
+        "states": []
+      }
+    ]
+  }
+}
