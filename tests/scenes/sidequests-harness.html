@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>SQ scene harness</title>
+<style>
+  html, body { margin: 0; }
+  #world { position: fixed; inset: 0; }
+  #twins { position: fixed; inset: 0; pointer-events: none; }
+  #twins button { pointer-events: auto; }
+</style>
+</head>
+<body>
+<div id="world"></div>
+<div id="twins"></div>
+<script type="module">
+import * as THREE from 'three';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { Theme } from '@astryxdesign/core/theme';
+import { LayerProvider } from '@astryxdesign/core';
+import { laneTheme } from '/themes/lane/laneTheme.mjs';
+import '/themes/lane/dist/lane.css';
+import { createLanefield } from '/src/world/lanefield.ts';
+import { createSideQuestsController } from '/src/world/sidequests.ts';
+import { generate } from '/src/world/layouts/sidequests.ts';
+import SideQuestsTwins from '/src/scenes/sidequests.tsx';
+import { T } from '/src/tokens.generated.ts';
+
+const params = new URLSearchParams(window.location.search);
+const reduced = params.get('reduced') === '1';
+
+if (params.get('mock') === '1') {
+  // No WebGL: a mock lanefield whose onFrame callbacks the test drives
+  // manually, so the spring numbers test samples at 60Hz instead of
+  // waiting on SwiftShader frames that take seconds.
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 120);
+  const cbs = new Set();
+  let simNow = 0;
+  const mockField = {
+    ready: Promise.resolve(),
+    travelTo: () => Promise.resolve(),
+    setReducedMotion: () => {},
+    setActivity: () => {},
+    clearActivity: () => {},
+    now: () => simNow,
+    screenToGround: () => null,
+    worldToScreen: () => [0, 0],
+    onFrame: (cb) => { cbs.add(cb); return () => cbs.delete(cb); },
+    scene,
+    camera,
+    dispose: () => {},
+  };
+  const controller = createSideQuestsController(mockField, { reducedMotion: () => reduced });
+  window.__sqtest = {
+    field: mockField,
+    controller,
+    T,
+    setActivityCalls: [],
+    drive: (t, dt) => { simNow = t; for (const cb of [...cbs]) cb(t, dt); },
+  };
+  window.__sqtestReady = Promise.resolve(true);
+} else {
+  const field = createLanefield(document.getElementById('world'), {
+    seed: T.world.seed,
+    reducedMotion: reduced,
+    initial: 'sidequests',
+  });
+  const setActivityCalls = [];
+  const origSet = field.setActivity.bind(field);
+  field.setActivity = (...args) => {
+    setActivityCalls.push({
+      lanes: Array.from(args[0]),
+      starts: Array.from(args[1]),
+      fadeAt: Array.from(args[2]),
+      kind: args[3],
+      uper: Array.from(args[4]),
+    });
+    return origSet(...args);
+  };
+  const controller = createSideQuestsController(field, { reducedMotion: () => reduced });
+  // Same deterministic generation as the worker, for test assertions.
+  const tex = T.world.layoutTexture;
+  const scratch = new Float32Array(tex.width * tex.height * 4);
+  const side = generate(T.world.seed, scratch, 2);
+  const root = createRoot(document.getElementById('twins'));
+  root.render(React.createElement(Theme, { theme: laneTheme, mode: 'dark' },
+    React.createElement(LayerProvider, null,
+      React.createElement(SideQuestsTwins, { controller, lanefield: field }))));
+  window.__sqtest = { field, controller, T, side, setActivityCalls };
+  window.__sqtestReady = field ? field.ready.then(() => true).catch(() => false) : Promise.resolve(false);
+  // No travel happens on this page (initial sidequests), so resume
+  // explicitly once the field is ready and markers rise.
+  if (field) field.ready.then(() => controller.resume()).catch(() => {});
+}
+</script>
+</body>
+</html>

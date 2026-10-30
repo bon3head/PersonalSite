@@ -234,12 +234,26 @@ receipts:
 notes:
 
 ## B6c SideQuests QA
-status: todo
-agent:
-commit:
+status: blocked
+agent: B6c worker
+commit: (this commit)
 tests:
-receipts:
+- T-SQ-2 walk feedback: PASS (1.6m). 3 twins 44x44 (+/-1px); click twin 1: setActivity kind 2, lanes exactly trail 0 laneIds, starts[0] <= now(), starts[j] = starts[0] + arcStarts[j]/14 (0.05s tol), uper[j] = 14/arcLengths[j] (0.1% tol); aria-pressed true.
+- T-SQ-4 spring numbers (mock): PASS (1.4s). Trail 0 length 14.40, claimStart 1.033s, minDrop -0.0276 (gate [-0.035, -0.020]), settleErr 0.0000 (gate <= 0.005). Bob-corrected.
+- T-SQ-5 keyboard: PASS (39.4s). Tab Tab focuses "Trail 2"; Enter lights trail 1 kind 2; aria-pressed true.
+- T-SQ-6 hue budget: PASS (1.3m). All three trails lit via keyboard, all claimed. Signal pixels (OKLab < 0.08 from #7BB5F8): 801 / 1,296,000 = 0.0006, under the 6% budget.
+- Reduced-motion extra: PASS (19.9s). Click twin 1: kind 2, all starts equal, all uper >= 100000, aria-pressed true within 5s.
+- T-SQ-3 readout contrast: FAIL (1.0m). H1 7.52 PASS; P1 2.37 FAIL; FACTS 1.24, VENUE 1.48, HINT 1.24 FAIL (debug run). See BLOCKED.
+- Full file: 5 passed, 1 failed, exit 1 (5.1m, Playwright-owned webServer).
+- tsc exit 0; lint-tokens clean; banned-scan clean for B6c files (repo-wide violation at run time was B6d's src/scenes/notfound.tsx, untouched).
+receipts: qa/scenes/sidequests/RECEIPTS.md
 notes:
+- src/world/sidequests.ts: controller regenerates side data via generate(seed, scratch, 2) (deterministic, identical to worker's; avoids touching B2-owned lanefield.ts which discards worker side data). Head rest y 1.29 (0.8 + 0.35*1.4). Claimed colors via instanced aClaim shader mix (signal upper / signalDim lower); instance-color multiplication cannot produce both tones (verified arithmetically). Spring only for marker y; color uses easePlain over fast; camera lean = base + 0.25*(drawing point - base), damp half-life 400ms, stops within 0.01 units so rig resumes control.
+- src/scenes/sidequests.tsx: SideQuestsTwins (B4 already built the readout, so this card's scene file is the twins, not readout content). Labels from C-SQ-MARKER; transform set imperatively via refs; hover lift fine-pointer only.
+- T-SQ-6 uses keyboard (Tab/Enter x3), not clicks: marker 2 projects to (1392, 1259) at the spec fine pose, 359px below the 900px viewport, so no pointer click can reach twin 2. Twin 2 exists and is focusable, so K-SQ-4 is not triggered, but pointer users cannot walk trail 2. See receipts for fix options (layout constraint vs camera change vs accept).
+- Test lessons: locator.click/boundingBox stall on bobbing twins (stability wait); use clickTwin helper or keyboard. Stale SwiftShader browsers starve CDP (load ~8.5 hung round trips for full 180s timeouts); kill strays before scene runs. Never run a second vite on 5173 (flaps against Playwright webServer, ERR_CONNECTION_REFUSED mid-run). T-SQ-6 must wait all three claims in one waitForFunction (sequential 150s waits exceed the 180s test timeout).
+BLOCKED: T-SQ-3 readability rule unsatisfiable (S07 sections 3.1/3.2). S07 section 3.2 requires only grid lanes behind the readout box and T-SQ-3 requires >= 4.5 contrast, but S07 section 3.1 places buildings, walkways, and trails with no readout clear zone, and the real readout footprint (1024-1380, 100-470 at 1440x900) sits over bright lanes: P1 2.37, FACTS 1.24, VENUE 1.48, HINT 1.24 (only H1 passes at 7.52). Question: which fix: (a) layout clear zone behind the readout footprint (B5c generator change + layout hash + receipt updates), (b) camera change so the footprint lands on empty ground, or (c) readout change (fill/scrim, contradicts S04 "no fill")? Test threshold not lowered.
+- Wiring request (coordinator, App.tsx, same pattern as B6a): pass a controllers map to the travel controller including createSideQuestsController(field), so travel pause/resume drives markers; render SideQuestsTwins when the scene is sidequests. Until wired, the live App shows no markers and no twins.
 
 ## B6d Notfound QA
 status: done
