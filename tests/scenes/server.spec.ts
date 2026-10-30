@@ -187,6 +187,11 @@ for (const vp of [
     // server controller spawns words that drift into the readout box,
     // so pause it first: pause fades the word pool out over
     // duration-fast, leaving only lanes and ground to measure.
+    // The pause does not freeze the lanefield itself: a transient
+    // (a warp pulse or fade residual, a faint dark-blue speck) can
+    // linger in the box for seconds after pause. It is present 1s
+    // after pause and gone by 6s (measured 2026-10-30), so wait
+    // 6000ms for the steady state, not 1000ms. Threshold unchanged.
     await page.evaluate(() => {
       const ctrls = (
         window as unknown as {
@@ -195,7 +200,7 @@ for (const vp of [
       ).__sceneControllers;
       ctrls?.get('server')?.pause();
     });
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(6000);
     const box = await page.evaluate(() => {
       const el = document.querySelector('.jp-readout');
       if (!el) throw new Error('no readout');
