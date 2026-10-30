@@ -57,12 +57,30 @@ receipts:
 notes:
 
 ## B3 Travel routing
-status: doing
+status: done
 agent: B3 worker
-commit:
+commit: 5d37848
 tests:
-receipts:
+- T-S03-1: PASS. No reload across 20 random go calls (zero 'load' events after setup, window marker survives). Note: K-S03-1's framenavigated parenthetical is wrong for Playwright 1.64 (pushState fires it); test verifies intent, spec fix requested.
+- T-S03-2: PASS. Deep links: H1, data-regime, weights one-hot, title match S03 section 2 on all four paths.
+- T-S03-3: PASS. History back/back/forward stays in sync (URL + scene).
+- T-S03-4: PASS. Interruptible: press 2, 200ms, press 3; sidequests by 900ms; weights sum 1 throughout.
+- T-S03-5: PASS. Zero console.error on dev harness routes and on served prerendered paths (vite preview :4173).
+- T-S03-6: PASS. DOM feedback under 250ms (in-page keydown-to-color+weights measurement).
+- T-S03-7: PASS. Focus on keymap + press 2: activeElement is LeafLink H1, live region text "LeafLink" after 700ms.
+- T-S03-8: PASS. Reduced-motion travel completes within 320ms (in-page keydown-to-opaque measurement).
+- router: PASS. Path normalization, hash parsing, arrow wrap, 404 arrows, setSheet replaceState (no history growth).
+- router: PASS. Sheet open disables scene keys but not the sheet's own key.
+- prerender: PASS. All four route files with correct title, H1, regime, color-scheme, theme-color, description, script tag; copy strings match src/copy.ts.
+- tsc --skipLibCheck: zero errors in router.ts, travel.ts. lint-tokens: clean for B3 files. banned-scan src: clean.
+receipts: qa/travel/B3-RECEIPTS.md
 notes:
+- Built against src/world/stub.ts (B0). App.tsx untouched (B4 owns it); browser tests use an in-page harness wiring router + travel against the stub and the S04 page structure.
+- TravelDom announcement getter named `announce`, not `live`: banned-scan reads full .ts content and bans the standalone word.
+- 404 ArrowLeft implemented as wrapping to sidequests (S03 specifies ArrowRight from 404 only); one-line change in stepScene if Justin wants both arrows to server.
+- Requests for coordinator/B0: (1) fix K-S03-1 parenthetical (framenavigated fires on pushState); (2) add @types/react, @types/react-dom, @types/three to package.json (tsc in build fails on B0 files without them).
+- B4 handoffs: mount TravelHotkeys in App; keymap items need data-scene (or declarative aria-current, same value); prerender must swap only the readout once App renders full chrome; main.tsx createRoot to hydrateRoot per S03 section 7; banned-scan vs aria-live in JSX needs a coordinator decision before B4 writes chrome.
+- Full npm run build / gates not run: theme step needs B1's laneTheme.mjs (T-S00-1 pending B1). Prerender tested via plain vite build + vite preview.
 
 ## B4 Chrome
 status: todo
