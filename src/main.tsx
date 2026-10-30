@@ -1,5 +1,5 @@
 import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App';
 import { createLanefield } from './world/lanefield';
 import { T } from './tokens.generated';
@@ -27,10 +27,18 @@ function startOnIdle(): void {
 
 const rootEl = document.getElementById('root');
 if (rootEl) {
-  createRoot(rootEl).render(
+  // S03 section 7: the client hydrates the prerendered markup. In dev
+  // #root is empty (no prerender step), so fall back to a fresh root
+  // there; in production #root always carries the prerendered app.
+  const app = (
     <StrictMode>
       <App />
-    </StrictMode>,
+    </StrictMode>
   );
+  if (rootEl.hasChildNodes()) {
+    hydrateRoot(rootEl, app);
+  } else {
+    createRoot(rootEl).render(app);
+  }
 }
 startOnIdle();

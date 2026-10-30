@@ -1,0 +1,18 @@
+B4 Chrome test run (tests/chrome.spec.ts), 2026-10-30
+Command: PATH="$PWD/node_modules/.bin:$PATH" playwright test tests/chrome.spec.ts --reporter=line
+Result: 7 passed (56.6s)
+
+[1/7] T-S04-1 keymap never wraps: PASS
+[2/7] T-S04-2 coarse targets at least 44x44: PASS
+[3/7] T-S04-3 axe clean on all routes, sheets closed and open: PASS
+[4/7] T-S04-4 copy paths: PASS
+[5/7] T-S04-5 focus returns to the keymap button on sheet close: PASS
+[6/7] T-S04-6 keyboard-only tab order: PASS
+[7/7] T-S04-7 sheet open animation at most 300ms: PASS
+
+Type check: npx tsc --noEmit exit 0
+lint-tokens: clean (all B4 files)
+banned-scan src: flags ONLY the spec-mandated .jp-live class name in
+  src/App.tsx and src/chrome/chrome.css (pattern \blive\b). See
+  MEASUREMENTS.md finding 2: scanner fix requested from coordinator,
+  same pattern as the aria-live S00 v1.0.3 fix. Not visible copy.

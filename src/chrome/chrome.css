@@ -1,0 +1,451 @@
+/* Chrome styles (S04). All rules live in the jp-chrome layer per S00
+ * section 6. Values come from tokens: Astryx --spacing/--text/--color
+ * tokens, --jp-* custom properties from tokens.generated.css, and
+ * --jp-ro-* properties set inline from T by Readout (TS-only tokens
+ * such as serverReadoutWidth have no CSS var). No hex, no duration
+ * literal, no cubic-bezier, no non-inset shadow, no gradient, no blur,
+ * no uppercase transform anywhere in this file. */
+@layer jp-chrome {
+  :root {
+    /* S04 section 4: keymap height by pointer; gutter by breakpoint.
+     * Token vars: --jp-keymap-h-fine/coarse, --jp-gutter-base/640/1280. */
+    --jp-keymap-h: var(--jp-keymap-h-fine);
+    --jp-gutter: var(--jp-gutter-base);
+  }
+
+  @media (pointer: coarse) {
+    :root {
+      --jp-keymap-h: var(--jp-keymap-h-coarse);
+    }
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --jp-gutter: var(--jp-gutter-640);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    :root {
+      --jp-gutter: var(--jp-gutter-1280);
+    }
+  }
+
+  /* S04 section 6: the page itself never scrolls. */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* Scrim: regime ground at 60% (S04 section 7). Astryx dialog
+   * ::backdrop reads --color-overlay; color-mix keeps the value in
+   * tokens (no hex literal). S04 section 7 also says never a blur:
+   * BottomSheet's backdrop has no blur filter (verified: the blur
+   * backdrop class belongs to Dialog/Lightbox/MobileNav, not
+   * BottomSheet). */
+  :root[data-regime="void"] {
+    --color-overlay: color-mix(in srgb, var(--jp-void-ground) 60%, transparent);
+  }
+
+  :root[data-regime="paper"] {
+    --color-overlay: color-mix(in srgb, var(--jp-paper-ground) 60%, transparent);
+  }
+
+  :root[data-regime="field"] {
+    --color-overlay: color-mix(in srgb, var(--jp-field-ground) 60%, transparent);
+  }
+
+  /* Wordmark (S04 section 5): top-left at the gutter, label size,
+   * weight 700, primary text color. Hidden on Server via the hidden
+   * attribute, not opacity. */
+  .jp-wordmark {
+    position: fixed;
+    top: var(--jp-gutter);
+    left: var(--jp-gutter);
+    z-index: 2;
+    font-size: var(--text-label-size);
+    font-weight: 700;
+    line-height: var(--text-label-leading);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .jp-wordmark:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+  }
+
+  /* Keymap (S04 section 4): fixed to the bottom edge, full width,
+   * opaque ground so it reads over any lane, 1px top hairline.
+   * Height is keymap-h plus safe-area room: border-box (Astryx reset)
+   * would otherwise crush the content area by the safe-area inset on
+   * notched phones, so the height calc keeps the content area exactly
+   * keymap-h. In tests safe-area is 0, so the measured height equals
+   * the token height. */
+  .jp-keymap {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    height: calc(var(--jp-keymap-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: var(--jp-gutter);
+    padding-right: var(--jp-gutter);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-6);
+    background: var(--jp-ground);
+    box-shadow: inset 0 1px 0 0 var(--jp-hairline);
+    white-space: nowrap;
+  }
+
+  /* T.chrome.keymapNarrowBelowPx: under 360px, reduce the gap, never
+   * shrink text below 13px, never truncate. */
+  @media (max-width: 359px) {
+    .jp-keymap {
+      gap: var(--spacing-3);
+    }
+  }
+
+  .jp-keymap-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    height: 100%;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-family: inherit;
+    font-size: var(--text-label-size);
+    line-height: var(--text-label-leading);
+    cursor: pointer;
+    transition: color var(--jp-duration-fast) var(--jp-ease-standard);
+  }
+
+  /* Coarse targets: at least 44px wide (T.size.coarseMinTargetPx).
+   * Labels already exceed this at 13px mono, but the floor holds for
+   * any shorter future label. */
+  @media (pointer: coarse) {
+    .jp-keymap-item {
+      min-width: 44px;
+    }
+  }
+
+  .jp-keymap-item:hover,
+  .jp-keymap-item:focus-visible {
+    color: var(--color-text-primary);
+  }
+
+  .jp-keymap-item[aria-current="page"],
+  .jp-keymap-item[aria-expanded="true"] {
+    color: var(--color-accent);
+  }
+
+  .jp-keymap-item .astryx-kbd {
+    transition: box-shadow var(--jp-duration-fast) var(--jp-ease-standard);
+  }
+
+  .jp-keymap-item:hover .astryx-kbd,
+  .jp-keymap-item:focus-visible .astryx-kbd {
+    box-shadow: inset 0 0 0 1px var(--color-text-secondary);
+  }
+
+  .jp-keymap-item[aria-current="page"] .astryx-kbd,
+  .jp-keymap-item[aria-expanded="true"] .astryx-kbd {
+    box-shadow: inset 0 0 0 1px var(--color-accent);
+  }
+
+  /* Coarse pointers: the Kbd is hidden (display none, not just
+   * transparent) and the label is the full target. */
+  @media (pointer: coarse) {
+    .jp-keymap-item .astryx-kbd {
+      display: none;
+    }
+  }
+
+  /* Focus: 2px accent, 3px offset (T.focus), :focus-visible only. */
+  .jp-keymap-item:focus-visible,
+  .jp-wordmark:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  /* Readout (S04 section 6). Base styles are the coarse/narrow
+   * placement; the fine media query (width at least
+   * T.breakpoints.desktopFromPx with a fine pointer) overrides to the
+   * fine placement. Variant geometry values arrive as --jp-ro-*
+   * custom properties set inline from T by Readout. */
+  .jp-readout {
+    position: fixed;
+    z-index: 1;
+    max-width: var(--jp-readout-max-width);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    color: var(--color-text-primary);
+  }
+
+  .jp-readout h1 {
+    margin: 0;
+  }
+
+  .jp-readout--server h1,
+  .jp-readout--notfound h1 {
+    font-size: var(--jp-text-display-0-size);
+    font-weight: var(--jp-text-display-0-weight);
+    line-height: var(--jp-text-display-0-leading);
+    letter-spacing: var(--jp-text-display-0-tracking);
+  }
+
+  .jp-readout--leaflink h1,
+  .jp-readout--sidequests h1 {
+    font-size: var(--jp-text-display-1-size);
+    font-weight: var(--jp-text-display-1-weight);
+    line-height: var(--jp-text-display-1-leading);
+    letter-spacing: var(--jp-text-display-1-tracking);
+  }
+
+  /* S08 section 3: the 404 reuses the server variant placement but its
+   * H1 is display-1, not display-0. */
+  .jp-readout--notfound h1 {
+    font-size: var(--jp-text-display-1-size);
+    font-weight: var(--jp-text-display-1-weight);
+    line-height: var(--jp-text-display-1-leading);
+    letter-spacing: var(--jp-text-display-1-tracking);
+  }
+
+  .jp-readout p {
+    font-size: var(--text-body-size);
+    font-weight: var(--text-body-weight);
+    line-height: var(--text-body-leading);
+    margin: 0;
+  }
+
+  .jp-readout .jp-readout-supporting {
+    font-size: var(--text-supporting-size);
+    font-weight: var(--text-supporting-weight);
+    line-height: var(--text-supporting-leading);
+    color: var(--color-text-secondary);
+  }
+
+  .jp-readout .jp-readout-caption {
+    font-size: var(--text-supporting-size);
+    font-weight: var(--text-supporting-weight);
+    line-height: var(--text-supporting-leading);
+    color: var(--color-text-secondary);
+  }
+
+  /* Spacing (S04 section 6): H1 to first paragraph spacing-6,
+   * paragraph to paragraph spacing-4, prose to supporting spacing-6,
+   * supporting lines spacing-2 apart, links row spacing-6 above,
+   * links spacing-6 apart. */
+  .jp-readout h1 + p,
+  .jp-readout h1 + .jp-readout-supporting,
+  .jp-readout h1 + .jp-readout-caption {
+    margin-top: var(--spacing-6);
+  }
+
+  .jp-readout p + p {
+    margin-top: var(--spacing-4);
+  }
+
+  .jp-readout p + .jp-readout-supporting,
+  .jp-readout p + .jp-readout-caption,
+  .jp-readout .jp-readout-supporting + .jp-readout-caption,
+  .jp-readout .jp-readout-caption + .jp-readout-supporting {
+    margin-top: var(--spacing-6);
+  }
+
+  .jp-readout .jp-readout-supporting + .jp-readout-supporting {
+    margin-top: var(--spacing-2);
+  }
+
+  .jp-readout-links {
+    display: flex;
+    gap: var(--spacing-6);
+    margin-top: var(--spacing-6);
+  }
+
+  /* Server variant, coarse/narrow: top, full width minus gutters. */
+  .jp-readout--server,
+  .jp-readout--notfound {
+    top: calc(var(--jp-gutter) + var(--jp-ro-top-extra));
+    left: var(--jp-gutter);
+    right: var(--jp-gutter);
+    max-width: none;
+  }
+
+  /* Server variant, fine: left column, bottom sits
+   * serverReadoutBottomGap above the keymap, width serverReadoutWidth. */
+  @media (min-width: 1024px) and (pointer: fine) {
+    .jp-readout--server,
+    .jp-readout--notfound {
+      top: auto;
+      left: var(--jp-gutter);
+      right: auto;
+      bottom: calc(var(--jp-keymap-h) + var(--jp-ro-bottom-gap));
+      width: var(--jp-ro-width);
+      max-width: var(--jp-readout-max-width);
+    }
+  }
+
+  /* LeafLink variant, coarse/narrow: slip above the keymap, full width
+   * minus gutters, max height 46dvh, scrolls internally. */
+  .jp-readout--leaflink {
+    left: var(--jp-gutter);
+    right: var(--jp-gutter);
+    bottom: calc(var(--jp-keymap-h) + var(--jp-gutter));
+    max-width: none;
+    max-height: var(--jp-ro-max-height);
+  }
+
+  /* LeafLink variant, fine: bottom-left legend slip. */
+  @media (min-width: 1024px) and (pointer: fine) {
+    .jp-readout--leaflink {
+      right: auto;
+      width: var(--jp-ro-width);
+      max-width: var(--jp-readout-max-width);
+      max-height: none;
+    }
+  }
+
+  /* LeafLink container: raised fill, 0 radius, hairline ring. */
+  .jp-readout--leaflink .jp-readout-slip {
+    background: var(--jp-raised);
+    box-shadow: inset 0 0 0 1px var(--jp-hairline);
+    border-radius: 0;
+    padding: var(--spacing-4);
+  }
+
+  /* Legend glyphs: ring, dot, bar, sized from
+   * T.chrome.legendGlyphPx (set inline by Readout). */
+  .jp-legend-glyph {
+    display: inline-block;
+    vertical-align: middle;
+    color: var(--color-text-secondary);
+  }
+
+  .jp-legend-glyph--ring {
+    border: 1px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .jp-legend-glyph--dot {
+    background: currentColor;
+    border-radius: 50%;
+  }
+
+  .jp-legend-glyph--bar {
+    background: currentColor;
+  }
+
+  /* SideQuests variant, coarse/narrow: top, full width minus gutters. */
+  .jp-readout--sidequests {
+    top: var(--jp-gutter);
+    left: var(--jp-gutter);
+    right: var(--jp-gutter);
+    max-width: none;
+  }
+
+  /* SideQuests variant, fine: top-right trailhead. */
+  @media (min-width: 1024px) and (pointer: fine) {
+    .jp-readout--sidequests {
+      left: auto;
+      right: var(--jp-gutter);
+      top: calc(var(--jp-gutter) + var(--jp-ro-top-extra));
+      width: var(--jp-ro-width);
+      max-width: var(--jp-readout-max-width);
+    }
+  }
+
+  /* SideQuests container: no fill, 1px dashed chalk outline. */
+  .jp-readout--sidequests .jp-readout-slip {
+    outline: 1px dashed var(--color-text-secondary);
+    outline-offset: var(--spacing-3);
+    padding: var(--spacing-3);
+  }
+
+  /* SideQuests hint: one string per pointer (S09 C-SQ-HINT). The
+   * hidden one is display none, so it leaves the a11y tree too. */
+  .jp-sq-hint--fine {
+    display: none;
+  }
+
+  @media (pointer: fine) {
+    .jp-sq-hint--coarse {
+      display: none;
+    }
+
+    .jp-sq-hint--fine {
+      display: inline;
+    }
+  }
+
+  /* Sheets (S04 section 7): on fine pointers the inner content is
+   * constrained to sheetMaxWidthPx and left-aligned with the keymap
+   * gutter, a pane rising above the keymap, not centered. */
+  .jp-sheet-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  .jp-sheet-inner h2 {
+    margin: 0;
+  }
+
+  .jp-sheet-inner p {
+    margin: 0;
+  }
+
+  .jp-sheet-inner ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .jp-sheet-links {
+    display: flex;
+    gap: var(--spacing-6);
+  }
+
+  .jp-sheet-actions {
+    display: flex;
+    gap: var(--spacing-4);
+    flex-wrap: wrap;
+  }
+
+  .jp-contact-email {
+    font-size: var(--text-large-size);
+    font-weight: 700;
+    line-height: var(--text-large-leading);
+    user-select: all;
+  }
+
+  @media (pointer: fine) {
+    .jp-sheet-inner {
+      max-width: var(--jp-sheet-max);
+      margin-left: var(--jp-gutter);
+    }
+  }
+
+  /* Live region (S04 section 8): visually hidden, standard clip
+   * pattern. S03 writes the new scene H1 into it after travel. */
+  .jp-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
