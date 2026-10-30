@@ -17,8 +17,9 @@ function startWorld(): void {
 }
 
 function startOnIdle(): void {
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(startWorld);
+  const ric = (window as unknown as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback;
+  if (ric) {
+    ric(startWorld);
   } else {
     window.setTimeout(startWorld, 0);
   }

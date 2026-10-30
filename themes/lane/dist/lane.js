@@ -7,7 +7,7 @@
  */
 
 /**
- * lane theme — built by `npx @astryxdesign/cli theme build`
+ * lane theme — built by `npx astryx theme build`
  * Import the CSS file alongside this module:
  *
  *   import { laneTheme } from './lane';

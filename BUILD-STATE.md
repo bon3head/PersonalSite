@@ -22,6 +22,7 @@ notes:
 - PIN CONFLICT RESOLVED (coordinator decision, spec bug not fact change): S00 pinned vite@7.3.7 with @vitejs/plugin-react@6.1.1, but 6.x declares peer vite ^8.0.0 (ERESOLVE). Fix: plugin-react to 5.2.0 (latest 5.x, supports Vite 7). Spec fix commit e6defe6 (S00 v1.0.2 + changelog), package.json + lockfile + fonts commit f4672f0. Vite 7 mature-line rationale preserved.
 - S02 section 2 and BUILD-ORDER section 4 were read only because the card mandates their contents (types.ts API, BUILD-STATE format); no other out-of-card spec was used.
 - Wave 0 gate G-BUILD completes after B1 lands (T-S00-1, T-S00-3 need laneTheme.mjs). Wave 1 starts now because B1 is the unblocker.
+- COORDINATOR FIXES 2026-10-30 (B0 omissions, not spec changes): added @astryxdesign/cli@0.7.1 to devDependencies (S00 pins it but B0 omitted it; npm run theme failed with "astryx: not found"); added @types/three@0.186.0, @types/react@19.3.0, @types/react-dom@19.3.0 (three and React do not ship their own types); fixed main.tsx requestIdleCallback narrowing (window narrowed to never in else branch); rebuilt themes/lane/dist (lane.js was stale per theme:check). tsc --noEmit now exit 0, theme:check now clean.
 
 ## B1 Theme
 status: done
@@ -44,6 +45,7 @@ notes:
 - laneTheme.mjs created first per card (unblocks B0 T-S00-1, T-S00-3).
 - theme.template.ts from `astryx init --features theme` is reference only, not imported.
 - dist/ is gitignored by the `dist/` pattern; S01 step 5 requires committing themes/lane/dist/*, so it is force-added.
+- INTEGRATION CONTRACT (for B4 app wiring): the app MUST pass Theme mode derived from data-regime (void/field to dark, paper to light). Theme's default system mode sets its own color-scheme on the wrapper div, which overrides the regime block inside the app and makes void/field resolve the light accent. The regime block alone is not sufficient; mode must follow regime.
 - REQUEST (coordinator, package.json is B0-owned): `npm run theme` fails with `astryx: not found` because @astryxdesign/cli is not in devDependencies (only core is). All B1 theme operations ran via `npx -y @astryxdesign/cli@0.7.1` with identical output. Add @astryxdesign/cli@0.7.1 to devDependencies so `npm run theme` and `npm run theme:check` resolve, otherwise the gates script cannot run theme:check.
 - INTEGRATION CONTRACT (for B3/B4 app wiring): the app MUST pass Theme `mode` derived from data-regime (void/field -> dark, paper -> light). Theme's default system mode sets its own color-scheme on the wrapper div, which overrides the regime block inside the app and makes void/field resolve the light accent. The B1 test harness mirrors this wiring (test-main.tsx derives mode from data-regime via MutationObserver). The regime block alone is not sufficient; mode must follow regime.
 - Regime block: S01 section 6 block plus B0 text/accent mappings (--jp-text, --jp-text-2, --jp-accent per regime), which jp-chrome needs. Layer order untouched.
