@@ -201,12 +201,29 @@ notes:
 - Test-lesson: bulk expects (one per texel, ~400k) block the Playwright worker event loop so the 30s timeout never fires; tests aggregate counts and assert once.
 
 ## B6a Server QA
-status: todo
-agent:
+status: blocked
+agent: B6a worker
 commit:
 tests:
-receipts:
+- T-SRV-1 geometry hand values: PASS (lane 0 k=0, k=6, k=7; 6144 lanes).
+- T-SRV-2 readout clear 1440x900: PASS (max delta E under 0.01).
+- T-SRV-2 readout clear 390x844: FAIL, max delta E 0.1536 (see BLOCKED).
+- T-SRV-3 lockstep: PASS (warp 10 identical at 3 samples; shader hashes on warp/sm).
+- T-SRV-4 words: PASS (12s collection, spawned set equals world.server.words, 9 of 9).
+- T-SRV-5 hue budget: PASS in isolation (at most 30% chroma over 0.04).
+- T-SRV-6 LCP element is the H1: PASS (observer-gated; addInitScript buffered observer).
+- G-COPY server readout matches S09: PASS (H1 + 3 paragraphs equal C-SRV-*).
+- tsc exit 0 for B6a files; lint-tokens clean for B6a files; banned-scan clean for B6a files. (Repo-wide violations at run time were siblings' files only, untouched.)
+receipts: qa/scenes/server/B6a-RECEIPTS.md
 notes:
+- src/world/server.ts: troika Text pool (token size 6), spawn on wordCadence, drift from focus, color hot to signal to text2, opacity 1 until wordFadeFrom then easePlain to 0, billboarded, anchor center, Commit Mono 400 woff. Pause fades over fast then hides; resume restarts; reduced places 3 statics at reducedWordAt. SceneController-compatible (pause/resume) plus setReducedMotion/dispose/activeWords/spawnedWords/isPaused.
+- src/scenes/server.tsx: canonical server readout content (C-SRV-H1/P1/P2/P3); B4's Readout inlines the same content (see wiring request).
+- Camera idle yaw/parallax live in the lanefield rig; lane pulses live in the fire() shader; this controller owns words only.
+- Troika import uses // @ts-ignore (same untyped-module pattern as B4's laneTheme): troika ships types under dist/types but no package.json types field.
+- T-SRV-4 uses a stub field (no WebGL) because ?world=0 makes createLanefield return null; word logic does not need WebGL. Live-App word test needs wiring request 1.
+BLOCKED: T-SRV-2 phone background (S05 section 8). At 390x844 coarse pose the canvas background in the readout box renders pure black [0,0,0], delta E 0.1536 from void ground, while 1440x900 fine pose renders void ground and passes. No lanes intrude at either viewport (phone maxDelta is exactly black-vs-void, not lane-bright), so the coarse shift is correct for lanes. GL interception proves the engine sets clear color [10,12,15,1] last at both viewports, and setting page background to void ground does not change it, so the defect is in src/world/lanefield.ts clear-color path (B2-owned), not in B6a files or the test. Test threshold not lowered.
+- Wiring request 1 (coordinator, App.tsx): pass a controllers map to createTravelController including createServerController(field), so travel pause/resume drives the word pool. Until wired, the live App shows no words.
+- Wiring request 2 (coordinator, optional): Readout.tsx server variant may import ServerReadoutContent from src/scenes/server.tsx instead of inlining the same JSX.
 
 ## B6b LeafLink QA
 status: todo
