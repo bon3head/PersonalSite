@@ -30,13 +30,13 @@ function generateAll(seed: number): {
   const tex = T.world.layoutTexture;
   const out = new Float32Array(tex.width * tex.height * FLOATS_PER_TEXEL);
   const side: Record<string, unknown> = {};
-  // Layout indices per S02: 0 server, 1 leaflink, 2 sidequests, 3 scatter.
+  // Layout indices per S02: server, leaflink, sidequests, scatter.
   // Each generator writes exactly laneCount * pointsPerLane texels into
   // its own slice (verified by its B5 card tests) and returns side data.
   genServer(seed, out, 0);
   side.leaflink = genLeaflink(seed, out, 1);
   side.sidequests = genSidequests(seed, out, 2);
-  side.scatter = genScatter(seed, out, 3);
+  side.scatter = genScatter(seed, out, 3); // lit-ok: S02 layout index scatter
   if (out.length !== tex.width * tex.height * FLOATS_PER_TEXEL) {
     throw new Error(`layout buffer length ${out.length} does not match texture size`);
   }
