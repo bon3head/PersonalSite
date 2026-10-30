@@ -168,12 +168,19 @@ notes:
 - lint-tokens repo-wide violations exist only in src/world/layouts/scatter.ts (B5d's file, in progress); left untouched.
 
 ## B5d Notfound scene
-status: todo
-agent:
+status: done
+agent: B5d worker
 commit:
 tests:
-receipts:
+- Layout: PASS. 5 Playwright tests in tests/layouts/scatter.test.ts (21.2s): 6144 lanes x 8 points all class 9; centers in sphere radius 8, lengths in [0.2, 0.6], points evenly spaced; deterministic across runs; generation 118ms (under 150ms); touches only layout 3 texels.
+- Byte-identity: PASS. qa/layouts/scatter/verify-byte-identity.mjs bundles the real worker.ts and compares its scatter slice against generate() at seeds 20271201 and 20271208: 0 mismatches, identical sha256 both seeds. Coordinator can register this generator without changing the layout hash.
+- lint-tokens: clean. banned-scan src/world/layouts + tests/layouts: clean. tsc: zero errors in B5d files (sole repo error at run time was B4's in-progress App.tsx laneTheme.mjs types).
+- T-404-1 full browser test (H1, weights one-hot 3, title) needs B4 chrome + B6d scene, wave 3. Layout portion covered above.
+receipts: qa/layouts/scatter/ (B5d-RECEIPTS.md, byte-identity.json, verify-byte-identity.mjs)
 notes:
+- src/world/layouts/scatter.ts mirrors B2's genScatter exactly: same seed stream rng(seed + layoutIndex * 1000003), same RNG call order (rejection sample, then z, phi, len), same arithmetic, same texel formula (lane*32 + layout*8 + point), class 9.
+- SideData is an empty interface: scatter carries no side data.
+- Test-lesson: bulk expects (one per texel, ~400k) block the Playwright worker event loop so the 30s timeout never fires; tests aggregate counts and assert once.
 
 ## B6a Server QA
 status: todo

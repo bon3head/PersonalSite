@@ -1,0 +1,21 @@
+{
+  "check": "B5d scatter byte-identity vs B2 worker.ts genScatter",
+  "seeds": [
+    {
+      "seed": 20271201,
+      "mismatches": 0,
+      "firstMismatch": -1,
+      "workerSliceSha256": "641a723e82f6846e203e8e89cd57e0c6093184c651c2d77f55fdd293dd8ba1b3",
+      "mineSliceSha256": "641a723e82f6846e203e8e89cd57e0c6093184c651c2d77f55fdd293dd8ba1b3"
+    },
+    {
+      "seed": 20271208,
+      "mismatches": 0,
+      "firstMismatch": -1,
+      "workerSliceSha256": "8db1b5ccdd4b6a63d92d0e45347d65c6e92fb7bd2bd071dc9c38720bcadb5fe1",
+      "mineSliceSha256": "8db1b5ccdd4b6a63d92d0e45347d65c6e92fb7bd2bd071dc9c38720bcadb5fe1"
+    }
+  ],
+  "pass": true,
+  "generatedAt": "2026-10-30T15:13:15.818Z"
+}
