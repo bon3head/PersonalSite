@@ -141,7 +141,15 @@ export default function App(props: AppProps): JSX.Element {
     );
     routerRef.current = router;
     applyRegime(initialScene);
+    // The world starts on idle in main.tsx, after App mounts. When it
+    // arrives, attach it so scene changes morph lanes.
+    const onLanefield = (event: Event): void => {
+      const detail = (event as CustomEvent).detail as Lanefield | null;
+      travel.setLanefield(detail ?? null);
+    };
+    window.addEventListener('lanefield-ready', onLanefield);
     return () => {
+      window.removeEventListener('lanefield-ready', onLanefield);
       router.dispose();
       travel.dispose();
       routerRef.current = null;

@@ -47,6 +47,7 @@ export interface TravelDeps {
 export interface TravelController {
   readonly current: SceneId;
   travelTo: (scene: SceneId) => Promise<void>;
+  setLanefield: (lanefield: Lanefield | null) => void;
   dispose: () => void;
 }
 
@@ -91,6 +92,10 @@ export function createTravelController(
   let timers: ReturnType<typeof setTimeout>[] = [];
   let pendingResolve: (() => void) | null = null;
   let disposed = false;
+  // Lanefield arrives late: main.tsx starts the world on idle, after
+  // App mounts. setLanefield attaches it; travelTo reads this variable,
+  // not deps.lanefield, so a late world still morphs lanes.
+  let lanefield: Lanefield | null = deps.lanefield;
 
   function later(ms: number, gen: number, fn: () => void): void {
     const id = setTimeout(() => {
@@ -123,7 +128,7 @@ export function createTravelController(
     const gen = generation;
 
     const reduced = deps.isReducedMotion();
-    const noWorld = deps.lanefield === null;
+    const noWorld = lanefield === null;
     const useReducedTiming = reduced || noWorld;
 
     const oldEl = deps.dom.readout();
@@ -147,8 +152,8 @@ export function createTravelController(
       oldEl.style.opacity = '0';
     }
     deps.controllers?.get(outgoing)?.pause();
-    const worldPromise = deps.lanefield
-      ? deps.lanefield.travelTo(SCENE_LAYOUT[target], {
+    const worldPromise = lanefield
+      ? lanefield.travelTo(SCENE_LAYOUT[target], {
           instant: useReducedTiming,
         })
       : Promise.resolve();
@@ -246,6 +251,9 @@ export function createTravelController(
       return current;
     },
     travelTo,
+    setLanefield(next: Lanefield | null): void {
+      lanefield = next;
+    },
     dispose(): void {
       disposed = true;
       cancelPending();

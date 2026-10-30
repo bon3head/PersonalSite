@@ -9,11 +9,16 @@ import './lib/reducedMotion';
 function startWorld(): void {
   const mount = document.getElementById('world');
   if (!mount) return;
-  createLanefield(mount, {
+  const lanefield = createLanefield(mount, {
     seed: T.world.seed,
     reducedMotion: document.documentElement.classList.contains('reduced-motion'),
     initial: 'server',
   });
+  if (lanefield) {
+    window.dispatchEvent(
+      new CustomEvent('lanefield-ready', { detail: lanefield }),
+    );
+  }
 }
 
 function startOnIdle(): void {
