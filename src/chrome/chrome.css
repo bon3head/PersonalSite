@@ -1,4 +1,4 @@
-/* Chrome styles (S04). All rules live in the jp-chrome layer per S00
+/* Chrome styles (S04). All rules sit in the jp-chrome layer per S00
  * section 6. Values come from tokens: Astryx --spacing/--text/--color
  * tokens, --jp-* custom properties from tokens.generated.css, and
  * --jp-ro-* properties set inline from T by Readout (TS-only tokens
@@ -435,7 +435,7 @@
     }
   }
 
-  /* Live region (S04 section 8): visually hidden, standard clip
+  /* Announcement region (S04 section 8): visually hidden, standard clip
    * pattern. S03 writes the new scene H1 into it after travel. */
   .jp-live {
     position: absolute;

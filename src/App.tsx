@@ -1,6 +1,6 @@
 // App (S04 section 3): the DOM layer that persists across scenes.
 // Page structure is exactly S04 section 3: wordmark, main with the
-// readout and the canvas-region description, keymap nav, live region,
+// readout and the canvas-region description, keymap nav, announcement region,
 // sheets. One h1 per scene (the readout heading). No header, no
 // footer.
 //
@@ -22,7 +22,7 @@ import { useEffect, useRef, useState, type JSX } from 'react';
 import { Theme } from '@astryxdesign/core/theme';
 import { LayerProvider } from '@astryxdesign/core';
 // B1's laneTheme.mjs ships no declarations, and a sibling .d.ts would
-// live in B1-owned themes/lane/. Suppress the implicit-any import here
+// sit in B1-owned themes/lane/. Suppress the implicit-any import here
 // instead; laneTheme is passed straight to Astryx Theme as-is.
 // @ts-ignore: untyped B1-owned module, no declarations shipped
 import { laneTheme } from '../themes/lane/laneTheme.mjs';
