@@ -203,7 +203,7 @@ notes:
 ## B6a Server QA
 status: blocked
 agent: B6a worker
-commit:
+commit: 9ecb352
 tests:
 - T-SRV-1 geometry hand values: PASS (lane 0 k=0, k=6, k=7; 6144 lanes).
 - T-SRV-2 readout clear 1440x900: PASS (max delta E under 0.01).
@@ -236,7 +236,7 @@ notes:
 ## B6c SideQuests QA
 status: blocked
 agent: B6c worker
-commit: (this commit)
+commit: 65e51ac
 tests:
 - T-SQ-2 walk feedback: PASS (1.6m). 3 twins 44x44 (+/-1px); click twin 1: setActivity kind 2, lanes exactly trail 0 laneIds, starts[0] <= now(), starts[j] = starts[0] + arcStarts[j]/14 (0.05s tol), uper[j] = 14/arcLengths[j] (0.1% tol); aria-pressed true.
 - T-SQ-4 spring numbers (mock): PASS (1.4s). Trail 0 length 14.40, claimStart 1.033s, minDrop -0.0276 (gate [-0.035, -0.020]), settleErr 0.0000 (gate <= 0.005). Bob-corrected.
