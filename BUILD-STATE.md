@@ -26,7 +26,7 @@ notes:
 ## B1 Theme
 status: done
 agent: B1 worker
-commit: (filled after commit)
+commit: e8a3f7c08d97233f8701df626077a9acccab962c
 tests:
 - T-S01-1: PASS. `astryx theme build` JSON: name lane, tokenCount 93, sizeKB 12.4, warnings [] (notices only: Commit Mono named but not loaded, handled by S00 fonts.css per S01 section 2).
 - T-S01-2: PASS. grep -i for 0064E0, 2694FE, 0082FB, 3E9EFB on themes/lane/dist/lane.css returns nothing.
