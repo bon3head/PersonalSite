@@ -1,6 +1,6 @@
 # S00 Foundation: repo, toolchain, pins, generators, lints
 
-Version 1.0.1, 2026-10-30. Depends on: DESIGN.md, S09. Blocks: everything.
+Version 1.0.2, 2026-10-30. Depends on: DESIGN.md, S09. Blocks: everything.
 
 ## 1. Purpose
 
@@ -10,7 +10,7 @@ Create the empty, buildable, lint-gated project every other spec lands in. After
 
 | Layer | Pick | Why |
 |---|---|---|
-| Build | Vite `7.3.7`, `@vitejs/plugin-react` `6.1.1` | Vite 8 moved to a new bundler core in 2026; 7.3.x is the mature line. |
+| Build | Vite `7.3.7`, `@vitejs/plugin-react` `5.2.0` | Vite 8 moved to a new bundler core in 2026; 7.3.x is the mature line. plugin-react 5.2.0 is the latest 5.x line and supports Vite 7 (peer `^4.2.0 \|\| ^5.0.0 \|\| ^6.0.0 \|\| ^7.0.0 \|\| ^8.0.0`); 6.x requires Vite 8 and was a spec error. |
 | Language | TypeScript `5.9.3`, `strict: true` | TypeScript 6 and 7 are new major lines; 5.9.3 has the widest tool support. |
 | DOM chrome | React `19.3.1`, React DOM `19.3.1` | Astryx components require React 19. The chrome is small; React is there to use Astryx's typed, accessible components (BottomSheet, Button, Link, Kbd, Toast, useHotkeys) rather than hand-roll them. |
 | Design system | `@astryxdesign/core@0.7.1`, `@astryxdesign/cli@0.7.1`, `@stylexjs/stylex@0.19.1` | Pinned per ASTRYX-REFERENCE. Components ship precompiled (no StyleX compiler needed unless a component is swizzled; none is in v1). |
@@ -150,3 +150,4 @@ U-S00-1: the `Commit Mono Fallback` metric overrides in DESIGN.md section 4 are 
 
 - 1.0.0, 2026-10-30: initial.
 - 1.0.1, 2026-10-30: `optional` export removed from the copy generator (C-SQ-VENUE is a normal string now).
+- 1.0.2, 2026-10-30: plugin-react pin corrected 6.1.1 to 5.2.0. 6.x declares peer vite ^8.0.0, which contradicts the Vite 7.3.7 pin and fails npm install with ERESOLVE. 5.2.0 is the latest 5.x line and supports Vite 7. No behavior change; the Vite 7 mature-line rationale stands.
