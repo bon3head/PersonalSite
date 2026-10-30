@@ -53,7 +53,7 @@ notes:
 ## B2 Engine core
 status: done (with 2 flagged items below, neither worked around)
 agent: B2 worker
-commit:
+commit: 7c634e3acd5c1317896eb021a927ee479dc7db55
 tests:
 - T-S02-1: PASS. laneCount 6144, info().calls 1, with and without ?debug=lanesOnly.
 - T-S02-1b: PASS. Same with ?debug=lanesOnly.
