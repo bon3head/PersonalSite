@@ -1,6 +1,6 @@
 # S06 Scene: LeafLink, mutual aid (`/leaflink`)
 
-Version 1.0.0, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.leaflink`, `world.camera.leaflink`. Blocks: S10 poster, S11 scene gates.
+Version 1.0.1, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.leaflink`, `world.camera.leaflink`. Blocks: S10 poster, S11 scene gates.
 
 ## 1. Purpose
 
@@ -95,8 +95,9 @@ S09 IDs: C-TITLE-LEAFLINK, C-LL-H1, C-LL-P1, C-LL-FACTS, C-LL-STACK, C-LL-CODE, 
 
 ## 10. Unknowns
 
-U-LL-1: LeafLink's real request and offer categories, UI and screenshots: UNKNOWN, not depicted. U-LL-2: "mutual aid" versus the older "event discovery" description (S09 D-LEAFLINK-KIND), for Justin to confirm. U-LL-3: whether LeafLink is still running: UNKNOWN; copy uses "Simulated feed" and never claims it is live now.
+U-LL-1: LeafLink's real request and offer categories, UI and screenshots: UNKNOWN, not depicted. U-LL-2: resolved, Justin confirmed "mutual aid" on 2026-10-30 (S09 D-LEAFLINK-KIND). U-LL-3: whether LeafLink is still running: UNKNOWN; copy uses "Simulated feed" and never claims it is live now.
 
 ## 11. Changelog
 
 - 1.0.0, 2026-10-30: initial.
+- 1.0.1, 2026-10-30: mutual aid confirmed by Justin.

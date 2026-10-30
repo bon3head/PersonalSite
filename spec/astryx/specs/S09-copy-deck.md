@@ -1,6 +1,6 @@
 # S09 Copy deck: every visible string
 
-Version 1.0.0, 2026-10-30. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+Version 1.1.0, 2026-10-30. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
 
 ## 1. Purpose
 
@@ -15,17 +15,13 @@ Every word the site shows, with an ID and a source. Builders copy strings from `
 5. No liveness claims. The Server scene renders the machine; it is not a live feed. No "live", "online", "status", "uptime" words.
 6. Voice: first person, terse, plain verbs. The brief's scene-feeling words (breathing, heartbeats, alive) are direction for designers and never appear in copy (banned-slop-styles 7c: no organic metaphors for software).
 
-**Decision recorded (D-PHONE):** the brief lists a phone number. It is not rendered. A personal phone number on a public page draws spam and the brief does not ask for it to be shown. Justin can reverse this; it would add one line to C-CONTACT.
+**Decision recorded (D-PHONE):** the brief lists a phone number. It is not rendered. A personal phone number on a public page draws spam and the brief does not ask for it to be shown. Justin confirmed hidden on 2026-10-30.
 
-**Decision recorded (D-LEAFLINK-KIND):** earlier project notes called LeafLink an "event discovery platform". The brief (2026-10-30, Justin explicit) calls it a mutual aid platform. The brief wins and this deck says mutual aid. Flagged to Justin in the delivery message.
+**Decision recorded (D-LEAFLINK-KIND):** earlier project notes called LeafLink an "event discovery platform". The brief (2026-10-30, Justin explicit) calls it a mutual aid platform. The brief wins and this deck says mutual aid. Justin confirmed mutual aid on 2026-10-30.
 
-## 3. Optional strings (default OFF)
+## 3. Strings decided by Justin outside the brief
 
-These are Justin-confirmed in project memory (2026-10-04) but absent from the brief, which says SideQuests stack details beyond the win are not in the record. They render only if `copy.optional.sidequestsVenue === true` in `src/copy.ts`, which stays false until Justin re-confirms in writing.
-
-| ID | String | Source |
-|---|---|---|
-| C-SQ-OPT-1 | `Built at Hack New Paltz. Working MVP in 24 hours.` | MEM |
+C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the brief. Justin confirmed it on 2026-10-04 and ruled on 2026-10-30 that it shows (D-SQ-VENUE). It is in the table below with source `MEM`.
 
 ## 4. The table
 
@@ -60,6 +56,7 @@ These are Justin-confirmed in project memory (2026-10-04) but absent from the br
 | C-SQ-H1 | SideQuests readout heading | `SideQuests` | BRIEF |
 | C-SQ-P1 | SideQuests readout | `Community engagement built as quests: small adventures set in everyday campus spaces, made to get people to show up.` | BRIEF |
 | C-SQ-FACTS | SideQuests readout, supporting | `Hackathon build with Julian Shuster. 2nd place.` | BRIEF |
+| C-SQ-VENUE | SideQuests readout, supporting, directly after C-SQ-FACTS | `Built at Hack New Paltz. Working MVP in 24 hours.` | MEM (Justin 2026-10-04; shown per Justin 2026-10-30, D-SQ-VENUE) |
 | C-SQ-CODE | SideQuests link | label `Code`, href `https://codeberg.org/bon3head/sidequests` | MEM (Justin confirmed 200, 2026-10-04) |
 | C-SQ-HINT | SideQuests caption | `Tap a marker to walk its trail.` (coarse pointer) / `Click a marker to walk its trail.` (fine pointer) | n/a |
 | C-SQ-MARKER | Accessible name of each marker's DOM twin | `Trail 1`, `Trail 2`, `Trail 3` | n/a |
@@ -92,7 +89,7 @@ These are Justin-confirmed in project memory (2026-10-04) but absent from the br
 - K-COPY-1: any string on the site that is not in this table (G-COPY scans rendered DOM text of every route and every sheet against the table).
 - K-COPY-2: any em dash (U+2014) or en dash (U+2013) in `dist/` HTML, JS or CSS content strings.
 - K-COPY-3: any banned word or any rule-4 item found in `dist/` (case-insensitive grep, list in `tools/banned.txt`, S00).
-- K-COPY-4: C-SQ-OPT-1 visible while `copy.optional.sidequestsVenue` is false.
+- K-COPY-4: C-SQ-VENUE missing from the SideQuests readout.
 
 ## 6. Receipts
 
@@ -105,9 +102,10 @@ These are Justin-confirmed in project memory (2026-10-04) but absent from the br
 
 ## 7. Unknowns
 
-U-COPY-1 Hack New Paltz and 24-hour MVP (C-SQ-OPT-1) need Justin's re-confirmation. U-COPY-2 LeafLink "mutual aid" versus earlier "event discovery" (D-LEAFLINK-KIND) needs Justin's eye. U-COPY-3 Phone number (D-PHONE).
+None open. D-SQ-VENUE (shown), D-LEAFLINK-KIND (mutual aid) and D-PHONE (hidden) were decided by Justin on 2026-10-30.
 
 ## 8. Changelog
 
 - 1.0.0, 2026-10-30: initial deck from CONTENT-BRIEF.md.
 - 1.0.0, 2026-10-30 (taste pass): C-LL-P1 rewritten from a three-beat list ("Someone needs something, someone nearby has it, and the map connects them") to two clauses; the triplet was a rule-of-three flag in TASTE-GATES section 2. Source unchanged: brief "neighbors helping neighbors", "live map", "in real time".
+- 1.1.0, 2026-10-30: Justin's decisions. C-SQ-OPT-1 becomes C-SQ-VENUE and always shows (D-SQ-VENUE); the `optional` flag is removed. Mutual aid and hidden phone confirmed.

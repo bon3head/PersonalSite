@@ -1,22 +1,22 @@
 # UNKNOWNS.md: register of what is not known and what Justin decides
 
-Version 1.0.0, 2026-10-30. Every UNKNOWN in the package is listed here once. Ship rule (S11 section 9): each is resolved or explicitly accepted by Justin in writing.
+Version 1.1.0, 2026-10-30. Every UNKNOWN in the package is listed here once. Ship rule (S11 section 9): each is resolved or explicitly accepted by Justin in writing.
 
-## 1. Decisions for Justin (defaults are already applied; reversing any is a one-line change)
+## 1. Decisions (Justin ruled on 2026-10-30 unless noted)
 
-| ID | Question | Default in the specs | Where |
+| ID | Question | Decision | Where |
 |---|---|---|---|
-| D-LEAFLINK-KIND | LeafLink is "mutual aid" in the 2026-10-30 brief; earlier project notes said "event discovery platform". Which is right? | Mutual aid (the brief wins) | S09 C-LL-P1, S06 |
-| D-SQ-VENUE | Show "Built at Hack New Paltz. Working MVP in 24 hours." on SideQuests? Confirmed by Justin on 2026-10-04 but missing from the brief. | Hidden (`optional.sidequestsVenue = false`) | S09 C-SQ-OPT-1 |
-| D-PHONE | Show the phone number? | Hidden | S09 rule 4 |
+| D-LEAFLINK-KIND | LeafLink is "mutual aid" in the 2026-10-30 brief; earlier project notes said "event discovery platform". Which is right? | Mutual aid (Justin, 2026-10-30) | S09 C-LL-P1, S06 |
+| D-SQ-VENUE | Show "Built at Hack New Paltz. Working MVP in 24 hours." on SideQuests? Confirmed by Justin on 2026-10-04 but missing from the brief. | Shown (Justin, 2026-10-30) | S09 C-SQ-VENUE |
+| D-PHONE | Show the phone number? | Hidden (Justin, 2026-10-30) | S09 rule 4 |
 | D-GPA | GPA | Cut (Justin, 2026-10-04). Not a question; listed so nobody re-adds it from the brief. | S09 rule 4 |
-| D-CODE-HOST | Repo links point at Codeberg (canonical code host per earlier decision); GitHub `bon3head` is linked from whoami only. Keep? | Yes | S09 C-LL-CODE, C-SQ-CODE, C-WHO-LINK-* |
+| D-CODE-HOST | Repo links point at Codeberg (canonical code host per earlier decision); GitHub `bon3head` is linked from whoami only. Keep? | Yes (earlier decision; not re-asked) | S09 C-LL-CODE, C-SQ-CODE, C-WHO-LINK-* |
 
 ## 2. Facts to verify before ship
 
 | ID | What | How to resolve |
 |---|---|---|
-| R-GPU | RTX 3070 Ti structure: 48 SMs, 128 CUDA cores each, 6,144 total (GA104). The site's whole geometry rests on it and C-SRV-ALT states it. | Open NVIDIA's RTX 3070 Ti spec page or a launch review (PC Perspective Founders Edition review, June 2021, https://pcper.com/2021/06/nvidia-geforce-rtx-3070-ti-founders-edition-review/) and record the URL and the numbers here. |
+| R-GPU | RTX 3070 Ti structure: 48 SMs, 128 CUDA cores each, 6,144 total (GA104). The site's whole geometry rests on it and C-SRV-ALT states it. | Open NVIDIA's RTX 3070 Ti spec page or a launch review (PC Perspective Founders Edition review, June 2021, https://pcper.com/2021/06/nvidia-geforce-rtx-3070-ti-founders-edition-review/) and record the URL and the numbers here. **Accepted by Justin on 2026-10-30 without a check**, so it no longer blocks ship. The numbers are NVIDIA's published GA104 figures; anyone who opens a source should still record the URL here. |
 | R-LINKS | Codeberg repos and LinkedIn return 200 (blocked from cloud runners) | T-COPY-4: one manual click each on the deployed preview |
 
 ## 3. Content unknowns (never filled, never depicted)
@@ -45,3 +45,4 @@ Version 1.0.0, 2026-10-30. Every UNKNOWN in the package is listed here once. Shi
 ## 5. Changelog
 
 - 1.0.0, 2026-10-30: initial.
+- 1.1.0, 2026-10-30: Justin's decisions applied: LeafLink is mutual aid, the Hack New Paltz line shows, the phone stays hidden, R-GPU accepted without a source check.

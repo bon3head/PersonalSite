@@ -1,6 +1,6 @@
 # S11 Performance and QA: the gates
 
-Version 1.0.0, 2026-10-30. Depends on: all specs. Blocks: ship.
+Version 1.0.1, 2026-10-30. Depends on: all specs. Blocks: ship.
 
 ## 1. Purpose
 
@@ -74,7 +74,7 @@ Then run the mechanical checklist from `baseline/ui-ux/ui-slop-patterns.md` sect
 
 ## 7. G-CONTENT (traceability)
 
-`tools/trace-content.mjs` loads `src/copy.ts` and checks every ID whose S09 source is `BRIEF` or `MEM` against an allow-list of fact tokens extracted by hand from CONTENT-BRIEF.md into `qa/content/facts.json` (names, places, dates, placements, stack items, URLs). Any capitalized word or number in a BRIEF/MEM string that is not in the facts list fails. Example: `C-LL-FACTS` contains `Week-long`, `four`, `Justin Poli`, `Julian Shuster`, `Devin Perez`, `Colton A.`, `2nd place`: all in facts. A string that grew a "50 users" would fail.
+`tools/trace-content.mjs` loads `src/copy.ts` and checks every ID whose S09 source is `BRIEF` or `MEM` against an allow-list of fact tokens extracted by hand from CONTENT-BRIEF.md, plus the MEM facts S09 names (the Codeberg URLs, `Hack New Paltz`, `24`, `MVP`), into `qa/content/facts.json` (names, places, dates, placements, stack items, URLs). Any capitalized word or number in a BRIEF/MEM string that is not in the facts list fails. Example: `C-LL-FACTS` contains `Week-long`, `four`, `Justin Poli`, `Julian Shuster`, `Devin Perez`, `Colton A.`, `2nd place`: all in facts. A string that grew a "50 users" would fail.
 
 ## 8. Kill list (any one stops the ship, whatever else passes)
 
@@ -95,3 +95,4 @@ All gates green, the kill list empty, G-PERF-DEVICE recorded, every UNKNOWN in U
 ## 10. Changelog
 
 - 1.0.0, 2026-10-30: initial.
+- 1.0.1, 2026-10-30: facts list includes the MEM facts now that C-SQ-VENUE ships.

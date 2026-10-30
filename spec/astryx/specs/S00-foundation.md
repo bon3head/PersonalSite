@@ -1,6 +1,6 @@
 # S00 Foundation: repo, toolchain, pins, generators, lints
 
-Version 1.0.0, 2026-10-30. Depends on: DESIGN.md, S09. Blocks: everything.
+Version 1.0.1, 2026-10-30. Depends on: DESIGN.md, S09. Blocks: everything.
 
 ## 1. Purpose
 
@@ -78,7 +78,7 @@ Fails (exit 1) if the block is missing, is not valid JSON, or `world.laneCount !
 
 ### 4.2 `tools/extract-copy.mjs`
 
-Reads `spec/astryx/specs/S09-copy-deck.md` section 4 table, writes `src/copy.ts` exporting `C` keyed by ID (`C['C-SRV-H1']`), with links as `{label, href}`. Fails on duplicate IDs. Also exports `optional = {sidequestsVenue: false}`.
+Reads `spec/astryx/specs/S09-copy-deck.md` section 4 table, writes `src/copy.ts` exporting `C` keyed by ID (`C['C-SRV-H1']`), with links as `{label, href}`. Fails on duplicate IDs.
 
 ### 4.3 npm scripts (exact names)
 
@@ -149,3 +149,4 @@ U-S00-1: the `Commit Mono Fallback` metric overrides in DESIGN.md section 4 are 
 ## 11. Changelog
 
 - 1.0.0, 2026-10-30: initial.
+- 1.0.1, 2026-10-30: `optional` export removed from the copy generator (C-SQ-VENUE is a normal string now).

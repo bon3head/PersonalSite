@@ -1,6 +1,6 @@
 # S05 Scene: the inference server (home, `/`)
 
-Version 1.0.0, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.server`, `world.camera.server`. Blocks: S10 poster, S11 scene gates.
+Version 1.0.1, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.server`, `world.camera.server`. Blocks: S10 poster, S11 scene gates.
 
 ## 1. Purpose
 
@@ -95,8 +95,9 @@ S09 IDs: C-TITLE-SERVER, C-SRV-H1, C-SRV-P1, C-SRV-P2, C-SRV-P3, C-SRV-ALT. In-s
 
 ## 9. Unknowns
 
-U-SRV-1 (R-GPU): the 48 SM by 128 core structure is NVIDIA's public GA104 spec for the RTX 3070 Ti (6,144 CUDA cores). Verify once against NVIDIA's spec page or a review (for example PC Perspective's Founders Edition review, pcper.com, June 2021) and record the URL in UNKNOWNS.md before launch. Which models Ollama serves: UNKNOWN, never shown.
+U-SRV-1 (R-GPU): the 48 SM by 128 core structure is NVIDIA's public GA104 spec for the RTX 3070 Ti (6,144 CUDA cores). Justin accepted it on 2026-10-30 without a source check (UNKNOWNS R-GPU), so it does not block ship; anyone may still verify it against NVIDIA's spec page or a review (for example PC Perspective's Founders Edition review, pcper.com, June 2021) and record the URL in UNKNOWNS.md before launch. Which models Ollama serves: UNKNOWN, never shown.
 
 ## 10. Changelog
 
 - 1.0.0, 2026-10-30: initial.
+- 1.0.1, 2026-10-30: R-GPU accepted by Justin.

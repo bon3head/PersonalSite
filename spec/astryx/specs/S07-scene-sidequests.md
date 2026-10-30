@@ -1,6 +1,6 @@
 # S07 Scene: SideQuests, community engagement (`/sidequests`)
 
-Version 1.0.0, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.sidequests`, `world.camera.sidequests`, `motion.spring`. Blocks: S10 poster, S11 scene gates.
+Version 1.0.1, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.sidequests`, `world.camera.sidequests`, `motion.spring`. Blocks: S10 poster, S11 scene gates.
 
 ## 1. Purpose
 
@@ -43,7 +43,7 @@ Three markers, one `InstancedMesh` for heads and one for poles (2 draw calls). H
 
 ### 3.4 Readout (variant `sidequests`, the trailhead sign)
 
-C-SQ-H1 (display-1), C-SQ-P1, C-SQ-FACTS, C-SQ-OPT-1 only if `optional.sidequestsVenue`, C-SQ-CODE (link), C-SQ-HINT (pointer-appropriate variant). Dashed chalk outline per S04. World region `aria-label` C-SQ-ALT.
+C-SQ-H1 (display-1), C-SQ-P1, C-SQ-FACTS, C-SQ-VENUE, C-SQ-CODE (link), C-SQ-HINT (pointer-appropriate variant). Dashed chalk outline per S04. World region `aria-label` C-SQ-ALT.
 
 ## 4. Motion
 
@@ -62,7 +62,7 @@ Claimed state lives in memory for the visit only. Nothing is stored.
 
 ## 5. Content
 
-S09 IDs: C-TITLE-SIDEQUESTS, C-SQ-H1, C-SQ-P1, C-SQ-FACTS, C-SQ-OPT-1 (gated), C-SQ-CODE, C-SQ-HINT, C-SQ-MARKER, C-SQ-ALT. No text in the scene.
+S09 IDs: C-TITLE-SIDEQUESTS, C-SQ-H1, C-SQ-P1, C-SQ-FACTS, C-SQ-VENUE, C-SQ-CODE, C-SQ-HINT, C-SQ-MARKER, C-SQ-ALT. No text in the scene.
 
 ## 6. Components
 
@@ -95,8 +95,9 @@ S09 IDs: C-TITLE-SIDEQUESTS, C-SQ-H1, C-SQ-P1, C-SQ-FACTS, C-SQ-OPT-1 (gated), C
 
 ## 9. Unknowns
 
-U-SQ-1: SideQuests' real quests, campus, UI and stack beyond the win: UNKNOWN, not depicted (markers are unlabeled; the plan is generic, not SUNY New Paltz). U-SQ-2: C-SQ-OPT-1 venue and 24-hour facts await Justin's re-confirmation.
+U-SQ-1: SideQuests' real quests, campus, UI and stack beyond the win: UNKNOWN, not depicted (markers are unlabeled; the plan is generic, not SUNY New Paltz). Venue and 24-hour MVP (C-SQ-VENUE) shown per Justin, 2026-10-30.
 
 ## 10. Changelog
 
 - 1.0.0, 2026-10-30: initial.
+- 1.0.1, 2026-10-30: C-SQ-VENUE always shown (Justin).

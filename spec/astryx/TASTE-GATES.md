@@ -1,6 +1,6 @@
 # TASTE-GATES.md: the taste gates, run on this package
 
-Version 1.0.0, 2026-10-30. Sources: `baseline/ui-ux/anti-slop-rubric.md`, `baseline/ui-ux/banned-slop-styles.md`, `baseline/ui-ux/ui-slop-patterns.md` section 6, `baseline/process/SPEC-DRIVEN-METHOD.md` section 5, `baseline/content/CONTENT-BRIEF.md`.
+Version 1.0.1, 2026-10-30. Sources: `baseline/ui-ux/anti-slop-rubric.md`, `baseline/ui-ux/banned-slop-styles.md`, `baseline/ui-ux/ui-slop-patterns.md` section 6, `baseline/process/SPEC-DRIVEN-METHOD.md` section 5, `baseline/content/CONTENT-BRIEF.md`.
 
 This file records what the gates found on the specs. It does not replace the gates on the built site: G-ANTI and G-CONTENT (S11 sections 6 and 7) rerun them on screenshots and on `src/copy.ts`.
 
@@ -55,7 +55,7 @@ The feel-words from the launch prompt and the scene keywords in the brief ("hear
 | 5. Superlative substitution | CLEAN | No adjective carries a claim. "Bold" in the prompt became a mechanism (one lane field, three regimes), not a word in the copy. |
 | 6. Entrenchment | CLEAN | First server render saturated into a solid block; the parameters were changed and the change written down rather than defended. Counter-cases are in section 7. |
 | 7. Framing parroting | CLEAN | See section 6: the prompt said "seamless travel"; the package does not fly a camera between three places, it re-forms one object. |
-| 8. Citation theater | **FLAG, open** | C-SRV-ALT and the whole geometry rest on the RTX 3070 Ti having 48 SMs of 128 CUDA cores (6,144). That is NVIDIA's public GA104 spec, but no source was opened while writing this package. It is registered as R-GPU, and the ship rule (S11 section 9) blocks until someone opens the source and records the URL. Every other factual string traces to a brief line (section 5). |
+| 8. Citation theater | **FLAG, accepted by Justin** | C-SRV-ALT and the whole geometry rest on the RTX 3070 Ti having 48 SMs of 128 CUDA cores (6,144). That is NVIDIA's public GA104 spec, but no source was opened while writing this package. It is registered as R-GPU; Justin accepted it on 2026-10-30 without a check, which the ship rule allows. Every other factual string traces to a brief line (section 5). |
 | 9. Hedge accounting | CLEAN | Every UNKNOWN names the test or the person that resolves it (UNKNOWNS sections 2 to 4). |
 | 10. Legacy protectiveness | CLEAN | PCB board, cipher/ember theme, GSAP and the single-file constraint of the earlier site are all dead here and named dead (README standing rules). Nothing from v1 to v6 was carried forward for sunk cost. |
 
@@ -79,11 +79,11 @@ Every BRIEF or MEM string in S09, against the line of `CONTENT-BRIEF.md` it rest
 | C-SQ-P1 | community engagement, quests, everyday spaces, people show up | 67, 73 to 75 |
 | C-SQ-FACTS | hackathon, co-built with Julian Shuster, 2nd place | 69 to 70 |
 | C-LL-CODE, C-SQ-CODE, C-WHO-LINK-CB | Codeberg repos | MEM (Justin, 2026-10-04); D-CODE-HOST |
-| C-SQ-OPT-1 | Hack New Paltz, 24 hours | MEM only, OFF by default (D-SQ-VENUE) |
+| C-SQ-VENUE | Hack New Paltz, 24 hours | MEM (Justin 2026-10-04), shown per Justin 2026-10-30 (D-SQ-VENUE) |
 
 Never shown, by rule: GPA (brief line 10; cut by Justin 2026-10-04), phone, model names Ollama serves, any metric, any liveness claim about the server or the projects.
 
-Conflict flagged for Justin: the brief calls LeafLink mutual aid; earlier project notes called it an event discovery platform. The specs follow the brief (D-LEAFLINK-KIND).
+Conflict resolved: the brief calls LeafLink mutual aid and earlier notes called it event discovery. Justin confirmed mutual aid on 2026-10-30 (D-LEAFLINK-KIND).
 
 ## 6. Reframes taken
 
@@ -103,3 +103,4 @@ Conflict flagged for Justin: the brief calls LeafLink mutual aid; earlier projec
 ## 8. Changelog
 
 - 1.0.0, 2026-10-30: initial run on the package.
+- 1.0.1, 2026-10-30: Justin's rulings on R-GPU, D-SQ-VENUE and D-LEAFLINK-KIND recorded.
