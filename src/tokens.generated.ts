@@ -581,7 +581,7 @@ export const T = {
           ],
           "fovDeg": 48,
           "shiftNdc": [
-            0.58,
+            0.62,
             0
           ]
         },

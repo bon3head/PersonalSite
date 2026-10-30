@@ -620,7 +620,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
           "pos": [-7.0, 2.4, 8.0],
           "target": [0.5, 0.0, -3.0],
           "fovDeg": 48,
-          "shiftNdc": [0.58, 0.0]
+          "shiftNdc": [0.62, 0.0]
         },
         "coarse": {
           "pos": [-3.5, 3.0, 12.0],
@@ -764,6 +764,7 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.0.4, 2026-10-30: server fine shiftNdc x 0.58 to 0.62. The 0.58 pose passed T-SRV-2 once but failed twice after (0.047, 0.61) because idle yaw (3 deg) plus pointer parallax (1.5 deg) can combine to ~4.5 deg of left rotation, and the 0.58 margin (58px) does not survive it: geometric sweep to +/-5 deg shows 310 lane segments in the box at yaw -5 deg for 0.58. Shift 0.62 is clear at every yaw to +/-5 deg (minX 617 at yaw 0, zero hits at worst yaw), so it survives max yaw plus max parallax. Output point moves to ~1471px (31px past the right edge); server words drift left ~135px from the output, so they still enter view as they cool.
 - 1.0.3, 2026-10-30: server fine camera fov 42 to 48, shiftNdc x 0.44 to 0.58. T-SRV-2 fine failed at every shift-only pose because the 3-degree idle yaw (20s period) pushes lanes left into the readout box at some yaw phases; shift alone cannot clear the box at all yaws. Verified geometrically (all 6144 lanes x 7 segments projected through the shifted camera, yaw swept -3 to +3 deg): fov 48 + shift 0.58 has zero segments in the box at every yaw (leftmost projection 588px, 58px right of the box edge); fov 48 + shift 0.50 still hits 1067 segments at yaw -3 deg. Output point projects to 1442px (2px past the right edge); server words drift left from the output, so they enter view as they cool. T-SRV-2 fine passes at this pose.
 - 1.0.2, 2026-10-30: display0 weight 200 to 400. Justin's critique on the server render: the hairline (200) name did not pop; 400 gives it dimension while staying in the preloaded weight. Rules line updated (700 titles/keys, 400 name and prose).
 - 1.0.1, 2026-10-30: hueBudgetPct gains scatter 6. B6d measured the 404 scatter scene at 0.175% (chroma over 0.04) at 1280x800; 6% matches the sidequestsSignal budget and leaves 30x headroom. S08 sets no numeric budget, so this fills the gap rather than changing a spec value.
