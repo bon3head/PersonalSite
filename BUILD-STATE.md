@@ -227,7 +227,7 @@ notes:
 ## B6d Notfound QA
 status: done
 agent: B6d worker
-commit: (this commit)
+commit: ce0a07b
 tests:
 - T-404-1 unknown path renders the scene: PASS (32.6s). Load /nope, real App + real world: H1 "Nothing at this address.", title "Not found, Justin Poli", weights one-hot index 3 after world ready.
 - T-404-2 one key home: PASS (4.9s). Load /nope?world=0, press 1: URL /, server readout visible, no document load (load-event count unchanged, window marker survives).
@@ -239,6 +239,7 @@ notes:
 - Readout content (src/scenes/notfound.tsx) matches Readout.tsx's notfound branch element for element (h1 h-notfound + P1); Readout itself is B4-owned and already renders this content in the live App, so no Readout edit was needed.
 - Hue: measured 0.175% (1,795 of 1,024,000 px above OKLCH chroma 0.04) at 1280x800. DESIGN hueBudgetPct has no scatter entry and S08 sets no numeric budget; 0.175% sits below every existing scene budget (server 30%, leaflink 10%, sidequests 6%). Recommend coordinator add a scatter entry (6% leaves 30x headroom). Playwright screenshot waits for stability which never comes with continuous WebGL on SwiftShader, so measure-hue.mjs captures via CDP Page.captureScreenshot.
 - COORDINATOR-OWNED FILE CHANGE IN THIS COMMIT (acknowledgment requested): main.tsx now starts the world at the URL scene's layout (SCENE_LAYOUT[parsePath(pathname)]) instead of hardcoded 'server'. Without it, direct load of any non-server scene showed server lanes (T-404-1 first failed with weights [1,0,0,0], H1/title passing); with it, T-404-1 passes. This fixes direct load for all B6 scenes, not just 404. Verified: T-404-1 green only after this change.
+- Coordinator resolution 2026-10-30: main.tsx direct-load fix ACCEPTED (minimal, correct, verified green by B6d). Scatter hue budget ADDED: DESIGN v1.0.1, hueBudgetPct.scatter 6, tokens regenerated, tsc exit 0, commit ed045a3. B6d hue now passes against a real budget.
 - Test-environment note: stale vite servers from backgrounded runs (PIDs on 5173/4173) plus a pkill self-match caused two spurious T-404-2 connection-refused failures; killing stale servers and letting the config webServer manage vite cleared it. Not a test bug.
 
 ## B7 Fallbacks a11y
