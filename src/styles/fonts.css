@@ -1,0 +1,32 @@
+@font-face {
+  font-family: "Commit Mono Fallback";
+  src: local("Menlo"), local("Consolas"), local("DejaVu Sans Mono");
+  size-adjust: 100%;
+  ascent-override: 92%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url("/fonts/commit-mono-latin-200-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/commit-mono-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Commit Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/commit-mono-latin-700-normal.woff2") format("woff2");
+}

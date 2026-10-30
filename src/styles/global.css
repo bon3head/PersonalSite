@@ -1,0 +1,68 @@
+@layer reset, astryx-base, astryx-theme, jp-tokens, jp-regime, jp-chrome;
+
+@import "@astryxdesign/core/reset.css" layer(reset);
+@import "@astryxdesign/core/astryx.css" layer(astryx-base);
+@import "./tokens.generated.css" layer(jp-tokens);
+@import "./fonts.css" layer(jp-tokens);
+
+@layer jp-regime {
+  :root {
+    --jp-ground: var(--jp-void-ground);
+    --jp-raised: var(--jp-void-raised);
+    --jp-text: var(--jp-void-text);
+    --jp-text-2: var(--jp-void-text2);
+    --jp-accent: var(--jp-void-accent);
+    --jp-hairline: var(--jp-void-hairline);
+  }
+
+  html[data-regime="paper"] {
+    --jp-ground: var(--jp-paper-ground);
+    --jp-raised: var(--jp-paper-raised);
+    --jp-text: var(--jp-paper-text);
+    --jp-text-2: var(--jp-paper-text2);
+    --jp-accent: var(--jp-paper-accent);
+    --jp-hairline: var(--jp-paper-hairline);
+  }
+
+  html[data-regime="field"] {
+    --jp-ground: var(--jp-field-ground);
+    --jp-raised: var(--jp-field-raised);
+    --jp-text: var(--jp-field-text);
+    --jp-text-2: var(--jp-field-text2);
+    --jp-accent: var(--jp-field-accent);
+    --jp-hairline: var(--jp-field-hairline);
+  }
+}
+
+@layer jp-chrome {
+  html,
+  body {
+    margin: 0;
+    background: var(--jp-ground);
+    color: var(--jp-text);
+    font-family: var(--jp-font-family);
+  }
+
+  body {
+    font-variant-numeric: tabular-nums;
+  }
+
+  #world {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+
+  .srv-h1 {
+    font-weight: var(--jp-text-display-0-weight);
+    font-size: var(--jp-text-display-0-size);
+    line-height: var(--jp-text-display-0-leading);
+    letter-spacing: var(--jp-text-display-0-tracking);
+    margin: 0;
+  }
+}

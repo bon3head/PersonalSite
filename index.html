@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" data-regime="void" style="color-scheme: dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Justin Poli. Computer science senior at SUNY New Paltz, graduating December 2027. Runs his own LLM inference server at home." />
+    <meta name="theme-color" content="#0A0C0F" />
+    <link rel="preload" href="/fonts/commit-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Justin Poli</title>
+    <style>
+      /* Inline critical CSS: first paint is the correct ground color before any JS. */
+      html, body { margin: 0; background: var(--jp-ground, #0A0C0F); }
+      html[data-regime="void"] { --jp-ground: #0A0C0F; }
+      html[data-regime="paper"] { --jp-ground: #F3F0EA; }
+      html[data-regime="field"] { --jp-ground: #10294E; }
+      #world { position: fixed; inset: 0; z-index: 0; }
+      #root { position: relative; z-index: 1; }
+    </style>
+  </head>
+  <body data-astryx-theme="lane">
+    <div id="world" aria-hidden="true"></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
