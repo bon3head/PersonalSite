@@ -2,9 +2,11 @@ import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App';
 import { createLanefield } from './world/lanefield';
+import { initMotionPref } from './lib/reducedMotion';
 import { T } from './tokens.generated';
 import './styles/global.css';
-import './lib/reducedMotion';
+
+initMotionPref();
 
 function startWorld(): void {
   const mount = document.getElementById('world');

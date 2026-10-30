@@ -14,6 +14,7 @@ const PREVIEW = 'http://localhost:4173';
 
 function buildAndPrerender(): void {
   execSync('npx vite build', { cwd: ROOT, stdio: 'pipe' });
+  execSync('npx vite build --ssr src/entry-server.tsx --outDir dist-server', { cwd: ROOT, stdio: 'pipe' });
   execSync('node tools/prerender.mjs', { cwd: ROOT, stdio: 'pipe' });
 }
 

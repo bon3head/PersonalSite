@@ -14,12 +14,19 @@
 // mechanical.
 //
 // Usage: node tools/prerender.mjs [distDir] (default: dist).
+// Requires the SSR bundle first: vite build --ssr src/entry-server.tsx
+// --outDir dist-server (run by npm run build before this tool).
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = join(root, process.argv[2] ?? 'dist');
+
+// Full App SSR render per route (B4: App accepts initialScene/
+// initialSheet SSR-safe). This is what hydrateRoot expects on the
+// client; a placeholder readout mismatches and throws React 418.
+const { renderRoute } = await import(join(root, 'dist-server', 'entry-server.js'));
 
 // Route table: S03 section 2. Titles and H1s come from S09 via the
 // generated copy module, read here as JSON-free constants because this
@@ -35,6 +42,8 @@ const ROUTES = [
     h1: 'Justin Poli',
     readoutClass: 'server',
     h1Id: 'h-server',
+    scene: 'server',
+    sheet: null,
   },
   {
     out: join('leaflink', 'index.html'),
@@ -44,6 +53,8 @@ const ROUTES = [
     h1: 'LeafLink',
     readoutClass: 'leaflink',
     h1Id: 'h-leaflink',
+    scene: 'leaflink',
+    sheet: null,
   },
   {
     out: join('sidequests', 'index.html'),
@@ -53,6 +64,8 @@ const ROUTES = [
     h1: 'SideQuests',
     readoutClass: 'sidequests',
     h1Id: 'h-sidequests',
+    scene: 'sidequests',
+    sheet: null,
   },
   {
     out: '404.html',
@@ -62,6 +75,8 @@ const ROUTES = [
     h1: 'Nothing at this address.',
     readoutClass: 'notfound',
     h1Id: 'h-notfound',
+    scene: 'notfound',
+    sheet: null,
   },
 ];
 
@@ -77,13 +92,7 @@ const REGIME_GROUND = {
 };
 
 function readoutHtml(route) {
-  return (
-    `<main id="scene" aria-busy="false">` +
-    `<section class="jp-readout jp-readout--${route.readoutClass}" aria-labelledby="${route.h1Id}">` +
-    `<h1 id="${route.h1Id}" tabindex="-1">${route.h1}</h1>` +
-    `</section></main>` +
-    `<div class="jp-live" aria-live="polite" aria-atomic="true"></div>`
-  );
+  return renderRoute(route.scene, route.sheet);
 }
 
 function render(base, route) {
