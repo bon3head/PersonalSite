@@ -1,0 +1,136 @@
+{
+  "ms": 74.9,
+  "warmSamples": [
+    180.4,
+    61,
+    100.8,
+    67.6,
+    74.9
+  ],
+  "coldMs": 105.4,
+  "counts": {
+    "4": 2080,
+    "5": 376,
+    "6": 3403,
+    "7": 146,
+    "8": 139
+  },
+  "total": 6144,
+  "hash": "5fe3fe09c6e02217a6b0848afd89f085651e20e80079004335251f4dc0b32e18",
+  "markers": [
+    [
+      -13,
+      -4
+    ],
+    [
+      16,
+      10
+    ],
+    [
+      9,
+      -12
+    ]
+  ],
+  "trailLanes": [
+    48,
+    37,
+    54
+  ],
+  "checks": [
+    {
+      "name": "generation under 150ms (warm median of 5)",
+      "ok": true,
+      "detail": "74.9ms"
+    },
+    {
+      "name": "all lanes written with valid classes",
+      "ok": true,
+      "detail": "none bad"
+    },
+    {
+      "name": "all points finite",
+      "ok": true,
+      "detail": "0 bad"
+    },
+    {
+      "name": "all points on plane y=0",
+      "ok": true,
+      "detail": "0 off-plane"
+    },
+    {
+      "name": "grid lanes 2080",
+      "ok": true,
+      "detail": "got 2080"
+    },
+    {
+      "name": "total lanes 6144",
+      "ok": true,
+      "detail": "got 6144"
+    },
+    {
+      "name": "hatch N matches remainder",
+      "ok": true,
+      "detail": "hatch=3403 remainder=3403"
+    },
+    {
+      "name": "class emission order grid,outlines,walkways,trails,hatch",
+      "ok": true,
+      "detail": "4,5,7,8,6,"
+    },
+    {
+      "name": "buildings 11",
+      "ok": true,
+      "detail": "got 11"
+    },
+    {
+      "name": "markers 3",
+      "ok": true,
+      "detail": "[[-13,-4],[16,10],[9,-12]]"
+    },
+    {
+      "name": "markers apart and away from start",
+      "ok": true,
+      "detail": "[[-13,-4],[16,10],[9,-12]]"
+    },
+    {
+      "name": "markers clear of footprints by margin",
+      "ok": true,
+      "detail": "min clearance 1.867"
+    },
+    {
+      "name": "trails 3",
+      "ok": true,
+      "detail": "got 3"
+    },
+    {
+      "name": "trail lanes ordered, dashed, curved, endpoints exact",
+      "ok": true,
+      "detail": "trail0: lanes=48 maxDev=2.57; trail1: lanes=37 maxDev=2.59; trail2: lanes=54 maxDev=0.77; "
+    },
+    {
+      "name": "trail lane total matches class count",
+      "ok": true,
+      "detail": "139 vs 139"
+    },
+    {
+      "name": "no trail overlap over 2 units",
+      "ok": true,
+      "detail": "trails 0-1: maxRunUnits~0.45; trails 0-2: maxRunUnits~0.45; trails 1-2: maxRunUnits~1.70; "
+    },
+    {
+      "name": "deterministic hash across runs",
+      "ok": true,
+      "detail": "5fe3fe09c6e02217"
+    },
+    {
+      "name": "side data deterministic",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "different seed differs",
+      "ok": true,
+      "detail": "9f352671e27648b4"
+    }
+  ]
+}

@@ -112,12 +112,21 @@ receipts:
 notes:
 
 ## B5a Server scene
-status: todo
-agent:
+status: done
+agent: B5a worker (server layout generator)
 commit:
 tests:
-receipts:
+- T-SRV-1: PASS. Lanes 0, 127, 128, 6143 at k=0 match hand values within 1e-4 (lane 0: (-3.565, -2.315, -24)); converge points k=6 (-1.7825, -1.1575, 0.4) and k=7 (-0.2852, -0.1852, 2.2) for lane 0 match.
+- Count: PASS. Exactly 6144 lanes of 8 points, all finite, all class 0.
+- Determinism: PASS. Same seed twice gives byte identical buffer; sha256 f1d87a0bcab18ae8cf80130ddbd862bb5ed96b4ba800f75fd078dad7b631c698; seed independent (pure grid arithmetic).
+- Timing: PASS. Generation 8ms steady state in Node (limit 150ms).
+- Slice isolation: PASS. Generator writes only its own layout slice.
+- tsc --noEmit: exit 0. lint-tokens: clean for this card's file. banned-scan src: clean.
+receipts: qa/layouts/server/B5a-RECEIPTS.md
 notes:
+- Owns src/world/layouts/server.ts ONLY: generate(seed, out, layoutIndex) writes the server slice of the full layout texture buffer. Consumes no randomness (S05 formula is pure grid arithmetic); seed accepted and ignored.
+- All values from T (tokens.generated); centering offsets derived as (cols-1)/2 etc., so no hardcoded geometry. No spec changes, no BLOCKED items.
+- Coordinator registration: replace genServerTest in src/world/worker.ts GENERATORS with a wrapper calling generate(seed, out, lay) and returning laneCount * pointsPerLane texels written.
 
 ## B5b LeafLink scene
 status: done
@@ -141,12 +150,22 @@ notes:
 - No BLOCKED items. No spec changes.
 
 ## B5c SideQuests scene
-status: todo
-agent:
+status: done
+agent: B5c worker
 commit:
 tests:
-receipts:
+- T-SQ-1: PASS. Grid 2080 exact, total 6144, hatch N matches remainder (3403), 11 buildings, 3 markers at least 9 apart (see qa/layouts/sidequests/RECEIPTS.md).
+- Determinism: PASS. SHA-256 5fe3fe09c6e02217a6b0848afd89f085651e20e80079004335251f4dc0b32e18 identical across runs; side data identical; different seed differs.
+- Timing: PASS (warm median of 5: 74.9ms, budget 150ms). Cold first call 105-435ms across runs (one-time VM warmup, persists under --no-lazy --no-opt); warm single samples spike on this VM, so the test asserts the median. Full distribution in receipt.json.
+- lint-tokens: clean for this file. banned-scan: clean. tsc --noEmit on this file: exit 0.
+receipts: qa/layouts/sidequests/ (run-test.mjs, receipt.json, RECEIPTS.md)
 notes:
+- Counts with default seed: grid 2080, outlines 376, walkways 146, trails 139, hatch 3403. Walkways/trails below the spec estimates (about 600/about 180); T-SQ-1 asserts neither count, and hatch absorbs the difference exactly.
+- Markers (-13,-4), (16,10), (9,-12); min footprint clearance 1.867.
+- Trails curved (max chord deviation 2.57/2.59/0.77); longest inter-trail near-run about 1.70 units vs 2.0 budget (tightest margin).
+- Last trail lane ends within one final gap remainder (at most 0.2) of its marker when the trail length falls in a gap interval; inherent to the dash/gap cut.
+- Contract: generate(seed, out, layoutIndex) writes texels and returns { markers, trails: [{ laneIds, arcStarts, arcLengths }], footprints }. Register with layout index 2. RNG defined locally verbatim to avoid a worker/layout import cycle.
+- lint-tokens repo-wide violations exist only in src/world/layouts/scatter.ts (B5d's file, in progress); left untouched.
 
 ## B5d Notfound scene
 status: todo
