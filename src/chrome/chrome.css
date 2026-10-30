@@ -89,6 +89,13 @@
     right: 0;
     bottom: 0;
     z-index: 2;
+    /* will-change forces the keymap into its own compositor layer.
+       Without it, Chromium's compositor leaves the top keymap-height
+       rows of the WebGL canvas black (T-SRV-2 phone background failure:
+       a 36px black band at the viewport top at every viewport, present
+       only while the keymap is a plain fixed element, gone the moment
+       the keymap gets its own layer). No visual or layout change. */
+    will-change: transform;
     height: calc(var(--jp-keymap-h) + env(safe-area-inset-bottom));
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: var(--jp-gutter);
