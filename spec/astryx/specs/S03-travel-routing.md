@@ -1,6 +1,6 @@
 # S03 Travel and routing: one space, four addresses
 
-Version 1.0.0, 2026-10-30. Depends on: S00, S02 (API only; S03 can be built against a stub), DESIGN.md section 6. Blocks: S04, S05 to S08, S10, S11.
+Version 1.0.1, 2026-10-30. Depends on: S00, S02 (API only; S03 can be built against a stub), DESIGN.md section 6. Blocks: S04, S05 to S08, S10, S11.
 
 ## 1. Purpose
 
@@ -75,7 +75,7 @@ The client hydrates with `hydrateRoot`. Hydration must not change any text (Reac
 
 ## 8. Kill criteria
 
-- K-S03-1: any route change causes a document load (Playwright: `page.on('framenavigated')` fires for the main frame after the first load).
+- K-S03-1: any route change causes a document load (Playwright 1.64 fires `framenavigated` for `history.pushState` too, so that event cannot detect a load. Detect a load instead by a second `load` event firing, or by a window marker set before travel not surviving it).
 - K-S03-2: back or forward leaves the URL and the scene out of sync.
 - K-S03-3: travel ever waits for something (a fetch, a shader compile, a font) before the lanes start moving.
 - K-S03-4: text visible on screen at less than its contrast requirement at any sampled frame of a travel (G-TRAVEL-CONTRAST: Playwright samples screenshots every 50ms through a server-to-leaflink travel and checks that any pixel region with readable text has its required contrast against the pixels behind it; the readout is hidden between 150 and 400ms, so this should be trivially true).
@@ -101,3 +101,4 @@ None.
 ## 11. Changelog
 
 - 1.0.0, 2026-10-30: initial.
+- 1.0.1, 2026-10-30: K-S03-1 detection corrected. Playwright 1.64 fires framenavigated for history.pushState, so that event false-fails correct code. Detection is now a second load event or a non-surviving window marker. Requirement unchanged: no route change causes a document load.

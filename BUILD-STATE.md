@@ -80,8 +80,9 @@ notes:
 - Built against src/world/stub.ts (B0). App.tsx untouched (B4 owns it); browser tests use an in-page harness wiring router + travel against the stub and the S04 page structure.
 - TravelDom announcement getter named `announce`, not `live`: banned-scan reads full .ts content and bans the standalone word.
 - 404 ArrowLeft implemented as wrapping to sidequests (S03 specifies ArrowRight from 404 only); one-line change in stepScene if Justin wants both arrows to server.
-- Requests for coordinator/B0: (1) fix K-S03-1 parenthetical (framenavigated fires on pushState); (2) add @types/react, @types/react-dom, @types/three to package.json (tsc in build fails on B0 files without them).
-- B4 handoffs: mount TravelHotkeys in App; keymap items need data-scene (or declarative aria-current, same value); prerender must swap only the readout once App renders full chrome; main.tsx createRoot to hydrateRoot per S03 section 7; banned-scan vs aria-live in JSX needs a coordinator decision before B4 writes chrome.
+- Requests for coordinator/B0: (1) fix K-S03-1 parenthetical (framenavigated fires on pushState) — RESOLVED by coordinator, S03 v1.0.1; (2) add @types/react, @types/react-dom, @types/three to package.json — RESOLVED by coordinator, commit 834944e.
+- B4 handoffs: mount TravelHotkeys in App; keymap items need data-scene (or declarative aria-current, same value); prerender must swap only the readout once App renders full chrome; main.tsx createRoot to hydrateRoot per S03 section 7; banned-scan vs aria-live in JSX — RESOLVED by coordinator: S00 v1.0.3 allows exact substring aria-live (not visible copy).
+- 404 ArrowLeft: coordinator accepts B3's wrapping to sidequests (S03 silent on ArrowLeft; symmetric completion, one-line change if Justin wants both arrows to server).
 - Full npm run build / gates not run: theme step needs B1's laneTheme.mjs (T-S00-1 pending B1). Prerender tested via plain vite build + vite preview.
 
 ## B4 Chrome

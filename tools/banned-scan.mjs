@@ -23,7 +23,7 @@ const bannedRaw = readFileSync(join(root, 'tools/banned.txt'), 'utf8')
   .map((l) => l.trim())
   .filter((l) => l.length > 0 && !l.startsWith('#'));
 
-const ALLOWED_LIVE = ['WebSocket live feed', 'on a live map'];
+const ALLOWED_LIVE = ['WebSocket live feed', 'on a live map', 'aria-live'];
 
 function extractText(file, content) {
   if (file.endsWith('.html')) {
