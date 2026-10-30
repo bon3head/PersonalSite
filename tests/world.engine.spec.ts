@@ -102,8 +102,8 @@ test('T-S02-5: principal shift moves the image by shift/2 of viewport width', as
   await loadReady(page);
   const vp = page.viewportSize()!;
   const pose = await page.evaluate(() => window.__lanefield.cameraPose());
-  // Server fine pose: shift x 0.44, shift y 0.
-  expect(pose.shift[0]).toBeCloseTo(0.44, 2);
+  // Server fine pose: shift x 0.58, shift y 0 (DESIGN v1.0.3 retune).
+  expect(pose.shift[0]).toBeCloseTo(0.58, 2);
   expect(pose.shift[1]).toBeCloseTo(0, 2);
   // The camera target sits on the view axis, so its projection is exactly
   // the shift: screen x = (1 + shiftX) / 2 * width, y = height / 2.
@@ -112,7 +112,7 @@ test('T-S02-5: principal shift moves the image by shift/2 of viewport width', as
     const target = window.__lanefield.cameraPose().target;
     return window.__test.field.worldToScreen(target);
   });
-  expect(tx).toBeCloseTo(((1 + 0.44) / 2) * vp.width, 0);
+  expect(tx).toBeCloseTo(((1 + 0.58) / 2) * vp.width, 0);
   expect(ty).toBeCloseTo(vp.height / 2, 0);
   // S02 v1.0.1 corrected the spec: the test point is target (on the view
   // axis by definition), not focus (0,0,2.2), which is off-axis and projects
