@@ -1,6 +1,6 @@
 # S00 Foundation: repo, toolchain, pins, generators, lints
 
-Version 1.0.3, 2026-10-30. Depends on: DESIGN.md, S09. Blocks: everything.
+Version 1.0.4, 2026-10-30. Depends on: DESIGN.md, S09. Blocks: everything.
 
 ## 1. Purpose
 
@@ -107,7 +107,7 @@ Scans `src/**/*.{ts,tsx,css,glsl}` excluding `*.generated.*`. Fails on any of:
 
 ### 5.2 `tools/banned-scan.mjs` and `tools/banned.txt`
 
-`banned.txt`, one pattern per line, case-insensitive: `passionate`, `leverage`, `cutting-edge`, `seamless`, `delve`, `tapestry`, `ninja`, `rockstar`, `showcase`, `robust`, `elevate`, `unlock`, `journey`, `\bactually\b`, `\bGPA\b`, `2\.77`, `631`, `835-5490`, `CanonClaw`, `\bASH\b`, `Nexus`, `GRPO`, `Oracle`, `\blive\b`, `\bonline\b`, `uptime`, `tokens/s`, `tok/s`, plus the two dash characters U+2013 and U+2014. Exception: two LeafLink strings describe the product with "live" by brief (C-LL-STACK, C-LL-P1); the scanner allows the exact substrings `WebSocket live feed` and `on a live map` and nothing else containing "live" as a word. The ARIA attribute name `aria-live` is also allowed (it is not visible copy; S04 section 8 requires a live region). The word never describes the server or the site. Scanning `dist/` scans text content of HTML and string literals of JS (use a simple extraction: everything between quotes or between tags).
+`banned.txt`, one pattern per line, case-insensitive: `passionate`, `leverage`, `cutting-edge`, `seamless`, `delve`, `tapestry`, `ninja`, `rockstar`, `showcase`, `robust`, `elevate`, `unlock`, `journey`, `\bactually\b`, `\bGPA\b`, `2\.77`, `631`, `835-5490`, `CanonClaw`, `\bASH\b`, `Nexus`, `GRPO`, `Oracle`, `\blive\b`, `\bonline\b`, `uptime`, `tokens/s`, `tok/s`, plus the two dash characters U+2013 and U+2014. Exception: two LeafLink strings describe the product with "live" by brief (C-LL-STACK, C-LL-P1); the scanner allows the exact substrings `WebSocket live feed` and `on a live map` and nothing else containing "live" as a word. The ARIA attribute name `aria-live` is also allowed (it is not visible copy; S04 section 8 requires a live region). The class name `jp-live` is also allowed (S04 section 8 mandates it for the live region element; it is not visible copy). The word never describes the server or the site. Scanning `dist/` scans text content of HTML and string literals of JS (use a simple extraction: everything between quotes or between tags).
 
 ## 6. CSS layer order (global.css, first line)
 
@@ -152,3 +152,4 @@ U-S00-1: the `Commit Mono Fallback` metric overrides in DESIGN.md section 4 are 
 - 1.0.1, 2026-10-30: `optional` export removed from the copy generator (C-SQ-VENUE is a normal string now).
 - 1.0.2, 2026-10-30: plugin-react pin corrected 6.1.1 to 5.2.0. 6.x declares peer vite ^8.0.0, which contradicts the Vite 7.3.7 pin and fails npm install with ERESOLVE. 5.2.0 is the latest 5.x line and supports Vite 7. No behavior change; the Vite 7 mature-line rationale stands.
 - 1.0.3, 2026-10-30: banned-scan allows the exact substring aria-live. The \blive\b pattern collided with the ARIA attribute S04 section 8 requires for the live region. aria-live is not visible copy, so the copy ban is unchanged.
+- 1.0.4, 2026-10-30: banned-scan allows the exact substring jp-live. The \blive\b pattern collided with the class name S04 section 8 mandates for the live region element. jp-live is not visible copy, so the copy ban is unchanged.
