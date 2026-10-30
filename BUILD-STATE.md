@@ -120,12 +120,25 @@ receipts:
 notes:
 
 ## B5b LeafLink scene
-status: todo
-agent:
+status: done
+agent: B5b worker
 commit:
 tests:
-receipts:
+- Lane total 6144, edge ranges contiguous from 0: PASS.
+- Deterministic bytes across runs (sha256 6cd5e76a30bc1f6a1cd523a145643060365e7b2c63f15ea963afe020c7b97104): PASS. Different seed differs: PASS.
+- Every lane point class 2 or 3; arterial 3, local 2; all y = 0: PASS.
+- Edge start points and lengths match nodes: PASS.
+- T-LL-1 graph connected 1089/1089 nodes: PASS.
+- Adjacency lists consistent (3866 entries): PASS.
+- Nodes within lattice plus jitter (maxAbs 20.135): PASS.
+- Generation under 150ms: PASS (median 59.9ms over 5 warmed runs; cold first call 238.8ms under parallel-worker load, reported in receipts, not gated).
+- lint-tokens clean for this file; banned-scan clean; tsc --noEmit no leaflink errors.
+receipts: qa/layouts/leaflink/ (RECEIPTS.md, verify.cjs, run-verify.sh, verify-output.txt)
 notes:
+- Stats: 1933 edges (320 arterial, 1613 local), 1089 nodes.
+- Registration: coordinator calls generate(seed, out, 1) and posts the returned side data; worker.ts untouched by this card.
+- Adjacency lists carry edge indices per node (documented in file header).
+- No BLOCKED items. No spec changes.
 
 ## B5c SideQuests scene
 status: todo

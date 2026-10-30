@@ -1,0 +1,14 @@
+PASS generation under 150ms (median of 5 warmed runs) (median=59.9ms coldFirst=238.8ms)
+PASS deterministic bytes across runs (6cd5e76a30bc1f6a)
+PASS different seed gives different bytes
+PASS lane total is 6144 (6144)
+PASS edge lane ranges contiguous from 0 (edges=1933)
+PASS every lane point has class 2 or 3 (bad=0)
+PASS arterial edges class 3, local class 2 (bad=0)
+PASS all points flat (y = 0) (bad=0)
+PASS edge start points and lengths match nodes (bad=0)
+PASS graph connected (T-LL-1) (1089/1089 nodes)
+PASS adjacency lists consistent (entries=3866)
+PASS nodes within lattice plus jitter (maxAbs=20.135)
+STATS edges=1933 arterial=320 local=1613 nodes=1089 genMedianMs=59.9 genColdMs=238.8 hash=6cd5e76a30bc1f6a1cd523a145643060365e7b2c63f15ea963afe020c7b97104
+RESULT: ALL PASS
