@@ -114,13 +114,10 @@ test('T-S02-5: principal shift moves the image by shift/2 of viewport width', as
   });
   expect(tx).toBeCloseTo(((1 + 0.44) / 2) * vp.width, 0);
   expect(ty).toBeCloseTo(vp.height / 2, 0);
-  // Spec contradiction, recorded not asserted: the spec's focus expectation
-  // (worldToScreen(focus) x within 2% of 0.5 + shift/2 of width, i.e. 72%,
-  // parenthetical 66%) cannot hold, because focus (0,0,2.2) is not on the
-  // view axis. Hand-computed from the server fine pose (pos (-7,2.4,8),
-  // target (0.5,0,-3), fov 42, shift 0.44, 16:9): unshifted 70.4%, shifted
-  // 92.4%, plus up to 3.8 points of idle yaw. The assertion below locks
-  // that correct value (and would have caught the aspect-1 init bug).
+  // S02 v1.0.1 corrected the spec: the test point is target (on the view
+  // axis by definition), not focus (0,0,2.2), which is off-axis and projects
+  // to ~92% of width. The focus band below is retained as an extra lock
+  // that caught the aspect-1 init bug.
   const focus = await page.evaluate(() =>
     window.__test.field.worldToScreen([0, 0, 2.2]),
   );
@@ -129,7 +126,7 @@ test('T-S02-5: principal shift moves the image by shift/2 of viewport width', as
   expect(focusFrac).toBeLessThan(0.98);
   console.log(
     `T-S02-5 note: focus projects to ${focusFrac.toFixed(3)} of width; ` +
-      `spec expects 0.72 (formula) or 0.66 (parenthetical); mechanism above is exact.`,
+      `spec (S02 v1.0.1) tests target at 0.72; focus band is an extra lock.`,
   );
 });
 

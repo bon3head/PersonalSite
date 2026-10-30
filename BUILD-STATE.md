@@ -51,7 +51,7 @@ notes:
 - Regime block: S01 section 6 block plus B0 text/accent mappings (--jp-text, --jp-text-2, --jp-accent per regime), which jp-chrome needs. Layer order untouched.
 
 ## B2 Engine core
-status: done (with 2 flagged items below, neither worked around)
+status: done
 agent: B2 worker
 commit: 7c634e3acd5c1317896eb021a927ee479dc7db55
 tests:
@@ -67,11 +67,12 @@ tests:
 - Full suite: 9 passed, 1 skipped (7.1m, Chromium SwiftShader). Tween specs pass.
 receipts: qa/world/B2-RECEIPTS.md
 notes:
-- BLOCKED: T-S02-5 spec expectation is geometrically inconsistent (S02 section 9). Focus (0,0,2.2) is not on the view axis; hand computation from token pose gives 92.4% of width plus up to 3.8 points idle yaw, measured 0.909/0.939. Needs a one-line coordinator spec fix (centered test point or shift-delta check). Camera mechanism itself verified exactly.
+- BLOCKED RESOLVED by coordinator, S02 v1.0.1: T-S02-5 test point changed from focus to target (focus is not on the view axis; target is by definition and projects to exactly 0.5 + shift[0]/2). Parenthetical corrected 66% to 72% (0.5 + 0.44/2 = 0.72). B2's target projection already verified the mechanism exactly.
+- @types gap RESOLVED by coordinator, commit 834944e (@types/react, @types/react-dom, @types/three added). Repo-wide tsc is now clean.
 - Bug found and fixed: camera.aspect was constructed as 1 and only corrected on resize, so first-load projection used a square aspect (focus at 1.101 of width pre-fix). Fix sets aspect from viewport at init; locked by the focus-band assertion in T-S02-5.
 - Spec-conformant extension: info() gains a programs field (T-S02-6 requires it; all specified fields still present).
 - Interpretation: uFadeSec uses T.world.leaflink.pins.fadeMs (only fade duration in tokens); S06/S07 may refine.
-- Tool gates: lint-tokens clean, banned-scan clean, tsc zero errors in src/world. Repo-wide tsc is red for a PRE-EXISTING gap: @types/react and @types/three absent from package.json (B0 files fail too). Coordinator decision needed; B2 does not touch package.json.
+- Tool gates: lint-tokens clean, banned-scan clean, tsc zero errors in src/world. Repo-wide tsc was red for a gap now RESOLVED by coordinator (commit 834944e added @types/react, @types/react-dom, @types/three).
 - Engine spec timeout raised to 180s per test (SwiftShader frames take seconds; assertions unchanged).
 
 ## B3 Travel routing

@@ -1,6 +1,6 @@
 # S02 Lanefield engine: the 6,144-lane world
 
-Version 1.0.0, 2026-10-30. Depends on: S00, DESIGN.md sections 1, 6, 8, 12 (`world`). Blocks: S03, S05, S06, S07, S08, S10, S11.
+Version 1.0.1, 2026-10-30. Depends on: S00, DESIGN.md sections 1, 6, 8, 12 (`world`). Blocks: S03, S05, S06, S07, S08, S10, S11.
 
 ## 1. Purpose
 
@@ -337,7 +337,7 @@ Test: `easeSignature(0.3)` is between 0.80 and 0.86 (this is what puts 80% of tr
 | T-S02-2 | Deterministic layouts | `layoutHash` identical across two fresh loads and across Chromium and WebKit |
 | T-S02-3 | Weights sum to 1 at every frame of a travel | sample `weights()` each rAF during `travelTo`; `abs(sum - 1) < 1e-4` |
 | T-S02-4 | Easing math | unit tests of section 7 numbers |
-| T-S02-5 | Principal shift | on Server fine pose, `worldToScreen(focus)` x is within 2% of `0.5 + shift/2` of viewport width (66%) |
+| T-S02-5 | Principal shift | on Server fine pose, `worldToScreen(target)` x is within 2% of `0.5 + shift[0]/2` of viewport width (72% for shift 0.44) |
 | T-S02-6 | No compile after ready | `renderer.info.programs.length` unchanged across 3 full travels |
 | T-S02-7 | Context loss recovers | lose and restore context, `layoutHash` unchanged, frame renders, no console error except the one expected warning |
 | T-S02-8 | Startup off the main thread | long tasks during `ready` all under 50ms (PerformanceObserver `longtask`) |
@@ -349,3 +349,4 @@ U-S02-1: real-device frame times (Justin's phone) are not measurable from a clou
 ## 15. Changelog
 
 - 1.0.0, 2026-10-30: initial.
+- 1.0.1, 2026-10-30: T-S02-5 corrected. The test point was focus (0,0,2.2), which is not on the view axis, so its projection is not 0.5 + shift/2 (measured 0.909/0.939, hand-computed 0.924). The test point is now target, which is on the view axis by definition and projects to exactly 0.5 + shift[0]/2. The parenthetical was also wrong: 0.5 + 0.44/2 is 72%, not 66%. The shift mechanism itself was already verified exactly by B2's target projection.
