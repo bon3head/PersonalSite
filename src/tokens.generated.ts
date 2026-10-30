@@ -160,7 +160,7 @@ export const T = {
     },
     "display0": {
       "size": "clamp(3.5rem, 9.5vw, 8rem)",
-      "weight": 200,
+      "weight": 400,
       "leading": 0.95,
       "tracking": "-0.04em"
     },

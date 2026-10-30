@@ -102,7 +102,7 @@ Scale: Astryx `typography.scale` with base 16, ratio 1.25 (verified output of `a
 
 | Token | Size | Weight | Leading | Tracking | Use |
 |---|---|---|---|---|---|
-| `--jp-text-display-0` | `clamp(3.5rem, 9.5vw, 8rem)` | 200 | 0.95 | -0.04em | "Justin Poli" on Server only |
+| `--jp-text-display-0` | `clamp(3.5rem, 9.5vw, 8rem)` | 400 | 0.95 | -0.04em | "Justin Poli" on Server only |
 | `--jp-text-display-1` | `clamp(2.25rem, 6vw, 4.5rem)` | 700 | 1.0 | -0.03em | Scene titles "LeafLink", "SideQuests" |
 | `--text-heading-2` (Astryx) | 25px | 700 | 1.2 | -0.01em | Sheet titles |
 | `--text-body` (Astryx) | 16px | 400 | 1.5 | 0 | Readout prose, max 52ch |
@@ -110,7 +110,7 @@ Scale: Astryx `typography.scale` with base 16, ratio 1.25 (verified output of `a
 | `--jp-text-key` | 13px | 700 | 1 | 0 | Keymap key glyphs |
 | `--jp-text-scene` | world units, see 12 | 400 | 1 | 0 | troika in-scene words |
 
-Rules: extreme weights only (200 for the name, 700 for titles and keys, 400 for everything else). No all-caps text anywhere. No letter-spaced eyebrows. No text smaller than 13px. Numbers use `font-variant-numeric: tabular-nums`.
+Rules: 700 for titles and keys, 400 for the name and everything else (name thickened from 200 per Justin's critique, 2026-10-30: the hairline name did not pop). No all-caps text anywhere. No letter-spaced eyebrows. No text smaller than 13px. Numbers use `font-variant-numeric: tabular-nums`.
 
 ## 5. Space, radius, size, border, focus
 
@@ -315,7 +315,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
     },
     "display0": {
       "size": "clamp(3.5rem, 9.5vw, 8rem)",
-      "weight": 200,
+      "weight": 400,
       "leading": 0.95,
       "tracking": "-0.04em"
     },
@@ -764,5 +764,6 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.0.2, 2026-10-30: display0 weight 200 to 400. Justin's critique on the server render: the hairline (200) name did not pop; 400 gives it dimension while staying in the preloaded weight. Rules line updated (700 titles/keys, 400 name and prose).
 - 1.0.1, 2026-10-30: hueBudgetPct gains scatter 6. B6d measured the 404 scatter scene at 0.175% (chroma over 0.04) at 1280x800; 6% matches the sidequestsSignal budget and leaves 30x headroom. S08 sets no numeric budget, so this fills the gap rather than changing a spec value.
 - 1.0.0, 2026-10-30: initial. Server lane alpha (0.08), SM pitch (0.95, 0.85), depth fog (7 to 30) and camera poses were set from real renders of the S02 shaders in headless Chromium; the first guess (alpha 0.34, pitch 0.64) saturated into a solid block. Blue chosen by OKLab distance against 51 reference blues; three regimes; Commit Mono; 6,144-lane world; travel 700ms expo-out with feedback under 250ms; Astryx 0.7.1 mapping verified by a probe `theme build`. Hue budgets moved into `hueBudgetPct`: the server budget is 30% because the verification render measured 24% (the first draft's 12% was a guess the render disproved).
