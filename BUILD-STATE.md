@@ -114,7 +114,7 @@ notes:
 ## B5a Server scene
 status: done
 agent: B5a worker (server layout generator)
-commit:
+commit: f14cd0e
 tests:
 - T-SRV-1: PASS. Lanes 0, 127, 128, 6143 at k=0 match hand values within 1e-4 (lane 0: (-3.565, -2.315, -24)); converge points k=6 (-1.7825, -1.1575, 0.4) and k=7 (-0.2852, -0.1852, 2.2) for lane 0 match.
 - Count: PASS. Exactly 6144 lanes of 8 points, all finite, all class 0.
