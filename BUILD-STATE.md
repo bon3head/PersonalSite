@@ -106,7 +106,7 @@ notes:
 ## B4 Chrome
 status: done
 agent: B4 worker
-commit:
+commit: a709f66
 tests:
 - T-S04-1 keymap never wraps: PASS (nav height equals token height at 7 widths; all 5 items share one top; containment logged, not asserted, see notes).
 - T-S04-2 coarse targets at least 44x44: PASS (390x844 hasTouch/isMobile; nav 44 high; all keymap items and both contact sheet action controls at least 44 tall).
