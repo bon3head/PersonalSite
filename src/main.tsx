@@ -42,10 +42,20 @@ if (rootEl) {
       <App />
     </StrictMode>
   );
-  if (rootEl.hasChildNodes()) {
-    hydrateRoot(rootEl, app);
-  } else {
-    createRoot(rootEl).render(app);
+  const root = rootEl.hasChildNodes()
+    ? hydrateRoot(rootEl, app)
+    : createRoot(rootEl);
+  if (!rootEl.hasChildNodes()) {
+    root.render(app);
   }
+  // Test hook: travel.spec.ts setupHarness replaces #root with its own
+  // router/travel harness. Without unmounting first, the real App's
+  // router and hotkeys survive (window listeners) and push duplicate
+  // history entries, so goBack lands on a duplicate instead of the
+  // previous scene. Unmounting runs App's cleanup (router.dispose,
+  // travel.dispose, hotkeys) before the harness takes over.
+  (window as unknown as Record<string, unknown>).__unmountApp = () => {
+    root.unmount();
+  };
 }
 startOnIdle();

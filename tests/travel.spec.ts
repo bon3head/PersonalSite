@@ -42,6 +42,11 @@ const WEIGHT_INDEX: Record<string, number> = {
 
 async function setupHarness(page: Page): Promise<void> {
   await page.evaluate(async () => {
+    // Unmount the real App first: its router and hotkeys attach window
+    // listeners that survive a DOM replacement and would push duplicate
+    // history entries, breaking goBack (T-S03-3 root cause).
+    (window as unknown as { __unmountApp?: () => void }).__unmountApp?.();
+
     const routerMod = await import('/src/router.ts');
     const travelMod = await import('/src/travel.ts');
     const stubMod = await import('/src/world/stub.ts');
@@ -273,7 +278,10 @@ test('T-S03-3: history back and forward stay in sync', async ({
     () =>
       document.querySelector('main#scene h1')?.textContent === 'Justin Poli',
   );
-  expect(page.url()).toBe(`${DEV}/`);
+  // Second goBack returns to the initial entry, which carries the
+  // harness ?world=0 query from the goto. PushState entries are clean;
+  // the initial entry is not rewritten.
+  expect(page.url()).toBe(`${DEV}/?world=0`);
   expect(await h1Text(page)).toBe('Justin Poli');
   await page.goForward();
   await page.waitForFunction(
