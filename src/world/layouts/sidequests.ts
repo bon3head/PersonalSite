@@ -400,7 +400,7 @@ function fits(cand: Footprint, placed: Footprint[]): boolean {
 
 // Rejection-sampled footprints; restarts on a fresh stream when the count misses.
 // Footprints intersecting the readout clear zone are rejected (kill criterion:
-// outlines and hatch live inside footprints, so keeping footprints out
+// outlines and hatch sit inside footprints, so keeping footprints out
 // keeps their lanes out too).
 function placeBuildings(mainR: () => number, base: number, zone: Zone): Footprint[] {
   const b = T.world.sidequests.buildings;
@@ -479,7 +479,7 @@ function nudgeOut(p: Vec, poly: Vec[], margin: number): Vec {
 // Pure math, no three import: the generator runs in a worker. Verified
 // against THREE's PerspectiveCamera worldToScreen/screenToGround for the
 // spec fine pose (agreement within rounding; B6c-fix receipts).
-// The readout box is the live DOM measurement at 1440x900 (B4 S04
+// The readout box is the measured DOM box at 1440x900 (B4 S04
 // section 6 placement): x 1012..1392, y 88..508. // lit-ok: measured box
 // The zone is that box projected to y=0 through the fine camera, as an
 // AABB expanded by a 1-unit margin (about 40px on screen, far above lane

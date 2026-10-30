@@ -43,10 +43,22 @@ import {
 import {
   applyRegime,
   createTravelController,
+  type SceneController,
   type TravelController,
 } from './travel';
 import { prefersReducedMotion } from './lib/reducedMotion';
 import type { Lanefield } from './world/types';
+import { createServerController } from './world/server';
+import {
+  createLeaflinkController,
+  type LeaflinkController,
+} from './world/leaflink';
+import {
+  createSideQuestsController,
+  type SideQuestsController,
+} from './world/sidequests';
+import { createNotfoundController } from './world/notfound';
+import SideQuestsTwins from './scenes/sidequests';
 import { C } from './copy';
 import Keymap from './chrome/Keymap';
 import Wordmark from './chrome/Wordmark';
@@ -98,6 +110,17 @@ export default function App(props: AppProps): JSX.Element {
   const contactButtonRef = useRef<HTMLButtonElement | null>(null);
   const routerRef = useRef<Router | null>(null);
   const travelRef = useRef<TravelController | null>(null);
+  // Scene controllers, created when the world arrives (lanefield-ready).
+  // The Map object is shared with the travel controller by reference,
+  // so populating it later still drives pause/resume on travel.
+  const controllersRef = useRef<Map<SceneId, SceneController>>(new Map());
+  // Wired field + controllers for rendering (twins, OfferButton). Null
+  // until the world arrives; the App shows lanes + readout only.
+  const [wired, setWired] = useState<{
+    field: Lanefield;
+    leaflink: LeaflinkController;
+    sidequests: SideQuestsController;
+  } | null>(null);
 
   // Theme mode follows data-regime (B1 contract).
   useEffect(() => {
@@ -116,8 +139,34 @@ export default function App(props: AppProps): JSX.Element {
 
   // Router + travel, created once, disposed on unmount.
   useEffect(() => {
+    // Create scene controllers for a field (or clear them). Called once
+    // if the App mounts with a field, and on every lanefield-ready.
+    const wireField = (field: Lanefield | null): void => {
+      if (field) {
+        const server = createServerController(field, {
+          reducedMotion: prefersReducedMotion(),
+        });
+        const leaflink = createLeaflinkController(field, {
+          target: document.getElementById('world'),
+          reducedMotion: prefersReducedMotion(),
+        });
+        const sidequests = createSideQuestsController(field, {
+          reducedMotion: prefersReducedMotion,
+        });
+        const notfound = createNotfoundController();
+        controllersRef.current.set('server', server);
+        controllersRef.current.set('leaflink', leaflink);
+        controllersRef.current.set('sidequests', sidequests);
+        controllersRef.current.set('notfound', notfound);
+        setWired({ field, leaflink, sidequests });
+      } else {
+        controllersRef.current.clear();
+        setWired(null);
+      }
+    };
     const travel = createTravelController(initialScene, {
       lanefield: props.lanefield ?? null,
+      controllers: controllersRef.current,
       dom: {
         readout: () => readoutRef.current,
         announce: () => liveRef.current,
@@ -142,16 +191,26 @@ export default function App(props: AppProps): JSX.Element {
     routerRef.current = router;
     applyRegime(initialScene);
     // The world starts on idle in main.tsx, after App mounts. When it
-    // arrives, attach it so scene changes morph lanes.
+    // arrives, attach it so scene changes morph lanes, and create the
+    // scene controllers so travel pause/resume drives words, sim, and
+    // markers. Controllers start active on creation (no resume needed
+    // for the initial scene).
     const onLanefield = (event: Event): void => {
       const detail = (event as CustomEvent).detail as Lanefield | null;
       travel.setLanefield(detail ?? null);
+      wireField(detail);
     };
     window.addEventListener('lanefield-ready', onLanefield);
+    // If the App mounted with a field already, wire it now.
+    if (props.lanefield) wireField(props.lanefield);
     return () => {
       window.removeEventListener('lanefield-ready', onLanefield);
       router.dispose();
       travel.dispose();
+      for (const c of controllersRef.current.values()) {
+        (c as { dispose?: () => void }).dispose?.();
+      }
+      controllersRef.current.clear();
       routerRef.current = null;
       travelRef.current = null;
     };
@@ -173,7 +232,19 @@ export default function App(props: AppProps): JSX.Element {
           <Wordmark scene={scene} />
         </div>
         <main id="scene" aria-busy="false" ref={mainRef}>
-          <Readout scene={scene} sectionRef={readoutRef} />
+          <Readout
+            scene={scene}
+            sectionRef={readoutRef}
+            onOffer={
+              wired ? () => wired.leaflink.dropOfferAtCenter() : undefined
+            }
+          />
+          {scene === 'sidequests' && wired && (
+            <SideQuestsTwins
+              controller={wired.sidequests}
+              lanefield={wired.field}
+            />
+          )}
           {alt !== null && (
             <div role="img" aria-label={alt} />
           )}

@@ -1,7 +1,7 @@
 // Notfound readout content (S08 section 3, S04 section 6). The 404
 // readout reuses the server variant placement (left column fine, top
 // coarse); this module owns the content itself so the scene's strings
-// live in exactly one place. Readout.tsx (B4-owned) renders the same
+// exist in exactly one place. Readout.tsx (B4-owned) renders the same
 // H1 and paragraph for scene notfound; this component matches it
 // element for element (h1 id h-notfound, one paragraph) so a future
 // wiring can delegate without changing the DOM the tests assert on.

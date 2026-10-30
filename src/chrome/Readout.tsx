@@ -14,6 +14,7 @@ import { Link } from '@astryxdesign/core/Link';
 import { C } from '../copy';
 import { T } from '../tokens.generated';
 import type { SceneId } from '../router';
+import LeaflinkReadout from '../scenes/leaflink';
 
 export type ReadoutVariant = 'server' | 'leaflink' | 'sidequests' | 'notfound';
 
@@ -34,26 +35,8 @@ const H1_ID: Record<SceneId, string> = {
 export interface ReadoutProps {
   scene: SceneId;
   sectionRef: RefObject<HTMLElement | null>;
-}
-
-function LegendGlyphs(): JSX.Element {
-  const g = T.chrome.legendGlyphPx;
-  return (
-    <span aria-hidden="true">
-      <span
-        className="jp-legend-glyph jp-legend-glyph--ring"
-        style={{ width: g.ring, height: g.ring }}
-      />{' '}
-      <span
-        className="jp-legend-glyph jp-legend-glyph--dot"
-        style={{ width: g.dot, height: g.dot }}
-      />{' '}
-      <span
-        className="jp-legend-glyph jp-legend-glyph--bar"
-        style={{ width: g.bar[0], height: g.bar[1] }}
-      />
-    </span>
-  );
+  /** Visitor offer (leaflink variant only). Undefined until wired. */
+  onOffer?: () => void;
 }
 
 export default function Readout(props: ReadoutProps): JSX.Element {
@@ -90,21 +73,7 @@ export default function Readout(props: ReadoutProps): JSX.Element {
         </>
       )}
       {scene === 'leaflink' && (
-        <div className="jp-readout-slip">
-          <h1 id={H1_ID.leaflink}>{C['C-LL-H1']}</h1>
-          <p>{C['C-LL-P1']}</p>
-          <p className="jp-readout-supporting">{C['C-LL-FACTS']}</p>
-          <p className="jp-readout-supporting">{C['C-LL-STACK']}</p>
-          <p className="jp-readout-supporting">
-            <LegendGlyphs /> {C['C-LL-LEGEND']}
-          </p>
-          <p className="jp-readout-caption">{C['C-LL-SIM']}</p>
-          <div className="jp-readout-links">
-            <Link href={C['C-LL-CODE'].href} isExternalLink>
-              {C['C-LL-CODE'].label}
-            </Link>
-          </div>
-        </div>
+        <LeaflinkReadout onOffer={props.onOffer ?? (() => {})} />
       )}
       {scene === 'sidequests' && (
         <div className="jp-readout-slip">
