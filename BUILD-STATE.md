@@ -229,7 +229,7 @@ BLOCKED: T-SRV-2 phone background (S05 section 8). At 390x844 coarse pose the ca
 ## B6b LeafLink QA
 status: done
 agent: B6b worker
-commit: (filled at commit time)
+commit: 1a7bab3
 tests:
 - T-LL-1 exactly 6144 lanes, connected graph: PASS (2.0s). Lane total 6144, connected 1089/1089, 1933 edges (matches B5b).
 - T-LL-2 deterministic first minute: PASS (2.2s). Two fresh same-seed controllers, first 20 events identical; K-LL-4 no two consecutive intervals equal.
