@@ -125,6 +125,8 @@ notes:
 - Minor follow-ups: wordmark fade during travel needs a TravelDom extension (travel.ts has no wordmark hook); keymap label size 16px (--text-label) is a B4 choice since S04 section 4 does not specify one; keymap height uses calc(keymap-h + safe-area) with padding-bottom safe-area so border-box does not crush content on notched phones.
 - laneTheme types: B1's laneTheme.mjs ships no declarations; App.tsx imports it with a // @ts-ignore plus comment (a standalone shim in src/chrome/ does NOT work: TS2665, cannot augment a real untyped module from elsewhere). Drop the suppression if B1 ships types later.
 - Coordinator note 2026-10-30 (preserved): T-S03-3 (history back/forward) fails on goBack in the current env; forward navigations pass. Investigation ongoing; failure may be environmental (B4's concurrent test runs occupying port 5173, IPv6-only vite bind) rather than a router bug. Clean gates rerun after B4 lands will settle it. Playwright config now binds webServer to 0.0.0.0; travel tests use ?world=0 to keep the real engine from racing the harness on SwiftShader.
+- Coordinator resolutions 2026-10-30: (2) jp-live fixed, S00 v1.0.4, banned-scan clean. (3) Travel wiring fixed via lanefield-ready event + travel.setLanefield. (4) Prerender SSR fixed, full App per route, React 418 gone, zero console errors on served routes verified manually. (1) Keymap 320px overflow OPEN, needs Justin.
+- Wave 2 gate G-WORLD rerun with real generators: 9 passed, 1 skipped (T-S02-8 SwiftShader). Real layouts deterministic, engine works.
 
 ## B5a Server scene
 status: done
