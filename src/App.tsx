@@ -159,9 +159,17 @@ export default function App(props: AppProps): JSX.Element {
         controllersRef.current.set('sidequests', sidequests);
         controllersRef.current.set('notfound', notfound);
         setWired({ field, leaflink, sidequests });
+        // Test hook: scene tests pause controllers to measure lanes
+        // without scene text (S05 T-SRV-2 excludes text pixels).
+        (window as unknown as {
+          __sceneControllers?: Map<SceneId, SceneController>;
+        }).__sceneControllers = controllersRef.current;
       } else {
         controllersRef.current.clear();
         setWired(null);
+        delete (window as unknown as {
+          __sceneControllers?: Map<SceneId, SceneController>;
+        }).__sceneControllers;
       }
     };
     const travel = createTravelController(initialScene, {
@@ -211,6 +219,9 @@ export default function App(props: AppProps): JSX.Element {
         (c as { dispose?: () => void }).dispose?.();
       }
       controllersRef.current.clear();
+      delete (window as unknown as {
+        __sceneControllers?: Map<SceneId, SceneController>;
+      }).__sceneControllers;
       routerRef.current = null;
       travelRef.current = null;
     };

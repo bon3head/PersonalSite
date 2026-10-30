@@ -248,16 +248,18 @@ test('T-S04-6 keyboard-only tab order', async ({ page }) => {
     });
     order.push(label);
   }
-  // Wordmark first, then the readout Code link, then the five keymap
-  // items in order (labels: server, leaflink, sidequests, whoami,
-  // contact; keymap items render as "1server" etc. with the Kbd).
+  // Wordmark first, then the readout Code link, then the OfferButton
+  // (leaflink scene control, S06), then the five keymap items in
+  // order (labels: server, leaflink, sidequests, whoami, contact;
+  // keymap items render as "1server" etc. with the Kbd).
   expect(order[0]).toBe('Justin Poli');
   expect(order[1]).toContain('Code');
-  expect(order[2]).toContain('server');
-  expect(order[3]).toContain('leaflink');
-  expect(order[4]).toContain('sidequests');
-  expect(order[5]).toContain('whoami');
-  expect(order[6]).toContain('contact');
+  expect(order[2]).toContain('Drop an offer');
+  expect(order[3]).toContain('server');
+  expect(order[4]).toContain('leaflink');
+  expect(order[5]).toContain('sidequests');
+  expect(order[6]).toContain('whoami');
+  expect(order[7]).toContain('contact');
 });
 
 test('T-S04-7 sheet open animation at most 300ms', async ({ page }) => {

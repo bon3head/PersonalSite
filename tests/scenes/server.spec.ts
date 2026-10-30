@@ -183,6 +183,19 @@ for (const vp of [
     await page.goto(`${DEV}/`);
     await waitReady(page);
     await page.waitForTimeout(3000);
+    // S05 T-SRV-2 measures every pixel that is NOT text. The wired
+    // server controller spawns words that drift into the readout box,
+    // so pause it first: pause fades the word pool out over
+    // duration-fast, leaving only lanes and ground to measure.
+    await page.evaluate(() => {
+      const ctrls = (
+        window as unknown as {
+          __sceneControllers?: Map<string, { pause: () => void }>;
+        }
+      ).__sceneControllers;
+      ctrls?.get('server')?.pause();
+    });
+    await page.waitForTimeout(1000);
     const box = await page.evaluate(() => {
       const el = document.querySelector('.jp-readout');
       if (!el) throw new Error('no readout');
