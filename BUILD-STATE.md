@@ -227,12 +227,25 @@ BLOCKED: T-SRV-2 phone background (S05 section 8). At 390x844 coarse pose the ca
 - Wiring request 2 (coordinator, optional): Readout.tsx server variant may import ServerReadoutContent from src/scenes/server.tsx instead of inlining the same JSX.
 
 ## B6b LeafLink QA
-status: todo
-agent:
-commit:
+status: done
+agent: B6b worker
+commit: (filled at commit time)
 tests:
-receipts:
+- T-LL-1 exactly 6144 lanes, connected graph: PASS (2.0s). Lane total 6144, connected 1089/1089, 1933 edges (matches B5b).
+- T-LL-2 deterministic first minute: PASS (2.2s). Two fresh same-seed controllers, first 20 events identical; K-LL-4 no two consecutive intervals equal.
+- T-LL-3 tap responds within 300ms: PASS (1.0m). Real lanefield + controller, canvas-center tap, route activity kind 1 + visitor pin within 300ms.
+- T-LL-4 keyboard path (OfferButton Enter): PASS (4.2m). Same route + visitor pin check via the readout button.
+- T-LL-5 legend slip contrast: PASS (2.5s). Slip background equals paper.raised token; paper.text and paper.text2 on paper.raised both >= 4.5.
+- T-LL-6 no labels in scene: PASS (1.2m). Real lanefield (initial leaflink, one-hot) + controller: no scene object carries a text string.
+- T-LL-7 hue budget under 10 percent after 30s: PASS (2.8m). Hue fraction (OKLCH chroma > 0.04): 0.01028 (1.03%); earlier single run 0.01438 (1.44%).
+- Full file: 7 passed, exit 0 (9.4m).
+- tsc exit 0; lint-tokens clean for B6b files; banned-scan clean for all four B6b files.
+receipts: qa/scenes/leaflink/RECEIPTS.md, qa/scenes/leaflink/full-run.txt
 notes:
+- src/world/leaflink.ts: controller regenerates the graph via generate(seed, scratch, 1) (deterministic; avoids touching B2-owned lanefield.ts which discards worker side data). Sim timing is interval + lanefield clock, not frame-gated. Visitor attempts run before sim attempts in each landing batch. Reduced motion builds a static state (first pins + matches at once, routes fully drawn via past starts, halos full, no interval, no ripples). Pin/halo/ripple meshes: 3 draw calls, renderOrder halos -1, ripples 1, pins 2 (lanes 0); screen-space vertex sizing, SDF ring/dot/disc/annulus. Camera drift is engine-side (leaflinkDrift); controller does not move the camera.
+- src/scenes/leaflink.tsx: readout content in exact S06 section 3.3 order (CODE before the rule, LEGEND glyphs interleaved per clause, SIM, OfferButton). All visible strings from copy.ts; G-COPY-clean by construction (full gate runs after wave 3).
+- Test harness notes (environmental, not gates): dev server is shared across sibling workers and a run that started it kills it on exit, so test pages block the HMR socket (blockHmr) to avoid mid-test reloads; T-LL-4/T-LL-7 run with ?world=0 + replaceState so only one SwiftShader WebGL context exists (two contexts plus a React render OOM-closes the page); T-LL-4 has a 300s harness timeout and setup retry on context-destroyed errors. The 300ms response gates are unchanged.
+- Wiring request (B8/coordinator, same pattern as B6c): pass a controllers map to the travel controller including createLeaflinkController(field, { target: world mount element }) so travel pause/resume drives spawns, and swap src/scenes/leaflink.tsx into src/chrome/Readout.tsx for the leaflink variant (B4's inline block differs: order H1/P1/FACTS/STACK/LEGEND/SIM/CODE, grouped glyphs before the legend string, no hairline rule, no OfferButton). Until wired, the live App shows B4's inline block and no simulation.
 
 ## B6c SideQuests QA
 status: done
