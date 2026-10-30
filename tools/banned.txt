@@ -14,7 +14,7 @@ journey
 \bactually\b
 \bGPA\b
 2\.77
-631
+\b631\b
 835-5490
 CanonClaw
 \bASH\b

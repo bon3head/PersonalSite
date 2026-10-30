@@ -56,8 +56,16 @@ function* walk(d) {
 }
 
 const violations = [];
+// When scanning dist/, JS bundles are skipped: they mix our code with
+// third-party library internals (Astryx, three, React) whose error
+// messages and format strings contain banned-pattern lookalikes
+// (dashes, live-region identifiers, digit substrings). Our JS strings
+// are already covered by the src/ scan, and dist/ HTML carries the
+// actual shipped visible copy, which is what this gate protects.
+const skipJs = target.split('/').pop() === 'dist';
 for (const file of walk(target)) {
   if (!/\.(ts|tsx|js|mjs|css|html)$/.test(file)) continue;
+  if (skipJs && (file.endsWith('.js') || file.endsWith('.mjs'))) continue;
   // The banned list itself and the scanner are exempt.
   if (file.endsWith('tools/banned.txt') || file.endsWith('tools/banned-scan.mjs')) continue;
   let content = readFileSync(file, 'utf8');
