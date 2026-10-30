@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App';
 import { createLanefield } from './world/lanefield';
+import { parsePath, SCENE_LAYOUT } from './router';
 import { initMotionPref } from './lib/reducedMotion';
 import { T } from './tokens.generated';
 import './styles/global.css';
@@ -14,7 +15,7 @@ function startWorld(): void {
   const lanefield = createLanefield(mount, {
     seed: T.world.seed,
     reducedMotion: document.documentElement.classList.contains('reduced-motion'),
-    initial: 'server',
+    initial: SCENE_LAYOUT[parsePath(window.location.pathname)],
   });
   if (lanefield) {
     window.dispatchEvent(

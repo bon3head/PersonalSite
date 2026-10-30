@@ -225,12 +225,21 @@ receipts:
 notes:
 
 ## B6d Notfound QA
-status: todo
-agent:
-commit:
+status: done
+agent: B6d worker
+commit: (this commit)
 tests:
-receipts:
+- T-404-1 unknown path renders the scene: PASS (32.6s). Load /nope, real App + real world: H1 "Nothing at this address.", title "Not found, Justin Poli", weights one-hot index 3 after world ready.
+- T-404-2 one key home: PASS (4.9s). Load /nope?world=0, press 1: URL /, server readout visible, no document load (load-event count unchanged, window marker survives).
+- Full file: 2 passed, exit 0 (43.3s, --workers=1).
+- lint-tokens: clean for all B6d files (repo-wide violations at run time were only B6a's in-progress src/world/server.ts, untouched). banned-scan B6d files: clean. tsc: zero errors in B6d files (repo-wide errors at run time were only B6a's server.ts troika types, untouched).
+receipts: qa/scenes/notfound/ (B6d-RECEIPTS.md, HUE.md, measure-hue.mjs)
 notes:
+- Controller (src/world/notfound.ts) is a documented no-op SceneController: engine owns camera pose (poseFor scatter), idle yaw (weight-blended, 4deg over 24s from tokens), reduced-motion static, and weights. No activity, picking, pins, or trails exist to pause.
+- Readout content (src/scenes/notfound.tsx) matches Readout.tsx's notfound branch element for element (h1 h-notfound + P1); Readout itself is B4-owned and already renders this content in the live App, so no Readout edit was needed.
+- Hue: measured 0.175% (1,795 of 1,024,000 px above OKLCH chroma 0.04) at 1280x800. DESIGN hueBudgetPct has no scatter entry and S08 sets no numeric budget; 0.175% sits below every existing scene budget (server 30%, leaflink 10%, sidequests 6%). Recommend coordinator add a scatter entry (6% leaves 30x headroom). Playwright screenshot waits for stability which never comes with continuous WebGL on SwiftShader, so measure-hue.mjs captures via CDP Page.captureScreenshot.
+- COORDINATOR-OWNED FILE CHANGE IN THIS COMMIT (acknowledgment requested): main.tsx now starts the world at the URL scene's layout (SCENE_LAYOUT[parsePath(pathname)]) instead of hardcoded 'server'. Without it, direct load of any non-server scene showed server lanes (T-404-1 first failed with weights [1,0,0,0], H1/title passing); with it, T-404-1 passes. This fixes direct load for all B6 scenes, not just 404. Verified: T-404-1 green only after this change.
+- Test-environment note: stale vite servers from backgrounded runs (PIDs on 5173/4173) plus a pkill self-match caused two spurious T-404-2 connection-refused failures; killing stale servers and letting the config webServer manage vite cleared it. Not a test bug.
 
 ## B7 Fallbacks a11y
 status: todo
