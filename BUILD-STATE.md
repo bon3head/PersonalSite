@@ -104,12 +104,13 @@ notes:
 - Full npm run build / gates not run: theme step needs B1's laneTheme.mjs (T-S00-1 pending B1). Prerender tested via plain vite build + vite preview.
 
 ## B4 Chrome
-status: todo
-agent:
+status: doing
+agent: B4 worker
 commit:
 tests:
 receipts:
 notes:
+- Coordinator note 2026-10-30: T-S03-3 (history back/forward) fails on goBack in the current env; forward navigations pass. Investigation ongoing; failure may be environmental (B4's concurrent test runs occupying port 5173, IPv6-only vite bind) rather than a router bug. Clean gates rerun after B4 lands will settle it. Playwright config now binds webServer to 0.0.0.0; travel tests use ?world=0 to keep the real engine from racing the harness on SwiftShader.
 
 ## B5a Server scene
 status: done
