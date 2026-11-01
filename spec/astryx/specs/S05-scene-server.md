@@ -40,9 +40,9 @@ Check by hand: lane 0 starts at `x = -3.5*0.95 - 0.5*0.27 - 3.5*0.03 = -3.565`, 
 
 ### 3.2 Camera and framing
 
-Pose `world.camera.server.fine`: camera at `(-7, 2.4, 8)` looking at `(0.5, 0, -3)`, fov 42, principal shift `+0.44` NDC in x. The lanes enter from the left middle of the frame, far ends dissolved by fog, and run right and toward the viewer into the horn, which sits near the right edge; the left third is void for the readout. Coarse: `(-3.5, 3, 12)` looking at `(0.3, 0, -3)`, fov 58, shift `-0.40` in y: the field fills the lower half, the readout owns the top.
+Pose `world.camera.server.fine`: camera at `(-7, 2.4, 8)` looking at `(0.5, 0, -3)`, fov 48, principal shift `+0.62` NDC in x. The lanes enter from the left middle of the frame, far ends dissolved by fog, and run right and toward the viewer into the horn, which sits near the right edge; the left third is void for the readout. Coarse: `(-3.5, 3, 12)` looking at `(0.3, 0, -3)`, fov 58, shift `-0.40` in y: the field fills the lower half, the readout owns the top.
 
-These poses come from verification renders of the S02 shaders on 2026-10-30 (desktop 1440 by 900 and phone 390 by 844). The desktop shift is a starting value: the far ends of the lanes can still reach into a wide readout, so T-SRV-2 decides the final shift, and the change goes into DESIGN, not code.
+These poses come from verification renders of the S02 shaders on 2026-10-30 (desktop 1440 by 900 and phone 390 by 844). The desktop shift is the DESIGN value decided by T-SRV-2 (0.62); any further change goes into DESIGN, not code.
 
 **Readability guarantee:** at both poses, no lane pixel may be drawn inside the readout's bounding box plus `--spacing-6` padding. Verified by T-SRV-2. If a lane crosses it at some aspect ratio, adjust the shift value in DESIGN (not in code) and re-run.
 
