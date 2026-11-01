@@ -34,6 +34,23 @@ export interface LanefieldDebug {
     fov: number;
     shift: [number, number];
   };
+  // Diagnostic camera readout (W0, ruling step 1a): current values from the
+  // rendered camera, including the SideQuests walk lean lookAt override
+  // that cameraPose (rig pose only) does not see. pitchDeg is the
+  // elevation of the forward vector above horizontal in degrees:
+  // negative looks down, fully downward is flat top-down. yawDeg is
+  // atan2(forward.x, forward.z) in degrees. distance is the distance
+  // along the view ray to the y = 0 plane, null when looking up.
+  readonly camera: {
+    pos: [number, number, number];
+    forward: [number, number, number];
+    pitchDeg: number;
+    yawDeg: number;
+    distance: number | null;
+    groundTarget: [number, number] | null;
+    projection: 'perspective';
+    fovDeg: number;
+  };
   info(): { calls: number; triangles: number; textures: number; geometries: number };
   frameStats(): { p50: number; p90: number; p95: number; count: number };
   dpr(): number;

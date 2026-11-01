@@ -49,11 +49,53 @@ export function createLanefield(
     };
   }
 
+  // Stub camera readout: same pitch/yaw/distance math as debug.ts,
+  // derived from the token pose since the stub draws nothing.
+  function cameraReadout(): {
+    pos: [number, number, number];
+    forward: [number, number, number];
+    pitchDeg: number;
+    yawDeg: number;
+    distance: number | null;
+    groundTarget: [number, number] | null;
+    projection: 'perspective';
+    fovDeg: number;
+  } {
+    const pose = cameraPose();
+    const dx = pose.target[0] - pose.pos[0];
+    const dy = pose.target[1] - pose.pos[1];
+    const dz = pose.target[2] - pose.pos[2];
+    const len = Math.sqrt(dx * dx + dy * dy + dz * dz); // lit-ok: vector length
+    const forward: [number, number, number] = [dx / len, dy / len, dz / len];
+    const radToDeg = 180 / Math.PI; // lit-ok: radians to degrees conversion
+    const pitchDeg = Math.asin(Math.max(-1, Math.min(1, forward[1]))) * radToDeg; // lit-ok: pitch clamp to asin domain
+    const yawDeg = Math.atan2(forward[0], forward[2]) * radToDeg; // lit-ok: yaw from forward x/z
+    let distance: number | null = null;
+    let groundTarget: [number, number] | null = null;
+    if (forward[1] < 0) {
+      distance = -pose.pos[1] / forward[1];
+      groundTarget = [pose.pos[0] + forward[0] * distance, pose.pos[2] + forward[2] * distance];
+    }
+    return {
+      pos: pose.pos,
+      forward,
+      pitchDeg,
+      yawDeg,
+      distance,
+      groundTarget,
+      projection: 'perspective',
+      fovDeg: pose.fov,
+    };
+  }
+
   const debug = {
     laneCount: T.world.laneCount,
     layoutHash: '0'.repeat(64), // lit-ok: SHA-256 hex digest length
     weights: () => [...weights],
     cameraPose,
+    get camera() {
+      return cameraReadout();
+    },
     info: () => ({ calls: 0, triangles: 0, textures: 0, geometries: 0 }),
     frameStats: () => ({ p50: 0, p90: 0, p95: 0, count: 0 }),
     dpr: () => window.devicePixelRatio,

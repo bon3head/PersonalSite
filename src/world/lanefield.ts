@@ -394,6 +394,10 @@ export function createLanefield(
     getLayoutHash: () => layoutHash,
     getWeights: () => weights,
     getCameraPose: () => rig.currentPose(),
+    getCameraMatrix: () => {
+      camera.updateMatrixWorld();
+      return [...camera.matrixWorld.elements];
+    },
     getInfo: () => ({
       calls: renderer.info.render.calls,
       triangles: renderer.info.render.triangles,

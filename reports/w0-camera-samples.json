@@ -1,0 +1,392 @@
+{
+  "checks": {
+    "canvasSameNode": true,
+    "nameTitle": {
+      "375": {
+        "first": {
+          "h1": [
+            28,
+            28,
+            347,
+            64
+          ],
+          "intersect": true,
+          "name": [
+            16,
+            16,
+            126,
+            40
+          ]
+        },
+        "frames": 10,
+        "intersecting": 10
+      },
+      "390": {
+        "first": {
+          "h1": [
+            28,
+            28,
+            362,
+            64
+          ],
+          "intersect": true,
+          "name": [
+            16,
+            16,
+            126,
+            40
+          ]
+        },
+        "frames": 10,
+        "intersecting": 10
+      },
+      "430": {
+        "first": {
+          "h1": [
+            28,
+            28,
+            402,
+            64
+          ],
+          "intersect": true,
+          "name": [
+            16,
+            16,
+            126,
+            40
+          ]
+        },
+        "frames": 10,
+        "intersecting": 10
+      }
+    },
+    "pageshow": {
+      "note": "Not exercised live: cross-origin navigation out of the sandbox is blocked (ERR_TUNNEL_CONNECTION_FAILED), so no bfcache restore could be produced here. Code fact: no pageshow listener exists in src, so no reset path exists; a restore preserves JS camera state by browser design. W7 must cover pageshow on a real browser.",
+      "restingPitchDeg": -64.4867
+    },
+    "reducedMotionDiag": {
+      "canvas": true,
+      "hasLanefield": true,
+      "ready": true,
+      "reducedClass": true,
+      "worldChildren": 1
+    },
+    "restingPoseCoarse": {
+      "fov": 46,
+      "pos": [
+        3.34,
+        30,
+        13.923
+      ],
+      "shift": [
+        0,
+        -0.22
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ]
+    },
+    "toast": {
+      "clipboardReadback": "copy succeeded (address read back from clipboard)",
+      "dialogRect": [
+        0,
+        0,
+        390,
+        844
+      ],
+      "elementFromPointAtToastCenter": "hits dialog content, not the toast",
+      "inDialog": false,
+      "popoverOpen": true,
+      "restRect": [
+        32,
+        788,
+        318,
+        812
+      ],
+      "sheetOpen": true,
+      "text": "Copied.",
+      "viewportStripRect": [
+        0,
+        756,
+        390,
+        844
+      ]
+    }
+  },
+  "method": "Playwright Chromium headless against vite dev on 127.0.0.1:5179, worktree at 14ab8df (src tree identical to c3fd464: the c3fd464 to 14ab8df diff touches only BUILD-STATE.md and qa/*.png, no src file). Sampler: in-page requestAnimationFrame loop reading window.__lanefield.camera (the W0 diagnostic getter). pitchDeg is the elevation of the forward view vector above horizontal in degrees: negative looks down, -90 is flat top-down. Counts are rAF samples, not wall-clock frames: headless SwiftShader rendering plus the concurrent baseline gate run kept the frame rate low, so counts are small. Every rendered frame's camera state persists until the next render, and the sampler runs once per compositor frame, so each distinct camera state is sampled. Provenance note: the raw per-frame arrays lived in /tmp and were lost when /tmp was swept mid-run; the per-trigger summaries below are the values printed during the run, preserved verbatim (rounded to 2 decimals).",
+  "note_on_flat_frame": "No trigger produced a flat frame. The steepest observed pitch in any SideQuests-scene frame is -69.62 (walk trail 1). Flat top-down is -90. Gap: 20.38 degrees.",
+  "triggers": {
+    "coldLoad": {
+      "distance": [
+        33.24,
+        33.24
+      ],
+      "frames": 1,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -64.49,
+        -64.49
+      ],
+      "steepestFrame": {
+        "distance": 33.242,
+        "forward": [
+          -0.1049,
+          -0.9025,
+          -0.4178
+        ],
+        "fovDeg": 46,
+        "pitchDeg": -64.487,
+        "pos": [
+          3.487,
+          30,
+          13.887
+        ],
+        "yawDeg": -165.906
+      },
+      "yawDeg": [
+        -165.91,
+        -165.91
+      ]
+    },
+    "desktopRest": {
+      "frames": 9,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -54.55,
+        -54.55
+      ],
+      "yawDeg": [
+        -158.76,
+        -158.76
+      ]
+    },
+    "morphFrom1": {
+      "distance": [
+        15.76,
+        33.24
+      ],
+      "frames": 6,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -64.49,
+        -10.97
+      ],
+      "yawDeg": [
+        -166.19,
+        168.71
+      ]
+    },
+    "morphFrom2": {
+      "distance": [
+        33.24,
+        37.78
+      ],
+      "frames": 6,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -64.49,
+        -64.11
+      ],
+      "yawDeg": [
+        -179.98,
+        -167.78
+      ]
+    },
+    "reducedMotionJumpCheck": {
+      "distinctPitches": [
+        -10.97,
+        -64.49
+      ],
+      "frames": 21,
+      "note": "Server to sidequests under reduced motion: only the two endpoint pitches appear, no intermediate value. Pure jump confirmed."
+    },
+    "reducedMotionMorph": {
+      "frames": 122,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -64.49,
+        -10.97
+      ]
+    },
+    "reducedMotionRest": {
+      "frames": 84,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -64.49,
+        -64.49
+      ]
+    },
+    "reload": {
+      "distance": [
+        33.24,
+        33.24
+      ],
+      "frames": 1,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -64.49,
+        -64.49
+      ],
+      "steepestFrame": {
+        "distance": 33.242,
+        "forward": [
+          -0.1046,
+          -0.9025,
+          -0.4178
+        ],
+        "fovDeg": 46,
+        "pitchDeg": -64.487,
+        "pos": [
+          3.478,
+          30,
+          13.889
+        ],
+        "yawDeg": -165.941
+      },
+      "yawDeg": [
+        -165.94,
+        -165.94
+      ]
+    },
+    "resizeOrientation": {
+      "frames": 48,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -64.49,
+        -64.49
+      ],
+      "yawDeg": [
+        -169.9,
+        -166.4
+      ]
+    },
+    "retarget": {
+      "distance": [
+        33.24,
+        37.79
+      ],
+      "frames": 20,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -64.49,
+        -64.11
+      ],
+      "yawDeg": [
+        -180,
+        -169.54
+      ]
+    },
+    "visibility": {
+      "frames": 20,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "method": "CDP Page.setWebLifecycleState frozen then active",
+      "pitchDeg": [
+        -64.49,
+        -64.49
+      ],
+      "yawDeg": [
+        -168.84,
+        -167.71
+      ]
+    },
+    "walkTrail1": {
+      "distance": [
+        32.0,
+        33.24
+      ],
+      "frames": 65,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -69.62,
+        -64.49
+      ],
+      "steepestFrame": {
+        "distance": 32.004,
+        "forward": [
+          -0.1007,
+          -0.9374,
+          -0.3334
+        ],
+        "fovDeg": 46,
+        "pitchDeg": -69.617,
+        "pos": [
+          3.199,
+          30,
+          13.956
+        ],
+        "yawDeg": -163.19
+      },
+      "yawDeg": [
+        -169.88,
+        -163.19
+      ]
+    },
+    "walkTrail2": {
+      "distance": null,
+      "frames": 72,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -69.49,
+        -64.49
+      ],
+      "yawDeg": [
+        -169.79,
+        -165.91
+      ]
+    },
+    "walkTrail3": {
+      "distance": null,
+      "frames": 70,
+      "laneCount": [
+        6144,
+        6144
+      ],
+      "pitchDeg": [
+        -69.49,
+        -64.49
+      ],
+      "yawDeg": [
+        -169.9,
+        -164.53
+      ]
+    }
+  }
+}

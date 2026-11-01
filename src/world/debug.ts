@@ -9,6 +9,9 @@ export interface DebugDeps {
   getLayoutHash: () => string;
   getWeights: () => number[];
   getCameraPose: () => Pose;
+  // Rendered camera world matrix elements (column-major),
+  // refreshed from the rendered camera on every access.
+  getCameraMatrix: () => readonly number[];
   getInfo: () => { calls: number; triangles: number; textures: number; geometries: number; programs: number };
   getFrameStats: () => { p50: number; p90: number; p95: number; count: number };
   getDpr: () => number;
@@ -32,6 +35,38 @@ export function createDebugView(deps: DebugDeps): DebugHandle {
     cameraPose: () => {
       const p = deps.getCameraPose();
       return { pos: [...p.pos], target: [...p.target], fov: p.fov, shift: [...p.shift] };
+    },
+    // Read-only rendered-camera snapshot. Forward is the camera local -Z
+    // axis in world space: the negated third column of the world
+    // matrix. This sees the walk lean override, which writes the
+    // camera directly after the rig pose is applied.
+    get camera() {
+      const e = deps.getCameraMatrix();
+      const pos: [number, number, number] = [e[12], e[13], e[14]]; // lit-ok: matrixWorld translation column
+      const fx = -e[8]; // lit-ok: matrixWorld third column, negated to forward
+      const fy = -e[9]; // lit-ok: matrixWorld third column, negated to forward
+      const fz = -e[10]; // lit-ok: matrixWorld third column, negated to forward
+      const fl = Math.sqrt(fx * fx + fy * fy + fz * fz); // lit-ok: vector length
+      const forward: [number, number, number] = [fx / fl, fy / fl, fz / fl];
+      const radToDeg = 180 / Math.PI; // lit-ok: radians to degrees conversion
+      const pitchDeg = Math.asin(Math.max(-1, Math.min(1, forward[1]))) * radToDeg; // lit-ok: pitch clamp to asin domain
+      const yawDeg = Math.atan2(forward[0], forward[2]) * radToDeg; // lit-ok: yaw from forward x/z
+      let distance: number | null = null;
+      let groundTarget: [number, number] | null = null;
+      if (forward[1] < 0) {
+        distance = -pos[1] / forward[1];
+        groundTarget = [pos[0] + forward[0] * distance, pos[2] + forward[2] * distance];
+      }
+      return {
+        pos,
+        forward,
+        pitchDeg,
+        yawDeg,
+        distance,
+        groundTarget,
+        projection: 'perspective' as const,
+        fovDeg: deps.getCameraPose().fov,
+      };
     },
     info: () => deps.getInfo(),
     frameStats: () => deps.getFrameStats(),
