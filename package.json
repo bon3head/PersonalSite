@@ -23,7 +23,8 @@
   "name": "justin-poli-personal-site",
   "private": true,
   "scripts": {
-    "build": "npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs",
+    "brand": "node tools/build-brand-assets.mjs",
+    "build": "npm run brand && npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs",
     "dev": "npm run gen && vite",
     "gates": "npm run build && npm run lint && npm run theme:check && node tools/banned-scan.mjs dist && playwright test",
     "gen": "node tools/extract-tokens.mjs && node tools/extract-copy.mjs && node tools/copy-fonts.mjs",
