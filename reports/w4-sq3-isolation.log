@@ -1,0 +1,27 @@
+
+Running 1 test using 1 worker
+
+T-SQ-3: "SideQuests" color=rgb(245, 241, 233) maxBgLum=0.449 contrast=1.87
+  ✘  1 tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast (37.4s)
+
+
+  1) tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast ──────────────────────────────
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 4.5
+    Received:    1.8674988310534326
+
+      333 |     const contrast = (light + 0.05) / (dark + 0.05);
+      334 |     console.log(`T-SQ-3: "${line.text}" color=${line.color} maxBgLum=${maxLum.toFixed(3)} contrast=${contrast.toFixed(2)}`);
+    > 335 |     expect(contrast).toBeGreaterThanOrEqual(4.5);
+          |                      ^
+      336 |   }
+      337 | });
+      338 |
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w4/tests/scenes/sidequests.spec.ts:335:22
+
+    Error Context: test-results/tests-scenes-sidequests-T-SQ-3-readout-contrast/error-context.md
+
+  1 failed
+    tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast ───────────────────────────────

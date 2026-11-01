@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { T } from '../tokens.generated';
-import type { Lanefield, LayoutId } from './types';
+import type { LaneParams, Lanefield, LayoutId } from './types';
+import {
+  paramsForLayout,
+  cloneParams,
+  laneAttributes as laneAttributesFor,
+} from './laneParams';
 
 const LAYOUT_ORDER: LayoutId[] = ['server', 'leaflink', 'sidequests', 'scatter'];
 
@@ -23,6 +28,7 @@ export function createLanefield(
   void opts.seed;
   let current: LayoutId = opts.initial;
   let weights = layoutWeights(current);
+  let params: LaneParams = paramsForLayout(current);
   let reduced = opts.reducedMotion;
   let disposed = false;
 
@@ -110,6 +116,7 @@ export function createLanefield(
       if (disposed) return Promise.resolve();
       current = id;
       weights = layoutWeights(id);
+      params = paramsForLayout(id);
       if (travelOpts?.instant) return Promise.resolve();
       return new Promise((resolve) => {
         window.setTimeout(resolve, T.motion.ms.travel);
@@ -118,6 +125,24 @@ export function createLanefield(
     setReducedMotion(on: boolean): void {
       reduced = on;
       void reduced;
+    },
+    getParams(): LaneParams {
+      return cloneParams(params);
+    },
+    setParams(p: Partial<LaneParams>): void {
+      if (p.leadOklab) params.leadOklab = [...p.leadOklab];
+      if (p.tailOklab) params.tailOklab = [...p.tailOklab];
+      if (p.signalOklab) params.signalOklab = [...p.signalOklab];
+      if (p.tailLength !== undefined) params.tailLength = p.tailLength;
+      if (p.lightMode !== undefined) params.lightMode = p.lightMode;
+      if (p.lightRadius !== undefined) params.lightRadius = p.lightRadius;
+      if (p.lightGain !== undefined) params.lightGain = p.lightGain;
+      if (p.ringCenter) params.ringCenter = [...p.ringCenter];
+      if (p.ringRadius !== undefined) params.ringRadius = p.ringRadius;
+      if (p.ringStrength !== undefined) params.ringStrength = p.ringStrength;
+    },
+    laneAttributes(lane: number) {
+      return laneAttributesFor(lane, weights[LAYOUT_ORDER.indexOf('server')]);
     },
     setActivity(): void {
       // Stub draws nothing; activity is accepted and dropped.

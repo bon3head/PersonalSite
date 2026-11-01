@@ -3,11 +3,19 @@
 // one draw call, morphing between four layouts by uniform weights.
 import * as THREE from 'three';
 import { T } from '../tokens.generated';
-import type { Lanefield, LayoutId } from './types';
+import type { LaneParams, Lanefield, LayoutId } from './types';
 import { easeSignature, easePlain } from './tween';
-import { CameraRig, poseFor, lerpPoseInto, type Pose } from './camera';
+import { CameraRig, poseFor, lerpPoseInto, clampSideQuestsPitch, type Pose } from './camera';
 import { Governor } from './governor';
 import { createDebugView } from './debug';
+import {
+  paramsForLayout,
+  cloneParams,
+  lerpParams,
+  lightModeIndex,
+  ringEnvelope,
+  laneAttributes as laneAttributesFor,
+} from './laneParams';
 import laneVert from './shaders/lane.vert.glsl?raw';
 import laneFrag from './shaders/lane.frag.glsl?raw';
 
@@ -85,29 +93,6 @@ function classStyle(): THREE.Vector2[] {
   return defs.map(([w, a]) => new THREE.Vector2(w, a));
 }
 
-function classColor(): THREE.Vector3[] {
-  const c = T.color;
-  const hexes: string[] = [
-    c.signal, // server lane
-    c.signal, // server converge
-    c.ink, // leaflink local
-    c.ink, // leaflink arterial
-    c.chalk, // sidequests grid
-    c.chalk, // sidequests outline
-    c.chalk, // sidequests hatch
-    c.chalk, // sidequests walkway
-    c.chalk, // sidequests trail
-    c.signalDim, // scatter lane
-    c.ink, // leaflink route
-    c.chalk, // sidequests lit trail
-    c.signal, // unused, value never sampled (alpha zero)
-    c.signal, // unused
-    c.signal, // unused
-    c.signal, // unused
-  ];
-  return hexes.map(hexToVec3);
-}
-
 export function createLanefield(
   mount: HTMLElement,
   opts: { seed: number; reducedMotion: boolean; initial: LayoutId },
@@ -159,6 +144,14 @@ export function createLanefield(
     T.world.camera.near,
     T.world.camera.far,
   );
+  // ITEM 6 init: the camera starts from the resting pose, never from // lit-ok:
+  // the THREE default at the origin. rig.applyPose re-applies this
+  // pose with its principal-point shift before the first draw.
+  {
+    const initPose = poseFor(opts.initial);
+    camera.position.set(initPose.pos[0], initPose.pos[1], initPose.pos[2]);
+    camera.lookAt(initPose.target[0], initPose.target[1], initPose.target[2]);
+  }
   const rig = new CameraRig(camera);
 
   // Layout texture: RGBA32F, full layout texture size, one texel per
@@ -209,6 +202,8 @@ export function createLanefield(
   geometry.instanceCount = instanceCount;
 
   const fire = T.world.server.fire;
+  const variance = T.lanefield.variance;
+  const initialParams = paramsForLayout(opts.initial);
   const uniforms: Record<string, THREE.IUniform> = {
     uLayouts: { value: layoutTex },
     uActivity: { value: activityTex },
@@ -217,7 +212,6 @@ export function createLanefield(
     uDpr: { value: 1 },
     uTime: { value: 0 },
     uClassStyle: { value: classStyle() },
-    uClassColor: { value: classColor() },
     uFog: { value: new THREE.Vector2(T.world.server.fog[0], T.world.server.fog[1]) },
     uHot: { value: hexToVec3(T.color.signalHot) },
     uRouteColor: { value: hexToVec3(T.color.ink) },
@@ -233,6 +227,23 @@ export function createLanefield(
     // pin fade). S06/S07 may refine this when their controllers land.
     uFadeSec: { value: T.world.leaflink.pins.fadeMs * MS_TO_SEC },
     uFrozen: { value: opts.reducedMotion ? 1 : 0 },
+    // W4 lane params: gradient stops are OKLab triples from the build.
+    uGradLead: { value: new THREE.Vector3(...initialParams.leadOklab) },
+    uGradTail: { value: new THREE.Vector3(...initialParams.tailOklab) },
+    uSignalOklab: { value: new THREE.Vector3(...initialParams.signalOklab) },
+    uGradTailLength: { value: initialParams.tailLength },
+    uLightMode: { value: lightModeIndex(initialParams.lightMode) },
+    uLightRadius: { value: initialParams.lightRadius },
+    uLightGain: { value: initialParams.lightGain },
+    // W4 variant B attributes, fixed per lane in the shader.
+    uLengthVariance: { value: variance.lengthVariance },
+    uDepthBands: { value: variance.depthBands },
+    uBandSpeed: { value: new THREE.Vector3(...variance.bandSpeed) },
+    uBandAlpha: { value: new THREE.Vector3(...variance.bandAlpha) },
+    // W4 deflection ring, zero strength at rest.
+    uRingCenter: { value: new THREE.Vector2(0, 0) },
+    uRingRadius: { value: 0 },
+    uRingStrength: { value: 0 },
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -271,6 +282,11 @@ export function createLanefield(
   const travelToW: number[] = [0, 0, 0, 0];
   let travel: { start: number; dur: number } | null = null;
   let pendingResolves: (() => void)[] = [];
+  // W4 interpolated lane params: current value, plus the travel
+  // snapshot/target pair. At rest, current equals the scene tokens.
+  let paramsCurrent: LaneParams = cloneParams(initialParams);
+  let paramsFrom: LaneParams = cloneParams(initialParams);
+  let paramsTo: LaneParams = cloneParams(initialParams);
   const pointer = { x: 0, y: 0 };
   const clearColor = new THREE.Color();
   const governor = new Governor();
@@ -319,10 +335,32 @@ export function createLanefield(
       groundWeights[i] = travelFromW[i] + (travelToW[i] - travelFromW[i]) * ge;
     }
     lerpPoseInto(travelFromPose, travelToPose, e, basePose);
+    // W4 params interpolate with the signature curve, same as weights.
+    paramsCurrent = lerpParams(paramsFrom, paramsTo, e);
+    // W4 ring envelope (motion.morph windows, via ringEnvelope):
+    // traveling to a project layout grows the ring over Gather and
+    // collapses it over Reveal, so it is zero at rest. Traveling away
+    // collapses an active ring over the collapse window. Center is the
+    // target pose ground point; radius is the target scene light
+    // radius; peak strength is half the radius. No per-lane start
+    // delay: one ring for all lanes.
+    const isProject = current === 'leaflink' || current === 'sidequests';
+    const env = ringEnvelope(p, isProject);
+    if (isProject) {
+      const targetPose = poseFor(current, variant);
+      paramsCurrent.ringCenter = [targetPose.target[0], targetPose.target[2]];
+      paramsCurrent.ringRadius = paramsTo.lightRadius;
+      paramsCurrent.ringStrength = paramsTo.lightRadius * 0.5 * env.gather * (1 - env.reveal); // lit-ok: ring peak is half its radius
+    } else {
+      paramsCurrent.ringCenter = [...paramsFrom.ringCenter];
+      paramsCurrent.ringRadius = paramsFrom.ringRadius * (1 - env.collapse);
+      paramsCurrent.ringStrength = paramsFrom.ringStrength * (1 - env.collapse);
+    }
     if (p >= 1) {
       travel = null;
       oneHot(current, weights);
       for (let i = 0; i < LAYOUT_ORDER.length; i++) groundWeights[i] = weights[i];
+      paramsCurrent = cloneParams(paramsTo);
       const pose = poseFor(current, variant);
       basePose.pos[0] = pose.pos[0];
       basePose.pos[1] = pose.pos[1];
@@ -349,9 +387,26 @@ export function createLanefield(
     updateTravel(t);
     rig.update(basePose, t, weights, pointer, dt * SEC_TO_MS, reduced, finePointer);
     for (const cb of callbacks) cb(t, dt);
+    // ITEM 6 clamp, the single and last camera write guard: after rig // lit-ok:
+    // interpolation, walk lean (a callback above), and parallax have
+    // combined, and before render. Active whenever the SideQuests
+    // layout has any weight, which covers morph transit and the walk.
+    // Other layouts keep their own poses untouched.
+    if (weights[layoutIndex('sidequests')] > 0) clampSideQuestsPitch(camera);
     (uniforms.uTime.value as number) = t;
     (uniforms.uW.value as THREE.Vector4).set(weights[0], weights[1], weights[2], weights[3]);
     (uniforms.uFrozen.value as number) = reduced ? 1 : 0;
+    // W4 param uniforms, from the interpolated current params.
+    (uniforms.uGradLead.value as THREE.Vector3).set(...paramsCurrent.leadOklab);
+    (uniforms.uGradTail.value as THREE.Vector3).set(...paramsCurrent.tailOklab);
+    (uniforms.uSignalOklab.value as THREE.Vector3).set(...paramsCurrent.signalOklab);
+    (uniforms.uGradTailLength.value as number) = paramsCurrent.tailLength;
+    (uniforms.uLightMode.value as number) = lightModeIndex(paramsCurrent.lightMode);
+    (uniforms.uLightRadius.value as number) = paramsCurrent.lightRadius;
+    (uniforms.uLightGain.value as number) = paramsCurrent.lightGain;
+    (uniforms.uRingCenter.value as THREE.Vector2).set(...paramsCurrent.ringCenter);
+    (uniforms.uRingRadius.value as number) = paramsCurrent.ringRadius;
+    (uniforms.uRingStrength.value as number) = paramsCurrent.ringStrength;
     updateClearColor();
     if (sampleGovernor) {
       governor.sample(dt * SEC_TO_MS, performance.now());
@@ -467,10 +522,54 @@ export function createLanefield(
     if (document.hidden) {
       stopLoop();
     } else {
+      // Restore from the last valid state, never from a reset default:
+      // basePose is untouched while hidden. Only a camera still at the
+      // origin (no resting pose ever applied) falls back to the
+      // resting pose.
+      if (camera.position.lengthSq() === 0) {
+        const pose = poseFor(current, variant);
+        basePose.pos[0] = pose.pos[0];
+        basePose.pos[1] = pose.pos[1];
+        basePose.pos[2] = pose.pos[2];
+        basePose.target[0] = pose.target[0];
+        basePose.target[1] = pose.target[1];
+        basePose.target[2] = pose.target[2];
+        basePose.fov = pose.fov;
+        basePose.shift[0] = pose.shift[0];
+        basePose.shift[1] = pose.shift[1];
+      }
       lastT = now();
       startLoop();
       if (reduced) renderOnce();
     }
+  }
+
+  function onPageShow(e: PageTransitionEvent): void {
+    if (!e.persisted) return;
+    // Back-forward cache restore: restart from the resting pose of the
+    // current scene, never from a reset default, and drop in-flight
+    // travel (its promises resolve, since the morph is abandoned).
+    const pose = poseFor(current, variant);
+    basePose.pos[0] = pose.pos[0];
+    basePose.pos[1] = pose.pos[1];
+    basePose.pos[2] = pose.pos[2];
+    basePose.target[0] = pose.target[0];
+    basePose.target[1] = pose.target[1];
+    basePose.target[2] = pose.target[2];
+    basePose.fov = pose.fov;
+    basePose.shift[0] = pose.shift[0];
+    basePose.shift[1] = pose.shift[1];
+    travel = null;
+    paramsCurrent = paramsForLayout(current);
+    paramsFrom = cloneParams(paramsCurrent);
+    paramsTo = cloneParams(paramsCurrent);
+    const resolves = pendingResolves;
+    pendingResolves = [];
+    for (const resolve of resolves) resolve();
+    rig.applyPose(basePose);
+    lastT = now();
+    startLoop();
+    if (reduced) renderOnce();
   }
 
   function onContextLost(e: Event): void {
@@ -488,6 +587,7 @@ export function createLanefield(
 
   window.addEventListener('resize', onResize);
   window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pageshow', onPageShow);
   document.addEventListener('visibilitychange', onVisibility);
   canvas.addEventListener('webglcontextlost', onContextLost);
   canvas.addEventListener('webglcontextrestored', () => void onContextRestored());
@@ -566,6 +666,9 @@ export function createLanefield(
         oneHot(id, weights);
         for (let i = 0; i < LAYOUT_ORDER.length; i++) groundWeights[i] = weights[i];
         travel = null;
+        paramsCurrent = paramsForLayout(id);
+        paramsFrom = cloneParams(paramsCurrent);
+        paramsTo = cloneParams(paramsCurrent);
         const pose = poseFor(id, variant);
         basePose.pos[0] = pose.pos[0];
         basePose.pos[1] = pose.pos[1];
@@ -584,6 +687,8 @@ export function createLanefield(
         travelFromW[i] = weights[i];
         travelToW[i] = i === layoutIndex(id) ? 1 : 0;
       }
+      paramsFrom = cloneParams(paramsCurrent);
+      paramsTo = paramsForLayout(id);
       travelFromPose.pos[0] = basePose.pos[0];
       travelFromPose.pos[1] = basePose.pos[1];
       travelFromPose.pos[2] = basePose.pos[2];
@@ -654,6 +759,28 @@ export function createLanefield(
       activityTex.needsUpdate = true;
       if (reduced) renderOnce();
     },
+    getParams(): LaneParams {
+      return cloneParams(paramsCurrent);
+    },
+    setParams(p: Partial<LaneParams>): void {
+      const apply = (target: LaneParams): void => {
+        if (p.leadOklab) target.leadOklab = [...p.leadOklab];
+        if (p.tailOklab) target.tailOklab = [...p.tailOklab];
+        if (p.signalOklab) target.signalOklab = [...p.signalOklab];
+        if (p.tailLength !== undefined) target.tailLength = p.tailLength;
+        if (p.lightMode !== undefined) target.lightMode = p.lightMode;
+        if (p.lightRadius !== undefined) target.lightRadius = p.lightRadius;
+        if (p.lightGain !== undefined) target.lightGain = p.lightGain;
+        if (p.ringCenter) target.ringCenter = [...p.ringCenter];
+        if (p.ringRadius !== undefined) target.ringRadius = p.ringRadius;
+        if (p.ringStrength !== undefined) target.ringStrength = p.ringStrength;
+      };
+      apply(paramsCurrent);
+      if (travel) apply(paramsTo);
+    },
+    laneAttributes(lane: number) {
+      return laneAttributesFor(lane, weights[layoutIndex('server')]);
+    },
     now,
     screenToGround(xCss: number, yCss: number): [number, number] | null {
       return rig.screenToGround(xCss, yCss, cssW, cssH);
@@ -675,6 +802,7 @@ export function createLanefield(
       stopLoop();
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pageshow', onPageShow);
       document.removeEventListener('visibilitychange', onVisibility);
       canvas.removeEventListener('webglcontextlost', onContextLost);
       if (worker) worker.terminate();

@@ -65,6 +65,37 @@ export function lerpPoseInto(a: Pose, b: Pose, t: number, out: Pose): void {
   out.shift[1] = mix(a.shift[1], b.shift[1]);
 }
 
+// ITEM 6 camera clamp (W4). The single clamp on the SideQuests camera // lit-ok:
+// path: it runs in the lanefield frame loop after rig interpolation,
+// walk lean, and pointer parallax have combined, and it is the last
+// camera write before render. Pitch is the elevation of the camera
+// forward vector above horizontal in degrees: negative looks down,
+// flat top-down is -90. The band is pitch only, from // lit-ok:
+// world.sidequests.camera.pitchMin to pitchMax; yaw gets no band.
+// Clamping rotates the forward vector about the camera right axis by
+// exactly the overshoot, so the position and the walk target are
+// untouched and a walk in progress still finishes its trail. Returns
+// true when it moved the camera.
+export function clampSideQuestsPitch(camera: THREE.PerspectiveCamera): boolean {
+  const min = T.world.sidequests.camera.pitchMin;
+  const max = T.world.sidequests.camera.pitchMax;
+  camera.updateMatrixWorld();
+  const e = camera.matrixWorld.elements;
+  const forward = new THREE.Vector3(-e[8], -e[9], -e[10]).normalize(); // lit-ok: matrix third column negated to forward
+  const pitch = Math.asin(Math.max(-1, Math.min(1, forward.y))) * 180 / Math.PI; // lit-ok: radians to degrees conversion
+  if (pitch >= min && pitch <= max) return false;
+  const target = Math.max(min, Math.min(max, pitch));
+  const delta = (target - pitch) * DEG_TO_RAD;
+  const right = new THREE.Vector3().crossVectors(forward, UP);
+  if (right.lengthSq() < 1e-8) right.set(1, 0, 0); // lit-ok: degenerate vertical forward fallback axis
+  right.normalize();
+  forward.applyAxisAngle(right, delta);
+  const pos = camera.position;
+  camera.lookAt(pos.x + forward.x, pos.y + forward.y, pos.z + forward.z);
+  camera.updateMatrixWorld();
+  return true;
+}
+
 const UP = new THREE.Vector3(0, 1, 0);
 
 export class CameraRig {
