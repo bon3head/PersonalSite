@@ -140,6 +140,10 @@ export function createLanefield(
       if (p.ringCenter) params.ringCenter = [...p.ringCenter];
       if (p.ringRadius !== undefined) params.ringRadius = p.ringRadius;
       if (p.ringStrength !== undefined) params.ringStrength = p.ringStrength;
+      if (p.silhouetteMask !== undefined) params.silhouetteMask = p.silhouetteMask;
+      if (p.silhouetteCenter) params.silhouetteCenter = [...p.silhouetteCenter];
+      if (p.silhouetteRadius !== undefined) params.silhouetteRadius = p.silhouetteRadius;
+      if (p.silhouetteStrength !== undefined) params.silhouetteStrength = p.silhouetteStrength;
     },
     laneAttributes(lane: number) {
       return laneAttributesFor(lane, weights[LAYOUT_ORDER.indexOf('server')]);

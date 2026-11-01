@@ -1,0 +1,15 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 tests/feedback-round/silhouette.spec.ts:32:1 › T-LF-9: silhouette pull moves lanes near the contour toward it (47ms)
+  ✓  2 tests/feedback-round/silhouette.spec.ts:53:1 › T-LF-9: mask kind, UV mapping, and envelope follow the route (14ms)
+  ✓  3 tests/feedback-round/silhouette.spec.ts:89:1 › T-LF-9: vertex shader mirrors the pull after the ring (37ms)
+  ✓  4 tests/feedback-round/silhouette.spec.ts:107:1 › T-LF-9: manifest names both per-route mask files (11ms)
+T-LF-8 bound: {
+  laneCount: 6144,
+  calls: 1,
+  silhouette: { kind: 'sidequests', loaded: 'sidequests', width: 128, height: 128 }
+}
+  ✓  5 tests/feedback-round/silhouette.spec.ts:122:1 › T-LF-8: one lane draw call with a mask texture bound (29.9s)
+
+  5 passed (34.7s)

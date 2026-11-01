@@ -5,6 +5,7 @@
 import { T } from '../tokens.generated';
 import type { LaneAttributes, LaneParams, LayoutId } from './types';
 import { easeSignature } from './tween';
+import { maskKindForLayout } from './silhouette';
 
 // GLSL hash11 mirror: fract(p * 0.1031); p *= p + 33.33; p *= p + p; // lit-ok:
 // fract(p). Double precision here; the shader uses float precision,
@@ -45,6 +46,10 @@ export function paramsForLayout(layout: LayoutId): LaneParams {
     ringCenter: [0, 0],
     ringRadius: 0,
     ringStrength: 0,
+    silhouetteMask: maskKindForLayout(layout),
+    silhouetteCenter: [0, 0],
+    silhouetteRadius: 0,
+    silhouetteStrength: 0,
   };
 }
 
@@ -60,6 +65,10 @@ export function cloneParams(p: LaneParams): LaneParams {
     ringCenter: [...p.ringCenter],
     ringRadius: p.ringRadius,
     ringStrength: p.ringStrength,
+    silhouetteMask: p.silhouetteMask,
+    silhouetteCenter: [...p.silhouetteCenter],
+    silhouetteRadius: p.silhouetteRadius,
+    silhouetteStrength: p.silhouetteStrength,
   };
 }
 
@@ -87,6 +96,16 @@ export function lerpParams(a: LaneParams, b: LaneParams, t: number): LaneParams 
     ringCenter: [mix(a.ringCenter[0], b.ringCenter[0], t), mix(a.ringCenter[1], b.ringCenter[1], t)],
     ringRadius: mix(a.ringRadius, b.ringRadius, t),
     ringStrength: mix(a.ringStrength, b.ringStrength, t),
+    // Mask kind is categorical like light mode: it switches at the
+    // midpoint. The engine overwrites center, radius, and strength
+    // from the ring envelope during travel, same as the ring.
+    silhouetteMask: t < 0.5 ? a.silhouetteMask : b.silhouetteMask,
+    silhouetteCenter: [
+      mix(a.silhouetteCenter[0], b.silhouetteCenter[0], t),
+      mix(a.silhouetteCenter[1], b.silhouetteCenter[1], t),
+    ],
+    silhouetteRadius: mix(a.silhouetteRadius, b.silhouetteRadius, t),
+    silhouetteStrength: mix(a.silhouetteStrength, b.silhouetteStrength, t),
   };
 }
 

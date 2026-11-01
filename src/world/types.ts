@@ -3,10 +3,18 @@ import type * as THREE from 'three';
 export type LayoutId = 'server' | 'leaflink' | 'sidequests' | 'scatter';
 export type Regime = 'void' | 'paper' | 'field';
 
+// P-LF-4b silhouette mask kind: which project mark supplies the alpha
+// mask, or none. The kind is a route identity; the engine resolves it
+// to a manifest file (SideQuests frame 0 PNG, LeafLink logo PNG).
+export type SilhouetteMaskKind = 'none' | 'sidequests' | 'leaflink';
+
 // W4 lane parameters: the interpolated state of the lane field. Gradient
 // stops are OKLab triples converted once at build time (extract-tokens);
 // the shader interpolates between them along lane length. The ring is
-// the P-LF-4a morph deflection ring: zero strength at rest.
+// the P-LF-4a morph deflection ring: zero strength at rest. The
+// silhouette fields are the P-LF-4b contour pull: zero strength at
+// rest, center and radius tracking the ring during a morph until W6
+// registers hero descriptors that override them through setParams.
 export interface LaneParams {
   leadOklab: [number, number, number];
   tailOklab: [number, number, number];
@@ -18,6 +26,10 @@ export interface LaneParams {
   ringCenter: [number, number];
   ringRadius: number;
   ringStrength: number;
+  silhouetteMask: SilhouetteMaskKind;
+  silhouetteCenter: [number, number];
+  silhouetteRadius: number;
+  silhouetteStrength: number;
 }
 
 // W4 variant B per-lane attributes (lanefield.variance). band is the
@@ -87,6 +99,12 @@ export interface LanefieldDebug {
     fovDeg: number;
   };
   info(): { calls: number; triangles: number; textures: number; geometries: number };
+  // P-LF-4b mask state, when the engine supplies it: the requested
+  // mask kind from params, the kind uploaded, and the uploaded
+  // texture size (small square for a logo mask, 1 square for the
+  // transparent placeholder). Absent on the stub, which draws
+  // nothing.
+  silhouette?: () => { kind: SilhouetteMaskKind; loaded: SilhouetteMaskKind; width: number; height: number };
   frameStats(): { p50: number; p90: number; p95: number; count: number };
   dpr(): number;
   memoryEstimate(): number;
