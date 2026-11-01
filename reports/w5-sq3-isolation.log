@@ -1,0 +1,16 @@
+
+Running 1 test using 1 worker
+
+[1/1] tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast
+tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast
+T-SQ-3: "SideQuests" color=rgb(245, 241, 233) maxBgLum=0.039 contrast=10.45
+
+T-SQ-3: "Community engagement built as quests: sm" color=rgb(245, 241, 233) maxBgLum=0.049 contrast=9.40
+
+T-SQ-3: "Hackathon build with Julian Shuster. 2nd" color=rgb(182, 198, 215) maxBgLum=0.045 contrast=6.37
+
+T-SQ-3: "Built at Hack New Paltz. Working MVP in " color=rgb(182, 198, 215) maxBgLum=0.039 contrast=6.76
+
+T-SQ-3: "Tap a marker to walk its trail.Click a m" color=rgb(182, 198, 215) maxBgLum=0.040 contrast=6.68
+
+  1 passed (47.6s)

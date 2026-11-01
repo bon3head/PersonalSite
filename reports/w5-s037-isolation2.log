@@ -1,0 +1,5 @@
+
+Running 1 test using 1 worker
+
+[1/1] tests/travel.spec.ts:370:1 › T-S03-7: focus moves to the new H1 and the region announces
+  1 passed (3.6s)

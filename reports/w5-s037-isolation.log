@@ -1,0 +1,25 @@
+
+Running 1 test using 1 worker
+
+[1/1] tests/travel.spec.ts:370:1 › T-S03-7: focus moves to the new H1 and the region announces
+  1) tests/travel.spec.ts:370:1 › T-S03-7: focus moves to the new H1 and the region announces ──────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "H1"
+    Received: "A"
+
+      384 |     return el ? { tag: el.tagName, text: el.textContent } : null;
+      385 |   });
+    > 386 |   expect(active?.tag).toBe('H1');
+          |                       ^
+      387 |   expect(active?.text).toBe('LeafLink');
+      388 |   expect(
+      389 |     await page.evaluate(
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/travel.spec.ts:386:23
+
+    Error Context: test-results/tests-travel-T-S03-7-focus-058a1-H1-and-the-region-announces/error-context.md
+
+
+  1 failed
+    tests/travel.spec.ts:370:1 › T-S03-7: focus moves to the new H1 and the region announces ───────

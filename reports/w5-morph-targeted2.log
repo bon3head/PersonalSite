@@ -1,0 +1,100 @@
+
+Running 14 tests using 1 worker
+
+[1/14] tests/feedback-round/morph.spec.ts:75:1 › T-MORPH-DESC: hero descriptors carry anchor, ring, silhouette
+[2/14] tests/feedback-round/morph.spec.ts:107:1 › T-MORPH-PHASES: sample invariants at every quarter of every pair
+[3/14] tests/feedback-round/morph.spec.ts:138:1 › T-MORPH-ENV: gather peaks, reveal looms, ends hand off to rest
+[4/14] tests/feedback-round/morph.spec.ts:161:1 › T-MORPH-BREATH: ring dips to ringBreath, regrows, anchor tracks
+[5/14] tests/feedback-round/morph.spec.ts:187:1 › T-MORPH-RECEDE: outgoing mark recedes over the 0 to 0.40 window
+[6/14] tests/feedback-round/morph.spec.ts:202:1 › T-MORPH-RETARGET: second input retargets from the current sample
+[7/14] tests/feedback-round/morph.spec.ts:227:1 › T-MORPH-REDUCED-DEGRADE: jump on reduced, latch at 30 frames
+tests/feedback-round/morph.spec.ts:227:1 › T-MORPH-REDUCED-DEGRADE: jump on reduced, latch at 30 frames
+[morph] degrade latched: silhouette pull 0 for session
+
+[morph] degrade latched: silhouette pull 0 for session
+
+[8/14] tests/feedback-round/morph.spec.ts:266:1 › T-TRANS-2: lanes, draw call, doc height, no navbar, no cards
+[9/14] tests/feedback-round/morph.spec.ts:347:1 › T-TRANS-3: retarget mid-flight ends on sidequests, weights one-hot
+[10/14] tests/feedback-round/morph.spec.ts:375:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade
+  1) tests/feedback-round/morph.spec.ts:375:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 650
+    Received:   3945
+
+      395 |   // Full travel is 700ms; reduced must land well under it (jump plus
+      396 |   // a 150ms crossfade, target about 300ms, margin for harness slop).
+    > 397 |   expect(elapsed).toBeLessThan(650);
+          |                   ^
+      398 |   const weights = await page.evaluate(() => window.__lanefield.weights());
+      399 |   expect(weights[1]).toBeCloseTo(1, 2);
+      400 |   await context.close();
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:397:19
+
+    Error Context: test-results/tests-feedback-round-morph-b61d5-jump-with-a-short-crossfade/error-context.md
+
+
+[11/14] tests/feedback-round/morph.spec.ts:404:1 › T-TRANS-5: back and forward run the morph with keymap direction
+  2) tests/feedback-round/morph.spec.ts:404:1 › T-TRANS-5: back and forward run the morph with keymap direction 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "leaflink"
+    Received: "sidequests"
+
+      438 |   await page.goForward();
+      439 |   await page.waitForFunction(
+    > 440 |     (h1) => document.querySelector('.jp-readout h1')?.textContent === h1,
+          |                           ^
+      441 |     H1.sidequests,
+      442 |     { timeout: 120000, polling: 100 },
+      443 |   );
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:440:27
+
+    Error Context: test-results/tests-feedback-round-morph-b6bc4-morph-with-keymap-direction/error-context.md
+
+
+[12/14] tests/feedback-round/morph.spec.ts:445:1 › T-TRANS-6: idle 60s per route causes no navigation
+  3) tests/feedback-round/morph.spec.ts:445:1 › T-TRANS-6: idle 60s per route causes no navigation ─
+
+    Test timeout of 300000ms exceeded.
+
+    Error: page.waitForTimeout: Test timeout of 300000ms exceeded.
+
+      454 |   expect(back.weights[1]).toBeCloseTo(1, 2);
+      455 |   expect(back.morph?.from).toBe('sidequests');
+    > 456 |   expect(back.morph?.to).toBe('leaflink');
+          |                ^
+      457 |   await page.goForward();
+      458 |   await page.waitForFunction(
+      459 |     (h1) => document.querySelector('.jp-readout h1')?.textContent === h1,
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:456:16
+
+    Error Context: test-results/tests-feedback-round-morph-2f8a5--route-causes-no-navigation/error-context.md
+
+
+[13/14] tests/feedback-round/morph.spec.ts:473:1 › T-NAME-2: name box never intersects the title box during a morph
+[14/14] tests/feedback-round/morph.spec.ts:515:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry
+  4) tests/feedback-round/morph.spec.ts:515:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry 
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation.
+
+      518 |   // empty rect, which cannot intersect; only non-empty pairs count.
+      519 |   await page.keyboard.press('2');
+    > 520 |   const samples = await page.evaluate(async () => {
+          |              ^
+      521 |     const out: Array<{ name: number[] | null; title: number[] }> = [];
+      522 |     for (let i = 0; i < 24; i++) {
+      523 |       const nameEl = document.querySelector('.jp-wordmark') as HTMLElement | null;
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:520:14
+
+    Error Context: test-results/tests-feedback-round-morph-f0f6c-100-percent-of-server-entry/error-context.md
+
+
+  4 failed
+    tests/feedback-round/morph.spec.ts:375:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade 
+    tests/feedback-round/morph.spec.ts:404:1 › T-TRANS-5: back and forward run the morph with keymap direction 
+    tests/feedback-round/morph.spec.ts:445:1 › T-TRANS-6: idle 60s per route causes no navigation ──
+    tests/feedback-round/morph.spec.ts:515:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry 
+  10 passed (18.3m)
