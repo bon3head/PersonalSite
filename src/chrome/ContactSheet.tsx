@@ -11,6 +11,7 @@ import { Link } from '@astryxdesign/core/Link';
 import { C } from '../copy';
 import { T } from '../tokens.generated';
 import { useCopyConfirm } from './CopyConfirm';
+import { useToastHostBridge } from './toastHostBridge';
 
 export interface ContactSheetProps {
   isOpen: boolean;
@@ -20,7 +21,9 @@ export interface ContactSheetProps {
 
 export default function ContactSheet(props: ContactSheetProps): JSX.Element {
   const addressRef = useRef<HTMLElement | null>(null);
+  const innerRef = useRef<HTMLDivElement | null>(null);
   const { copyEmail } = useCopyConfirm();
+  useToastHostBridge(props.isOpen, innerRef);
   const innerStyle = {
     '--jp-sheet-max': `${T.chrome.sheetMaxWidthPx}px`,
   } as CSSProperties;
@@ -34,7 +37,7 @@ export default function ContactSheet(props: ContactSheetProps): JSX.Element {
       hasScrim
       finalFocusRef={props.finalFocusRef}
     >
-      <div className="jp-sheet-inner" style={innerStyle}>
+      <div className="jp-sheet-inner" style={innerStyle} ref={innerRef}>
         <h2>{C['C-CON-H']}</h2>
         <p>
           <span ref={addressRef} className="jp-contact-email">

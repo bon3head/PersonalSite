@@ -1,0 +1,316 @@
+
+> justin-poli-personal-site@0.0.0 gates
+> npm run build && npm run lint && npm run theme:check && node tools/banned-scan.mjs dist && playwright test
+
+
+> justin-poli-personal-site@0.0.0 build
+> npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs
+
+
+> justin-poli-personal-site@0.0.0 gen
+> node tools/extract-tokens.mjs && node tools/extract-copy.mjs && node tools/copy-fonts.mjs
+
+extract-tokens: wrote tokens from DESIGN.md v1.1.0
+extract-copy: wrote 56 entries to src/copy.ts
+copy-fonts: copied 4 files to public/fonts/
+
+> justin-poli-personal-site@0.0.0 theme
+> astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css
+
+
+Next step: run `npx astryx init` to finish setup and install the Astryx agent prompt.
+[ok] themes/lane/dist/lane.css (12.4 KB, 93 token overrides, 5 component overrides)
+[note] Fonts named but not loaded: "Commit Mono", "Commit Mono Fallback". Load them in your app (recipe: astryx docs typography).
+Run with --detail full for the install example and font recipe.
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 707 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.40 kB │ gzip:   0.71 kB
+dist/assets/worker-DIcFacU6.js   20.54 kB
+dist/assets/index-DtToJhau.css  209.92 kB │ gzip:  37.40 kB
+dist/assets/index-B4cdVi-6.js   508.18 kB │ gzip: 158.30 kB
+dist/assets/world-Bbdp1TUN.js   707.56 kB │ gzip: 199.17 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 15.90s
+vite v7.3.7 building ssr environment for production...
+transforming...
+✓ 29 modules transformed.
+rendering chunks...
+dist-server/entry-server.js           40.60 kB
+dist-server/assets/world-BXH0v1UE.js  88.79 kB
+✓ built in 1.90s
+prerender: wrote index.html
+prerender: wrote leaflink/index.html
+prerender: wrote sidequests/index.html
+prerender: wrote 404.html
+(node:43887) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+> justin-poli-personal-site@0.0.0 lint
+> node tools/lint-tokens.mjs && node tools/banned-scan.mjs src && python3 -I tools/palette-receipt.py spec/astryx/DESIGN.md
+
+lint-tokens: clean
+banned-scan: clean (/home/hatch/workspace/worktrees/personalsite-astryx-w2/src)
+== Distinctness (identity colors must be >= 0.050 from every reference, >= 0.10 from Meta)
+PASS signal         #7BB5F8 nearest=tailwind indigo-300 dE=0.050 dE_meta=0.120
+PASS signalDim      #4F77A5 nearest=tailwind sky-600 dE=0.064 dE_meta=0.122
+PASS ink            #0E3565 nearest=tailwind sky-900 dE=0.065 dE_meta=0.230
+PASS field.ground   #10294E nearest=tailwind indigo-900 dE=0.103 dE_meta=0.282
+== Contrast
+PASS void.text    on void.ground   15.94 (need 4.5)
+PASS void.text2   on void.ground    8.48 (need 4.5)
+PASS signal       on void.ground    9.15 (need 4.5)
+PASS signal       on void.raised    8.38 (need 4.5)
+PASS signalDim    on void.ground    4.21 (need 3.0)
+PASS void.text    on void.raised   14.61 (need 4.5)
+PASS paper.text   on paper.ground  15.92 (need 4.5)
+PASS paper.text2  on paper.ground   6.82 (need 4.5)
+PASS paper.text2  on paper.raised   6.02 (need 4.5)
+PASS ink          on paper.ground  10.76 (need 4.5)
+PASS ink          on paper.raised   9.49 (need 4.5)
+PASS ink          on inkTint        8.69 (need 4.5)
+PASS chalk        on field.ground  12.86 (need 4.5)
+PASS chalk2       on field.ground   8.31 (need 4.5)
+PASS chalk        on field.raised  10.70 (need 4.5)
+PASS chalk2       on field.raised   6.91 (need 4.5)
+PASS signal       on field.ground   6.77 (need 4.5)
+PASS void.ground  on signal         9.15 (need 4.5)
+PASS paper.ground on ink           10.76 (need 4.5)
+PASS errorDark    on void.ground    7.40 (need 4.5)
+PASS errorLight   on paper.ground   5.74 (need 4.5)
+
+> justin-poli-personal-site@0.0.0 theme:check
+> astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css --check
+
+
+Next step: run `npx astryx init` to finish setup and install the Astryx agent prompt.
+
+Building theme from themes/lane/laneTheme.mjs...
+
+[ok] Theme outputs are up to date with themes/lane/laneTheme.mjs.
+banned-scan: clean (/home/hatch/workspace/worktrees/personalsite-astryx-w2/dist)
+
+Running 69 tests using 1 worker
+
+T-S04-1 containment: {"320":{"fits":false,"rightEdge":574},"360":{"fits":false,"rightEdge":622},"390":{"fits":false,"rightEdge":622},"768":{"fits":true,"rightEdge":638},"1024":{"fits":true,"rightEdge":638},"1440":{"fits":true,"rightEdge":654},"2560":{"fits":true,"rightEdge":654}}
+  ✓   1 tests/chrome.spec.ts:34:1 › T-S04-1 keymap never wraps (8.9s)
+  ✓   2 tests/chrome.spec.ts:68:1 › T-S04-2 coarse targets at least 44x44 (2.4s)
+  ✓   3 tests/chrome.spec.ts:118:1 › T-S04-3 axe clean on all routes, sheets closed and open (25.1s)
+  ✓   4 tests/chrome.spec.ts:160:1 › T-S04-4 copy paths (4.7s)
+  ✓   5 tests/chrome.spec.ts:204:1 › T-S04-5 focus returns to the keymap button on sheet close (2.0s)
+  ✓   6 tests/chrome.spec.ts:238:1 › T-S04-6 keyboard-only tab order (1.8s)
+  ✓   7 tests/chrome.spec.ts:265:1 › T-S04-7 sheet open animation at most 300ms (2.1s)
+  ✘   8 tests/feedback-round/name.spec.ts:51:1 › T-NAME-1 name box never intersects the title box (8.9s)
+  ✘   9 tests/feedback-round/name.spec.ts:87:1 › T-NAME-1 sidequests title rests across sampled frames while live (1.5m)
+  ✓  10 tests/feedback-round/toast.spec.ts:17:1 › T-TOAST-1 toast paints above the open Contact sheet (3.0s)
+  ✓  11 tests/feedback-round/toast.spec.ts:59:1 › T-TOAST-2 toast inside the open dialog, not inert, announced role (2.7s)
+  ✓  12 tests/feedback-round/toast.spec.ts:105:1 › T-TOAST-3 toast does not move focus (2.9s)
+  ✓  13 tests/layouts/scatter.test.ts:24:1 › scatter writes 6144 lanes of 8 points, all class 9 (160ms)
+  ✓  14 tests/layouts/scatter.test.ts:37:1 › scatter geometry: centers in sphere, lengths in range, points evenly spaced (15ms)
+  ✓  15 tests/layouts/scatter.test.ts:72:1 › scatter is deterministic across runs (1.9s)
+  ✓  16 tests/layouts/scatter.test.ts:80:1 › scatter generation is under 150ms (9ms)
+  ✓  17 tests/layouts/scatter.test.ts:88:1 › scatter touches only its own layout texels (61ms)
+  ✓  18 tests/scenes/leaflink.spec.ts:51:1 › T-LL-1: exactly 6144 lanes, connected graph (1.6s)
+  ✓  19 tests/scenes/leaflink.spec.ts:93:1 › T-LL-2: deterministic first minute (first 20 events identical) (2.0s)
+  ✓  20 tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms (33.3s)
+  ✘  21 tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) (4.1m)
+  ✓  22 tests/scenes/leaflink.spec.ts:353:1 › T-LL-5: legend slip contrast (3.6s)
+  ✓  23 tests/scenes/leaflink.spec.ts:390:1 › T-LL-6: no labels in scene (11.5s)
+T-LL-7 hue fraction (chroma > 0.04): 0.009071180555555556
+  ✓  24 tests/scenes/leaflink.spec.ts:417:1 › T-LL-7: hue budget under 10 percent after 30s (1.8m)
+  ✓  25 tests/scenes/notfound.spec.ts:27:1 › T-404-1: unknown path renders the scene (15.3s)
+  ✓  26 tests/scenes/notfound.spec.ts:42:1 › T-404-2: one key home (5.4s)
+  ✓  27 tests/scenes/server.spec.ts:17:1 › T-SRV-1: server layout hand values (23ms)
+  ✓  28 tests/scenes/server.spec.ts:75:1 › T-SRV-3: warp 10 fires in lockstep (4ms)
+  ✘  29 tests/scenes/server.spec.ts:180:3 › T-SRV-2: readout clear at 1440x900 (1.4m)
+  ✓  30 tests/scenes/server.spec.ts:180:3 › T-SRV-2: readout clear at 390x844 (53.7s)
+  ✓  31 tests/scenes/server.spec.ts:237:1 › T-SRV-4: word set equals world.server.words over 12s (16.5s)
+  ✓  32 tests/scenes/server.spec.ts:278:1 › T-SRV-5: server hue budget (1.1m)
+  ✘  33 tests/scenes/server.spec.ts:296:1 › T-SRV-6: LCP element is the H1 (5.1s)
+  ✓  34 tests/scenes/server.spec.ts:324:1 › G-COPY: server readout matches S09 copy (1.7s)
+  ✓  35 tests/scenes/sidequests.spec.ts:183:1 › T-SQ-2: walk feedback (1.6m)
+T-SQ-4: trail0 length=11.83 claimStart=0.850 minDrop=-0.0276 settleErr=0.0000
+  ✓  36 tests/scenes/sidequests.spec.ts:230:1 › T-SQ-4: spring numbers (1.9s)
+  ✓  37 tests/scenes/sidequests.spec.ts:270:1 › T-SQ-5: keyboard (36.8s)
+T-SQ-3: "SideQuests" color=rgb(245, 241, 233) maxBgLum=0.264 contrast=2.96
+  ✘  38 tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast (44.4s)
+T-SQ-6: signalPixels=1669 total=1296000 fraction=0.0013
+  ✓  39 tests/scenes/sidequests.spec.ts:339:1 › T-SQ-6: hue budget (1.0m)
+  ✓  40 tests/scenes/sidequests.spec.ts:379:1 › T-SQ-7 (extra): reduced motion (11.8s)
+  ✓  41 tests/travel-prerender.spec.ts:56:1 › prerender: all four route files with correct shell (30.8s)
+  ✓  42 tests/travel-prerender.spec.ts:76:1 › prerender: copy strings match src/copy.ts (75ms)
+  ✓  43 tests/travel-prerender.spec.ts:84:1 › T-S03-5: zero console errors on served prerendered paths (47.3s)
+  ✓  44 tests/travel.spec.ts:202:1 › T-S03-1: no reload across 20 random go calls (3.0s)
+  ✓  45 tests/travel.spec.ts:236:1 › T-S03-2: deep links render the right scene (3.2s)
+  ✓  46 tests/travel.spec.ts:257:1 › T-S03-3: history back and forward stay in sync (2.0s)
+  ✓  47 tests/travel.spec.ts:293:1 › T-S03-4: travel is interruptible (1.5s)
+  ✓  48 tests/travel.spec.ts:314:1 › T-S03-5: clean console on every route (dev harness) (3.5s)
+  ✓  49 tests/travel.spec.ts:330:1 › T-S03-6: DOM feedback under 250ms (1.3s)
+  ✓  50 tests/travel.spec.ts:370:1 › T-S03-7: focus moves to the new H1 and the region announces (2.1s)
+  ✓  51 tests/travel.spec.ts:395:1 › T-S03-8: reduced-motion travel completes within 320ms (1.2s)
+  ✓  52 tests/travel.spec.ts:439:1 › router: path normalization, hash, arrows, sheet replaceState (1.3s)
+  ✓  53 tests/travel.spec.ts:484:1 › router: sheet open disables scene keys but not the sheet key (1.5s)
+  ✓  54 tests/world.engine.spec.ts:52:1 › T-S02-1: 6,144 lanes, one draw call (16.6s)
+  ✓  55 tests/world.engine.spec.ts:60:1 › T-S02-1b: one draw call with ?debug=lanesOnly (13.3s)
+  ✓  56 tests/world.engine.spec.ts:66:1 › T-S02-2: layoutHash identical across two fresh loads (Chromium) (25.1s)
+  ✓  57 tests/world.engine.spec.ts:79:1 › T-S02-3: weights sum to 1 at every frame of a travel (25.9s)
+  ✘  58 tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width (27.5s)
+  ✓  59 tests/world.engine.spec.ts:133:1 › T-S02-6: no shader compile after ready across 3 travels (38.3s)
+  ✓  60 tests/world.engine.spec.ts:148:1 › T-S02-7: context loss recovers with layoutHash unchanged (39.3s)
+  -  61 tests/world.engine.spec.ts:181:6 › T-S02-8: no longtask during startup (SwiftShader; gate is G-PERF-DEVICE)
+  ✓  62 tests/world.layouts.server.spec.ts:26:1 › T-SRV-1: lanes 0, 127, 128, 6143 at k=0 match hand values (16ms)
+  ✓  63 tests/world.layouts.server.spec.ts:44:1 › T-SRV-1: converge points k=6, k=7 for lane 0 mix toward focus (4ms)
+  ✓  64 tests/world.layouts.server.spec.ts:59:1 › server layout: exactly 6144 lanes of 8 points, all finite, all class 0 (80ms)
+  ✓  65 tests/world.layouts.server.spec.ts:80:1 › server layout: deterministic across runs and seeds (pure grid arithmetic) (2.8s)
+  ✓  66 tests/world.layouts.server.spec.ts:91:1 › server layout: generation under 150ms in Node (1ms)
+  ✓  67 tests/world.layouts.server.spec.ts:99:1 › server layout: writes only its own layout slice (2ms)
+  ✓  68 tests/world.tween.spec.ts:5:1 › easeSignature(0.3) is between 0.80 and 0.86 (1ms)
+  ✓  69 tests/world.tween.spec.ts:11:1 › spring(0.7, 3.2) peaks 1.040 to 1.052 and settles within 0.01 of 1 after 0.6s (55ms)
+
+
+  1) tests/feedback-round/name.spec.ts:51:1 › T-NAME-1 name box never intersects the title box ─────
+
+    Error: /sidequests 375x667: name [16,16,126,40] vs title [28,28,347,64]
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      74 |           intersects(m.name, m.title),
+      75 |           `${route} ${vp.width}x${vp.height}: name ${JSON.stringify(m.name)} vs title ${JSON.stringify(m.title)}`,
+    > 76 |         ).toBe(false);
+         |           ^
+      77 |       }
+      78 |       expect(
+      79 |         m.titleFits,
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w2/tests/feedback-round/name.spec.ts:76:11
+
+    Error Context: test-results/tests-feedback-round-name--76f79-er-intersects-the-title-box/error-context.md
+
+  2) tests/feedback-round/name.spec.ts:87:1 › T-NAME-1 sidequests title rests across sampled frames while live 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      123 |   for (const s of samples) {
+      124 |     if (s.name !== null) {
+    > 125 |       expect(intersects(s.name, s.title)).toBe(false);
+          |                                           ^
+      126 |     }
+      127 |   }
+      128 |   await context.close();
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w2/tests/feedback-round/name.spec.ts:125:43
+
+    Error Context: test-results/tests-feedback-round-name--c68af-s-sampled-frames-while-live/error-context.md
+
+  3) tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) ───────────────
+
+    TimeoutError: locator.waitFor: Timeout 60000ms exceeded.
+    Call log:
+      - waiting for locator('#ll-offer-host button') to be visible
+
+
+      325 |   // concurrently, and a React commit can stall under that load. The
+      326 |   // 300ms response gate below is unchanged.
+    > 327 |   await button.waitFor({ timeout: 60000 });
+          |                ^
+      328 |   const tapAt = Date.now();
+      329 |   await button.focus();
+      330 |   await page.keyboard.press('Enter');
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w2/tests/scenes/leaflink.spec.ts:327:16
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-d58fc-ard-path-OfferButton-Enter-/error-context.md
+
+  4) tests/scenes/server.spec.ts:180:3 › T-SRV-2: readout clear at 1440x900 ────────────────────────
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 0.01
+    Received:   0.6119103665490742
+
+      227 |     const stats = await analyzeShot(page, shot, box, 'delta');
+      228 |     expect(stats.total).toBeGreaterThan(0);
+    > 229 |     expect(stats.maxDelta).toBeLessThan(0.01);
+          |                            ^
+      230 |   });
+      231 | }
+      232 |
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w2/tests/scenes/server.spec.ts:229:28
+
+    Error Context: test-results/tests-scenes-server-T-SRV-2-readout-clear-at-1440x900/error-context.md
+
+  5) tests/scenes/server.spec.ts:296:1 › T-SRV-6: LCP element is the H1 ────────────────────────────
+
+    Error: expect(received).not.toBeNull()
+
+    Received: null
+
+      315 |     return { tag: el.tagName, text: (el.textContent ?? '').trim() };
+      316 |   });
+    > 317 |   expect(lcp).not.toBeNull();
+          |                   ^
+      318 |   expect(lcp?.tag).toBe('H1');
+      319 |   expect(lcp?.text).toBe(C['C-SRV-H1']);
+      320 | });
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w2/tests/scenes/server.spec.ts:317:19
+
+    Error Context: test-results/tests-scenes-server-T-SRV-6-LCP-element-is-the-H1/error-context.md
+
+  6) tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast ──────────────────────────────
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 4.5
+    Received:    2.9638918858247907
+
+      333 |     const contrast = (light + 0.05) / (dark + 0.05);
+      334 |     console.log(`T-SQ-3: "${line.text}" color=${line.color} maxBgLum=${maxLum.toFixed(3)} contrast=${contrast.toFixed(2)}`);
+    > 335 |     expect(contrast).toBeGreaterThanOrEqual(4.5);
+          |                      ^
+      336 |   }
+      337 | });
+      338 |
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w2/tests/scenes/sidequests.spec.ts:335:22
+
+    Error Context: test-results/tests-scenes-sidequests-T-SQ-3-readout-contrast/error-context.md
+
+  7) tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 0.98
+    Received:   1.0037459726347933
+
+      124 |   const focusFrac = focus[0] / vp.width;
+      125 |   expect(focusFrac).toBeGreaterThan(0.87);
+    > 126 |   expect(focusFrac).toBeLessThan(0.98);
+          |                     ^
+      127 |   console.log(
+      128 |     `T-S02-5 note: focus projects to ${focusFrac.toFixed(3)} of width; ` +
+      129 |       `spec (S02 v1.0.1) tests target at 0.72; focus band is an extra lock.`,
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w2/tests/world.engine.spec.ts:126:21
+
+    Error Context: test-results/tests-world.engine-T-S02-5-ecea5-y-shift-2-of-viewport-width/error-context.md
+
+    Error Context: test-results/tests-world.engine-T-S02-5-ecea5-y-shift-2-of-viewport-width/error-context.md
+
+  7 failed
+    tests/feedback-round/name.spec.ts:51:1 › T-NAME-1 name box never intersects the title box ──────
+    tests/feedback-round/name.spec.ts:87:1 › T-NAME-1 sidequests title rests across sampled frames while live 
+    tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) ────────────────
+    tests/scenes/server.spec.ts:180:3 › T-SRV-2: readout clear at 1440x900 ─────────────────────────
+    tests/scenes/server.spec.ts:296:1 › T-SRV-6: LCP element is the H1 ─────────────────────────────
+    tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast ───────────────────────────────
+    tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width 
+  1 skipped
+  61 passed (23.1m)

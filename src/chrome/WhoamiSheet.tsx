@@ -3,10 +3,12 @@
 // On fine pointers the inner content is constrained to sheetMaxWidthPx
 // and left-aligned with the keymap gutter (chrome.css).
 import type { CSSProperties, JSX, RefObject } from 'react';
+import { useRef } from 'react';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { Link } from '@astryxdesign/core/Link';
 import { C } from '../copy';
 import { T } from '../tokens.generated';
+import { useToastHostBridge } from './toastHostBridge';
 
 export interface WhoamiSheetProps {
   isOpen: boolean;
@@ -15,6 +17,8 @@ export interface WhoamiSheetProps {
 }
 
 export default function WhoamiSheet(props: WhoamiSheetProps): JSX.Element {
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  useToastHostBridge(props.isOpen, innerRef);
   const innerStyle = {
     '--jp-sheet-max': `${T.chrome.sheetMaxWidthPx}px`,
   } as CSSProperties;
@@ -28,7 +32,7 @@ export default function WhoamiSheet(props: WhoamiSheetProps): JSX.Element {
       hasScrim
       finalFocusRef={props.finalFocusRef}
     >
-      <div className="jp-sheet-inner" style={innerStyle}>
+      <div className="jp-sheet-inner" style={innerStyle} ref={innerRef}>
         <h2>{C['C-WHO-H']}</h2>
         <p>{C['C-WHO-EDU']}</p>
         <p>{C['C-WHO-PLACE']}</p>
