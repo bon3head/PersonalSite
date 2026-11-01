@@ -1,0 +1,91 @@
+{
+  "testStartRelMs": 0,
+  "firstFrameRelMs": 49005,
+  "diag": {
+    "t0": 1793522931741,
+    "listenerAttachMs": [
+      9,
+      1004,
+      1185,
+      1189
+    ],
+    "dispatchMs": [
+      1340
+    ],
+    "ricCallMs": [
+      1007,
+      1899
+    ],
+    "ricFireMs": [
+      1289,
+      14780
+    ],
+    "firstFrameMs": 1899
+  },
+  "brandRequests": [
+    {
+      "url": "http://localhost:5173/brand/manifest.json",
+      "atMs": 14902
+    },
+    {
+      "url": "http://localhost:5173/brand/sidequests.frame0.70fcad6b1476ce70.png",
+      "atMs": 34938
+    },
+    {
+      "url": "http://localhost:5173/brand/sidequests.60421a79e67ab676.gif",
+      "atMs": 34939
+    },
+    {
+      "url": "http://localhost:5173/brand/logo.538a891a8f0d1fbd.png",
+      "atMs": 34939
+    }
+  ],
+  "brandResponses": [
+    {
+      "url": "http://localhost:5173/brand/manifest.json",
+      "atMs": 21800,
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5173/brand/sidequests.frame0.70fcad6b1476ce70.png",
+      "atMs": 39541,
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5173/brand/sidequests.60421a79e67ab676.gif",
+      "atMs": 39543,
+      "status": 200
+    },
+    {
+      "url": "http://localhost:5173/brand/logo.538a891a8f0d1fbd.png",
+      "atMs": 39543,
+      "status": 200
+    }
+  ],
+  "prefetched": [
+    "sidequests.frame0.70fcad6b1476ce70.png",
+    "sidequests.60421a79e67ab676.gif",
+    "logo.538a891a8f0d1fbd.png"
+  ],
+  "started": true,
+  "brandCount": 4,
+  "pollCompletedWithin120s": true,
+  "brandReqRelToFirstFrameMs": [
+    {
+      "url": "http://localhost:5173/brand/manifest.json",
+      "afterFirstFrameMs": 13003
+    },
+    {
+      "url": "http://localhost:5173/brand/sidequests.frame0.70fcad6b1476ce70.png",
+      "afterFirstFrameMs": 33039
+    },
+    {
+      "url": "http://localhost:5173/brand/sidequests.60421a79e67ab676.gif",
+      "afterFirstFrameMs": 33040
+    },
+    {
+      "url": "http://localhost:5173/brand/logo.538a891a8f0d1fbd.png",
+      "afterFirstFrameMs": 33040
+    }
+  ]
+}

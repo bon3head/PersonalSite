@@ -9,6 +9,16 @@ const DEV = process.env.ASSET_DEV_BASE || 'http://localhost:5173';
 test('T-ASSET-5: no brand request before the first field frame', async ({
   page,
 }) => {
+  // Timeout alignment, not a threshold change: this test's own design
+  // already allows up to 180s for the first frame (waitForFunction
+  // below) plus a 120s poll for the prefetch. The Playwright default
+  // of 30s killed the test mid poll under full gate load even though
+  // the prefetch completes inside its own 120s deadline (diagnosed
+  // 2026-11-01, qa/diag-asset5-result.json: 4th brand request at
+  // 34.9s wall in an instrumented run, inside the 120s poll). Every
+  // assertion below is unchanged. 180s covers the observed ~15s to
+  // first frame plus the full 120s poll plus margin.
+  test.setTimeout(180000);
   await page.addInitScript(() => {
     (window as any).__brandFirstFrameAt = null;
     window.addEventListener(
