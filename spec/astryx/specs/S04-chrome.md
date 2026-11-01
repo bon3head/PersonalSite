@@ -1,6 +1,6 @@
 # S04 Chrome: Keymap, Readout, sheets, wordmark
 
-Version 1.0.0, 2026-10-30. Depends on: S00, S01, S03, S09. Blocks: S05 to S08, S10, S11.
+Version 1.1.0, 2026-11-01. Depends on: S00, S01, S03, S09. Blocks: S05 to S08, S10, S11.
 
 ## 1. Purpose
 
@@ -52,6 +52,8 @@ Each item is a real link or button:
 
 `Justin Poli` (C-WORDMARK) as a link to `/`, top-left at `--jp-gutter`, `--text-label`, weight 700, color `--color-text-primary`. Hidden on Server (the H1 is the name there) with `hidden`, not opacity. Fades with the readout during travel.
 
+**Name clear zone (W1).** The wordmark bounding box expanded by `zone.name.padPx` (12px) on every side is reserved: no scene title, readout, hero, or keymap may intersect it (DESIGN.md section 5). W0 measured the coarse name box as left 16, top 16, right 126, bottom 40, so the coarse clear box is left 4, top 4, right 138, bottom 52. Scene titles size to fit: a title renders at the smaller of its token size and the available width divided by characters times the Commit Mono advance. T-NAME-1 checks the zone on every route, and T-NAME-2 checks it mid-morph.
+
 ## 6. Readout (`src/chrome/Readout.tsx`)
 
 One component, three variants, plus the 404 which reuses `server`. Content comes from S09 by ID; the variant decides placement and container. Max width `--jp-readout-max` (520px), prose max 52ch.
@@ -64,7 +66,7 @@ One component, three variants, plus the 404 which reuses `server`. Content comes
 
 Typography inside every variant: H1 `--jp-text-display-0` on server, `--jp-text-display-1` on leaflink and sidequests; paragraphs `--text-body`; facts and stack lines `--text-supporting` in `--color-text-secondary`; links `Link` (Astryx) with `isExternalLink`, color accent, underline on hover only. Spacing: H1 to first paragraph `--spacing-6`, paragraph to paragraph `--spacing-4`, prose to supporting lines `--spacing-6`, supporting lines `--spacing-2` apart, links row `--spacing-6` above, links `--spacing-6` apart.
 
-Phones: the readout region may scroll (`overflow-y: auto`, `overscroll-behavior: contain`); the page itself never scrolls (`html, body { height: 100%; overflow: hidden; }`). Touch on the canvas region must not be captured by the readout.
+Phones: the readout region may scroll (`overflow-y: auto`, `overscroll-behavior: contain`); the page itself never scrolls (`html, body { height: 100%; overflow: hidden; }`). Touch on the canvas region must not be captured by the readout. On coarse or narrow viewports the readout top sits below the name clear zone (section 5); no readout may intersect it on any viewport.
 
 ## 7. Sheets
 
@@ -73,6 +75,8 @@ Both are Astryx `BottomSheet` with `purpose="info"`, `height="hug"`, `hasScrim` 
 ### 7.1 WhoamiSheet
 
 Heading `<h2>` C-WHO-H. Lines in order: C-WHO-EDU, C-WHO-PLACE, then the three roles as a `<ul>` with no bullets (each `<li>` one line), then a links row: C-WHO-LINK-CB, C-WHO-LINK-GH, C-WHO-LINK-LI (Astryx `Link`, `isExternalLink`).
+
+**Field-quiet (W1).** Whoami shows no brand mark. While the sheet is open over any scene, the field stays quiet per `scene.whoami.gradient` (lead ink, tail field, tailLength 0.5, static light, gain 0.5): no hero mark appears, no ring grows, and no logo looms. The server field hero (S05) is the quiet counterpart, not a mark.
 
 ### 7.2 ContactSheet
 
@@ -83,6 +87,8 @@ Copy behavior: `copyText` from `src/lib/copyText.ts` (verbatim from repo `spec/s
 ### 7.3 CopyConfirm
 
 Astryx `Toast` through `useToast`, stock anatomy, colors from tokens. Enter animation is Astryx's own (verify it is at most 225ms; if longer, override the duration via the theme `components.toast` target).
+
+**Toast layer decision (W1).** Toasts render in the top-most open layer (DESIGN.md section 7). W0 confirmed the cause is top-layer paint order: the Contact sheet dialog opened later paints above the earlier-shown toast popover because BottomSheet never registers a modal outlet. No `layer.*` tokens are added: the W2 fix is portal rehost on modal open or outlet exposure for the sheet, and W2 decides between those two. Tests T-TOAST-1 (elementFromPoint finds the toast over the open sheet), T-TOAST-2 (not inert, announced), and T-TOAST-3 (activeElement unchanged) cover it.
 
 ## 8. Live region
 
@@ -126,4 +132,5 @@ U-S04-1: whether BottomSheet's built-in open animation exceeds 300ms; resolved i
 
 ## 13. Changelog
 
+- 1.1.0, 2026-11-01: W1 name clear zone (section 5) with titles sized to fit, readout clearance below the zone, toast layer decision (section 7.3, no layer.* tokens), whoami field-quiet (section 7.1). No keymap, sheet, or copy change.
 - 1.0.0, 2026-10-30: initial.

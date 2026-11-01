@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.0.0, 2026-10-30. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.1.0, 2026-11-01. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -90,6 +90,20 @@ Server is blue light on black. LeafLink is blue ink on paper. SideQuests is pape
 
 The build recomputes every pair from the token block (G-CONTRAST). Any pair under its requirement fails the build.
 
+### 3.5 Gradients in lane motion, and the brand-marks exception
+
+**Gradients exist only in the lane shader.** The page background stays flat field `#10294E` on SideQuests and flat ground elsewhere. CSS gradient functions stay banned in stylesheets, and the banned scan is unchanged. No gradient appears in UI chrome, ever.
+
+**Lane gradient.** Each lane is a short gradient from head to tail: the head is the scene's lead stop, the tail decays toward ink, then field, at alpha. Moving lanes read as comet streaks, so the gradient is the motion. Interpolation happens in OKLab inside the shader, never in sRGB and never in HSV. Stop values come from the `scene.<route>.gradient` tokens, converted once to OKLab at build time (W4 owns that conversion step). The three stops are signal, ink, and field only; no new hue enters through any gradient. Per-page character comes from lead stop placement, tail length, and light mode, never from a new hue.
+
+**Light source.** Each scene has one moving light parameter that shifts lanes toward signal near it. This is a sourced brightening: lanes get brighter near the light, nothing glows from nowhere.
+
+**Dithering.** Dark blues band on 8-bit displays, so the shader adds a luminance-only dither of plus or minus half a level. The same factor scales all three channels, so hue does not change. Per-channel noise is forbidden: it would swing the hue of near-black pixels and trip the hue gate. T-LF-5 tests dithered near-black pixels against the gate.
+
+**Hue gate method (kept, stated plainly).** The gate measures OKLab distance from signal, not an HSV hue band. T-SQ-6 screenshots the route, converts every pixel to OKLab, counts pixels within DeltaE_ok 0.08 of signal `#7BB5F8`, and requires under 6 percent on SideQuests; server and LeafLink use the same method against their budgets (30 and 10). The patch plan section 3.2 statement that an HSV equivalent band is measured in W0 is not satisfiable from the gate as written (W0 section 4): the gate measures OKLab distance from signal, not an HSV hue band. W1 keeps the OKLab method and adds no HSV measurement. If a later round wants an HSV measurement, it adds it as a new gate; it must not be claimed from the OKLab gate.
+
+**Brand-marks exception.** The no-logo rule in section 9 has one scoped exception: the two project marks (LeafLink and SideQuests) render in native color. Exactly one `data-brand-mark` element exists on LeafLink and on SideQuests; none exists on server or whoami. Outside that element's rectangle, the existing hue budget is unchanged. Inside it, only colors in that asset's fingerprint are allowed, within DeltaE 3 (token `brand.fingerprintDeltaE`). Area cap: the rectangle may cover at most 12 percent of the viewport at 390x844 (token `brand.areaCap`, measured in W6). Surrounding motion stays in the Astryx blue family; only the mark itself carries native color.
+
 ## 4. Type
 
 **One family: Commit Mono** (OFL 1.1, `@fontsource/commit-mono@5.2.5`, Latin subset, weights 200, 400, 700). Justin's hero object is a terminal UI he wrote in Go; the site speaks in that voice everywhere, so there is one typeface decision and it is on purpose. Not Inter, not system sans, not JetBrains Mono (the developer-portfolio default). Commit Mono is neutral enough for paragraphs at 16px and distinct at display sizes.
@@ -115,6 +129,7 @@ Rules: 700 for titles and keys, 400 for the name and everything else (name thick
 ## 5. Space, radius, size, border, focus
 
 - **Spacing**: Astryx scale unchanged (4px base: `--spacing-1` 0.25rem up to `--spacing-12` 3rem). Local: `--jp-gutter` 16px under 640px wide, 32px from 640, 48px from 1280. `--jp-keymap-h` 44px (coarse pointer) and 36px (fine pointer).
+- **Name clear zone**: the wordmark bounding box expanded by `zone.name.padPx` (12px) on every side. No title, readout, hero, or keymap may intersect it. W0 measured the coarse name box as left 16, top 16, right 126, bottom 40, so the coarse clear box is left 4, top 4, right 138, bottom 52. Titles size to fit: a title renders at the smaller of its token size and the available width divided by characters times the Commit Mono advance, and it never enters the zone. T-NAME-1 checks the zone on every route.
 - **Radius**: Astryx `radius: {base: 2, multiplier: 1}` gives inner 2px, element 4px, container 6px, page 14px (verified). The site uses only `--radius-none` and `--radius-element` (4px). One radius system. The LeafLink legend slip has 0 radius (paper is cut, not rounded). Pins and markers are geometric shapes, not radii.
 - **Control sizes**: Astryx `--size-element-sm/md/lg` overridden to 32/36/44px; every touch target is at least 44 by 44 CSS px on coarse pointers (adaptation rule `pointer: coarse` sets md and lg to 44px).
 - **Border**: `--border-width` 1px. Borders are drawn as `box-shadow: inset 0 0 0 1px var(--jp-hairline)` (hairline rings, crisp on all DPRs).
@@ -180,6 +195,54 @@ Motion is never the only carrier of information: every fact on a scene is in DOM
 4. Ambient loops never block or delay input.
 5. 60fps on phones is a requirement with a measured receipt, not a hope (S11).
 
+### 6.6 SideQuests camera band (feedback-11 cut, ruling step 2a)
+
+**Scope decision, stated explicitly.** The band applies to every frame of the SideQuests camera path, including init, restore, morph, walk, resize, and reduced motion. It is not scoped to the fully active scene only: the band is wide enough to admit morph transit, so no scope carve-out is needed and T-SQ-CAM-1 can assert every sampled frame without exception.
+
+**Band.** Tokens `world.sidequests.camera.pitchMin` -75 and `world.sidequests.camera.pitchMax` -5. Pitch is the elevation of the camera forward vector above horizontal in degrees: negative looks down, flat top-down is -90. The band is a pitch interval only; yaw gets no band.
+
+**W0 numbers behind the band.** Coarse rest pitch -64.49, coarse walk lean steepens to -69.62 (lean range 5.13 degrees), coarse morph server to SideQuests traverses -10.97 to -64.49, fine rest -54.55, steepest legitimate frame anywhere -69.62, flat top-down -90, headroom from steepest legitimate to flat 20.38 degrees. Fine endpoints derived from the token camera poses by the same geometry that reproduces every W0 coarse measurement exactly (coarse server -10.97, coarse LeafLink about -64.1, coarse rest -64.49, fine rest -54.55): fine server endpoint -10.22, fine LeafLink endpoint -56.98. Fine walk lean was not sampled in W0; if it steepens like coarse (5.13 degrees), fine walk sits near -59.68, and W7 must sample it.
+
+**Margins.** Steep edge: steepest legitimate -69.62 to band edge -75 is 5.38 degrees of margin past the worst legitimate frame, and band edge -75 to flat -90 leaves 15.00 degrees of headroom, so no clamped frame reads as flat. Shallow edge: shallowest legitimate morph frame -10.97 (coarse server endpoint) to band edge -5 is 5.97 degrees of margin; fine server endpoint -10.22 to band edge -5 is 5.22 degrees. Both morph endpoint pairs sit inside the band on both variants (coarse: -10.97 and -64.49, -64.11 and -64.49; fine: -10.22 and -54.55, -56.98 and -54.55), so interpolation between endpoints cannot pass through top-down, and the clamp at the single final write point catches any overshoot.
+
+**Yaw.** Yaw wraps through plus and minus 180 during morphs (W0: LeafLink morph spans -179.98 to -167.78, server morph spans -166.19 to 168.71 across the wrap), so yaw is not bandable as a single interval, and yaw is not the axis that produces the flat read. No yaw band is set.
+
+**Rules.** No frame falls outside the band under the chosen scope. The camera initializes from the scene resting pose before the first draw; no default or identity camera may ever reach a frame. On pageshow with persisted state and on visibilitychange to visible, the camera restores from the resting pose or the last valid clamped state, never from a reset default. Where the clamp engages during a walk, the walk still finishes its trail; only the camera tilt stops at the band edge. The plan layout is ambient and is never presented flat from above.
+
+### 6.7 Route morph (three phases inside travel 700ms)
+
+All phases run inside `--jp-duration-travel` (700ms) with the signature curve unless stated. Times are fractions of travel and overlap on purpose. Values are proposed tokens (`motion.morph`, `morph.*`); the device run confirms them.
+
+- **Release** (0.00 to 0.30): the outgoing signature loosens: Lockstep sync to free, heartbeat amplitude to 0, or wander damped. Gradient parameters start interpolating. Curve: signature.
+- **Gather** (0.15 to 0.75): the deflection ring grows from 0 to r at the target anchor, so lanes bend open around a circle. Silhouette pull (strength `morph.silhouettePull` 0.35, proposed) draws lanes near the ring toward the logo alpha-mask contour, so the lanes visibly become the logo outline. Curve: signature for radius; `curve.track` if the anchor moves.
+- **Reveal** (0.55 to 1.00): the logo looms in: opacity 0 to 1, scale `morph.loomFrom` 0.92 to 1.00. The incoming signature starts at 1.00. The SideQuests spring overshoot is allowed only in its own arrival. Curve: signature.
+
+**Other directions.** Project to server or whoami: the logo recedes (scale 1.00 to `morph.recedeTo` 0.96, opacity to 0, window 0 to 0.40), the ring collapses (0.20 to 0.80), and Lockstep or Quiet re-forms (0.50 to 1.00). Project to project (for example LeafLink to SideQuests): logo A recedes, the ring shrinks to `morph.ringBreath` 0.6r and regrows to r (a breath), the ring travels between anchors on `curve.track` if the anchors differ, and logo B looms in during Reveal.
+
+**Controller rules.** State is snapshot, target, and start time. Navigate takes a snapshot of the current interpolated values, sets the target and start time, and pushes history immediately, so back works mid-flight. The previous morph is discarded, never queued (retargeting). Direction follows keymap order 1, 2, 3, W; history back and forward use the same path with direction from that order. Outgoing title and copy exit over 150ms at t = 0. The incoming title arrives at Reveal start. Focus moves to the new H1 at Reveal start, under the existing focus condition (only if focus was inside the old readout or on the keymap), and never while the Contact sheet focus lock is active. No per-lane start-time stagger: all lanes start at t = 0 and vary only in path, never in start time.
+
+**Hero descriptors per route.** server: kind field, ring 0, mark none. leaflink: kind mark, anchor at the hero anchor, ring r, mark leaflink. sidequests: kind mark, anchor at the hero anchor, ring r, mark sidequests. whoami: kind field-quiet, ring 0, mark none.
+
+**Reduced motion.** All parameters jump at t = 0, the DOM crossfades over 150ms, the ring jumps, and the GIF shows its static frame. No intermediate frame exists outside the camera band.
+
+**Degrade path.** If p95 frame time during a morph exceeds budget for 30 consecutive frames, silhouette pull drops to 0 for the rest of the session. Lanes, gradient, and ring stay. This is logged to the dev HUD.
+
+### 6.8 Hero motion
+
+**Placement.** Outside the name clear zone, the readout clear zone, and the keymap. Minimum hero size (`hero.minSizePx`) keeps 375x667 at document height equal to viewport height. The displayed rectangle must also satisfy the brand area cap (section 3.5); W6 fits each mark inside the cap from its aspect ratio.
+
+**Passive motion.** Continuous, never pausing and restarting on a timer. LeafLink: a small scale on each beat, peak `hero.beatScale` 1.015 (proposed). SideQuests: drift along the wander path, settling with the existing spring.
+
+**Active motion.** Pointer or touch-drag tilts the plane within `hero.tiltMaxDeg` 8 (proposed) and shifts the lane depth bands for parallax. A tap sends one ripple through the ring: 150ms out, 700ms settle. No gyroscope, because it needs a permission prompt on iOS.
+
+### 6.9 Lane field variant B
+
+Variant B values (all proposed, token `lanefield.variance`): three depth bands, with speed multipliers 0.85, 1.00, 1.15 and signal alpha multipliers 0.55, 0.80, 1.00; lane length variance plus or minus 18 percent; seeded phase jitter; density clusters that move with the scene signature. Rules: Lockstep keeps zero phase jitter, so it stays in lockstep. Lanes enter and leave only at viewport edges; none appears or vanishes in place. The established cadence stays. Variants A and C are not built; no dev switch exists for them.
+
+### 6.10 Performance budget
+
+Budget, held on every route and during morphs (tokens `perf.*`): p95 frame time 16.7ms or less, p99 33ms or less, no long task over 50ms during a morph. Measurement: a dev-only HUD reading requestAnimationFrame deltas, the Safari Web Inspector timeline over a cable, normal mode and Low Power Mode, with whatever frame rate Low Power Mode produces recorded rather than assumed. Device run 2 measures against this budget; if a budget number is wrong, it changes here with the measurement, never by quiet lowering.
+
 ## 7. Component signatures
 
 Named for their role on this site. Each has at least two variants or it is plain on purpose.
@@ -194,8 +257,11 @@ Named for their role on this site. Each has at least two variants or it is plain
 | `CopyConfirm` | Copy result | `Toast` via `useToast` | info "Copied." / error "Copy failed. The address is selected." |
 | `OfferButton` | LeafLink keyboard path to drop an offer | `Button` variant `secondary` | idle, pressed |
 | `QuestMarker` | SideQuests marker (WebGL plus DOM button twin) | none in WebGL; DOM twin is a `Button` ghost | open, lit, claimed |
+| `BrandHero` | Project hero mark (LeafLink, SideQuests) | none; `picture` markup over the lane field | F0 animated GIF, F1 first-frame PNG, F2 text mark, F3 image without deflection |
 
 Theme component overrides (in `themes/lane/laneTheme.mjs`, legal keys verified with `astryx theme targets <Name> --json` in S01): Button `base` radius `--radius-element`, no shadow, label weight 700; Button `variant:primary` background `--color-accent`, color `--color-on-accent`; Kbd `base` background transparent, hairline ring, radius 2px; BottomSheet `base` background `--jp-raised`, radius 0 on the top corners (a TUI pane, not a phone card), no shadow.
+
+**Toast layer decision.** Toasts render in the top-most open layer. W0 confirmed the cause is top-layer paint order: the Contact sheet is a native dialog opened with showModal, the toast viewport is a manual popover shown earlier, and the later-opened dialog paints above the earlier-shown popover because BottomSheet never registers a modal outlet, so the toast host is never rehosted above the dialog. That is not a z-index contest, so no `layer.*` tokens are added: the W2 fix is portal rehost on modal open or outlet exposure for the sheet, and W2 decides between those two. If W2 finds a stacking-context cause instead, it records that finding and revisits this decision rather than quietly adding tokens.
 
 ## 8. World constants (the Lanefield)
 
@@ -210,6 +276,18 @@ All geometry is in world units (1 unit reads as 1 meter). Exact values are in se
 ## 9. Imagery and assets
 
 No photos, no illustrations, no icons except Astryx's built-in external-link indicator on `Link isExternalLink`. No logos of Ollama, Docker, Tailscale, NVIDIA or anyone else: product names appear as text only. No map tiles, no real street data, no Leaflet marker graphic. Every visual is procedural from S02, S05, S06, S07.
+
+**Brand-marks exception (the only logos on the site).** The two project marks ship as real GIF assets from Codeberg, pinned by commit SHA and recorded with sha256 in a manifest (W3 owns the pipeline). SideQuests hero: `sidequests.gif` from opensourcery/sidequests (branch dev, app/assets/sidequests.gif), 1920x538, 4 frames, 42591 bytes. LeafLink hero: W3 confirms whether `leaves.gif` (bon3head/LeafLink, branch main, app/assets/leaves.gif, 305x400, 50 frames, 828040 bytes) or `logo.png` (same repo, public/logo.png, 1024x1024 RGBA, 174622 bytes) is the shipped mark; `logo.png` is also the reduced-motion PNG and the F1 fallback source for LeafLink. `sidequests-alpha.gif` is DO NOT USE: it adds the word "alpha" below the logo and stays reference only. The hero holds exactly one mark per project route. Feedback-05 and feedback-08 are not placed on any page this round; circuit.gif and gears.gif are creative liberty only, never heroes.
+
+**Delivery markup (per project hero).** A `picture` element: a `source` for reduced motion pointing at the first-frame PNG, and an `img` pointing at the GIF with the approved alt text, explicit width and height, `decoding="async"`, and `data-brand-mark` set to the project. The first-frame PNG is extracted from the GIF at build time and is identical to GIF frame 0. The PNG renders first, at Reveal. The GIF loads behind it and replaces it on `img.decode()` resolve, with no fade, since an identical frame means no visible onset. A script listener on reduced motion forces the PNG at runtime even if `picture` does not re-evaluate.
+
+**Fallback chain (each level is tested).** F0: the GIF decodes and its natural size matches the manifest, so the animated GIF shows. F1: network or decode error, size mismatch with the manifest (truncated file), or not decoded within `brand.decodeTimeoutMs` 4000 (proposed), with no retry loop, so the first-frame PNG shows, static. F2: the PNG also fails, so a text mark shows: the approved alt text's project name in Commit Mono 700, signal color, sentence case, centered in the ring. Lanes still deflect, so the hero still exists. F3: WebGL unavailable (the existing field fallback), so the F0, F1, or F2 image shows without deflection, over the flat field.
+
+**Build-time checks.** Frame count, loop duration, per-frame delays, dimensions, transparency flag, edge fringe (near-white pixels next to transparent ones), the union of all frame palettes (the hue fingerprint), and byte size. If the GIF is matted against white, W3 re-mattes its edge pixels per frame against transparency; T-ASSET-4 must pass on the navy field, or W3 stops.
+
+**Budgets (proposed).** 900 KB transferred per GIF (token `brand.gifMaxBytes` 900000) and decoded memory (width times height times 4 times frames) of 48 MB or less (token `brand.gifMaxDecoded` 48000000). If over budget, first run lossless `gifsicle -O3`, then resize to displayed size times 3 DPR, keeping the same GIF and the same animation. If still over budget, stop and report. Switching format away from GIF needs Justin's yes, because he asked for the actual GIFs. W0 measured budgets: sidequests.gif 42591 bytes transferred and 16527360 bytes decoded (15.8 MB); leaves.gif 828040 bytes transferred and 24400000 bytes decoded (23.3 MB); both inside budget.
+
+**Alt text rule.** Alt text is the project name plus what the mark depicts, 12 words or fewer, never starting with the words "image of". The final alt strings are drafted in W0 section 6 and finalized by W3; W1 writes only this rule. W0 drafts, recorded here as drafts and not as final copy: "SideQuests logo, green handwritten wordmark with a star"; "LeafLink logo, animated green maple leaf"; "LeafLink logo, green leaves forming a smile". The same string drives the F2 text mark, so the alt text physically appears in the theme when the image fails. No other copy changes in this round.
 
 ## 10. What this system never does
 
@@ -243,7 +321,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
 
 ```json design-tokens
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -387,7 +465,12 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
       "frequencyHz": 3.2
     },
     "leaflinkEventIntervalMs": [1000, 1600],
-    "feedbackMaxMs": 250
+    "feedbackMaxMs": 250,
+    "morph": {
+      "release": [0.0, 0.3],
+      "gather": [0.15, 0.75],
+      "reveal": [0.55, 1.0]
+    }
   },
   "world": {
     "laneCount": 6144,
@@ -602,6 +685,10 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
       "cameraFollow": {
         "weight": 0.25,
         "halfLifeMs": 400
+      },
+      "camera": {
+        "pitchMin": -75,
+        "pitchMax": -5
       }
     },
     "scatter": {
@@ -705,6 +792,83 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
     "desktopFromPx": 1024
   },
   "hueBudgetPct": {"server": 30, "leaflink": 10, "sidequestsSignal": 6, "scatter": 6},
+  "zone": {
+    "name": {
+      "padPx": 12
+    }
+  },
+  "curve": {
+    "track": [0.65, 0, 0.35, 1]
+  },
+  "morph": {
+    "loomFrom": 0.92,
+    "recedeTo": 0.96,
+    "ringBreath": 0.6,
+    "silhouettePull": 0.35
+  },
+  "scene": {
+    "server": {
+      "gradient": {
+        "leadStop": "signal",
+        "tailStop": "field",
+        "tailLength": 0.6,
+        "light": {"mode": "band", "radius": 8.0, "gain": 1.0}
+      }
+    },
+    "leaflink": {
+      "gradient": {
+        "leadStop": "ink",
+        "tailStop": "field",
+        "tailLength": 1.0,
+        "light": {"mode": "radial", "radius": 6.0, "gain": 1.0}
+      }
+    },
+    "sidequests": {
+      "gradient": {
+        "leadStop": "field",
+        "tailStop": "signal",
+        "tailLength": 0.8,
+        "light": {"mode": "wander", "radius": 5.0, "gain": 1.0}
+      }
+    },
+    "whoami": {
+      "gradient": {
+        "leadStop": "ink",
+        "tailStop": "field",
+        "tailLength": 0.5,
+        "light": {"mode": "static", "radius": 10.0, "gain": 0.5}
+      }
+    }
+  },
+  "lanefield": {
+    "variance": {
+      "depthBands": 3,
+      "bandSpeed": [0.85, 1.0, 1.15],
+      "bandAlpha": [0.55, 0.8, 1.0],
+      "lengthVariance": 0.18,
+      "phaseJitterSeeded": true,
+      "lockstepPhaseJitter": 0
+    }
+  },
+  "hero": {
+    "sizePx": 280,
+    "minSizePx": 160,
+    "tiltMaxDeg": 8,
+    "beatScale": 1.015
+  },
+  "brand": {
+    "gifMaxBytes": 900000,
+    "gifMaxDecoded": 48000000,
+    "decodeTimeoutMs": 4000,
+    "fingerprintDeltaE": 3,
+    "areaCap": 0.12
+  },
+  "perf": {
+    "p95Ms": 16.7,
+    "p99Ms": 33,
+    "longTaskMs": 50,
+    "degradeFrames": 30
+  },
   "budgets": {
     "lcpMs": 2000,
     "ttiMs": 3000,
@@ -764,6 +928,20 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.1.0, 2026-11-01: W1 feedback round spec patch.
+  - "Gradients permitted inside lane-field motion only, cooked in OKLab from signal, ink and field."
+  - "Server hero is the field; project heroes are brand marks; three-phase morph between them."
+  - "Brand-marks exception: SideQuests and LeafLink marks in native color, scoped by fingerprint and area cap."
+  - "Layer order: toasts render in the top-most open layer."
+  - "Name clear zone; titles size to fit."
+  - "Lane field variant B."
+  - "Performance budget recorded; measured on device."
+  - "SideQuests flat plan view (feedback-11) removed: camera clamped to a measured band in every frame; plan layout remains ambient; trail walk and copy unchanged."
+  - "Hue gate keeps the OKLab distance-from-signal method; no HSV band is claimed or added."
+  - "No layer.* tokens: W0 confirmed a top-layer cause, so the fix is portal rehost or outlet exposure, not z-index."
+  - "Version bump: changelog 1.0.4 and section 12 JSON 1.0.0 agree at 1.1.0."
+  - "Camera band scope: the band applies to every frame of the SideQuests camera path, including morph transit, so the shallow edge sits at or above the shallowest morph frame; see section 6.6 for margins."
+  - "Proposed values: scene gradient values, morph phase values, variant B values, hero size values, and brand budgets are proposed; the device run confirms them."
 - 1.0.4, 2026-10-30: server fine shiftNdc x 0.58 to 0.62. The 0.58 pose passed T-SRV-2 once but failed twice after (0.047, 0.61) because idle yaw (3 deg) plus pointer parallax (1.5 deg) can combine to ~4.5 deg of left rotation, and the 0.58 margin (58px) does not survive it: geometric sweep to +/-5 deg shows 310 lane segments in the box at yaw -5 deg for 0.58. Shift 0.62 is clear at every yaw to +/-5 deg (minX 617 at yaw 0, zero hits at worst yaw), so it survives max yaw plus max parallax. Output point moves to ~1471px (31px past the right edge); server words drift left ~135px from the output, so they still enter view as they cool.
 - 1.0.3, 2026-10-30: server fine camera fov 42 to 48, shiftNdc x 0.44 to 0.58. T-SRV-2 fine failed at every shift-only pose because the 3-degree idle yaw (20s period) pushes lanes left into the readout box at some yaw phases; shift alone cannot clear the box at all yaws. Verified geometrically (all 6144 lanes x 7 segments projected through the shifted camera, yaw swept -3 to +3 deg): fov 48 + shift 0.58 has zero segments in the box at every yaw (leftmost projection 588px, 58px right of the box edge); fov 48 + shift 0.50 still hits 1067 segments at yaw -3 deg. Output point projects to 1442px (2px past the right edge); server words drift left from the output, so they enter view as they cool. T-SRV-2 fine passes at this pose.
 - 1.0.2, 2026-10-30: display0 weight 200 to 400. Justin's critique on the server render: the hairline (200) name did not pop; 400 gives it dimension while staying in the preloaded weight. Rules line updated (700 titles/keys, 400 name and prose).

@@ -1,6 +1,6 @@
 # S05 Scene: the inference server (home, `/`)
 
-Version 1.0.1, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.server`, `world.camera.server`. Blocks: S10 poster, S11 scene gates.
+Version 1.1.0, 2026-11-01. Depends on: S02, S03, S04, S09, DESIGN `world.server`, `world.camera.server`. Blocks: S10 poster, S11 scene gates.
 
 ## 1. Purpose
 
@@ -13,6 +13,8 @@ The hero identity. A visitor lands inside a rendering of Justin's local LLM infe
 - Motion: lockstep. Pulses run in straight lines at constant speed with linear time. Groups of 32 fire together. A slow sweep raises activity across the SM columns every 6s, like load moving across the die.
 - Text in the scene: real stack words (DESIGN `world.server.words`) emerge at the focus, drift toward the viewer, cool from hot to signal to secondary, and vanish.
 - Not a circuit board: no right-angle turns, no pads, no labels like U1 or SM0, no green, no copper. Not a dashboard: no numbers, no gauges, no "status".
+
+**Hero is the field (W1).** The server hero is the lane-field motion itself: no brand mark, no `data-brand-mark` element, no ring, no logo on this route (descriptor: kind field, ring 0, mark none, DESIGN.md section 6.7). Project heroes morph into this field and back: on entry from a project, the logo recedes (scale 1.00 to `morph.recedeTo`, opacity to 0, window 0 to 0.40) and the ring collapses (0.20 to 0.80) while Lockstep re-forms (0.50 to 1.00). Gradient: `scene.server.gradient` (lead signal, tail field, tailLength 0.6, horizontal band light sweeping in lockstep with the lanes).
 
 ## 3. Layout
 
@@ -54,6 +56,7 @@ C-SRV-H1 (display-0, weight 200), C-SRV-P1, C-SRV-P2, C-SRV-P3. No links on this
 |---|---|---|
 | Entry (first load) | DOM readout is in the prerendered HTML and visible at first paint. The canvas fades from opacity 0 to 1 when `ready` resolves. No intro sequence, no boot animation. | `--duration-medium`, ease, on `ready` |
 | Entry (travel in) | Lanes re-form into the server layout, camera settles at the server pose (S03). | 700ms, expo-out |
+| Morph out to a project | The field loosens during Release; the ring grows at the target anchor during Gather; the project mark looms in during Reveal (DESIGN.md section 6.7). No mark ever appears on server itself. | Inside travel 700ms |
 | Idle: pulses | Fragment `fire()` (S02 5.2): warp period hashed in `[3, 7]s`, duty 0.6, head speed 0.55 lane lengths per second, sigma 0.05, SM-column sweep every 6s. | Linear time, always on |
 | Idle: words | Every `wordCadence` (1100ms) the next word in `world.server.words` (cycling) spawns at `focus + (0, 0, 0.2)` from a pool of 6 troika `Text` meshes. Over `--jp-duration-word` (2600ms): position moves by `wordDrift (-1.0, 0.5, 1.0)`, toward the camera and into the frame (y sign alternates per word), color goes signalHot at 0%, signal at 40%, void.text2 at 100%; opacity 1 until 55%, then `easePlain` to 0. Font size `wordSize` 0.32 world units, Commit Mono 400 `.woff`, billboarded (copy camera quaternion each frame), anchor center. | Linear position, eased opacity |
 | Idle: camera | Yaw `±3 deg` around target over 20s sine; pointer parallax up to 1.5 deg (fine pointer). | Damped, half-life 180ms |
@@ -99,5 +102,6 @@ U-SRV-1 (R-GPU): the 48 SM by 128 core structure is NVIDIA's public GA104 spec f
 
 ## 10. Changelog
 
-- 1.0.0, 2026-10-30: initial.
+- 1.1.0, 2026-11-01: W1 server hero is the field (section 2) with the server gradient group and morph out row. No lane, camera, or copy change.
 - 1.0.1, 2026-10-30: R-GPU accepted by Justin.
+- 1.0.0, 2026-10-30: initial.

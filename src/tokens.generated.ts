@@ -1,6 +1,6 @@
-// GENERATED from spec/astryx/DESIGN.md v1.0.0. Do not edit.
+// GENERATED from spec/astryx/DESIGN.md v1.1.0. Do not edit.
 export const T = {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -248,7 +248,21 @@ export const T = {
       1000,
       1600
     ],
-    "feedbackMaxMs": 250
+    "feedbackMaxMs": 250,
+    "morph": {
+      "release": [
+        0,
+        0.3
+      ],
+      "gather": [
+        0.15,
+        0.75
+      ],
+      "reveal": [
+        0.55,
+        1
+      ]
+    }
   },
   "world": {
     "laneCount": 6144,
@@ -551,6 +565,10 @@ export const T = {
       "cameraFollow": {
         "weight": 0.25,
         "halfLifeMs": 400
+      },
+      "camera": {
+        "pitchMin": -75,
+        "pitchMax": -5
       }
     },
     "scatter": {
@@ -752,6 +770,112 @@ export const T = {
     "leaflink": 10,
     "sidequestsSignal": 6,
     "scatter": 6
+  },
+  "zone": {
+    "name": {
+      "padPx": 12
+    }
+  },
+  "curve": {
+    "track": [
+      0.65,
+      0,
+      0.35,
+      1
+    ]
+  },
+  "morph": {
+    "loomFrom": 0.92,
+    "recedeTo": 0.96,
+    "ringBreath": 0.6,
+    "silhouettePull": 0.35
+  },
+  "scene": {
+    "server": {
+      "gradient": {
+        "leadStop": "signal",
+        "tailStop": "field",
+        "tailLength": 0.6,
+        "light": {
+          "mode": "band",
+          "radius": 8,
+          "gain": 1
+        }
+      }
+    },
+    "leaflink": {
+      "gradient": {
+        "leadStop": "ink",
+        "tailStop": "field",
+        "tailLength": 1,
+        "light": {
+          "mode": "radial",
+          "radius": 6,
+          "gain": 1
+        }
+      }
+    },
+    "sidequests": {
+      "gradient": {
+        "leadStop": "field",
+        "tailStop": "signal",
+        "tailLength": 0.8,
+        "light": {
+          "mode": "wander",
+          "radius": 5,
+          "gain": 1
+        }
+      }
+    },
+    "whoami": {
+      "gradient": {
+        "leadStop": "ink",
+        "tailStop": "field",
+        "tailLength": 0.5,
+        "light": {
+          "mode": "static",
+          "radius": 10,
+          "gain": 0.5
+        }
+      }
+    }
+  },
+  "lanefield": {
+    "variance": {
+      "depthBands": 3,
+      "bandSpeed": [
+        0.85,
+        1,
+        1.15
+      ],
+      "bandAlpha": [
+        0.55,
+        0.8,
+        1
+      ],
+      "lengthVariance": 0.18,
+      "phaseJitterSeeded": true,
+      "lockstepPhaseJitter": 0
+    }
+  },
+  "hero": {
+    "sizePx": 280,
+    "minSizePx": 160,
+    "tiltMaxDeg": 8,
+    "beatScale": 1.015
+  },
+  "brand": {
+    "gifMaxBytes": 900000,
+    "gifMaxDecoded": 48000000,
+    "decodeTimeoutMs": 4000,
+    "fingerprintDeltaE": 3,
+    "areaCap": 0.12
+  },
+  "perf": {
+    "p95Ms": 16.7,
+    "p99Ms": 33,
+    "longTaskMs": 50,
+    "degradeFrames": 30
   },
   "budgets": {
     "lcpMs": 2000,

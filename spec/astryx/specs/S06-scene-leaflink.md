@@ -1,6 +1,6 @@
 # S06 Scene: LeafLink, mutual aid (`/leaflink`)
 
-Version 1.0.1, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.leaflink`, `world.camera.leaflink`. Blocks: S10 poster, S11 scene gates.
+Version 1.1.0, 2026-11-01. Depends on: S02, S03, S04, S09, DESIGN `world.leaflink`, `world.camera.leaflink`. Blocks: S10 poster, S11 scene gates.
 
 ## 1. Purpose
 
@@ -36,6 +36,12 @@ Fine: camera `(0, 30, 21)` looking at `(0, 0, 1.5)`, fov 34, no shift (the legen
 
 C-LL-H1 (display-1), C-LL-P1, C-LL-FACTS, C-LL-STACK, C-LL-CODE (link), then a hairline rule, then C-LL-LEGEND with three inline glyphs drawn in CSS (a 10px ink ring, a 10px ink dot, a 16px by 3px ink bar) each before its word, then C-LL-SIM, then the `OfferButton` (C-LL-OFFER, Astryx `Button variant="secondary" size="sm"`). World region `aria-label` C-LL-ALT.
 
+### 3.4 Hero mark (W1)
+
+The LeafLink hero is the project's brand mark, rendered by `BrandHero` (DESIGN.md sections 3.5, 6.8, 9) at the hero anchor inside the scene. Descriptor: kind mark, ring r, mark leaflink. W3 confirms whether `leaves.gif` or `logo.png` is the shipped mark; `logo.png` is also the reduced-motion PNG and the F1 fallback source. The hero holds exactly one mark: no second image shares the viewport.
+
+Placement: outside the name clear zone (`zone.name.padPx`), outside the readout clear zone (the legend slip), and outside the keymap. Displayed size comes from `hero.sizePx` and `hero.minSizePx`, fitted inside the brand area cap (`brand.areaCap` 0.12 at 390x844) from the mark's aspect ratio; the cap governs, so a portrait mark displays narrower than a landscape mark. Gradient: `scene.leaflink.gradient` (lead ink, tail field, tailLength 1.0, radial light from the hero anchor; the ring brightens on each heartbeat, then decays). Passive motion: a small scale on each beat, peak `hero.beatScale` 1.015, continuous. Active motion: pointer or touch-drag tilts the plane within `hero.tiltMaxDeg` 8; a tap sends one ripple through the ring (150ms out, 700ms settle). Under reduced motion the hero shows the static PNG with an identity transform. The hero rectangle never overlaps the name zone, the readout zone, or the keymap (T-HERO-3).
+
 ## 4. The simulation (`src/world/leaflink.ts`, main thread controller)
 
 Deterministic: its own `rng(seed + 7)`. Same seed, same first minute of events (screenshot tests rely on it).
@@ -62,6 +68,8 @@ Each is an `InstancedMesh` of a unit quad lying on `y = 0.01`, with a tiny shade
 | Phase | What | Duration, easing, trigger |
 |---|---|---|
 | Entry (travel in) | Lanes flatten into streets; ground goes void (or field) to paper on plain ease; camera rises to the map pose. Simulation resumes at t = 700 with one event scheduled 300ms later so something lands soon. | 700ms expo-out; 700ms ease for ground |
+| Hero (morph in) | The deflection ring grows at the hero anchor during Gather; the mark looms in during Reveal (DESIGN.md section 6.7). On exit the mark recedes and the ring collapses. | Inside travel 700ms |
+| Hero (idle and active) | Passive beat scale, continuous. Tilt on pointer or touch-drag within 8 degrees; tap ripple through the ring. | Beat scale peak 1.015; ripple 150ms out, 700ms settle |
 | Idle | Spawns, landings, ripples, routes, halos, fades (section 4). Camera drift. | Heartbeat cadence |
 | Interaction | Tap or OfferButton (section 5). Button press state is Astryx default. | Response next frame |
 | Exit | Controller pauses: no new spawns; existing pins and routes freeze in place and fade with `uW.y`. On return, they resume. | With travel |
@@ -99,5 +107,6 @@ U-LL-1: LeafLink's real request and offer categories, UI and screenshots: UNKNOW
 
 ## 11. Changelog
 
-- 1.0.0, 2026-10-30: initial.
+- 1.1.0, 2026-11-01: W1 hero section (3.4) and hero motion rows: brand mark at the hero anchor, placement outside the name, readout, and keymap zones, area cap governs display size, beat scale and tilt, reduced-motion static PNG. No map, pin, or copy change.
 - 1.0.1, 2026-10-30: mutual aid confirmed by Justin.
+- 1.0.0, 2026-10-30: initial.

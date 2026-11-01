@@ -1,6 +1,6 @@
 # S07 Scene: SideQuests, community engagement (`/sidequests`)
 
-Version 1.0.1, 2026-10-30. Depends on: S02, S03, S04, S09, DESIGN `world.sidequests`, `world.camera.sidequests`, `motion.spring`. Blocks: S10 poster, S11 scene gates.
+Version 1.1.0, 2026-11-01. Depends on: S02, S03, S04, S09, DESIGN `world.sidequests`, `world.camera.sidequests`, `motion.spring`. Blocks: S10 poster, S11 scene gates.
 
 ## 1. Purpose
 
@@ -33,6 +33,10 @@ Expected counts with the default seed (record actuals in the build state file): 
 
 Fine: camera `(6, 24, 16)` looking at the origin, fov 36, shift `-0.18` NDC in x (the plan sits left, the trailhead readout right). Coarse: `(3, 30, 14)`, fov 46, shift `-0.22` in y (plan lower, readout top). Idle yaw `±2 deg` over 30s.
 
+The plan view is not a state of the scene.
+
+**Camera band (W1, DESIGN.md section 6.6).** The SideQuests camera pitch stays inside `world.sidequests.camera.pitchMin` -75 to `world.sidequests.camera.pitchMax` -5 in every frame, including init, restore, morph, walk, resize, and reduced motion. The band scope is every frame, not the fully active scene only: the band is wide enough to admit morph transit (shallowest legitimate morph frame -10.97 coarse server endpoint, -10.22 fine server endpoint derived from token poses; steepest legitimate frame -69.62 walk lean; flat -90). Yaw gets no band: it wraps through plus and minus 180 during morphs and is not the axis that produces the flat read. The plan layout (grid, outline, hatch, walkway, trail lanes) stays ambient structure, seen only through the scene's normal camera, never presented flat from above. The clamp sits at the single final write point in W4; where it engages during a walk, the walk still finishes its trail.
+
 **Readability rule:** only grid lanes (class 4, 10% alpha) may appear behind the readout box. T-SQ-3 checks the worst-case text contrast against the actual pixels.
 
 ### 3.3 Markers (`src/world/sidequests.ts`)
@@ -45,11 +49,19 @@ Three markers, one `InstancedMesh` for heads and one for poles (2 draw calls). H
 
 C-SQ-H1 (display-1), C-SQ-P1, C-SQ-FACTS, C-SQ-VENUE, C-SQ-CODE (link), C-SQ-HINT (pointer-appropriate variant). Dashed chalk outline per S04. World region `aria-label` C-SQ-ALT.
 
+### 3.5 Hero mark (W1)
+
+The SideQuests hero is the project's brand mark, rendered by `BrandHero` (DESIGN.md sections 3.5, 6.8, 9) at the hero anchor inside the scene. Descriptor: kind mark, ring r, mark sidequests. The shipped mark is `sidequests.gif` from opensourcery/sidequests (branch dev, app/assets/sidequests.gif); `sidequests-alpha.gif` is DO NOT USE and never ships. The hero holds exactly one mark: no second image shares the viewport.
+
+Placement: outside the name clear zone (`zone.name.padPx`), outside the readout clear zone (the trailhead sign), and outside the keymap. Displayed size comes from `hero.sizePx` and `hero.minSizePx`, fitted inside the brand area cap (`brand.areaCap` 0.12 at 390x844) from the mark's aspect ratio; the cap governs. Gradient: `scene.sidequests.gradient` (lead field, tail signal, tailLength 0.8, wander light that follows the wander path; overshoot moments brighten). Passive motion: drift along the wander path, settling with the existing spring, continuous. Active motion: pointer or touch-drag tilts the plane within `hero.tiltMaxDeg` 8; a tap sends one ripple through the ring (150ms out, 700ms settle). Under reduced motion the hero shows the static PNG with an identity transform. The hero rectangle never overlaps any marker tap target (the three 44 by 44 CSS px twins), so a tap on the logo (ripple) and a tap on a marker (walk) can never conflict (T-HERO-3).
+
 ## 4. Motion
 
 | Phase | What | Duration, easing, trigger |
 |---|---|---|
 | Entry (travel in) | Lanes loosen into the plan; ground to field (plain ease); camera to the plan pose. Markers rise from `y = 0` to rest with the spring (staggered 80ms apart) after travel resolves. | 700ms expo-out; spring 0.7 / 3.2Hz |
+| Hero (morph in) | The deflection ring grows at the hero anchor during Gather; the mark looms in during Reveal (DESIGN.md section 6.7). On exit the mark recedes and the ring collapses. | Inside travel 700ms |
+| Hero (idle and active) | Passive wander drift with spring settle, continuous. Tilt on pointer or touch-drag within 8 degrees; tap ripple through the ring. | Ripple 150ms out, 700ms settle |
 | Idle | Marker bob `0.06 * sin(2 pi t / 2.4 + phase_i)`, phases `0, 2.1, 4.2` rad. Camera yaw. | Sine, linear time |
 | Hover (fine pointer) | Hovered twin: marker head lifts 0.15 units by spring; cursor pointer. Leaving returns it by spring. | Spring |
 | Walk (tap, click, Enter or Space on a twin) | `setActivity(trailLanes, start_i = now + arcStart_i / 14, fadeAt 0, kind 2, uPerSec = 14 / laneLength_i)`; the first dash lights on the next frame. Camera target damps toward the current drawing point with weight 0.25 (half-life 400ms) while drawing, then back to the pose. | 14 units per second; first feedback under one frame |
@@ -92,6 +104,9 @@ S09 IDs: C-TITLE-SIDEQUESTS, C-SQ-H1, C-SQ-P1, C-SQ-FACTS, C-SQ-VENUE, C-SQ-CODE
 | T-SQ-4 | Spring numbers | sample marker head y during claim: minimum is between 0.020 and 0.035 below rest, settles within 0.005 by 0.6s |
 | T-SQ-5 | Keyboard | Tab to twin 2, Enter: same as T-SQ-2 for trail 2 |
 | T-SQ-6 | Hue budget | all trails lit, G-HUE signal fraction under `hueBudgetPct.sidequestsSignal` (6%) |
+| T-SQ-CAM-1 | Camera band on every trigger | Run every W0 trigger (cold load; reload; reduced motion on; morph into SideQuests from each route sampled 0 to 100%; full marker trail walk including lean; tab hidden 60s then shown; back/forward page restore; orientation change and resize) in Chromium and WebKit with iPhone profiles. Every sampled frame's camera pitch is inside [`world.sidequests.camera.pitchMin`, `world.sidequests.camera.pitchMax`]. Fail on the first frame outside it and log the trigger and frame index. laneCount stays 6144 and one lane draw call holds across all of it. |
+| T-SQ-CAM-2 | Flat frame regression (re-scoped, W1) | T-SQ-CAM-2 (re-scoped, W1): no W0 trigger reproduces the flat frame, so this test does not reproduce a W0 trigger. Instead, in a test harness, force the SideQuests camera to the flat pose (pitch -90) before a frame, then assert the rendered frame's camera pitch is inside the band [`world.sidequests.camera.pitchMin`, `world.sidequests.camera.pitchMax`] and the trail walk still completes its trail. The clamp, not a trigger, is what this test exercises. T-SQ-CAM-1 separately asserts no reachable trigger produces an out-of-band frame. |
+| T-SQ-CAM-3 | Reduced motion camera | Reduced motion on /sidequests: the camera jumps straight to the resting pose with no intermediate out-of-band frame. |
 
 ## 9. Unknowns
 
@@ -99,5 +114,6 @@ U-SQ-1: SideQuests' real quests, campus, UI and stack beyond the win: UNKNOWN, n
 
 ## 10. Changelog
 
-- 1.0.0, 2026-10-30: initial.
+- 1.1.0, 2026-11-01: W1 camera band (3.2) with the ruling step 2c line, hero section (3.5), hero motion rows, and T-SQ-CAM-1/2/3 receipts with T-SQ-CAM-2 re-scoped as a harness-forced clamp test. No lane class, lane count, trail, or copy change.
 - 1.0.1, 2026-10-30: C-SQ-VENUE always shown (Justin).
+- 1.0.0, 2026-10-30: initial.

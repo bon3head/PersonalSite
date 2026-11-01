@@ -1,6 +1,6 @@
 # S03 Travel and routing: one space, four addresses
 
-Version 1.0.1, 2026-10-30. Depends on: S00, S02 (API only; S03 can be built against a stub), DESIGN.md section 6. Blocks: S04, S05 to S08, S10, S11.
+Version 1.1.0, 2026-11-01. Depends on: S00, S02 (API only; S03 can be built against a stub), DESIGN.md section 6. Blocks: S04, S05 to S08, S10, S11.
 
 ## 1. Purpose
 
@@ -42,6 +42,11 @@ Times are from the moment of input (`t = 0`). Durations come from DESIGN tokens.
 
 Rules:
 - **Interruptible.** A new `go()` during travel cancels the DOM timers, keeps the current lane weights and camera pose as the new start, and travels to the new target with a fresh 700ms. Weights stay normalized. No queueing, no waiting.
+- **Morph snapshot and retarget.** The morph controller (W5, DESIGN.md section 6.7) holds snapshot, target, and start time. `navigate(to)` takes a snapshot of the current interpolated values (scene weights, gradient parameters, ring center and radius, silhouette strength, logo opacity and scale, signature amplitudes), sets the target and start time, and pushes history immediately, so back works mid-flight. The previous morph is discarded, never queued. No per-lane start-time stagger: all lanes start at t = 0 and vary only in path, never in start time.
+- **Morph phases.** Release (0.00 to 0.30), Gather (0.15 to 0.75), Reveal (0.55 to 1.00), per DESIGN.md section 6.7 and tokens `motion.morph` and `morph.*`. The logo looms in during Reveal (scale `morph.loomFrom` to 1.00); on exit it recedes (scale 1.00 to `morph.recedeTo`, opacity to 0, window 0 to 0.40) and the ring collapses (0.20 to 0.80). Project to project shrinks the ring to `morph.ringBreath` 0.6r and regrows it to r, traveling between anchors on `curve.track` if the anchors differ.
+- **Direction from keymap order.** Direction follows keymap order 1, 2, 3, W: server (1), leaflink (2), sidequests (3), whoami (W, a sheet over the current scene, not a route). History back and forward use the same morph path, with direction taken from that order: moving toward a higher-order scene runs the forward morph, moving toward a lower-order scene runs the reverse morph. The 404 scene is outside the order; entering or leaving it uses the same morph grammar with the scatter layout as its endpoint.
+- **Focus at Reveal start.** The section 4 table row that moves focus at 700ms is superseded by the morph rule: focus moves to the new readout's heading at Reveal start (0.55 of travel), under the existing condition (only if focus was inside the old readout or on the keymap), and never while the Contact sheet focus lock is active. The incoming title arrives at Reveal start; outgoing title and copy exit over 150ms at t = 0.
+- **Degrade path.** If p95 frame time during a morph exceeds budget for `perf.degradeFrames` 30 consecutive frames, silhouette pull drops to 0 for the rest of the session. Lanes, gradient, and ring stay. This is logged to the dev HUD.
 - **One dominant element.** Nothing else animates between 150 and 400 except the world.
 - **Input never blocked.** Keys and taps work during travel.
 - **Reduced motion.** World cuts instantly (`travelTo(target, {instant: true})`). DOM: old readout fades out over `--duration-fast`, regime switches at 150, new readout fades in over `--duration-fast` with no translate. Total 300ms, all opacity.
@@ -100,5 +105,6 @@ None.
 
 ## 11. Changelog
 
-- 1.0.0, 2026-10-30: initial.
+- 1.1.0, 2026-11-01: W1 morph rules: snapshot and retarget semantics, Release/Gather/Reveal phases, keymap-order direction for back and forward, focus at Reveal start (superseding the 700ms focus row), degrade path. No route, key, or copy change.
 - 1.0.1, 2026-10-30: K-S03-1 detection corrected. Playwright 1.64 fires framenavigated for history.pushState, so that event false-fails correct code. Detection is now a second load event or a non-surviving window marker. Requirement unchanged: no route change causes a document load.
+- 1.0.0, 2026-10-30: initial.
