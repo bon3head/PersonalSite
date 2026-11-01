@@ -1,7 +1,7 @@
 // Debug view (S02 debug chapter) on window.__lanefield, plus the ?perf HUD
 // and perf dump frame JSON download (S02 governor chapter).
 import { T } from '../tokens.generated';
-import type { LanefieldDebug } from './types';
+import type { LanefieldDebug, SilhouetteMaskKind } from './types';
 import type { Pose } from './camera';
 
 export interface DebugDeps {
@@ -18,6 +18,7 @@ export interface DebugDeps {
   getMemoryEstimate: () => number;
   getRecentFrames: () => number[];
   isRingFull: () => boolean;
+  getSilhouette?: () => { kind: SilhouetteMaskKind; loaded: SilhouetteMaskKind; width: number; height: number };
 }
 
 export interface DebugHandle {
@@ -69,6 +70,7 @@ export function createDebugView(deps: DebugDeps): DebugHandle {
       };
     },
     info: () => deps.getInfo(),
+    ...(deps.getSilhouette ? { silhouette: deps.getSilhouette } : {}),
     frameStats: () => deps.getFrameStats(),
     dpr: () => deps.getDpr(),
     memoryEstimate: () => deps.getMemoryEstimate(),

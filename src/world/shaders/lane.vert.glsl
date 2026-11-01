@@ -18,6 +18,10 @@ uniform vec3 uBandAlpha;       // lanefield.variance.bandAlpha // lit-ok: shader
 uniform vec2 uRingCenter;      // deflection ring center, world XZ // lit-ok: shader constant
 uniform float uRingRadius;     // deflection ring radius, world units // lit-ok: shader constant
 uniform float uRingStrength;   // deflection ring strength, world units // lit-ok: shader constant
+uniform sampler2D uSilhouetteMask; // logo alpha mask, small square texture // lit-ok: shader constant
+uniform vec2 uSilhouetteCenter;    // pull center, world XZ, tracks the ring // lit-ok: shader constant
+uniform float uSilhouetteRadius;   // pull radius, world units, tracks the ring // lit-ok: shader constant
+uniform float uSilhouetteStrength; // pull peak displacement, world units // lit-ok: shader constant
 
 out float vSide;
 out float vHalf;
@@ -49,6 +53,30 @@ vec2 deflectXZ(vec2 p) { // lit-ok: shader constant
   return p + (d / dist) * (uRingStrength * f * f); // lit-ok: shader constant
 }
 
+// P-LF-4b silhouette pull, mirroring src/world/silhouette.ts: the
+// ring disc maps to the mask square (u with world x, v with world z),
+// the alpha gradient points into the mark, and the point moves along
+// that gradient by strength times (1 - alpha). The gradient is zero
+// away from the contour, so only lanes near the contour move. The
+// mask is a small square texture with linear filtering and no
+// mipmaps, so texture() in the vertex stage needs no derivatives.
+vec2 pullXZ(vec2 p) { // lit-ok: shader constant
+  if (uSilhouetteRadius <= 0.0 || uSilhouetteStrength == 0.0) return p; // lit-ok: shader constant
+  vec2 uv = (p - uSilhouetteCenter) / (2.0 * uSilhouetteRadius) + 0.5; // lit-ok: shader constant
+  if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) return p; // lit-ok: shader constant
+  vec2 texel = 1.0 / vec2(textureSize(uSilhouetteMask, 0)); // lit-ok: shader constant
+  float a = texture(uSilhouetteMask, uv).a; // lit-ok: shader constant
+  float aE = texture(uSilhouetteMask, uv + vec2(texel.x, 0.0)).a; // lit-ok: shader constant
+  float aW = texture(uSilhouetteMask, uv - vec2(texel.x, 0.0)).a; // lit-ok: shader constant
+  float aS = texture(uSilhouetteMask, uv + vec2(0.0, texel.y)).a; // lit-ok: shader constant
+  float aN = texture(uSilhouetteMask, uv - vec2(0.0, texel.y)).a; // lit-ok: shader constant
+  vec2 grad = vec2(aE - aW, aS - aN); // lit-ok: shader constant
+  float g = length(grad); // lit-ok: shader constant
+  if (g < 0.0001) return p; // lit-ok: shader constant
+  float mag = uSilhouetteStrength * (1.0 - clamp(a, 0.0, 1.0)); // lit-ok: shader constant
+  return p + (grad / g) * mag; // lit-ok: shader constant
+}
+
 void main() {
   int lane = int(aSeg.x + 0.5); // lit-ok: shader constant
   int k = int(aSeg.y + 0.5); // lit-ok: shader constant
@@ -77,6 +105,10 @@ void main() {
   p1 = start + (p1 - start) * lenScale; // lit-ok: shader constant
   p0.xz = deflectXZ(p0.xz); // lit-ok: shader constant
   p1.xz = deflectXZ(p1.xz); // lit-ok: shader constant
+  // Silhouette pull runs after the ring deflection, on the deflected
+  // point, so the bunching follows the opened ring shape.
+  p0.xz = pullXZ(p0.xz); // lit-ok: shader constant
+  p1.xz = pullXZ(p1.xz); // lit-ok: shader constant
 
   vec4 act = texelFetch(uActivity, ivec2(lane & 255, lane >> 8), 0); // lit-ok: shader constant
   int kind = int(act.b + 0.5); // lit-ok: shader constant

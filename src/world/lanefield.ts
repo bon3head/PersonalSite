@@ -16,6 +16,11 @@ import {
   ringEnvelope,
   laneAttributes as laneAttributesFor,
 } from './laneParams';
+import {
+  SILHOUETTE_MASK_SIZE,
+  silhouetteEnvelopeStrength,
+} from './silhouette';
+import type { SilhouetteMaskKind } from './types';
 import laneVert from './shaders/lane.vert.glsl?raw';
 import laneFrag from './shaders/lane.frag.glsl?raw';
 
@@ -201,6 +206,28 @@ export function createLanefield(
   geometry.setAttribute('aSeg', new THREE.InstancedBufferAttribute(seg, 2));
   geometry.instanceCount = instanceCount;
 
+  // P-LF-4b mask texture: a transparent 1x1 placeholder is bound from
+  // the first frame, so the shader always has a texture and the lane
+  // field stays one draw call. A logo mask replaces it once loaded;
+  // the placeholder gradient is zero, so it never moves a lane. The
+  // mask is a bound texture on the existing lane material, never a
+  // second mesh or draw call.
+  const placeholderData = new Uint8Array([0, 0, 0, 0]);
+  const placeholderTex = new THREE.DataTexture(
+    placeholderData,
+    1,
+    1,
+    THREE.RGBAFormat,
+  );
+  placeholderTex.magFilter = THREE.NearestFilter;
+  placeholderTex.minFilter = THREE.NearestFilter;
+  placeholderTex.generateMipmaps = false;
+  placeholderTex.needsUpdate = true;
+  let maskTexture: THREE.Texture = placeholderTex;
+  let maskLoadedKind: SilhouetteMaskKind = 'none';
+  let maskRequestedKind: SilhouetteMaskKind = 'none';
+  let framesRendered = 0;
+
   const fire = T.world.server.fire;
   const variance = T.lanefield.variance;
   const initialParams = paramsForLayout(opts.initial);
@@ -244,6 +271,11 @@ export function createLanefield(
     uRingCenter: { value: new THREE.Vector2(0, 0) },
     uRingRadius: { value: 0 },
     uRingStrength: { value: 0 },
+    // P-LF-4b silhouette pull, zero strength at rest.
+    uSilhouetteMask: { value: placeholderTex },
+    uSilhouetteCenter: { value: new THREE.Vector2(0, 0) },
+    uSilhouetteRadius: { value: 0 },
+    uSilhouetteStrength: { value: 0 },
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -351,10 +383,23 @@ export function createLanefield(
       paramsCurrent.ringCenter = [targetPose.target[0], targetPose.target[2]];
       paramsCurrent.ringRadius = paramsTo.lightRadius;
       paramsCurrent.ringStrength = paramsTo.lightRadius * 0.5 * env.gather * (1 - env.reveal); // lit-ok: ring peak is half its radius
+      // P-LF-4b: the same envelope drives the silhouette pull, with
+      // center and radius aligned to the ring until a hero descriptor
+      // overrides them. Peak pull is the morph.silhouettePull token.
+      paramsCurrent.silhouetteCenter = [targetPose.target[0], targetPose.target[2]];
+      paramsCurrent.silhouetteRadius = paramsTo.lightRadius;
+      paramsCurrent.silhouetteStrength = silhouetteEnvelopeStrength(
+        env.gather,
+        env.reveal,
+        T.morph.silhouettePull,
+      );
     } else {
       paramsCurrent.ringCenter = [...paramsFrom.ringCenter];
       paramsCurrent.ringRadius = paramsFrom.ringRadius * (1 - env.collapse);
       paramsCurrent.ringStrength = paramsFrom.ringStrength * (1 - env.collapse);
+      paramsCurrent.silhouetteCenter = [...paramsFrom.silhouetteCenter];
+      paramsCurrent.silhouetteRadius = paramsFrom.silhouetteRadius * (1 - env.collapse);
+      paramsCurrent.silhouetteStrength = paramsFrom.silhouetteStrength * (1 - env.collapse);
     }
     if (p >= 1) {
       travel = null;
@@ -383,6 +428,90 @@ export function createLanefield(
     }
   }
 
+  // P-LF-4b mask load: resolve the params mask kind through the
+  // brand manifest (SideQuests frame 0 PNG, LeafLink logo PNG), draw
+  // it letterboxed into a small square canvas so aspect is preserved
+  // and the contour band is texel-wide, and upload it as the lane
+  // material texture. A load that finishes after the route moved on
+  // is discarded, never applied to the wrong route. Any failure leaves
+  // the placeholder bound, so lanes render unchanged.
+  async function loadMask(kind: SilhouetteMaskKind): Promise<void> {
+    if (kind === 'none') return;
+    try {
+      const res = await fetch('/brand/manifest.json');
+      if (!res.ok) {
+        if (maskRequestedKind === kind) maskRequestedKind = 'none';
+        return;
+      }
+      const manifest = (await res.json()) as {
+        heroes?: {
+          sidequests?: { frame0?: { file?: string } };
+          leaflink?: { png?: { file?: string } };
+        };
+      };
+      const file =
+        kind === 'sidequests'
+          ? manifest.heroes?.sidequests?.frame0?.file
+          : manifest.heroes?.leaflink?.png?.file;
+      if (!file) {
+        if (maskRequestedKind === kind) maskRequestedKind = 'none';
+        return;
+      }
+      const img = new Image();
+      img.src = `/brand/${file}`;
+      await img.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = SILHOUETTE_MASK_SIZE;
+      canvas.height = SILHOUETTE_MASK_SIZE;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        if (maskRequestedKind === kind) maskRequestedKind = 'none';
+        return;
+      }
+      const scale = Math.min(
+        SILHOUETTE_MASK_SIZE / img.naturalWidth,
+        SILHOUETTE_MASK_SIZE / img.naturalHeight,
+      );
+      const w = img.naturalWidth * scale;
+      const h = img.naturalHeight * scale;
+      ctx.clearRect(0, 0, SILHOUETTE_MASK_SIZE, SILHOUETTE_MASK_SIZE);
+      ctx.drawImage(img, (SILHOUETTE_MASK_SIZE - w) / 2, (SILHOUETTE_MASK_SIZE - h) / 2, w, h);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.magFilter = THREE.LinearFilter;
+      tex.minFilter = THREE.LinearFilter;
+      tex.generateMipmaps = false;
+      tex.flipY = false;
+      tex.colorSpace = THREE.NoColorSpace;
+      tex.needsUpdate = true;
+      if (disposed) {
+        tex.dispose();
+        return;
+      }
+      if (paramsCurrent.silhouetteMask !== kind) {
+        tex.dispose();
+        return;
+      }
+      const old = maskTexture;
+      maskTexture = tex;
+      maskLoadedKind = kind;
+      if (old !== placeholderTex) old.dispose();
+    } catch {
+      // Mask failure is not a field failure; the placeholder stays,
+      // and a later route change may retry the load.
+      if (maskRequestedKind === kind) maskRequestedKind = 'none';
+    }
+  }
+
+  function syncMask(): void {
+    const kind = paramsCurrent.silhouetteMask;
+    if (kind === 'none' || kind === maskLoadedKind || kind === maskRequestedKind) return;
+    // Brand bytes never precede the first field frame: the load starts
+    // only after a frame has rendered.
+    if (framesRendered < 1) return;
+    maskRequestedKind = kind;
+    void loadMask(kind);
+  }
+
   function doFrame(t: number, dt: number, sampleGovernor: boolean): void {
     updateTravel(t);
     rig.update(basePose, t, weights, pointer, dt * SEC_TO_MS, reduced, finePointer);
@@ -407,6 +536,10 @@ export function createLanefield(
     (uniforms.uRingCenter.value as THREE.Vector2).set(...paramsCurrent.ringCenter);
     (uniforms.uRingRadius.value as number) = paramsCurrent.ringRadius;
     (uniforms.uRingStrength.value as number) = paramsCurrent.ringStrength;
+    (uniforms.uSilhouetteMask.value as THREE.Texture) = maskTexture;
+    (uniforms.uSilhouetteCenter.value as THREE.Vector2).set(...paramsCurrent.silhouetteCenter);
+    (uniforms.uSilhouetteRadius.value as number) = paramsCurrent.silhouetteRadius;
+    (uniforms.uSilhouetteStrength.value as number) = paramsCurrent.silhouetteStrength;
     updateClearColor();
     if (sampleGovernor) {
       governor.sample(dt * SEC_TO_MS, performance.now());
@@ -414,6 +547,8 @@ export function createLanefield(
     }
     if (lanesOnly) hideNonLaneChildren();
     renderer.render(scene, camera);
+    framesRendered += 1;
+    syncMask();
     debugHandle.updateHud();
   }
 
@@ -462,6 +597,15 @@ export function createLanefield(
     }),
     getFrameStats: () => governor.stats(),
     getDpr: () => currentDpr,
+    getSilhouette: () => {
+      const image = maskTexture.image as { width?: number; height?: number } | null;
+      return {
+        kind: paramsCurrent.silhouetteMask,
+        loaded: maskLoadedKind,
+        width: image?.width ?? 0,
+        height: image?.height ?? 0,
+      };
+    },
     getMemoryEstimate: () => {
       const layoutBytes = texSpec.width * texSpec.height * TEXEL_FLOATS * TEXEL_FLOATS; // lit-ok: RGBA32F bytes
       const activityBytes = actSpec.width * actSpec.height * TEXEL_FLOATS * TEXEL_FLOATS; // lit-ok: RGBA32F bytes
@@ -774,6 +918,10 @@ export function createLanefield(
         if (p.ringCenter) target.ringCenter = [...p.ringCenter];
         if (p.ringRadius !== undefined) target.ringRadius = p.ringRadius;
         if (p.ringStrength !== undefined) target.ringStrength = p.ringStrength;
+        if (p.silhouetteMask !== undefined) target.silhouetteMask = p.silhouetteMask;
+        if (p.silhouetteCenter) target.silhouetteCenter = [...p.silhouetteCenter];
+        if (p.silhouetteRadius !== undefined) target.silhouetteRadius = p.silhouetteRadius;
+        if (p.silhouetteStrength !== undefined) target.silhouetteStrength = p.silhouetteStrength;
       };
       apply(paramsCurrent);
       if (travel) apply(paramsTo);
@@ -810,6 +958,8 @@ export function createLanefield(
       material.dispose();
       layoutTex.dispose();
       activityTex.dispose();
+      if (maskTexture !== placeholderTex) maskTexture.dispose();
+      placeholderTex.dispose();
       renderer.dispose();
       canvas.remove();
       if (window.__lanefield === debugHandle.debug) delete window.__lanefield;
