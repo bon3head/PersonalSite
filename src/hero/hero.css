@@ -1,0 +1,36 @@
+/* P-HERO-1 hero styles. All rules sit in the jp-chrome layer per
+ * S00 section 6. Values come from tokens: the signal color var for
+ * the F2 text mark, the font family var for Commit Mono. No hex, no
+ * duration literal, no gradient, no blur, no non-inset shadow, no
+ * uppercase transform anywhere in this file. The hero plane is a
+ * CSS 3D plane (perspective plus rotateX and rotateY from the
+ * component), with touch-action none on the hero only, so pointer
+ * drag tilts the plane instead of scrolling the page (the page
+ * never scrolls in any case). */
+@layer jp-chrome {
+  .jp-hero {
+    position: fixed;
+    z-index: 1;
+    perspective: 1000px;
+    touch-action: none;
+  }
+
+  .jp-hero picture,
+  .jp-hero img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .jp-hero-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-family: var(--jp-font-family);
+    font-weight: 700;
+    color: var(--jp-signal);
+    text-align: center;
+  }
+}

@@ -1,0 +1,343 @@
+
+> justin-poli-personal-site@0.0.0 gates
+> npm run build && npm run lint && npm run theme:check && node tools/banned-scan.mjs dist && playwright test
+
+
+> justin-poli-personal-site@0.0.0 build
+> npm run brand && npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs
+
+
+> justin-poli-personal-site@0.0.0 brand
+> node tools/build-brand-assets.mjs
+
+build-brand-assets: wrote public/brand/manifest.json
+build-brand-assets: sidequests gif sidequests.60421a79e67ab676.gif (42591 bytes, 16527360 decoded)
+build-brand-assets: sidequests frame0 sidequests.frame0.70fcad6b1476ce70.png (15739 bytes)
+build-brand-assets: leaflink png logo.538a891a8f0d1fbd.png (174622 bytes)
+build-brand-assets: fringe near-white edge pixels 0 on every shipped file
+
+> justin-poli-personal-site@0.0.0 gen
+> node tools/extract-tokens.mjs && node tools/extract-copy.mjs && node tools/copy-fonts.mjs
+
+extract-tokens: wrote tokens from DESIGN.md v1.1.0
+extract-copy: wrote 56 entries to src/copy.ts
+copy-fonts: copied 4 files to public/fonts/
+
+> justin-poli-personal-site@0.0.0 theme
+> astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css
+
+
+Next step: run `npx astryx init` to finish setup and install the Astryx agent prompt.
+[ok] themes/lane/dist/lane.css (12.4 KB, 93 token overrides, 5 component overrides)
+[note] Fonts named but not loaded: "Commit Mono", "Commit Mono Fallback". Load them in your app (recipe: astryx docs typography).
+Run with --detail full for the install example and font recipe.
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 716 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.40 kB │ gzip:   0.71 kB
+dist/assets/worker-DIcFacU6.js   20.54 kB
+dist/assets/index-CNEFZPA3.css  210.47 kB │ gzip:  37.52 kB
+dist/assets/index-BRyFurM-.js   517.59 kB │ gzip: 161.77 kB
+dist/assets/world-31AMVewh.js   729.80 kB │ gzip: 205.95 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 14.11s
+vite v7.3.7 building ssr environment for production...
+transforming...
+✓ 34 modules transformed.
+rendering chunks...
+dist-server/entry-server.js           58.84 kB
+dist-server/assets/world-447r_zSd.js  91.65 kB
+✓ built in 1.91s
+prerender: wrote index.html
+prerender: wrote leaflink/index.html
+prerender: wrote sidequests/index.html
+prerender: wrote 404.html
+(node:8470) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+> justin-poli-personal-site@0.0.0 lint
+> node tools/lint-tokens.mjs && node tools/banned-scan.mjs src && python3 -I tools/palette-receipt.py spec/astryx/DESIGN.md
+
+lint-tokens: clean
+banned-scan: clean (/home/hatch/workspace/worktrees/personalsite-astryx-w6/src)
+== Distinctness (identity colors must be >= 0.050 from every reference, >= 0.10 from Meta)
+PASS signal         #7BB5F8 nearest=tailwind indigo-300 dE=0.050 dE_meta=0.120
+PASS signalDim      #4F77A5 nearest=tailwind sky-600 dE=0.064 dE_meta=0.122
+PASS ink            #0E3565 nearest=tailwind sky-900 dE=0.065 dE_meta=0.230
+PASS field.ground   #10294E nearest=tailwind indigo-900 dE=0.103 dE_meta=0.282
+== Contrast
+PASS void.text    on void.ground   15.94 (need 4.5)
+PASS void.text2   on void.ground    8.48 (need 4.5)
+PASS signal       on void.ground    9.15 (need 4.5)
+PASS signal       on void.raised    8.38 (need 4.5)
+PASS signalDim    on void.ground    4.21 (need 3.0)
+PASS void.text    on void.raised   14.61 (need 4.5)
+PASS paper.text   on paper.ground  15.92 (need 4.5)
+PASS paper.text2  on paper.ground   6.82 (need 4.5)
+PASS paper.text2  on paper.raised   6.02 (need 4.5)
+PASS ink          on paper.ground  10.76 (need 4.5)
+PASS ink          on paper.raised   9.49 (need 4.5)
+PASS ink          on inkTint        8.69 (need 4.5)
+PASS chalk        on field.ground  12.86 (need 4.5)
+PASS chalk2       on field.ground   8.31 (need 4.5)
+PASS chalk        on field.raised  10.70 (need 4.5)
+PASS chalk2       on field.raised   6.91 (need 4.5)
+PASS signal       on field.ground   6.77 (need 4.5)
+PASS void.ground  on signal         9.15 (need 4.5)
+PASS paper.ground on ink           10.76 (need 4.5)
+PASS errorDark    on void.ground    7.40 (need 4.5)
+PASS errorLight   on paper.ground   5.74 (need 4.5)
+
+> justin-poli-personal-site@0.0.0 theme:check
+> astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css --check
+
+
+Next step: run `npx astryx init` to finish setup and install the Astryx agent prompt.
+
+Building theme from themes/lane/laneTheme.mjs...
+
+[ok] Theme outputs are up to date with themes/lane/laneTheme.mjs.
+banned-scan: clean (/home/hatch/workspace/worktrees/personalsite-astryx-w6/dist)
+
+Running 125 tests using 1 worker
+
+T-S04-1 containment: {"320":{"fits":false,"rightEdge":574},"360":{"fits":false,"rightEdge":622},"390":{"fits":false,"rightEdge":622},"768":{"fits":true,"rightEdge":638},"1024":{"fits":true,"rightEdge":638},"1440":{"fits":true,"rightEdge":654},"2560":{"fits":true,"rightEdge":654}}
+  ✓    1 tests/chrome.spec.ts:34:1 › T-S04-1 keymap never wraps (5.7s)
+  ✓    2 tests/chrome.spec.ts:68:1 › T-S04-2 coarse targets at least 44x44 (1.5s)
+  ✓    3 tests/chrome.spec.ts:118:1 › T-S04-3 axe clean on all routes, sheets closed and open (22.8s)
+  ✓    4 tests/chrome.spec.ts:160:1 › T-S04-4 copy paths (4.2s)
+  ✓    5 tests/chrome.spec.ts:204:1 › T-S04-5 focus returns to the keymap button on sheet close (1.8s)
+  ✓    6 tests/chrome.spec.ts:238:1 › T-S04-6 keyboard-only tab order (1.8s)
+  ✓    7 tests/chrome.spec.ts:265:1 › T-S04-7 sheet open animation at most 300ms (1.3s)
+  ✓    8 tests/feedback-round/asset-prefetch.spec.ts:9:1 › T-ASSET-5: no brand request before the first field frame (53.8s)
+  ✓    9 tests/feedback-round/asset.spec.ts:44:1 › T-ASSET-1: manifest matches the files and SOURCES.json (85ms)
+  ✓   10 tests/feedback-round/asset.spec.ts:79:1 › T-ASSET-2: shipped GIF and PNG files are under budget (6ms)
+  ✓   11 tests/feedback-round/asset.spec.ts:98:1 › T-ASSET-3: GIF frame 0 equals the PNG pixel for pixel (2.5s)
+  ✓   12 tests/feedback-round/asset.spec.ts:127:1 › T-ASSET-4: no near-white edge pixels on the navy field (1.1s)
+  ✓   13 tests/feedback-round/hero.spec.ts:93:1 › T-HERO-1: exactly one mark per project route, none on server or whoami (11.1s)
+T-HERO-2 sidequests: unique colors=1 maxDeltaE=0
+T-HERO-2 leaflink: unique colors=392 maxDeltaE=0
+  ✓   14 tests/feedback-round/hero.spec.ts:144:1 › T-HERO-2: shipped mark pixels sit within fingerprintDeltaE of the fingerprint (2.0s)
+  ✓   15 tests/feedback-round/hero.spec.ts:193:1 › T-HERO-ALT: manifest alt text follows the approved rule (2ms)
+T-HERO-2 leaflink hue fraction excluding hero: 0.027986820020361555
+T-HERO-2 leaflink hue fraction with planted block: 0.283214786891561
+  ✓   16 tests/feedback-round/hero.spec.ts:219:1 › T-HERO-2: hue gate passes with the exclusion, planted pixel outside fails it (1.9s)
+  ✓   17 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 375x667 (1.0m)
+  ✓   18 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 375x667 (1.3m)
+  ✓   19 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 390x844 (1.2m)
+  ✓   20 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 390x844 (1.5m)
+  ✓   21 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 430x932 (58.0s)
+  ✓   22 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 430x932 (1.5m)
+  ✓   23 tests/feedback-round/hero.spec.ts:375:1 › T-HERO-4: reduced motion shows static PNG and identity transform (12.2s)
+  ✓   24 tests/feedback-round/hero.spec.ts:421:1 › T-HERO-5: fallback chain F0 to F2 (15.8s)
+  ✓   25 tests/feedback-round/hero.spec.ts:525:1 › T-HERO-5-F3: hero renders with no field (2.0s)
+  ✓   26 tests/feedback-round/hero.spec.ts:543:1 › T-HERO-6: area cap holds on phones and desktop (44ms)
+  ✓   27 tests/feedback-round/hero.spec.ts:583:1 › T-HERO-UV: mask UV mapping is not mirrored (12.4s)
+  ✓   28 tests/feedback-round/hero.spec.ts:634:1 › T-HERO-UNIT: beat, wander, and placement follow the tokens (186ms)
+  ✓   29 tests/feedback-round/lanefield.spec.ts:44:1 › T-LF-7: ring deflection is C1 across the boundary (14ms)
+  ✓   30 tests/feedback-round/lanefield.spec.ts:75:1 › T-LF-2b: params interpolate and the ring envelope peaks mid-travel (6ms)
+  ✓   31 tests/feedback-round/lanefield.spec.ts:106:1 › T-LF-1: per-lane band, length, and phase attributes (49.4s)
+  ✓   32 tests/feedback-round/lanefield.spec.ts:141:1 › T-LF-2: canvas persists and params land on the target tokens (1.0m)
+T-LF-3 server: lanePixels=241336 inBand=241336
+  ✓   33 tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on server (1.6m)
+T-LF-3 leaflink: lanePixels=75480 inBand=75480
+  ✓   34 tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on leaflink (54.6s)
+T-LF-3 sidequests: lanePixels=21829 inBand=21829
+  ✓   35 tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on sidequests (1.1m)
+T-LF-5: darkColored=52030 darkInBand=52030
+  ✓   36 tests/feedback-round/lanefield.spec.ts:280:1 › T-LF-5: near-black lane pixels pass the hue gate (2.3m)
+T-LF-4 /: theme fade divs excluded: [
+  'DIV linear-gradient(rgb(21, 23, 27) 60%, rgba(0, 0, 0, 0))',
+  'DIV linear-gradient(rgb(21, 23, 27) 60%, rgba(0, 0, 0, 0))'
+]
+  ✓   37 tests/feedback-round/lanefield.spec.ts:304:3 › T-LF-4: no CSS gradient on route / (3.2s)
+T-LF-4 /leaflink: theme fade divs excluded: [
+  'DIV linear-gradient(rgb(230, 226, 220) 60%, rgba(0, 0, 0, 0))',
+  'DIV linear-gradient(rgb(230, 226, 220) 60%, rgba(0, 0, 0, 0))'
+]
+  ✓   38 tests/feedback-round/lanefield.spec.ts:304:3 › T-LF-4: no CSS gradient on route /leaflink (3.6s)
+T-LF-4 /sidequests: theme fade divs excluded: [
+  'DIV linear-gradient(rgb(24, 54, 98) 60%, rgba(0, 0, 0, 0))',
+  'DIV linear-gradient(rgb(24, 54, 98) 60%, rgba(0, 0, 0, 0))'
+]
+  ✓   39 tests/feedback-round/lanefield.spec.ts:304:3 › T-LF-4: no CSS gradient on route /sidequests (2.1s)
+  ✓   40 tests/feedback-round/lanefield.spec.ts:351:1 › T-LF-6: lane count, draw calls, and attributes fixed through a morph (2.0m)
+  ✓   41 tests/feedback-round/lanefield.spec.ts:408:1 › T-TRANS-1: canvas node persists across routes (32.3s)
+T-SQ-CLAMP-1 clamped pitch: -75.0000000000041 pos: [ 0, 30, 0 ]
+T-SQ-CLAMP-1 rest pitch: -54.54912206195699
+  ✓   42 tests/feedback-round/lanefield.spec.ts:439:1 › T-SQ-CLAMP-1: forced flat pose clamps inside the band (38.5s)
+  ✓   43 tests/feedback-round/morph.spec.ts:75:1 › T-MORPH-DESC: hero descriptors carry anchor, ring, silhouette (86ms)
+  ✓   44 tests/feedback-round/morph.spec.ts:107:1 › T-MORPH-PHASES: sample invariants at every quarter of every pair (672ms)
+  ✓   45 tests/feedback-round/morph.spec.ts:138:1 › T-MORPH-ENV: gather peaks, reveal looms, ends hand off to rest (81ms)
+  ✓   46 tests/feedback-round/morph.spec.ts:161:1 › T-MORPH-BREATH: ring dips to ringBreath, regrows, anchor tracks (3ms)
+  ✓   47 tests/feedback-round/morph.spec.ts:187:1 › T-MORPH-RECEDE: outgoing mark recedes over the 0 to 0.40 window (2ms)
+  ✓   48 tests/feedback-round/morph.spec.ts:202:1 › T-MORPH-RETARGET: second input retargets from the current sample (5ms)
+[morph] degrade latched: silhouette pull 0 for session
+[morph] degrade latched: silhouette pull 0 for session
+  ✓   49 tests/feedback-round/morph.spec.ts:227:1 › T-MORPH-REDUCED-DEGRADE: jump on reduced, latch at 30 frames (4ms)
+  ✓   50 tests/feedback-round/morph.spec.ts:266:1 › T-TRANS-2: lanes, draw call, doc height, no navbar, no cards (9.9m)
+  ✓   51 tests/feedback-round/morph.spec.ts:347:1 › T-TRANS-3: retarget mid-flight ends on sidequests, weights one-hot (1.6m)
+T-TRANS-4: reduced travel wall-clock elapsed 3737ms
+  ✓   52 tests/feedback-round/morph.spec.ts:387:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade (23.7s)
+  ✓   53 tests/feedback-round/morph.spec.ts:428:1 › T-TRANS-5: back and forward run the morph with keymap direction (2.6m)
+  ✓   54 tests/feedback-round/morph.spec.ts:483:1 › T-TRANS-6: idle 60s per route causes no navigation (4.8m)
+  ✓   55 tests/feedback-round/morph.spec.ts:512:1 › T-NAME-2: name box never intersects the title box during a morph (2.4m)
+  ✓   56 tests/feedback-round/morph.spec.ts:554:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry (2.6m)
+  ✓   57 tests/feedback-round/name.spec.ts:51:1 › T-NAME-1 name box never intersects the title box (38.4s)
+  ✓   58 tests/feedback-round/name.spec.ts:87:1 › T-NAME-1 sidequests title rests across sampled frames while live (1.3m)
+  ✓   59 tests/feedback-round/silhouette.spec.ts:32:1 › T-LF-9: silhouette pull moves lanes near the contour toward it (3ms)
+  ✓   60 tests/feedback-round/silhouette.spec.ts:53:1 › T-LF-9: mask kind, UV mapping, and envelope follow the route (7ms)
+  ✓   61 tests/feedback-round/silhouette.spec.ts:89:1 › T-LF-9: vertex shader mirrors the pull after the ring (12ms)
+  ✓   62 tests/feedback-round/silhouette.spec.ts:107:1 › T-LF-9: manifest names both per-route mask files (15ms)
+T-LF-8 bound: {
+  laneCount: 6144,
+  calls: 1,
+  silhouette: { kind: 'sidequests', loaded: 'sidequests', width: 128, height: 128 }
+}
+  ✓   63 tests/feedback-round/silhouette.spec.ts:122:1 › T-LF-8: one lane draw call with a mask texture bound (37.5s)
+  ✓   64 tests/feedback-round/theme.spec.ts:14:1 › T-THEME-1: per-route gradient parameters match tokens (93ms)
+T-THEME-2 /home/hatch/workspace/worktrees/personalsite-astryx-w6/public/brand/sidequests.frame0.70fcad6b1476ce70.png: colorfulness=0.1523 edgeDensity=0.0490
+T-THEME-2 /home/hatch/workspace/worktrees/personalsite-astryx-w6/public/brand/logo.538a891a8f0d1fbd.png: colorfulness=0.1087 edgeDensity=0.0133
+  ✓   65 tests/feedback-round/theme.spec.ts:59:1 › T-THEME-2: per-route colorfulness and edge density inside one band (3.7s)
+  ✓   66 tests/feedback-round/toast.spec.ts:17:1 › T-TOAST-1 toast paints above the open Contact sheet (3.2s)
+  ✓   67 tests/feedback-round/toast.spec.ts:59:1 › T-TOAST-2 toast inside the open dialog, not inert, announced role (3.2s)
+  ✓   68 tests/feedback-round/toast.spec.ts:105:1 › T-TOAST-3 toast does not move focus (3.7s)
+  ✓   69 tests/layouts/scatter.test.ts:24:1 › scatter writes 6144 lanes of 8 points, all class 9 (35ms)
+  ✓   70 tests/layouts/scatter.test.ts:37:1 › scatter geometry: centers in sphere, lengths in range, points evenly spaced (64ms)
+  ✓   71 tests/layouts/scatter.test.ts:72:1 › scatter is deterministic across runs (3.1s)
+  ✓   72 tests/layouts/scatter.test.ts:80:1 › scatter generation is under 150ms (61ms)
+  ✓   73 tests/layouts/scatter.test.ts:88:1 › scatter touches only its own layout texels (20ms)
+  ✓   74 tests/scenes/leaflink.spec.ts:51:1 › T-LL-1: exactly 6144 lanes, connected graph (2.4s)
+  ✓   75 tests/scenes/leaflink.spec.ts:93:1 › T-LL-2: deterministic first minute (first 20 events identical) (2.1s)
+  ✓   76 tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms (1.3m)
+  ✘   77 tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) (2.7m)
+  ✓   78 tests/scenes/leaflink.spec.ts:353:1 › T-LL-5: legend slip contrast (2.9s)
+  ✓   79 tests/scenes/leaflink.spec.ts:390:1 › T-LL-6: no labels in scene (29.7s)
+T-LL-7 hue fraction (chroma > 0.04): 0.005130208333333333
+  ✓   80 tests/scenes/leaflink.spec.ts:417:1 › T-LL-7: hue budget under 10 percent after 30s (6.4m)
+  ✓   81 tests/scenes/notfound.spec.ts:27:1 › T-404-1: unknown path renders the scene (13.3s)
+  ✓   82 tests/scenes/notfound.spec.ts:42:1 › T-404-2: one key home (3.9s)
+  ✓   83 tests/scenes/server.spec.ts:17:1 › T-SRV-1: server layout hand values (12ms)
+  ✓   84 tests/scenes/server.spec.ts:75:1 › T-SRV-3: warp 10 fires in lockstep (28ms)
+  ✓   85 tests/scenes/server.spec.ts:180:3 › T-SRV-2: readout clear at 1440x900 (1.8m)
+  ✓   86 tests/scenes/server.spec.ts:180:3 › T-SRV-2: readout clear at 390x844 (1.5m)
+  ✓   87 tests/scenes/server.spec.ts:237:1 › T-SRV-4: word set equals world.server.words over 12s (18.2s)
+  ✓   88 tests/scenes/server.spec.ts:278:1 › T-SRV-5: server hue budget (1.2m)
+  ✘   89 tests/scenes/server.spec.ts:296:1 › T-SRV-6: LCP element is the H1 (5.2s)
+  ✓   90 tests/scenes/server.spec.ts:324:1 › G-COPY: server readout matches S09 copy (987ms)
+  ✓   91 tests/scenes/sidequests.spec.ts:183:1 › T-SQ-2: walk feedback (1.7m)
+T-SQ-4: trail0 length=11.83 claimStart=0.850 minDrop=-0.0276 settleErr=0.0000
+  ✓   92 tests/scenes/sidequests.spec.ts:230:1 › T-SQ-4: spring numbers (2.5s)
+  ✓   93 tests/scenes/sidequests.spec.ts:270:1 › T-SQ-5: keyboard (53.0s)
+T-SQ-3: "SideQuests" color=rgb(245, 241, 233) maxBgLum=0.038 contrast=10.60
+T-SQ-3: "Community engagement built as quests: sm" color=rgb(245, 241, 233) maxBgLum=0.050 contrast=9.28
+T-SQ-3: "Hackathon build with Julian Shuster. 2nd" color=rgb(182, 198, 215) maxBgLum=0.043 contrast=6.48
+T-SQ-3: "Built at Hack New Paltz. Working MVP in " color=rgb(182, 198, 215) maxBgLum=0.038 contrast=6.85
+T-SQ-3: "Tap a marker to walk its trail.Click a m" color=rgb(182, 198, 215) maxBgLum=0.039 contrast=6.74
+  ✓   94 tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast (1.0m)
+T-SQ-6: signalPixels=1986 total=1296000 fraction=0.0015
+  ✓   95 tests/scenes/sidequests.spec.ts:339:1 › T-SQ-6: hue budget (56.8s)
+  ✓   96 tests/scenes/sidequests.spec.ts:379:1 › T-SQ-7 (extra): reduced motion (8.6s)
+  ✓   97 tests/travel-prerender.spec.ts:56:1 › prerender: all four route files with correct shell (27.9s)
+  ✓   98 tests/travel-prerender.spec.ts:76:1 › prerender: copy strings match src/copy.ts (5ms)
+  ✓   99 tests/travel-prerender.spec.ts:84:1 › T-S03-5: zero console errors on served prerendered paths (39.6s)
+  ✓  100 tests/travel.spec.ts:202:1 › T-S03-1: no reload across 20 random go calls (2.9s)
+  ✓  101 tests/travel.spec.ts:236:1 › T-S03-2: deep links render the right scene (4.1s)
+  ✓  102 tests/travel.spec.ts:257:1 › T-S03-3: history back and forward stay in sync (2.3s)
+  ✓  103 tests/travel.spec.ts:293:1 › T-S03-4: travel is interruptible (1.7s)
+  ✓  104 tests/travel.spec.ts:314:1 › T-S03-5: clean console on every route (dev harness) (4.3s)
+  ✓  105 tests/travel.spec.ts:330:1 › T-S03-6: DOM feedback under 250ms (1.5s)
+  ✓  106 tests/travel.spec.ts:370:1 › T-S03-7: focus moves to the new H1 and the region announces (2.3s)
+  ✓  107 tests/travel.spec.ts:395:1 › T-S03-8: reduced-motion travel completes within 320ms (1.3s)
+  ✓  108 tests/travel.spec.ts:439:1 › router: path normalization, hash, arrows, sheet replaceState (1.3s)
+  ✓  109 tests/travel.spec.ts:484:1 › router: sheet open disables scene keys but not the sheet key (1.8s)
+  ✓  110 tests/world.engine.spec.ts:52:1 › T-S02-1: 6,144 lanes, one draw call (24.4s)
+  ✓  111 tests/world.engine.spec.ts:60:1 › T-S02-1b: one draw call with ?debug=lanesOnly (26.3s)
+  ✓  112 tests/world.engine.spec.ts:66:1 › T-S02-2: layoutHash identical across two fresh loads (Chromium) (42.4s)
+  ✓  113 tests/world.engine.spec.ts:79:1 › T-S02-3: weights sum to 1 at every frame of a travel (39.2s)
+  ✘  114 tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width (30.4s)
+  ✓  115 tests/world.engine.spec.ts:133:1 › T-S02-6: no shader compile after ready across 3 travels (41.9s)
+  ✓  116 tests/world.engine.spec.ts:148:1 › T-S02-7: context loss recovers with layoutHash unchanged (47.2s)
+  -  117 tests/world.engine.spec.ts:181:6 › T-S02-8: no longtask during startup (SwiftShader; gate is G-PERF-DEVICE)
+  ✓  118 tests/world.layouts.server.spec.ts:26:1 › T-SRV-1: lanes 0, 127, 128, 6143 at k=0 match hand values (179ms)
+  ✓  119 tests/world.layouts.server.spec.ts:44:1 › T-SRV-1: converge points k=6, k=7 for lane 0 mix toward focus (4ms)
+  ✓  120 tests/world.layouts.server.spec.ts:59:1 › server layout: exactly 6144 lanes of 8 points, all finite, all class 0 (108ms)
+  ✓  121 tests/world.layouts.server.spec.ts:80:1 › server layout: deterministic across runs and seeds (pure grid arithmetic) (3.9s)
+  ✓  122 tests/world.layouts.server.spec.ts:91:1 › server layout: generation under 150ms in Node (3ms)
+  ✓  123 tests/world.layouts.server.spec.ts:99:1 › server layout: writes only its own layout slice (65ms)
+  ✓  124 tests/world.tween.spec.ts:5:1 › easeSignature(0.3) is between 0.80 and 0.86 (2ms)
+  ✓  125 tests/world.tween.spec.ts:11:1 › spring(0.7, 3.2) peaks 1.040 to 1.052 and settles within 0.01 of 1 after 0.6s (9ms)
+
+
+  1) tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) ───────────────
+
+    TimeoutError: locator.waitFor: Timeout 60000ms exceeded.
+    Call log:
+      - waiting for locator('#ll-offer-host button') to be visible
+
+
+      325 |   // concurrently, and a React commit can stall under that load. The
+      326 |   // 300ms response gate below is unchanged.
+    > 327 |   await button.waitFor({ timeout: 60000 });
+          |                ^
+      328 |   const tapAt = Date.now();
+      329 |   await button.focus();
+      330 |   await page.keyboard.press('Enter');
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w6/tests/scenes/leaflink.spec.ts:327:16
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-d58fc-ard-path-OfferButton-Enter-/error-context.md
+
+  2) tests/scenes/server.spec.ts:296:1 › T-SRV-6: LCP element is the H1 ────────────────────────────
+
+    Error: expect(received).not.toBeNull()
+
+    Received: null
+
+      315 |     return { tag: el.tagName, text: (el.textContent ?? '').trim() };
+      316 |   });
+    > 317 |   expect(lcp).not.toBeNull();
+          |                   ^
+      318 |   expect(lcp?.tag).toBe('H1');
+      319 |   expect(lcp?.text).toBe(C['C-SRV-H1']);
+      320 | });
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w6/tests/scenes/server.spec.ts:317:19
+
+    Error Context: test-results/tests-scenes-server-T-SRV-6-LCP-element-is-the-H1/error-context.md
+
+  3) tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 0.98
+    Received:   1.0038269286722465
+
+      124 |   const focusFrac = focus[0] / vp.width;
+      125 |   expect(focusFrac).toBeGreaterThan(0.87);
+    > 126 |   expect(focusFrac).toBeLessThan(0.98);
+          |                     ^
+      127 |   console.log(
+      128 |     `T-S02-5 note: focus projects to ${focusFrac.toFixed(3)} of width; ` +
+      129 |       `spec (S02 v1.0.1) tests target at 0.72; focus band is an extra lock.`,
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w6/tests/world.engine.spec.ts:126:21
+
+    Error Context: test-results/tests-world.engine-T-S02-5-ecea5-y-shift-2-of-viewport-width/error-context.md
+
+    Error Context: test-results/tests-world.engine-T-S02-5-ecea5-y-shift-2-of-viewport-width/error-context.md
+
+  Slow test file: tests/feedback-round/morph.spec.ts (24.2m)
+  Slow test file: tests/feedback-round/lanefield.spec.ts (11.1m)
+  Slow test file: tests/feedback-round/hero.spec.ts (8.4m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  3 failed
+    tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) ────────────────
+    tests/scenes/server.spec.ts:296:1 › T-SRV-6: LCP element is the H1 ─────────────────────────────
+    tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width 
+  1 skipped
+  121 passed (1.3h)

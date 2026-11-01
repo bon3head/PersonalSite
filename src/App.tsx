@@ -59,6 +59,7 @@ import {
 } from './world/sidequests';
 import { createNotfoundController } from './world/notfound';
 import SideQuestsTwins from './scenes/sidequests';
+import BrandHero from './hero/BrandHero';
 import { C } from './copy';
 import Keymap from './chrome/Keymap';
 import Wordmark from './chrome/Wordmark';
@@ -271,6 +272,19 @@ export default function App(props: AppProps): JSX.Element {
               controller={wired.sidequests}
               lanefield={wired.field}
             />
+          )}
+          {/* P-HERO-1: exactly one brand mark per project route, none
+              on server or whoami. The hero renders with no sheet
+              open, so a whoami or contact sheet shows no mark, and
+              it renders before the field arrives (or with no field
+              at all, the F3 path), so the mark never depends on
+              WebGL. wired is null until lanefield-ready; the hero
+              takes the field when it exists and null otherwise. */}
+          {scene === 'leaflink' && sheet === null && (
+            <BrandHero project="leaflink" lanefield={wired?.field ?? null} />
+          )}
+          {scene === 'sidequests' && sheet === null && (
+            <BrandHero project="sidequests" lanefield={wired?.field ?? null} />
           )}
           {alt !== null && (
             <div role="img" aria-label={alt} />
