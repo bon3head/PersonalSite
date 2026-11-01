@@ -166,30 +166,46 @@ export function createTravelController(
     const regimeAt = useReducedTiming
       ? T.chrome.travelDom.reducedRegimeSwitchAtMs
       : T.chrome.travelDom.regimeSwitchAtMs;
+    // P-MORPH-1: the incoming title enters at Reveal start
+    // (motion.morph.reveal[0] of travel), not at the old readout
+    // delay, and focus moves at the same point (S03 morph rule,
+    // superseding the old 700ms focus row). Reduced motion keeps
+    // its 150ms switch point for both.
+    const revealStartMs = T.motion.ms.travel * T.motion.morph.reveal[0];
     const inAt = useReducedTiming
       ? T.chrome.travelDom.reducedRegimeSwitchAtMs
-      : T.chrome.travelDom.readoutInDelayMs;
+      : revealStartMs;
+    const focusAt = useReducedTiming
+      ? T.chrome.travelDom.reducedRegimeSwitchAtMs
+      : revealStartMs;
     const resolveAt = useReducedTiming
       ? T.chrome.travelDom.reducedRegimeSwitchAtMs + T.motion.ms.fast
       : T.motion.ms.travel;
 
     return new Promise<void>((resolve) => {
       pendingResolve = resolve;
+      // Focus move, shared by the Reveal timer: only if focus was
+      // inside the old readout or on the keymap at t = 0, and never
+      // while a sheet focus lock holds focus (active element inside
+      // a dialog). The readout swap at the hidden point precedes
+      // Reveal, so the new heading exists when this runs.
+      const moveFocus = (): void => {
+        if (gen !== generation || disposed) return;
+        if (!focusWasInside) return;
+        const active = document.activeElement as HTMLElement | null;
+        if (active?.closest?.('[role="dialog"]')) return;
+        const h1 = dom.readout()?.querySelector('h1');
+        if (h1) {
+          (h1 as HTMLElement).tabIndex = -1;
+          (h1 as HTMLElement).focus({ preventScroll: true });
+        }
+      };
       const finish = (): void => {
         if (gen !== generation || disposed) return;
         if (pendingResolve) {
           pendingResolve = null;
         }
         if (busyEl) busyEl.setAttribute('aria-busy', 'false');
-        // Focus moves to the new readout heading only if focus was inside
-        // the old readout or on the keymap at t = 0.
-        if (focusWasInside) {
-          const h1 = dom.readout()?.querySelector('h1');
-          if (h1) {
-            (h1 as HTMLElement).tabIndex = -1;
-            (h1 as HTMLElement).focus({ preventScroll: true });
-          }
-        }
         // The polite announcement region announces the new H1
         // (C-SR-TRAVEL: the new scene's H1 string). Read it from the
         // rendered readout so the announcement always matches what is
@@ -226,6 +242,9 @@ export function createTravelController(
       later(regimeAt, gen, () => {
         applyRegime(target);
       });
+
+      // Focus moves at Reveal start (P-MORPH-1, S03 morph rule).
+      later(focusAt, gen, moveFocus);
 
       // Readout entrance: opacity 0 to 1, and translateY 8px to 0 on the
       // full timing (no translate on reduced motion, opacity only).

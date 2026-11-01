@@ -13,13 +13,16 @@ import {
   cloneParams,
   lerpParams,
   lightModeIndex,
-  ringEnvelope,
   laneAttributes as laneAttributesFor,
 } from './laneParams';
 import {
   SILHOUETTE_MASK_SIZE,
-  silhouetteEnvelopeStrength,
 } from './silhouette';
+import {
+  createMorphController,
+  type MorphSnapshot,
+} from '../motion/morph-controller';
+import { descriptorForLayout } from '../motion/hero-descriptors';
 import type { SilhouetteMaskKind } from './types';
 import laneVert from './shaders/lane.vert.glsl?raw';
 import laneFrag from './shaders/lane.frag.glsl?raw';
@@ -319,6 +322,28 @@ export function createLanefield(
   let paramsCurrent: LaneParams = cloneParams(initialParams);
   let paramsFrom: LaneParams = cloneParams(initialParams);
   let paramsTo: LaneParams = cloneParams(initialParams);
+  // P-MORPH-1 morph controller: owns the route morph state machine
+  // (snapshot, target, start time) and the ring and silhouette
+  // envelope. updateTravel samples it per frame; the debug hook
+  // below is a stable object whose fields update in place, so
+  // tests can read the current sample without a new interface method.
+  const morph = createMorphController(opts.initial);
+  const morphDebug: {
+    from: LayoutId;
+    to: LayoutId;
+    sample: ReturnType<typeof morph.sample> | null;
+    degraded: boolean;
+    degrade: () => void;
+    degradeState: () => ReturnType<typeof morph.degradeState>;
+  } = {
+    from: opts.initial,
+    to: opts.initial,
+    sample: null,
+    degraded: false,
+    degrade: () => morph.forceDegrade(),
+    degradeState: () => morph.degradeState(),
+  };
+  (window as unknown as { __morph?: typeof morphDebug }).__morph = morphDebug;
   const pointer = { x: 0, y: 0 };
   const clearColor = new THREE.Color();
   const governor = new Governor();
@@ -369,38 +394,24 @@ export function createLanefield(
     lerpPoseInto(travelFromPose, travelToPose, e, basePose);
     // W4 params interpolate with the signature curve, same as weights.
     paramsCurrent = lerpParams(paramsFrom, paramsTo, e);
-    // W4 ring envelope (motion.morph windows, via ringEnvelope):
-    // traveling to a project layout grows the ring over Gather and
-    // collapses it over Reveal, so it is zero at rest. Traveling away
-    // collapses an active ring over the collapse window. Center is the
-    // target pose ground point; radius is the target scene light
-    // radius; peak strength is half the radius. No per-lane start
-    // delay: one ring for all lanes.
-    const isProject = current === 'leaflink' || current === 'sidequests';
-    const env = ringEnvelope(p, isProject);
-    if (isProject) {
-      const targetPose = poseFor(current, variant);
-      paramsCurrent.ringCenter = [targetPose.target[0], targetPose.target[2]];
-      paramsCurrent.ringRadius = paramsTo.lightRadius;
-      paramsCurrent.ringStrength = paramsTo.lightRadius * 0.5 * env.gather * (1 - env.reveal); // lit-ok: ring peak is half its radius
-      // P-LF-4b: the same envelope drives the silhouette pull, with
-      // center and radius aligned to the ring until a hero descriptor
-      // overrides them. Peak pull is the morph.silhouettePull token.
-      paramsCurrent.silhouetteCenter = [targetPose.target[0], targetPose.target[2]];
-      paramsCurrent.silhouetteRadius = paramsTo.lightRadius;
-      paramsCurrent.silhouetteStrength = silhouetteEnvelopeStrength(
-        env.gather,
-        env.reveal,
-        T.morph.silhouettePull,
-      );
-    } else {
-      paramsCurrent.ringCenter = [...paramsFrom.ringCenter];
-      paramsCurrent.ringRadius = paramsFrom.ringRadius * (1 - env.collapse);
-      paramsCurrent.ringStrength = paramsFrom.ringStrength * (1 - env.collapse);
-      paramsCurrent.silhouetteCenter = [...paramsFrom.silhouetteCenter];
-      paramsCurrent.silhouetteRadius = paramsFrom.silhouetteRadius * (1 - env.collapse);
-      paramsCurrent.silhouetteStrength = paramsFrom.silhouetteStrength * (1 - env.collapse);
-    }
+    // P-MORPH-1: the ring and silhouette fields come from the morph
+    // controller sample, whose centers are the hero descriptor
+    // anchors and whose envelope is the Release, Gather, Reveal
+    // state machine. The gradient and light fields above still come
+    // from the param lerp; only the ring and silhouette envelope
+    // moved into the controller, so endpoint params are unchanged.
+    // Peak ring strength is half the radius, as in W4.
+    const morphSample = morph.sample(t * SEC_TO_MS);
+    paramsCurrent.ringCenter = [...morphSample.ringCenter];
+    paramsCurrent.ringRadius = morphSample.ringRadius;
+    paramsCurrent.ringStrength = morphSample.ringStrength;
+    paramsCurrent.silhouetteCenter = [...morphSample.silhouetteCenter];
+    paramsCurrent.silhouetteRadius = morphSample.silhouetteRadius;
+    paramsCurrent.silhouetteStrength = morphSample.silhouetteStrength;
+    morphDebug.from = morphSample.from;
+    morphDebug.to = morphSample.to;
+    morphDebug.sample = morphSample;
+    morphDebug.degraded = morphSample.degraded;
     if (p >= 1) {
       travel = null;
       oneHot(current, weights);
@@ -514,6 +525,10 @@ export function createLanefield(
 
   function doFrame(t: number, dt: number, sampleGovernor: boolean): void {
     updateTravel(t);
+    // P-MORPH-1 degrade observation: only frames inside a morph
+    // count, and the controller itself gates on its own sample, so
+    // a completed morph stops counting without extra state here.
+    if (travel) morph.observeFrame(dt * SEC_TO_MS, performance.now());
     rig.update(basePose, t, weights, pointer, dt * SEC_TO_MS, reduced, finePointer);
     for (const cb of callbacks) cb(t, dt);
     // ITEM 6 clamp, the single and last camera write guard: after rig // lit-ok:
@@ -707,6 +722,7 @@ export function createLanefield(
     paramsCurrent = paramsForLayout(current);
     paramsFrom = cloneParams(paramsCurrent);
     paramsTo = cloneParams(paramsCurrent);
+    morph.navigateReduced(current, now() * SEC_TO_MS);
     const resolves = pendingResolves;
     pendingResolves = [];
     for (const resolve of resolves) resolve();
@@ -810,6 +826,14 @@ export function createLanefield(
         oneHot(id, weights);
         for (let i = 0; i < LAYOUT_ORDER.length; i++) groundWeights[i] = weights[i];
         travel = null;
+        morph.navigateReduced(id, now() * SEC_TO_MS);
+        // An instant travel never enters updateTravel, so publish
+        // the jumped sample here; otherwise the debug hook would
+        // still show the previous morph after a reduced travel.
+        morphDebug.from = morph.from;
+        morphDebug.to = morph.to;
+        morphDebug.sample = morph.sample(now() * SEC_TO_MS);
+        morphDebug.degraded = morphDebug.sample.degraded;
         paramsCurrent = paramsForLayout(id);
         paramsFrom = cloneParams(paramsCurrent);
         paramsTo = cloneParams(paramsCurrent);
@@ -831,6 +855,36 @@ export function createLanefield(
         travelFromW[i] = weights[i];
         travelToW[i] = i === layoutIndex(id) ? 1 : 0;
       }
+      // P-MORPH-1 retarget snapshot: mid-flight, the snapshot is the
+      // current interpolated ring and silhouette state, so the new
+      // morph starts exactly where the old one is. At rest, the ring
+      // fields are zero and the center is the origin, so a project
+      // rest state snapshots its descriptor anchor instead; a field
+      // rest state keeps the zero center, which collapses in place.
+      const morphSnapshot: MorphSnapshot = travel
+        ? {
+            center: [...paramsCurrent.ringCenter],
+            silhouetteCenter: [...paramsCurrent.silhouetteCenter],
+            ringRadius: paramsCurrent.ringRadius,
+            ringStrength: paramsCurrent.ringStrength,
+            silhouetteRadius: paramsCurrent.silhouetteRadius,
+            silhouetteStrength: paramsCurrent.silhouetteStrength,
+          }
+        : (() => {
+            const restDesc = descriptorForLayout(current);
+            const atProject = restDesc.kind === 'mark';
+            return {
+              center: atProject ? [...restDesc.anchor] : [...paramsCurrent.ringCenter],
+              silhouetteCenter: atProject
+                ? [...restDesc.silhouetteCenter]
+                : [...paramsCurrent.silhouetteCenter],
+              ringRadius: paramsCurrent.ringRadius,
+              ringStrength: paramsCurrent.ringStrength,
+              silhouetteRadius: paramsCurrent.silhouetteRadius,
+              silhouetteStrength: paramsCurrent.silhouetteStrength,
+            };
+          })();
+      morph.navigate(id, now() * SEC_TO_MS, morphSnapshot);
       paramsFrom = cloneParams(paramsCurrent);
       paramsTo = paramsForLayout(id);
       travelFromPose.pos[0] = basePose.pos[0];

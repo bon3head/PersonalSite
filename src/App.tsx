@@ -158,6 +158,20 @@ export default function App(props: AppProps): JSX.Element {
         controllersRef.current.set('leaflink', leaflink);
         controllersRef.current.set('sidequests', sidequests);
         controllersRef.current.set('notfound', notfound);
+        // P-MORPH-1 sub-task 1: pause every non-active controller at
+        // wire time. Controllers used to start unpaused and pause
+        // only on travel away, so a direct load to an inactive
+        // scene's route never paused the others and their ambient
+        // sims rendered into the shared scene over the active scene.
+        // The active route is the travel controller's current scene
+        // (not the mount route: the visitor may have traveled before
+        // the world arrived). Travel resumes the target controller
+        // at morph end, so no controller stays paused after its
+        // route is visited.
+        const active = travelRef.current?.current ?? initialScene;
+        for (const [id, controller] of controllersRef.current) {
+          if (id !== active) controller.pause();
+        }
         setWired({ field, leaflink, sidequests });
         // Test hook: scene tests pause controllers to measure lanes
         // without scene text (S05 T-SRV-2 excludes text pixels).
@@ -201,15 +215,17 @@ export default function App(props: AppProps): JSX.Element {
     // The world starts on idle in main.tsx, after App mounts. When it
     // arrives, attach it so scene changes morph lanes, and create the
     // scene controllers so travel pause/resume drives words, sim, and
-    // markers. Controllers start active on creation (no resume needed
-    // for the initial scene).
+    // markers. wireField pauses every non-active controller, so only
+    // the active route's controller simulates at mount.
     const onLanefield = (event: Event): void => {
       const detail = (event as CustomEvent).detail as Lanefield | null;
       travel.setLanefield(detail ?? null);
       wireField(detail);
     };
     window.addEventListener('lanefield-ready', onLanefield);
-    // If the App mounted with a field already, wire it now.
+    // If the App mounted with a field already, wire it now. The
+    // travel controller above already exists by this point, so the
+    // pause rule inside wireField reads its current scene.
     if (props.lanefield) wireField(props.lanefield);
     return () => {
       window.removeEventListener('lanefield-ready', onLanefield);

@@ -1,0 +1,153 @@
+
+Running 14 tests using 1 worker
+
+[1/14] tests/feedback-round/morph.spec.ts:72:1 › T-MORPH-DESC: hero descriptors carry anchor, ring, silhouette
+  1) tests/feedback-round/morph.spec.ts:72:1 › T-MORPH-DESC: hero descriptors carry anchor, ring, silhouette 
+
+    ReferenceError: window is not defined
+
+       at src/world/camera.ts:23
+
+      21 | // below-desktop viewport. Re-evaluated on resize and orientation change.
+      22 | export function isCoarseVariant(): boolean {
+    > 23 |   if (window.innerWidth < T.breakpoints.coarseOrNarrowBelowPx) return true;
+         |   ^
+      24 |   if (window.matchMedia('(pointer: coarse)').matches && window.innerWidth < T.breakpoints.desktopFromPx) {
+      25 |     return true;
+      26 |   }
+        at isCoarseVariant (/home/hatch/workspace/worktrees/personalsite-astryx-w5/src/world/camera.ts:23:3)
+        at currentVariant (/home/hatch/workspace/worktrees/personalsite-astryx-w5/src/world/camera.ts:31:10)
+        at poseFor (/home/hatch/workspace/worktrees/personalsite-astryx-w5/src/world/camera.ts:34:72)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:81:5
+
+    Error Context: test-results/tests-feedback-round-morph-38772-arry-anchor-ring-silhouette/error-context.md
+
+
+[2/14] tests/feedback-round/morph.spec.ts:104:1 › T-MORPH-PHASES: sample invariants at every quarter of every pair
+[3/14] tests/feedback-round/morph.spec.ts:135:1 › T-MORPH-ENV: gather peaks, reveal looms, ends hand off to rest
+[4/14] tests/feedback-round/morph.spec.ts:158:1 › T-MORPH-BREATH: ring dips to ringBreath, regrows, anchor tracks
+  2) tests/feedback-round/morph.spec.ts:158:1 › T-MORPH-BREATH: ring dips to ringBreath, regrows, anchor tracks 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+        0,
+    -   0,
+    +   0.1061948695766548,
+      ]
+
+      165 |   const regrown = c.sample(0.75 * TRAVEL_MS);
+      166 |   expect(regrown.ringFactor).toBeGreaterThan(0.95);
+    > 167 |   expect(regrown.ringCenter).toEqual(descriptorForLayout('sidequests').anchor);
+          |                              ^
+      168 |   const early = c.sample(0.25 * TRAVEL_MS);
+      169 |   const leafAnchor = descriptorForLayout('leaflink').anchor;
+      170 |   const sqAnchor = descriptorForLayout('sidequests').anchor;
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:167:30
+
+    Error Context: test-results/tests-feedback-round-morph-4848e-reath-regrows-anchor-tracks/error-context.md
+
+
+[5/14] tests/feedback-round/morph.spec.ts:180:1 › T-MORPH-RECEDE: outgoing mark recedes over the 0 to 0.40 window
+[6/14] tests/feedback-round/morph.spec.ts:195:1 › T-MORPH-RETARGET: second input retargets from the current sample
+  3) tests/feedback-round/morph.spec.ts:195:1 › T-MORPH-RETARGET: second input retargets from the current sample 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 0.05
+    Received:   2.5
+
+      207 |   );
+      208 |   expect(centerDelta).toBeLessThan(0.05);
+    > 209 |   expect(Math.abs(at201.ringStrength - at200.ringStrength)).toBeLessThan(0.05);
+          |                                                             ^
+      210 |   expect(
+      211 |     Math.abs(at201.silhouetteStrength - at200.silhouetteStrength),
+      212 |   ).toBeLessThan(0.05);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:209:61
+
+    Error Context: test-results/tests-feedback-round-morph-5a6af-ets-from-the-current-sample/error-context.md
+
+
+[7/14] tests/feedback-round/morph.spec.ts:220:1 › T-MORPH-REDUCED-DEGRADE: jump on reduced, latch at 30 frames
+tests/feedback-round/morph.spec.ts:220:1 › T-MORPH-REDUCED-DEGRADE: jump on reduced, latch at 30 frames
+[morph] degrade latched: silhouette pull 0 for session
+
+[morph] degrade latched: silhouette pull 0 for session
+
+[8/14] tests/feedback-round/morph.spec.ts:259:1 › T-TRANS-2: lanes, draw call, doc height, no navbar, no cards
+  4) tests/feedback-round/morph.spec.ts:259:1 › T-TRANS-2: lanes, draw call, doc height, no navbar, no cards 
+
+    Test timeout of 300000ms exceeded.
+
+    Error: page.goto: net::ERR_ABORTED; maybe frame was detached?
+    Call log:
+      - navigating to "http://localhost:5173/", waiting until "domcontentloaded"
+
+
+      54 | async function gotoApp(page: Page, route: string): Promise<void> {
+      55 |   await page.setViewportSize({ width: 1440, height: 900 });
+    > 56 |   await page.goto(DEV + route, { waitUntil: 'domcontentloaded' });
+         |              ^
+      57 |   await waitAppReady(page);
+      58 |   await page.waitForTimeout(1500);
+      59 | }
+        at gotoApp (/home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:56:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:312:3
+
+    Error Context: test-results/tests-feedback-round-morph-5efd0-c-height-no-navbar-no-cards/error-context.md
+
+
+[9/14] tests/feedback-round/morph.spec.ts:348:1 › T-TRANS-3: retarget mid-flight ends on sidequests, weights one-hot
+[10/14] tests/feedback-round/morph.spec.ts:376:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade
+  5) tests/feedback-round/morph.spec.ts:376:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 650
+    Received:   10823
+
+      396 |   // Full travel is 700ms; reduced must land well under it (jump plus
+      397 |   // a 150ms crossfade, target about 300ms, margin for harness slop).
+    > 398 |   expect(elapsed).toBeLessThan(650);
+          |                   ^
+      399 |   const weights = await page.evaluate(() => window.__lanefield.weights());
+      400 |   expect(weights[1]).toBeCloseTo(1, 2);
+      401 |   await context.close();
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:398:19
+
+    Error Context: test-results/tests-feedback-round-morph-b61d5-jump-with-a-short-crossfade/error-context.md
+
+
+[11/14] tests/feedback-round/morph.spec.ts:405:1 › T-TRANS-5: back and forward run the morph with keymap direction
+[12/14] tests/feedback-round/morph.spec.ts:446:1 › T-TRANS-6: idle 60s per route causes no navigation
+[13/14] tests/feedback-round/morph.spec.ts:474:1 › T-NAME-2: name box never intersects the title box during a morph
+[14/14] tests/feedback-round/morph.spec.ts:516:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry
+  6) tests/feedback-round/morph.spec.ts:516:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry 
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+      61 | async function travelByKey(page: Page, scene: string): Promise<void> {
+      62 |   await page.keyboard.press(KEY[scene]);
+    > 63 |   await page.waitForFunction(
+         |              ^
+      64 |     (h1) => document.querySelector('.jp-readout h1')?.textContent === h1,
+      65 |     H1[scene],
+      66 |     { timeout: 30000 },
+        at travelByKey (/home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:63:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w5/tests/feedback-round/morph.spec.ts:520:3
+
+    Error Context: test-results/tests-feedback-round-morph-f0f6c-100-percent-of-server-entry/error-context.md
+
+
+  6 failed
+    tests/feedback-round/morph.spec.ts:72:1 › T-MORPH-DESC: hero descriptors carry anchor, ring, silhouette 
+    tests/feedback-round/morph.spec.ts:158:1 › T-MORPH-BREATH: ring dips to ringBreath, regrows, anchor tracks 
+    tests/feedback-round/morph.spec.ts:195:1 › T-MORPH-RETARGET: second input retargets from the current sample 
+    tests/feedback-round/morph.spec.ts:259:1 › T-TRANS-2: lanes, draw call, doc height, no navbar, no cards 
+    tests/feedback-round/morph.spec.ts:376:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade 
+    tests/feedback-round/morph.spec.ts:516:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry 
+  8 passed (17.0m)
