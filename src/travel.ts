@@ -175,9 +175,6 @@ export function createTravelController(
     const inAt = useReducedTiming
       ? T.chrome.travelDom.reducedRegimeSwitchAtMs
       : revealStartMs;
-    const focusAt = useReducedTiming
-      ? T.chrome.travelDom.reducedRegimeSwitchAtMs
-      : revealStartMs;
     const resolveAt = useReducedTiming
       ? T.chrome.travelDom.reducedRegimeSwitchAtMs + T.motion.ms.fast
       : T.motion.ms.travel;
@@ -243,11 +240,13 @@ export function createTravelController(
         applyRegime(target);
       });
 
-      // Focus moves at Reveal start (P-MORPH-1, S03 morph rule).
-      later(focusAt, gen, moveFocus);
-
       // Readout entrance: opacity 0 to 1, and translateY 8px to 0 on the
       // full timing (no translate on reduced motion, opacity only).
+      // Focus moves at Reveal start (P-MORPH-1, S03 morph rule), from
+      // inside this callback after the unhide: a focus call while
+      // the section is still hidden is a no-op, so the focus move
+      // must run after el.hidden flips, not on a parallel timer at
+      // the same millisecond.
       later(inAt, gen, () => {
         const el = dom.readout();
         if (!el) return;
@@ -259,6 +258,7 @@ export function createTravelController(
         }
         el.style.opacity = '1';
         el.style.transform = '';
+        moveFocus();
       });
 
       later(resolveAt, gen, finish);
