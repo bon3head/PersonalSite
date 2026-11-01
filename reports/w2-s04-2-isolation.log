@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+[1/1] tests/chrome.spec.ts:68:1 › T-S04-2 coarse targets at least 44x44
+  1 passed (6.8s)
+exit=0

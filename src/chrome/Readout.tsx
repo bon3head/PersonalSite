@@ -15,6 +15,7 @@ import { C } from '../copy';
 import { T } from '../tokens.generated';
 import type { SceneId } from '../router';
 import LeaflinkReadout from '../scenes/leaflink';
+import { useTitleFit } from './titleFit';
 
 export type ReadoutVariant = 'server' | 'leaflink' | 'sidequests' | 'notfound';
 
@@ -42,7 +43,9 @@ export interface ReadoutProps {
 export default function Readout(props: ReadoutProps): JSX.Element {
   const { scene } = props;
   const variant = VARIANT[scene];
+  useTitleFit(props.sectionRef, scene);
   const style = {
+    '--jp-name-pad': `${T.zone.name.padPx}px`,
     '--jp-ro-width':
       variant === 'server' || variant === 'notfound'
         ? T.chrome.serverReadoutWidth

@@ -285,6 +285,19 @@
     max-width: none;
   }
 
+  /* Name clear zone (S04 section 5, DESIGN section 5): the
+   * wordmark sits at the gutter with label height, so the clear
+   * box bottom is gutter plus label height plus zone pad. The
+   * 404 readout on coarse/narrow starts below that bottom; the
+   * server variant keeps its own top because its wordmark is
+   * hidden. The fine rule below still bottom-anchors both. */
+  .jp-readout--notfound {
+    top: calc(
+      var(--jp-gutter) + var(--text-label-size) *
+        var(--text-label-leading) + var(--jp-name-pad)
+    );
+  }
+
   /* Server variant, fine: left column, bottom sits
    * serverReadoutBottomGap above the keymap, width serverReadoutWidth. */
   @media (min-width: 1024px) and (pointer: fine) {
@@ -349,9 +362,14 @@
     background: currentColor;
   }
 
-  /* SideQuests variant, coarse/narrow: top, full width minus gutters. */
+  /* SideQuests variant, coarse/narrow: top below the name clear
+   * zone, full width minus gutters. Same clear box bottom as the
+   * 404 rule above: gutter plus label height plus zone pad. */
   .jp-readout--sidequests {
-    top: var(--jp-gutter);
+    top: calc(
+      var(--jp-gutter) + var(--text-label-size) *
+        var(--text-label-leading) + var(--jp-name-pad)
+    );
     left: var(--jp-gutter);
     right: var(--jp-gutter);
     max-width: none;

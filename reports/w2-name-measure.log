@@ -1,0 +1,54 @@
+
+Running 1 test using 1 worker
+
+[1/1] tests/feedback-round/probe.tmp.spec.ts:4:1 › probe rects
+tests/feedback-round/probe.tmp.spec.ts:4:1 › probe rects
+375x667 / name=null title=[16,24,359,130.375] font=56px text=Justin Poli
+
+375x667 /leaflink name=[16,16,126,40] title=[32,316.1875,343,352.1875] font=36px text=LeafLink
+
+375x667 /sidequests name=[16,16,126,40] title=[28,64,347,100] font=36px text=SideQuests
+
+375x667 /nope name=[16,16,126,40] title=[16,52,359,75.8125] font=23.8194px text=Nothing at this address.
+
+390x844 / name=null title=[16,24,374,77.1875] font=56px text=Justin Poli
+
+390x844 /leaflink name=[16,16,126,40] title=[32,411.765625,358,447.765625] font=36px text=LeafLink
+
+390x844 /sidequests name=[16,16,126,40] title=[28,64,362,100] font=36px text=SideQuests
+
+390x844 /nope name=[16,16,126,40] title=[16,52,374,76.859375] font=24.8611px text=Nothing at this address.
+
+430x932 / name=null title=[16,24,414,77.1875] font=56px text=Justin Poli
+
+430x932 /leaflink name=[16,16,126,40] title=[32,459.28125,398,495.28125] font=36px text=LeafLink
+
+430x932 /sidequests name=[16,16,126,40] title=[28,64,402,100] font=36px text=SideQuests
+
+430x932 /nope name=[16,16,126,40] title=[16,52,414,79.640625] font=27.6389px text=Nothing at this address.
+
+1440x900 / name=null title=[48,180.8125,528,424] font=128px text=Justin Poli
+
+1440x900 /leaflink name=[48,48,158,72] title=[64,278.671875,392,347] font=68.3333px text=LeafLink
+
+  1) tests/feedback-round/probe.tmp.spec.ts:4:1 › probe rects ──────────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForTimeout: Test ended.
+
+      20 |       });
+      21 |       await page.waitForSelector('.jp-readout h1', { timeout: 30000 });
+    > 22 |       await page.waitForTimeout(1600);
+         |                  ^
+      23 |       const m = await page.evaluate(() => {
+      24 |         const nameEl = document.querySelector('.jp-wordmark') as HTMLElement | null;
+      25 |         const titleEl = document.querySelector('.jp-readout h1') as HTMLElement;
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w2/tests/feedback-round/probe.tmp.spec.ts:22:18
+
+    Error Context: test-results/tests-feedback-round-probe.tmp-probe-rects/error-context.md
+
+
+  1 failed
+    tests/feedback-round/probe.tmp.spec.ts:4:1 › probe rects ───────────────────────────────────────
+exit=1

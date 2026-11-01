@@ -1,0 +1,7 @@
+
+Running 2 tests using 1 worker
+
+[1/2] tests/feedback-round/name.spec.ts:51:1 › T-NAME-1 name box never intersects the title box
+[2/2] tests/feedback-round/name.spec.ts:87:1 › T-NAME-1 sidequests title rests across sampled frames while live
+  2 passed (1.5m)
+exit=0
