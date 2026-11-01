@@ -4,10 +4,12 @@ import App from './App';
 import { createLanefield } from './world/lanefield';
 import { parsePath, SCENE_LAYOUT } from './router';
 import { initMotionPref } from './lib/reducedMotion';
+import { initBrandPrefetch } from './lib/brandPrefetch';
 import { T } from './tokens.generated';
 import './styles/global.css';
 
 initMotionPref();
+initBrandPrefetch();
 
 function startWorld(): void {
   const mount = document.getElementById('world');
