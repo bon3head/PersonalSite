@@ -10,14 +10,20 @@ uniform vec2 uViewport;       // drawing buffer size, device px // lit-ok: shade
 uniform float uDpr;
 uniform float uTime;
 uniform vec2 uClassStyle[16]; // widthPx (CSS), alpha // lit-ok: shader constant
-uniform vec3 uClassColor[16]; // lit-ok: shader constant
 uniform vec2 uFog;            // view-depth fade [start, end], server and scatter only // lit-ok: shader constant
+uniform float uLengthVariance; // lanefield.variance.lengthVariance // lit-ok: shader constant
+uniform float uDepthBands;     // lanefield.variance.depthBands // lit-ok: shader constant
+uniform vec3 uBandSpeed;       // lanefield.variance.bandSpeed // lit-ok: shader constant
+uniform vec3 uBandAlpha;       // lanefield.variance.bandAlpha // lit-ok: shader constant
+uniform vec2 uRingCenter;      // deflection ring center, world XZ // lit-ok: shader constant
+uniform float uRingRadius;     // deflection ring radius, world units // lit-ok: shader constant
+uniform float uRingStrength;   // deflection ring strength, world units // lit-ok: shader constant
 
 out float vSide;
 out float vHalf;
 out float vU;
-out vec3 vColor; // lit-ok: shader constant
 out float vAlpha;
+out float vBandSpeed;
 flat out int vLane;
 flat out int vKind;
 flat out vec4 vAct; // lit-ok: shader constant
@@ -27,22 +33,50 @@ vec4 pt(int lane, int lay, int k) {          // 'layout' is a GLSL keyword // li
   return texelFetch(uLayouts, ivec2(idx & 255, idx >> 8), 0); // lit-ok: shader constant
 }
 
+float hash11(float p) { p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; return fract(p); } // lit-ok: shader constant
+
+// P-LF-4a ring deflection, mirroring src/world/deflection.ts: radial
+// push with falloff (1 - (d / r)^2)^2 inside the ring, zero outside.
+// Falloff and its derivative are both zero at d = r, so the first
+// derivative is continuous across the boundary.
+vec2 deflectXZ(vec2 p) { // lit-ok: shader constant
+  if (uRingRadius <= 0.0 || uRingStrength == 0.0) return p; // lit-ok: shader constant
+  vec2 d = p - uRingCenter; // lit-ok: shader constant
+  float dist = length(d); // lit-ok: shader constant
+  if (dist >= uRingRadius || dist < 0.0001) return p; // lit-ok: shader constant
+  float x = dist / uRingRadius; // lit-ok: shader constant
+  float f = 1.0 - x * x; // lit-ok: shader constant
+  return p + (d / dist) * (uRingStrength * f * f); // lit-ok: shader constant
+}
+
 void main() {
   int lane = int(aSeg.x + 0.5); // lit-ok: shader constant
   int k = int(aSeg.y + 0.5); // lit-ok: shader constant
-  vec3 p0 = vec3(0.0); vec3 p1 = vec3(0.0); // lit-ok: shader constant
-  float widthCss = 0.0; float alpha = 0.0; vec3 color = vec3(0.0); // lit-ok: shader constant
+  float laneF = float(lane); // lit-ok: shader constant
+  vec3 p0 = vec3(0.0); vec3 p1 = vec3(0.0); vec3 start = vec3(0.0); // lit-ok: shader constant
+  float widthCss = 0.0; float alpha = 0.0; // lit-ok: shader constant
   for (int l = 0; l < 4; l++) { // lit-ok: shader constant
     float w = uW[l];
     if (w <= 0.0) continue; // lit-ok: shader constant
     vec4 a = pt(lane, l, k); // lit-ok: shader constant
     vec4 b = pt(lane, l, k + 1); // lit-ok: shader constant
-    p0 += w * a.xyz; p1 += w * b.xyz; // lit-ok: shader constant
+    vec4 s = pt(lane, l, 0); // lit-ok: shader constant
+    p0 += w * a.xyz; p1 += w * b.xyz; start += w * s.xyz; // lit-ok: shader constant
     int cls = int(a.w + 0.5); // lit-ok: shader constant
     widthCss += w * uClassStyle[cls].x;
     alpha    += w * uClassStyle[cls].y;
-    color    += w * uClassColor[cls];
   }
+
+  // Variant B: fixed per-lane depth band, length, and (in the fragment
+  // shader) phase. Length scales the lane about its start point, so a
+  // lane never extends past its layout endpoints.
+  int bands = int(uDepthBands + 0.5); // lit-ok: shader constant
+  int band = lane - (lane / bands) * bands; // lit-ok: shader constant
+  float lenScale = 1.0 + (hash11(laneF * 0.013 + 7.0) - 0.5) * 2.0 * uLengthVariance; // lit-ok: shader constant
+  p0 = start + (p0 - start) * lenScale; // lit-ok: shader constant
+  p1 = start + (p1 - start) * lenScale; // lit-ok: shader constant
+  p0.xz = deflectXZ(p0.xz); // lit-ok: shader constant
+  p1.xz = deflectXZ(p1.xz); // lit-ok: shader constant
 
   vec4 act = texelFetch(uActivity, ivec2(lane & 255, lane >> 8), 0); // lit-ok: shader constant
   int kind = int(act.b + 0.5); // lit-ok: shader constant
@@ -76,10 +110,10 @@ void main() {
   vSide = position.y * ext;
   vHalf = halfW;
   vU = (float(k) + position.x) / 7.0; // lit-ok: shader constant
-  vColor = color;
   float depth = mix(c0.w, c1.w, position.x); // lit-ok: shader constant
   float fogAmt = smoothstep(uFog.x, uFog.y, depth) * (uW.x + uW.w);
-  vAlpha = alpha * coverage * (1.0 - fogAmt); // lit-ok: shader constant
+  vAlpha = alpha * coverage * (1.0 - fogAmt) * uBandAlpha[band]; // lit-ok: shader constant
+  vBandSpeed = uBandSpeed[band]; // lit-ok: shader constant
   vLane = lane;
   vKind = kind;
   vAct = act;

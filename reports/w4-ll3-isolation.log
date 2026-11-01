@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms (1.2m)
+
+  1 passed (1.3m)

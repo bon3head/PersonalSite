@@ -29,6 +29,48 @@ if (tokens.world.laneCount !== tokens.world.server.sm.count * 128) {
   );
   process.exit(1);
 }
+
+// W4 build-time step: convert each scene gradient stop from its hex to
+// OKLab once, here, so the shader interpolates in OKLab and no runtime
+// code ever converts a token hex. Stop names resolve against the color
+// tokens; an unknown stop name fails the build.
+function hexToOklab(hex) {
+  const srgb = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const lin = srgb.map((c) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)));
+  const [r, g, b] = lin;
+  const l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+  const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+  const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+  const l3 = Math.cbrt(l);
+  const m3 = Math.cbrt(m);
+  const s3 = Math.cbrt(s);
+  return [
+    0.2104542553 * l3 + 0.7936177850 * m3 - 0.0040720468 * s3,
+    1.9779984951 * l3 - 2.4285922050 * m3 + 0.4505937099 * s3,
+    0.0259040371 * l3 + 0.7827717662 * m3 - 0.8086757660 * s3,
+  ];
+}
+const STOP_HEX = {
+  signal: tokens.color.signal,
+  signalDim: tokens.color.signalDim,
+  ink: tokens.color.ink,
+  field: tokens.color.field.ground,
+  chalk: tokens.color.chalk,
+};
+for (const [route, scene] of Object.entries(tokens.scene)) {
+  const grad = scene.gradient;
+  if (!grad) continue;
+  for (const key of ['leadStop', 'tailStop']) {
+    const hex = STOP_HEX[grad[key]];
+    if (!hex) {
+      console.error(`extract-tokens: unknown gradient stop "${grad[key]}" in scene.${route}`);
+      process.exit(1);
+    }
+  }
+  grad.leadOklab = hexToOklab(STOP_HEX[grad.leadStop]);
+  grad.tailOklab = hexToOklab(STOP_HEX[grad.tailStop]);
+  grad.signalOklab = hexToOklab(tokens.color.signal);
+}
 const version = tokens.version;
 
 const tsHeader = `// GENERATED from spec/astryx/DESIGN.md v${version}. Do not edit.\n`;
