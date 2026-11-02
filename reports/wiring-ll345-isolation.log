@@ -1,0 +1,75 @@
+
+Running 3 tests using 1 worker
+
+  ✘  1 [webkit] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms (14.6s)
+  ✘  2 [webkit] › tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) (8.8s)
+  ✘  3 [webkit] › tests/scenes/leaflink.spec.ts:353:1 › T-LL-5: legend slip contrast (5.3s)
+
+
+  1) [webkit] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms ────────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      282 |     }
+      283 |   }, tapAt);
+    > 284 |   expect(found).toBe(true);
+          |                 ^
+      285 |   await disposeReal(page);
+      286 | });
+      287 |
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/scenes/leaflink.spec.ts:284:17
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-3-tap-responds-within-300ms-webkit/error-context.md
+
+  2) [webkit] › tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) ────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      347 |     }
+      348 |   }, tapAt);
+    > 349 |   expect(found).toBe(true);
+          |                 ^
+      350 |   await disposeReal(page);
+      351 | });
+      352 |
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/scenes/leaflink.spec.ts:349:17
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-d58fc-ard-path-OfferButton-Enter--webkit/error-context.md
+
+  3) [webkit] › tests/scenes/leaflink.spec.ts:353:1 › T-LL-5: legend slip contrast ─────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 3
+
+      Array [
+    -   230,
+    -   226,
+    -   220,
+    +   21,
+    +   23,
+    +   27,
+      ]
+
+      378 |   });
+      379 |   // Rendered slip background is the paper.raised token.
+    > 380 |   expect(parseRgb(res.bg)).toEqual(parseHex(res.tokens.raised));
+          |                            ^
+      381 |   // Receipt pairs: paper.text and paper.text2 on paper.raised.
+      382 |   expect(
+      383 |     contrast(parseHex(res.tokens.text), parseHex(res.tokens.raised)),
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/scenes/leaflink.spec.ts:380:28
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-5-legend-slip-contrast-webkit/error-context.md
+
+  3 failed
+    [webkit] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms ─────────────
+    [webkit] › tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) ─────
+    [webkit] › tests/scenes/leaflink.spec.ts:353:1 › T-LL-5: legend slip contrast ──────────────────

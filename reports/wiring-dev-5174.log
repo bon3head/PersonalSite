@@ -1,0 +1,11 @@
+2:33:39 AM [vite] (client) Re-optimizing dependencies because vite config has changed
+
+  VITE v7.3.7  ready in 520 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: http://198.19.0.2:5174/
+3:04:30 AM [vite] (client) page reload src/tokens.generated.ts
+3:04:30 AM [vite] (client) hmr update /src/App.tsx
+3:04:30 AM [vite] (client) hmr update /src/styles/global.css
+3:04:30 AM [vite] (client) page reload src/copy.ts
+3:04:53 AM [vite] (client) hmr update /themes/lane/dist/lane.css
