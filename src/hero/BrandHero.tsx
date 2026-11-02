@@ -149,6 +149,26 @@ export default function BrandHero(props: {
   entryRef.current = entry;
   const rippleRef = useRef<{ startMs: number } | null>(null);
   const tiltRef = useRef<{ rx: number; ry: number }>({ rx: 0, ry: 0 });
+  // HERO-BAND-FIX: rest baseline for the walk freeze. The hero
+  // re-tracks every field frame, but its placement trails twin
+  // positions by one engine frame: during a walk the camera lean
+  // displaces every twin projection (measured: twin0 up 88 px in
+  // one frame), the re-track moves the hero to the displaced
+  // optimum (top 504), and on the claim frame the twins snap back
+  // to rest while the hero still holds 504, overlapping twin0 at
+  // rest (505 to 517) for one frame. Wander (6 px) and bob (about
+  // 3 px projected) cannot produce that 80 px jump, so the fix is
+  // a freeze, not a margin change: once the twins have sat in one
+  // configuration for two frames with the current placement
+  // clearing it, that configuration is the rest baseline. While
+  // any twin sits more than 12 px from its baseline rect, a walk
+  // lean is in progress and placement holds at rest. When the
+  // twins return near baseline, re-tracking resumes and computes
+  // the same rest placement. The baseline resets on mount, entry
+  // change, and resize, so a new viewport re-adopts cleanly.
+  const twinBaselineRef = useRef<Rect[] | null>(null);
+  const lastTwinRectsRef = useRef<Rect[] | null>(null);
+  const stableTwinFramesRef = useRef<number>(0);
   const downRef = useRef<{ x: number; y: number } | null>(null);
 
   // Reduced-motion listener.
@@ -295,6 +315,49 @@ export default function BrandHero(props: {
   // re-tracked on every field frame below: a twin that drifts
   // into the hero band pushes the hero to a clear position, and
   // the 4 px hysteresis keeps bob from jittering the hero.
+  // HERO-BAND-FIX helpers: read the current twin tap targets,
+  // test whether any twin is displaced from the rest baseline,
+  // and note the current twin configuration for baseline adoption.
+  const readTwinRects = (): Rect[] => {
+    const out: Rect[] = [];
+    const twins = document.querySelectorAll('button[aria-pressed]');
+    for (let i = 0; i < twins.length; i++) {
+      const r = rectOf(twins[i]);
+      if (r) out.push(r);
+    }
+    return out;
+  };
+  const rectsWithin = (a: Rect[], b: Rect[], px: number): boolean => {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (
+        Math.abs(a[i].left - b[i].left) > px ||
+        Math.abs(a[i].top - b[i].top) > px ||
+        Math.abs(a[i].right - b[i].right) > px ||
+        Math.abs(a[i].bottom - b[i].bottom) > px
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+  const twinsDisplaced = (): boolean => {
+    const base = twinBaselineRef.current;
+    if (!base) return false;
+    const cur = readTwinRects();
+    if (cur.length !== base.length) return false;
+    return !rectsWithin(cur, base, 12);
+  };
+  const noteTwinRects = (): void => {
+    const cur = readTwinRects();
+    const last = lastTwinRectsRef.current;
+    if (last && rectsWithin(cur, last, 4)) {
+      stableTwinFramesRef.current += 1;
+    } else {
+      stableTwinFramesRef.current = 0;
+    }
+    lastTwinRectsRef.current = cur;
+  };
   const computePlacement = (): PlacedRect | null => {
     const currentEntry = entryRef.current;
     if (!currentEntry) return null;
@@ -325,6 +388,19 @@ export default function BrandHero(props: {
       const r = rectOf(twins[i]);
       if (r) blockers.push(r);
     }
+    // HERO-BAND-FIX: twins sit at the viewport origin until the
+    // first field frame positions them. Placing against origin
+    // rects picks the displaced optimum (top 504), which then
+    // overlaps the true twin0 at rest until the re-track corrects
+    // it. Refuse to place until every twin has left the origin,
+    // so the hero stays hidden instead of flashing into a twin
+    // band at load. With no field there are no twins at all, so
+    // the F3 path is unaffected. A marker projecting exactly to
+    // screen (22, 22) would trip this, but no route pose does.
+    const twinRects = readTwinRects();
+    if (twinRects.some((r) => r.left === 0 && r.top === 0)) {
+      return null;
+    }
     return placeHero(
       window.innerWidth,
       window.innerHeight,
@@ -341,16 +417,32 @@ export default function BrandHero(props: {
 
   useEffect(() => {
     if (!entry) return;
+    // HERO-BAND-FIX: a new entry or project means a new page
+    // configuration, so the rest baseline re-adopts from scratch.
+    twinBaselineRef.current = null;
+    lastTwinRectsRef.current = null;
+    stableTwinFramesRef.current = 0;
     const compute = (): void => {
+      // HERO-BAND-FIX: the settle timer must not move the hero
+      // mid-walk either; a displaced twin set holds placement.
+      if (twinsDisplaced()) return;
       const next = computePlacement();
       if (next) setPlacement(next);
     };
     compute();
     const timer = setTimeout(compute, 1500);
-    window.addEventListener('resize', compute);
+    const onResize = (): void => {
+      // A resize invalidates every measured rect, so the baseline
+      // re-adopts and this compute is allowed through.
+      twinBaselineRef.current = null;
+      lastTwinRectsRef.current = null;
+      stableTwinFramesRef.current = 0;
+      compute();
+    };
+    window.addEventListener('resize', onResize);
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('resize', compute);
+      window.removeEventListener('resize', onResize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entry, project]);
@@ -358,15 +450,68 @@ export default function BrandHero(props: {
   useEffect(() => {
     if (!lanefield) return;
     const off = lanefield.onFrame(() => {
+      noteTwinRects();
+      // HERO-BAND-FIX: freeze re-tracking while a walk lean
+      // displaces the twins. The hero holds its rest placement
+      // through the walk and the claim snap-back, so it can never
+      // sit at the displaced optimum when a twin returns to rest.
+      // Self-healing guard: a hold must never freeze an actual
+      // overlap. If the held rect already intersects a twin (a
+      // wrong baseline, e.g. adopted while twins sat at the
+      // origin), drop the baseline and re-track immediately.
+      if (twinsDisplaced()) {
+        const heroEl = wrapRef.current;
+        const cur = readTwinRects();
+        let overlapping = false;
+        if (heroEl) {
+          const hr = heroEl.getBoundingClientRect();
+          for (const t of cur) {
+            if (
+              hr.left < t.right &&
+              hr.right > t.left &&
+              hr.top < t.bottom &&
+              hr.bottom > t.top
+            ) {
+              overlapping = true;
+              break;
+            }
+          }
+        }
+        if (!overlapping) return;
+        twinBaselineRef.current = null;
+      }
       const next = computePlacement();
       const current = placementRef.current;
       if (!next) return;
-      if (
+      const moved =
         !current ||
         Math.abs(next.left - current.left) > 4 ||
-        Math.abs(next.top - current.top) > 4
-      ) {
+        Math.abs(next.top - current.top) > 4;
+      if (moved) {
         setPlacement(next);
+        return;
+      }
+      // HERO-BAND-FIX: adopt the rest baseline only when the
+      // computed placement already matches the current one (so a
+      // pending move never adopts a displaced configuration) and
+      // the twins have sat still for two frames. Bob stays inside
+      // the 4 px stability window; a walk lean does not.
+      if (
+        !twinBaselineRef.current &&
+        current &&
+        stableTwinFramesRef.current >= 1
+      ) {
+        // Never adopt while a twin still sits at the viewport
+        // origin: twins rest there until the first field frame
+        // positions them, and an origin baseline would freeze the
+        // hero at its pre-positioning placement forever.
+        const candidate = readTwinRects();
+        if (
+          candidate.length > 0 &&
+          candidate.every((r) => !(r.left === 0 && r.top === 0))
+        ) {
+          twinBaselineRef.current = candidate;
+        }
       }
     });
     return off;
