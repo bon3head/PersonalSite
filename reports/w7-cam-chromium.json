@@ -28,7 +28,7 @@
           }
         ],
         "url": "/sidequests",
-        "pitchBefore": -64.48669073907848,
+        "pitchBefore": -64.48669073907851,
         "pitchAfter": -64.48669073907851,
         "laneCount": 6144,
         "calls": 1,
@@ -72,9 +72,9 @@
       "test": "T-SQ-CAM-1 reload",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 6,
-      "minPitch": -64.48669073907851,
-      "maxPitch": -64.48669073907848,
+      "samples": 5,
+      "minPitch": -64.48669073907853,
+      "maxPitch": -64.48669073907851,
       "firstOutside": null,
       "extra": {
         "trigger": "reload",
@@ -88,13 +88,13 @@
       "test": "T-SQ-CAM-1 morph from server",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 8,
+      "samples": 19,
       "minPitch": -64.48669073907851,
-      "maxPitch": -10.97212628857863,
+      "maxPitch": -10.972126288578634,
       "firstOutside": null,
       "extra": {
         "trigger": "morphFromServer",
-        "morphPMin": 0.013714285714252452,
+        "morphPMin": 0.028857142856078488,
         "morphPMax": 1,
         "callsMin": 1,
         "callsMax": 3
@@ -104,13 +104,13 @@
       "test": "T-SQ-CAM-1 morph from leaflink",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 8,
+      "samples": 12,
       "minPitch": -64.48669073907851,
       "maxPitch": -64.11297373367333,
       "firstOutside": null,
       "extra": {
         "trigger": "morphFromLeaflink",
-        "morphPMin": 0.0008571428571095956,
+        "morphPMin": 0.03728571428252118,
         "morphPMax": 1,
         "callsMin": 2,
         "callsMax": 4
@@ -120,14 +120,14 @@
       "test": "T-SQ-CAM-1 fast retarget",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 13,
-      "minPitch": -64.487221017083,
-      "maxPitch": -10.97212628857863,
+      "samples": 16,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -10.972126288578629,
       "firstOutside": null,
       "extra": {
         "trigger": "retarget",
         "finalUrl": "http://localhost:5173/sidequests",
-        "morphPMin": 0.0002857142858140703,
+        "morphPMin": 0.02114285714392151,
         "morphPMax": 1,
         "callsMin": 1,
         "callsMax": 3
@@ -137,8 +137,8 @@
       "test": "T-SQ-CAM-1 walk trail 1",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 23,
-      "minPitch": -69.18541470593723,
+      "samples": 24,
+      "minPitch": -69.7691825358529,
       "maxPitch": -64.48669073907848,
       "firstOutside": null,
       "extra": {
@@ -153,9 +153,9 @@
       "test": "T-SQ-CAM-1 walk trail 2",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 19,
-      "minPitch": -69.35492181167218,
-      "maxPitch": -64.48669073907851,
+      "samples": 24,
+      "minPitch": -69.67287911423618,
+      "maxPitch": -64.48669073907848,
       "firstOutside": null,
       "extra": {
         "trigger": "walkTrail2",
@@ -169,8 +169,8 @@
       "test": "T-SQ-CAM-1 walk trail 3",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 20,
-      "minPitch": -69.52941957596137,
+      "samples": 24,
+      "minPitch": -69.3013971226021,
       "maxPitch": -64.48669073907848,
       "firstOutside": null,
       "extra": {
@@ -185,7 +185,7 @@
       "test": "T-SQ-CAM-1 resize and orientation change",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 14,
+      "samples": 12,
       "minPitch": -64.48669073907851,
       "maxPitch": -64.48669073907848,
       "firstOutside": null,
@@ -202,7 +202,7 @@
       "browser": "chromium",
       "verdict": "pass",
       "samples": 22,
-      "minPitch": -64.48669073907851,
+      "minPitch": -64.48669073907853,
       "maxPitch": -64.48669073907848,
       "firstOutside": null,
       "extra": {
@@ -218,9 +218,9 @@
       "test": "T-SQ-CAM-1 reduced motion morph",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 175,
+      "samples": 205,
       "minPitch": -64.48669073907851,
-      "maxPitch": -10.97212628857863,
+      "maxPitch": -64.48669073907851,
       "firstOutside": null,
       "extra": {
         "trigger": "reducedMotionMorph",
@@ -234,14 +234,14 @@
       "test": "T-SQ-CAM-1 back and forward restore",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 20,
+      "samples": 10,
       "minPitch": -64.48669073907853,
       "maxPitch": -10.972126288578629,
       "firstOutside": null,
       "extra": {
         "trigger": "backForward",
         "finalUrl": "http://localhost:5173/",
-        "morphPMin": 0.01485714285700981,
+        "morphPMin": 0.007285714287843023,
         "morphPMax": 1,
         "callsMin": 1,
         "callsMax": 3
@@ -251,7 +251,7 @@
       "test": "T-SQ-CAM-2 forced flat pose",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 20,
+      "samples": 17,
       "minPitch": -75.0000000000041,
       "maxPitch": -64.48669073907851,
       "firstOutside": null,
@@ -269,7 +269,7 @@
       "test": "T-SQ-CAM-3 reduced motion jump",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 99,
+      "samples": 125,
       "minPitch": -64.48669073907851,
       "maxPitch": -64.48669073907851,
       "firstOutside": null,
@@ -283,7 +283,7 @@
       "test": "T-SQ-CAM fine walk lean",
       "browser": "chromium",
       "verdict": "pass",
-      "samples": 13,
+      "samples": 4,
       "minPitch": -54.54912206195702,
       "maxPitch": -54.549122061956986,
       "firstOutside": null,
@@ -292,26 +292,26 @@
         "trails": [
           {
             "trail": 1,
-            "samples": 28,
-            "walkMin": -59.15195258574363,
-            "walkMax": -54.54912206195699,
-            "steepening": 4.602830523786636,
+            "samples": 15,
+            "walkMin": -59.51950176959063,
+            "walkMax": -54.549122061956986,
+            "steepening": 4.97037970763364,
             "firstOutside": null
           },
           {
             "trail": 2,
-            "samples": 19,
-            "walkMin": -59.246481386570466,
-            "walkMax": -54.549122061956986,
-            "steepening": 4.697359324613473,
+            "samples": 20,
+            "walkMin": -59.66372902505852,
+            "walkMax": -54.54912206195699,
+            "steepening": 5.114606963101529,
             "firstOutside": null
           },
           {
             "trail": 3,
-            "samples": 13,
-            "walkMin": -59.4477641299065,
+            "samples": 12,
+            "walkMin": -59.60806550289413,
             "walkMax": -54.54912206195699,
-            "steepening": 4.89864206794951,
+            "steepening": 5.058943440937135,
             "firstOutside": null
           }
         ]
@@ -320,51 +320,14 @@
     {
       "test": "T-HERO-BAND-WALK",
       "browser": "chromium",
-      "verdict": "fail",
-      "samples": 18,
+      "verdict": "pass",
+      "samples": 15,
       "minPitch": null,
       "maxPitch": null,
       "firstOutside": null,
       "extra": {
-        "overlaps": [
-          {
-            "walk": 2,
-            "sample": 3,
-            "vs": "twin0",
-            "hero": [
-              63.83000183105469,
-              505.2200012207031,
-              343.8300018310547,
-              583.673095703125
-            ],
-            "other": [
-              208.45556640625,
-              472.712158203125,
-              252.45556640625,
-              516.712158203125
-            ],
-            "atWalkEnd": false
-          },
-          {
-            "walk": 3,
-            "sample": 3,
-            "vs": "twin0",
-            "hero": [
-              63.720001220703125,
-              502.42999267578125,
-              343.7200012207031,
-              580.8831176757812
-            ],
-            "other": [
-              208.4013671875,
-              472.6371765136719,
-              252.4013671875,
-              516.63720703125
-            ],
-            "atWalkEnd": false
-          }
-        ],
-        "overlapCount": 2
+        "overlaps": [],
+        "overlapCount": 0
       }
     },
     {
