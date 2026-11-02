@@ -24,14 +24,15 @@
   "private": true,
   "scripts": {
     "brand": "node tools/build-brand-assets.mjs",
-    "build": "npm run brand && npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs",
+    "build": "npm run brand && npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs && npm run check:hud",
     "dev": "npm run gen && vite",
     "gates": "npm run build && npm run lint && npm run theme:check && node tools/banned-scan.mjs dist && playwright test",
     "gen": "node tools/extract-tokens.mjs && node tools/extract-copy.mjs && node tools/copy-fonts.mjs",
     "lint": "node tools/lint-tokens.mjs && node tools/banned-scan.mjs src && python3 -I tools/palette-receipt.py spec/astryx/DESIGN.md",
     "test": "playwright test",
     "theme": "astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css",
-    "theme:check": "astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css --check"
+    "theme:check": "astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css --check",
+    "check:hud": "node tools/check-dev-hud-absent.mjs dist"
   },
   "type": "module",
   "version": "0.0.0"
