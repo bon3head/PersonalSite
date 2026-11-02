@@ -1,0 +1,72 @@
+
+Running 6 tests using 1 worker
+
+CAM-RESULT {"test":"T-HERO-BAND-WALK","browser":"chromium","verdict":"pass","samples":19,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"overlaps":[],"overlapCount":0}}
+T-HERO-BAND-WALK: samples=19 overlaps=[]
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/reports/w7-cam-chromium.json (20 results)
+  ✓  1 [chromium] › tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks (3.4m)
+  ✘  2 [chromium] › tests/feedback-round/morph.spec.ts:554:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry (4.5m)
+  ✘  3 [chromium] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms (3.1m)
+T-LL-7 hue fraction (chroma > 0.04): 0.006705729166666666
+  ✓  4 [chromium] › tests/scenes/leaflink.spec.ts:417:1 › T-LL-7: hue budget under 10 percent after 30s (2.4m)
+  ✓  5 [chromium] › tests/scenes/server.spec.ts:278:1 › T-SRV-5: server hue budget (3.0m)
+  ✘  6 [chromium] › tests/scenes/sidequests.spec.ts:183:1 › T-SQ-2: walk feedback (3.1m)
+
+
+  1) [chromium] › tests/feedback-round/morph.spec.ts:554:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry 
+
+    TimeoutError: page.waitForFunction: Timeout 120000ms exceeded.
+
+      64 | async function travelByKey(page: Page, scene: string): Promise<void> {
+      65 |   await page.keyboard.press(KEY[scene]);
+    > 66 |   await page.waitForFunction(
+         |              ^
+      67 |     (h1) => document.querySelector('.jp-readout h1')?.textContent === h1,
+      68 |     H1[scene],
+      69 |     { timeout: 120000, polling: 100 },
+        at travelByKey (/home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/feedback-round/morph.spec.ts:66:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/feedback-round/morph.spec.ts:558:3
+
+    Error Context: test-results/tests-feedback-round-morph-f0f6c-100-percent-of-server-entry-chromium/error-context.md
+
+  2) [chromium] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms ──────────
+
+    Test timeout of 180000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 180000ms exceeded.
+
+      195 |
+      196 | async function disposeReal(page: Page): Promise<void> {
+    > 197 |   await page.evaluate(() => {
+          |              ^
+      198 |     const t = (window as unknown as Record<string, unknown>).__lltest as
+      199 |       | {
+      200 |           controller: { dispose: () => void };
+        at disposeReal (/home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/scenes/leaflink.spec.ts:197:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/scenes/leaflink.spec.ts:285:9
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-3-tap-responds-within-300ms-chromium/error-context.md
+
+  3) [chromium] › tests/scenes/sidequests.spec.ts:183:1 › T-SQ-2: walk feedback ────────────────────
+
+    Test timeout of 180000ms exceeded.
+
+    Error: mouse.click: Test timeout of 180000ms exceeded.
+
+      178 |   const box = await page.locator(`button[aria-label="${name}"]`).boundingBox();
+      179 |   if (!box) throw new Error(`twin ${name} has no box`);
+    > 180 |   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+          |                    ^
+      181 | }
+      182 |
+      183 | test('T-SQ-2: walk feedback', async ({ page }) => {
+        at clickTwin (/home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/scenes/sidequests.spec.ts:180:20)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/tests/scenes/sidequests.spec.ts:194:3
+
+    Error Context: test-results/tests-scenes-sidequests-T-SQ-2-walk-feedback-chromium/error-context.md
+
+  3 failed
+    [chromium] › tests/feedback-round/morph.spec.ts:554:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry 
+    [chromium] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms ───────────
+    [chromium] › tests/scenes/sidequests.spec.ts:183:1 › T-SQ-2: walk feedback ─────────────────────
+  3 passed (19.9m)

@@ -1,0 +1,9 @@
+
+Running 3 tests using 1 worker
+
+  ✓  1 [chromium] › tests/feedback-round/morph-wiring-tmp.spec.ts:347:1 › T-TRANS-3: retarget mid-flight ends on sidequests, weights one-hot (1.6m)
+T-TRANS-4: reduced travel wall-clock elapsed 4696ms
+  ✓  2 [chromium] › tests/feedback-round/morph-wiring-tmp.spec.ts:387:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade (26.9s)
+  ✓  3 [chromium] › tests/feedback-round/morph-wiring-tmp.spec.ts:428:1 › T-TRANS-5: back and forward run the morph with keymap direction (2.9m)
+
+  3 passed (5.0m)

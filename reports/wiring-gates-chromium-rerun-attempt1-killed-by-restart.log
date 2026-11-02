@@ -1,0 +1,75 @@
+
+Running 147 tests using 1 worker
+
+T-S04-1 containment: {"320":{"fits":false,"rightEdge":574},"360":{"fits":false,"rightEdge":622},"390":{"fits":false,"rightEdge":622},"768":{"fits":true,"rightEdge":638},"1024":{"fits":true,"rightEdge":638},"1440":{"fits":true,"rightEdge":654},"2560":{"fits":true,"rightEdge":654}}
+  ✓    1 [chromium] › tests/chrome.spec.ts:34:1 › T-S04-1 keymap never wraps (10.0s)
+  ✓    2 [chromium] › tests/chrome.spec.ts:68:1 › T-S04-2 coarse targets at least 44x44 (2.9s)
+  ✓    3 [chromium] › tests/chrome.spec.ts:118:1 › T-S04-3 axe clean on all routes, sheets closed and open (31.9s)
+  ✓    4 [chromium] › tests/chrome.spec.ts:160:1 › T-S04-4 copy paths (5.7s)
+  ✓    5 [chromium] › tests/chrome.spec.ts:204:1 › T-S04-5 focus returns to the keymap button on sheet close (2.6s)
+  ✓    6 [chromium] › tests/chrome.spec.ts:238:1 › T-S04-6 keyboard-only tab order (2.3s)
+  ✓    7 [chromium] › tests/chrome.spec.ts:265:1 › T-S04-7 sheet open animation at most 300ms (2.2s)
+  ✓    8 [chromium] › tests/feedback-round/asset-prefetch.spec.ts:9:1 › T-ASSET-5: no brand request before the first field frame (58.3s)
+  ✓    9 [chromium] › tests/feedback-round/asset.spec.ts:44:1 › T-ASSET-1: manifest matches the files and SOURCES.json (175ms)
+  ✓   10 [chromium] › tests/feedback-round/asset.spec.ts:79:1 › T-ASSET-2: shipped GIF and PNG files are under budget (13ms)
+  ✓   11 [chromium] › tests/feedback-round/asset.spec.ts:98:1 › T-ASSET-3: GIF frame 0 equals the PNG pixel for pixel (3.4s)
+  ✓   12 [chromium] › tests/feedback-round/asset.spec.ts:127:1 › T-ASSET-4: no near-white edge pixels on the navy field (1.8s)
+CAM-RESULT {"test":"T-SQ-CAM-1 cold load","browser":"chromium","verdict":"pass","samples":5,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"coldLoad","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   13 [chromium] › tests/feedback-round/camera.spec.ts:293:1 › T-SQ-CAM-1 cold load (24.7s)
+CAM-RESULT {"test":"T-SQ-CAM-1 reload","browser":"chromium","verdict":"pass","samples":5,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"reload","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   14 [chromium] › tests/feedback-round/camera.spec.ts:303:1 › T-SQ-CAM-1 reload (42.1s)
+CAM-RESULT {"test":"T-SQ-CAM-1 morph from server","browser":"chromium","verdict":"pass","samples":8,"minPitch":-64.48669073907851,"maxPitch":-10.972126288578629,"firstOutside":null,"extra":{"trigger":"morphFromServer","morphPMin":0.014571428571694663,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓   15 [chromium] › tests/feedback-round/camera.spec.ts:315:1 › T-SQ-CAM-1 morph from server (1.2m)
+CAM-RESULT {"test":"T-SQ-CAM-1 morph from leaflink","browser":"chromium","verdict":"pass","samples":7,"minPitch":-64.48669073907851,"maxPitch":-64.13213756609902,"firstOutside":null,"extra":{"trigger":"morphFromLeaflink","morphPMin":0.006142857142588452,"morphPMax":1,"callsMin":3,"callsMax":5}}
+  ✓   16 [chromium] › tests/feedback-round/camera.spec.ts:329:1 › T-SQ-CAM-1 morph from leaflink (43.2s)
+CAM-RESULT {"test":"T-SQ-CAM-1 fast retarget","browser":"chromium","verdict":"pass","samples":12,"minPitch":-64.48669073907851,"maxPitch":-10.97212628857863,"firstOutside":null,"extra":{"trigger":"retarget","finalUrl":"http://localhost:5173/sidequests","morphPMin":0.00042857142963579725,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓   17 [chromium] › tests/feedback-round/camera.spec.ts:343:1 › T-SQ-CAM-1 fast retarget (1.6m)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 1","browser":"chromium","verdict":"pass","samples":17,"minPitch":-69.70210939140257,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail1","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   18 [chromium] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 1 (1.2m)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 2","browser":"chromium","verdict":"pass","samples":21,"minPitch":-69.38609437412171,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail2","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   19 [chromium] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 2 (1.5m)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 3","browser":"chromium","verdict":"pass","samples":24,"minPitch":-69.54944028765829,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail3","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   20 [chromium] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 3 (2.2m)
+CAM-RESULT {"test":"T-SQ-CAM-1 resize and orientation change","browser":"chromium","verdict":"pass","samples":20,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"resizeOrientation","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   21 [chromium] › tests/feedback-round/camera.spec.ts:380:1 › T-SQ-CAM-1 resize and orientation change (1.7m)
+CAM-RESULT {"test":"T-SQ-CAM-1 visibility hidden 60s then shown","browser":"chromium","verdict":"pass","samples":25,"minPitch":-64.48669073907853,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"visibility","method":"cdp-frozen-60s","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   22 [chromium] › tests/feedback-round/camera.spec.ts:397:1 › T-SQ-CAM-1 visibility hidden 60s then shown (1.4m)
+CAM-RESULT {"test":"T-SQ-CAM-1 reduced motion morph","browser":"chromium","verdict":"pass","samples":146,"minPitch":-64.48669073907851,"maxPitch":-10.97212628857863,"firstOutside":null,"extra":{"trigger":"reducedMotionMorph","morphPMin":1,"morphPMax":1,"callsMin":6,"callsMax":6}}
+  ✓   23 [chromium] › tests/feedback-round/camera.spec.ts:421:1 › T-SQ-CAM-1 reduced motion morph (20.9s)
+CAM-RESULT {"test":"T-SQ-CAM-1 back and forward restore","browser":"chromium","verdict":"pass","samples":27,"minPitch":-64.48669073907851,"maxPitch":-10.972126288578629,"firstOutside":null,"extra":{"trigger":"backForward","finalUrl":"http://localhost:5173/","morphPMin":0.011571428570896387,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓   24 [chromium] › tests/feedback-round/camera.spec.ts:443:1 › T-SQ-CAM-1 back and forward restore (5.6m)
+T-SQ-CAM-2 clamped pitch: -75.0000000000041
+CAM-RESULT {"test":"T-SQ-CAM-2 forced flat pose","browser":"chromium","verdict":"pass","samples":18,"minPitch":-75.0000000000041,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"forcedFlat","clampedPitch":-75.0000000000041,"walkCompleted":true,"morphPMin":null,"morphPMax":null,"callsMin":3,"callsMax":3}}
+  ✓   25 [chromium] › tests/feedback-round/camera.spec.ts:466:1 › T-SQ-CAM-2 forced flat pose clamps and walk completes (1.2m)
+CAM-RESULT {"test":"T-SQ-CAM-3 reduced motion jump","browser":"chromium","verdict":"pass","samples":126,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"distinctPitches":[-64.49]}}
+  ✓   26 [chromium] › tests/feedback-round/camera.spec.ts:504:1 › T-SQ-CAM-3 reduced motion jump to resting pose (14.8s)
+CAM-RESULT {"test":"T-SQ-CAM fine walk lean","browser":"chromium","verdict":"pass","samples":6,"minPitch":-54.54912206195701,"maxPitch":-54.54912206195699,"firstOutside":null,"extra":{"restPitch":-54.54912206195699,"trails":[{"trail":1,"samples":18,"walkMin":-59.37789088604738,"walkMax":-54.549122061956986,"steepening":4.828768824090389,"firstOutside":null},{"trail":2,"samples":15,"walkMin":-59.53357394069666,"walkMax":-54.549122061956986,"steepening":4.984451878739669,"firstOutside":null},{"trail":3,"samples":14,"walkMin":-59.30833013130393,"walkMax":-54.54912206195699,"steepening":4.75920806934694,"firstOutside":null}]}}
+T-SQ-CAM fine walk lean: restPitch=-54.54912206195699 trails=[{"trail":1,"samples":18,"walkMin":-59.37789088604738,"walkMax":-54.549122061956986,"steepening":4.828768824090389,"firstOutside":null},{"trail":2,"samples":15,"walkMin":-59.53357394069666,"walkMax":-54.549122061956986,"steepening":4.984451878739669,"firstOutside":null},{"trail":3,"samples":14,"walkMin":-59.30833013130393,"walkMax":-54.54912206195699,"steepening":4.75920806934694,"firstOutside":null}]
+  ✓   27 [chromium] › tests/feedback-round/camera.spec.ts:540:1 › T-SQ-CAM fine walk lean on all trails (4.3m)
+CAM-RESULT {"test":"T-HERO-BAND-WALK","browser":"chromium","verdict":"fail","samples":20,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"overlaps":[{"walk":3,"sample":2,"vs":"twin0","hero":[56.58000183105469,498.0199890136719,336.5800018310547,576.47314453125],"other":[207.4503631591797,471.38031005859375,251.4503631591797,515.3803100585938],"atWalkEnd":false}],"overlapCount":1}}
+T-HERO-BAND-WALK: samples=20 overlaps=[{"walk":3,"sample":2,"vs":"twin0","hero":[56.58000183105469,498.0199890136719,336.5800018310547,576.47314453125],"other":[207.4503631591797,471.38031005859375,251.4503631591797,515.3803100585938],"atWalkEnd":false}]
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/reports/w7-cam-chromium.json (20 results)
+  ✘   28 [chromium] › tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks (3.7m)
+CAM-RESULT {"test":"T-SQ-CAM rest name title readout and lanes","browser":"chromium","verdict":"pass","samples":35,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"failed":[]}}
+  ✓   29 [chromium] › tests/feedback-round/camera.spec.ts:695:1 › T-SQ-CAM rest name title readout and lanes (40.3s)
+CAM-RESULT {"test":"T-SQ-CAM pageshow persisted attempt","browser":"chromium","verdict":"not-exercised","samples":1,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"events":[{"persisted":false}],"url":"/sidequests","pitchBefore":-64.48669073907851,"pitchAfter":-64.48669073907851,"laneCount":6144,"calls":1,"exercised":false}}
+T-SQ-CAM pageshow: events=[{"persisted":false}] url=/sidequests pitchBefore=-64.48669073907851 pitchAfter=-64.48669073907851
+  ✓   30 [chromium] › tests/feedback-round/camera.spec.ts:767:1 › T-SQ-CAM pageshow persisted attempt (1.2m)
+CAM-RESULT {"test":"T-SQ-CAM-2 world harness forced flat pose","browser":"chromium","verdict":"pass","samples":1,"minPitch":-75.0000000000041,"maxPitch":-75.0000000000041,"firstOutside":null,"extra":{"clampedPitch":-75.0000000000041,"pos":[0,30,0]}}
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7-fix-wiring/reports/w7-cam-chromium.json (20 results)
+  ✓   31 [chromium] › tests/feedback-round/camera.spec.ts:827:1 › T-SQ-CAM-2 world harness forced flat pose (30.0s)
+T-DEV-1 dev HUD text: jp-dev-hud
+laneCount: 6144
+calls: 1
+pitchDeg: -64.49
+yawDeg: -169.39
+distance: 33.24
+morph: sidequests -> sidequests p=1.00 phase=rest done=true
+hero: sidequests mark anchor=[0.00,0.00] ring=5.00
+frameP95gov: 6206.7ms frameP95hud: 3416.5ms frameP99hud: 6283.1ms frames: 6
+degrade: false over=0 longTask=0 max=0.0ms
+  ✓   32 [chromium] › tests/feedback-round/dev-hud.spec.ts:18:1 › T-DEV-1 dev: HUD renders lane field state under ?hud=1 (33.9s)
+T-DEV-1 prod: scanned 9 dist files, hits=0
+  ✓   33 [chromium] › tests/feedback-round/dev-hud.spec.ts:44:1 › T-DEV-1 prod: no HUD marker in the production bundle (431ms)
+T-DEV-1 preview: #jp-dev-hud count=0
+  ✓   34 [chromium] › tests/feedback-round/dev-hud.spec.ts:72:1 › T-DEV-1 preview: no HUD element on the production preview under ?hud=1 (14.9s)

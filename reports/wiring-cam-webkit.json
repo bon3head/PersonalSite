@@ -1,0 +1,186 @@
+{
+  "browser": "webkit",
+  "results": [
+    {
+      "test": "T-SQ-CAM-1 morph from server",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 18,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48345431789083,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "morphFromServer",
+        "morphPMin": 0.8928571428571429,
+        "morphPMax": 1,
+        "callsMin": 1,
+        "callsMax": 3
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 morph from leaflink",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 19,
+      "minPitch": -64.49471612757158,
+      "maxPitch": -64.11297373367333,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "morphFromLeaflink",
+        "morphPMin": 0.027142857142857142,
+        "morphPMax": 1,
+        "callsMin": 3,
+        "callsMax": 5
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 fast retarget",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 16,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.4825639195263,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "retarget",
+        "finalUrl": "http://localhost:5174/sidequests",
+        "morphPMin": 0.8842857142857142,
+        "morphPMax": 1,
+        "callsMin": 1,
+        "callsMax": 3
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 1",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 12,
+      "minPitch": -74.99999999999997,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "walkTrail1",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 2",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 18,
+      "minPitch": -75.00000000000006,
+      "maxPitch": -64.48669073907848,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "walkTrail2",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 3",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 20,
+      "minPitch": -75.00000000000006,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "walkTrail3",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 reduced motion morph",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 184,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "reducedMotionMorph",
+        "morphPMin": 1,
+        "morphPMax": 1,
+        "callsMin": 6,
+        "callsMax": 6
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 back and forward restore",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 13,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -10.972126288578629,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "backForward",
+        "finalUrl": "http://localhost:5174/",
+        "morphPMin": 0.0028571428571454558,
+        "morphPMax": 1,
+        "callsMin": 1,
+        "callsMax": 5
+      }
+    },
+    {
+      "test": "T-SQ-CAM fine walk lean",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 2,
+      "minPitch": -54.54912206195699,
+      "maxPitch": -54.54912206195699,
+      "firstOutside": null,
+      "extra": {
+        "restPitch": -54.54912206195699,
+        "trails": [
+          {
+            "trail": 1,
+            "samples": 16,
+            "walkMin": -68.43807955479006,
+            "walkMax": -54.54912206195699,
+            "steepening": 13.888957492833072,
+            "firstOutside": null
+          },
+          {
+            "trail": 2,
+            "samples": 27,
+            "walkMin": -69.7711446565516,
+            "walkMax": -55.14426822778146,
+            "steepening": 15.222022594594605,
+            "firstOutside": null
+          },
+          {
+            "trail": 3,
+            "samples": 32,
+            "walkMin": -68.09527868741505,
+            "walkMax": -55.829819061880514,
+            "steepening": 13.546156625458053,
+            "firstOutside": null
+          }
+        ]
+      }
+    },
+    {
+      "test": "T-HERO-BAND-WALK",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 17,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "overlaps": [],
+        "overlapCount": 0
+      }
+    }
+  ]
+}
