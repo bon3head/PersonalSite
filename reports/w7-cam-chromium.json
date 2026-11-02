@@ -1,0 +1,383 @@
+{
+  "browser": "chromium",
+  "results": [
+    {
+      "test": "T-SQ-CAM rest name title readout and lanes",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 35,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "failed": []
+      }
+    },
+    {
+      "test": "T-SQ-CAM pageshow persisted attempt",
+      "browser": "chromium",
+      "verdict": "not-exercised",
+      "samples": 1,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "events": [
+          {
+            "persisted": false
+          }
+        ],
+        "url": "/sidequests",
+        "pitchBefore": -64.48669073907848,
+        "pitchAfter": -64.48669073907851,
+        "laneCount": 6144,
+        "calls": 1,
+        "exercised": false
+      }
+    },
+    {
+      "test": "T-SQ-CAM-2 world harness forced flat pose",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 1,
+      "minPitch": -75.0000000000041,
+      "maxPitch": -75.0000000000041,
+      "firstOutside": null,
+      "extra": {
+        "clampedPitch": -75.0000000000041,
+        "pos": [
+          0,
+          30,
+          0
+        ]
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 cold load",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 6,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907848,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "coldLoad",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 reload",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 6,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907848,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "reload",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 morph from server",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 8,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -10.97212628857863,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "morphFromServer",
+        "morphPMin": 0.013714285714252452,
+        "morphPMax": 1,
+        "callsMin": 1,
+        "callsMax": 3
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 morph from leaflink",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 8,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.11297373367333,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "morphFromLeaflink",
+        "morphPMin": 0.0008571428571095956,
+        "morphPMax": 1,
+        "callsMin": 2,
+        "callsMax": 4
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 fast retarget",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 13,
+      "minPitch": -64.487221017083,
+      "maxPitch": -10.97212628857863,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "retarget",
+        "finalUrl": "http://localhost:5173/sidequests",
+        "morphPMin": 0.0002857142858140703,
+        "morphPMax": 1,
+        "callsMin": 1,
+        "callsMax": 3
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 1",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 23,
+      "minPitch": -69.18541470593723,
+      "maxPitch": -64.48669073907848,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "walkTrail1",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 2",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 19,
+      "minPitch": -69.35492181167218,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "walkTrail2",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 3",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 20,
+      "minPitch": -69.52941957596137,
+      "maxPitch": -64.48669073907848,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "walkTrail3",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 resize and orientation change",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 14,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907848,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "resizeOrientation",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 visibility hidden 60s then shown",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 22,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907848,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "visibility",
+        "method": "cdp-frozen-60s",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 reduced motion morph",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 175,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -10.97212628857863,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "reducedMotionMorph",
+        "morphPMin": 1,
+        "morphPMax": 1,
+        "callsMin": 6,
+        "callsMax": 6
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 back and forward restore",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 20,
+      "minPitch": -64.48669073907853,
+      "maxPitch": -10.972126288578629,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "backForward",
+        "finalUrl": "http://localhost:5173/",
+        "morphPMin": 0.01485714285700981,
+        "morphPMax": 1,
+        "callsMin": 1,
+        "callsMax": 3
+      }
+    },
+    {
+      "test": "T-SQ-CAM-2 forced flat pose",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 20,
+      "minPitch": -75.0000000000041,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "forcedFlat",
+        "clampedPitch": -75.0000000000041,
+        "walkCompleted": true,
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 3,
+        "callsMax": 3
+      }
+    },
+    {
+      "test": "T-SQ-CAM-3 reduced motion jump",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 99,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "distinctPitches": [
+          -64.49
+        ]
+      }
+    },
+    {
+      "test": "T-SQ-CAM fine walk lean",
+      "browser": "chromium",
+      "verdict": "pass",
+      "samples": 13,
+      "minPitch": -54.54912206195702,
+      "maxPitch": -54.549122061956986,
+      "firstOutside": null,
+      "extra": {
+        "restPitch": -54.54912206195699,
+        "trails": [
+          {
+            "trail": 1,
+            "samples": 28,
+            "walkMin": -59.15195258574363,
+            "walkMax": -54.54912206195699,
+            "steepening": 4.602830523786636,
+            "firstOutside": null
+          },
+          {
+            "trail": 2,
+            "samples": 19,
+            "walkMin": -59.246481386570466,
+            "walkMax": -54.549122061956986,
+            "steepening": 4.697359324613473,
+            "firstOutside": null
+          },
+          {
+            "trail": 3,
+            "samples": 13,
+            "walkMin": -59.4477641299065,
+            "walkMax": -54.54912206195699,
+            "steepening": 4.89864206794951,
+            "firstOutside": null
+          }
+        ]
+      }
+    },
+    {
+      "test": "T-HERO-BAND-WALK",
+      "browser": "chromium",
+      "verdict": "fail",
+      "samples": 18,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "overlaps": [
+          {
+            "walk": 2,
+            "sample": 3,
+            "vs": "twin0",
+            "hero": [
+              63.83000183105469,
+              505.2200012207031,
+              343.8300018310547,
+              583.673095703125
+            ],
+            "other": [
+              208.45556640625,
+              472.712158203125,
+              252.45556640625,
+              516.712158203125
+            ],
+            "atWalkEnd": false
+          },
+          {
+            "walk": 3,
+            "sample": 3,
+            "vs": "twin0",
+            "hero": [
+              63.720001220703125,
+              502.42999267578125,
+              343.7200012207031,
+              580.8831176757812
+            ],
+            "other": [
+              208.4013671875,
+              472.6371765136719,
+              252.4013671875,
+              516.63720703125
+            ],
+            "atWalkEnd": false
+          }
+        ],
+        "overlapCount": 2
+      }
+    },
+    {
+      "test": "T-HERO-BAND-WALK hero never overlaps a marker during walks",
+      "browser": "chromium",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 38\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"atWalkEnd\": false,\u001b[39m\n\u001b[31m+     \"hero\": Array [\u001b[39m\n\u001b[31m+       63.83000183105469,\u001b[39m\n\u001b[31m+       505.2200012207031,\u001b[39m\n\u001b[31m+       343.8300018310547,\u001b[39m\n\u001b[31m+       583.673095703125,\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"other\": Array [\u001b[39"
+      }
+    }
+  ]
+}

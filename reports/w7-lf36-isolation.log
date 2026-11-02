@@ -1,0 +1,14 @@
+
+Running 4 tests using 1 worker
+
+T-LF-3 server: lanePixels=289467 inBand=289467
+  ✓  1 tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on server (2.3m)
+T-LF-3 leaflink: lanePixels=76568 inBand=76568
+  ✓  2 tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on leaflink (1.1m)
+T-LF-3 sidequests: lanePixels=21354 inBand=21354
+  ✓  3 tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on sidequests (1.1m)
+  ✓  4 tests/feedback-round/lanefield.spec.ts:351:1 › T-LF-6: lane count, draw calls, and attributes fixed through a morph (1.5m)
+
+  Slow test file: tests/feedback-round/lanefield.spec.ts (6.1m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  4 passed (6.2m)

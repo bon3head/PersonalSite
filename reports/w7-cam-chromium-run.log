@@ -1,0 +1,130 @@
+
+Running 19 tests using 1 worker
+
+CAM-RESULT {"test":"T-SQ-CAM-1 cold load","browser":"chromium","verdict":"pass","samples":7,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"coldLoad","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   1 tests/feedback-round/camera.spec.ts:276:1 › T-SQ-CAM-1 cold load (26.0s)
+CAM-RESULT {"test":"T-SQ-CAM-1 reload","browser":"chromium","verdict":"pass","samples":6,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"trigger":"reload","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   2 tests/feedback-round/camera.spec.ts:286:1 › T-SQ-CAM-1 reload (40.9s)
+CAM-RESULT {"test":"T-SQ-CAM-1 morph from server","browser":"chromium","verdict":"pass","samples":13,"minPitch":-64.48669073907851,"maxPitch":-10.972126288578632,"firstOutside":null,"extra":{"trigger":"morphFromServer","morphPMin":0.004428571428039244,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓   3 tests/feedback-round/camera.spec.ts:298:1 › T-SQ-CAM-1 morph from server (1.2m)
+CAM-RESULT {"test":"T-SQ-CAM-1 morph from leaflink","browser":"chromium","verdict":"pass","samples":8,"minPitch":-64.48669073907853,"maxPitch":-64.11297373367333,"firstOutside":null,"extra":{"trigger":"morphFromLeaflink","morphPMin":0.08571428571428312,"morphPMax":1,"callsMin":3,"callsMax":5}}
+  ✓   4 tests/feedback-round/camera.spec.ts:312:1 › T-SQ-CAM-1 morph from leaflink (27.0s)
+CAM-RESULT {"test":"T-SQ-CAM-1 fast retarget","browser":"chromium","verdict":"pass","samples":13,"minPitch":-64.48739353540114,"maxPitch":-10.972126288578634,"firstOutside":null,"extra":{"trigger":"retarget","finalUrl":"http://localhost:5173/sidequests","morphPMin":0.0005714285712955253,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓   5 tests/feedback-round/camera.spec.ts:326:1 › T-SQ-CAM-1 fast retarget (55.1s)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 1","browser":"chromium","verdict":"pass","samples":16,"minPitch":-69.66115385613656,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail1","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   6 tests/feedback-round/camera.spec.ts:346:3 › T-SQ-CAM-1 walk trail 1 (55.6s)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 2","browser":"chromium","verdict":"pass","samples":20,"minPitch":-69.89326213236843,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail2","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   7 tests/feedback-round/camera.spec.ts:346:3 › T-SQ-CAM-1 walk trail 2 (1.1m)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 3","browser":"chromium","verdict":"pass","samples":21,"minPitch":-69.994407301317,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail3","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   8 tests/feedback-round/camera.spec.ts:346:3 › T-SQ-CAM-1 walk trail 3 (1.1m)
+CAM-RESULT {"test":"T-SQ-CAM-1 resize and orientation change","browser":"chromium","verdict":"pass","samples":12,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"trigger":"resizeOrientation","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   9 tests/feedback-round/camera.spec.ts:363:1 › T-SQ-CAM-1 resize and orientation change (39.5s)
+CAM-RESULT {"test":"T-SQ-CAM-1 visibility hidden 60s then shown","browser":"chromium","verdict":"pass","samples":30,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"visibility","method":"cdp-frozen-60s","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓  10 tests/feedback-round/camera.spec.ts:380:1 › T-SQ-CAM-1 visibility hidden 60s then shown (1.3m)
+CAM-RESULT {"test":"T-SQ-CAM-1 reduced motion morph","browser":"chromium","verdict":"pass","samples":213,"minPitch":-64.48669073907851,"maxPitch":-10.97212628857863,"firstOutside":null,"extra":{"trigger":"reducedMotionMorph","morphPMin":1,"morphPMax":1,"callsMin":6,"callsMax":6}}
+  ✓  11 tests/feedback-round/camera.spec.ts:404:1 › T-SQ-CAM-1 reduced motion morph (18.5s)
+CAM-RESULT {"test":"T-SQ-CAM-1 back and forward restore","browser":"chromium","verdict":"pass","samples":11,"minPitch":-64.48669073907851,"maxPitch":-10.972126288578629,"firstOutside":null,"extra":{"trigger":"backForward","finalUrl":"http://localhost:5173/","morphPMin":0.005999999999600862,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓  12 tests/feedback-round/camera.spec.ts:426:1 › T-SQ-CAM-1 back and forward restore (1.5m)
+T-SQ-CAM-2 clamped pitch: -75.0000000000041
+CAM-RESULT {"test":"T-SQ-CAM-2 forced flat pose","browser":"chromium","verdict":"pass","samples":17,"minPitch":-75.0000000000041,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"forcedFlat","clampedPitch":-75.0000000000041,"walkCompleted":true,"morphPMin":null,"morphPMax":null,"callsMin":3,"callsMax":3}}
+  ✓  13 tests/feedback-round/camera.spec.ts:449:1 › T-SQ-CAM-2 forced flat pose clamps and walk completes (48.5s)
+CAM-RESULT {"test":"T-SQ-CAM-3 reduced motion jump","browser":"chromium","verdict":"pass","samples":177,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"distinctPitches":[-64.49]}}
+  ✓  14 tests/feedback-round/camera.spec.ts:487:1 › T-SQ-CAM-3 reduced motion jump to resting pose (10.0s)
+CAM-RESULT {"test":"T-SQ-CAM fine walk lean","browser":"chromium","verdict":"pass","samples":5,"minPitch":-54.54912206195701,"maxPitch":-54.549122061956986,"firstOutside":null,"extra":{"restPitch":-54.54912206195699,"trails":[{"trail":1,"samples":16,"walkMin":-59.89247961335506,"walkMax":-54.549122061956986,"steepening":5.343357551398064,"firstOutside":null},{"trail":2,"samples":12,"walkMin":-59.832359126779274,"walkMax":-54.54912206195699,"steepening":5.283237064822281,"firstOutside":null},{"trail":3,"samples":12,"walkMin":-59.656965801039945,"walkMax":-54.54912206195699,"steepening":5.107843739082952,"firstOutside":null}]}}
+T-SQ-CAM fine walk lean: restPitch=-54.54912206195699 trails=[{"trail":1,"samples":16,"walkMin":-59.89247961335506,"walkMax":-54.549122061956986,"steepening":5.343357551398064,"firstOutside":null},{"trail":2,"samples":12,"walkMin":-59.832359126779274,"walkMax":-54.54912206195699,"steepening":5.283237064822281,"firstOutside":null},{"trail":3,"samples":12,"walkMin":-59.656965801039945,"walkMax":-54.54912206195699,"steepening":5.107843739082952,"firstOutside":null}]
+  ✓  15 tests/feedback-round/camera.spec.ts:523:1 › T-SQ-CAM fine walk lean on all trails (2.3m)
+CAM-RESULT {"test":"T-HERO-BAND-WALK","browser":"chromium","verdict":"fail","samples":20,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"overlaps":[{"walk":1,"sample":6,"vs":"twin0","hero":[61.46000671386719,499.6099853515625,341.4600067138672,578.0631103515625],"other":[207.4010772705078,471.3179931640625,251.4010772705078,515.3179931640625],"atWalkEnd":false},{"walk":2,"sample":3,"vs":"twin0","hero":[57.83000183105469,498.1600036621094,337.8300018310547,576.6131591796875],"other":[207.97312927246094,472.057861328125,251.97312927246094,516.057861328125],"atWalkEnd":false},{"walk":2,"sample":4,"vs":"twin0","hero":[54.160003662109375,509.8399963378906,334.1600036621094,588.2930908203125],"other":[208.8190155029297,473.22515869140625,252.8190155029297,517.2251586914062],"atWalkEnd":false}],"overlapCount":3}}
+T-HERO-BAND-WALK: samples=20 overlaps=[{"walk":1,"sample":6,"vs":"twin0","hero":[61.46000671386719,499.6099853515625,341.4600067138672,578.0631103515625],"other":[207.4010772705078,471.3179931640625,251.4010772705078,515.3179931640625],"atWalkEnd":false},{"walk":2,"sample":3,"vs":"twin0","hero":[57.83000183105469,498.1600036621094,337.8300018310547,576.6131591796875],"other":[207.97312927246094,472.057861328125,251.97312927246094,516.057861328125],"atWalkEnd":false},{"walk":2,"sample":4,"vs":"twin0","hero":[54.160003662109375,509.8399963378906,334.1600036621094,588.2930908203125],"other":[208.8190155029297,473.22515869140625,252.8190155029297,517.2251586914062],"atWalkEnd":false}]
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-chromium.json
+  ✘  16 tests/feedback-round/camera.spec.ts:579:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks (2.3m)
+CAM-RESULT {"test":"T-SQ-CAM rest name title readout and lanes","browser":"chromium","verdict":"pass","samples":35,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"failed":[]}}
+  ✓  17 tests/feedback-round/camera.spec.ts:678:1 › T-SQ-CAM rest name title readout and lanes (24.4s)
+CAM-RESULT {"test":"T-SQ-CAM pageshow persisted attempt","browser":"chromium","verdict":"not-exercised","samples":1,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"events":[{"persisted":false}],"url":"/sidequests","pitchBefore":-64.48669073907851,"pitchAfter":-64.48669073907848,"laneCount":6144,"calls":1,"exercised":false}}
+T-SQ-CAM pageshow: events=[{"persisted":false}] url=/sidequests pitchBefore=-64.48669073907851 pitchAfter=-64.48669073907848
+  ✓  18 tests/feedback-round/camera.spec.ts:750:1 › T-SQ-CAM pageshow persisted attempt (41.1s)
+CAM-RESULT {"test":"T-SQ-CAM-2 world harness forced flat pose","browser":"chromium","verdict":"fail","samples":1,"minPitch":-75.0000000000041,"maxPitch":-75.0000000000041,"firstOutside":null,"extra":{"clampedPitch":-75.0000000000041,"pos":[0,30,0]}}
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-chromium.json
+  ✓  19 tests/feedback-round/camera.spec.ts:810:1 › T-SQ-CAM-2 world harness forced flat pose (22.9s)
+
+
+  1) tests/feedback-round/camera.spec.ts:579:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 56
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "atWalkEnd": false,
+    +     "hero": Array [
+    +       61.46000671386719,
+    +       499.6099853515625,
+    +       341.4600067138672,
+    +       578.0631103515625,
+    +     ],
+    +     "other": Array [
+    +       207.4010772705078,
+    +       471.3179931640625,
+    +       251.4010772705078,
+    +       515.3179931640625,
+    +     ],
+    +     "sample": 6,
+    +     "vs": "twin0",
+    +     "walk": 1,
+    +   },
+    +   Object {
+    +     "atWalkEnd": false,
+    +     "hero": Array [
+    +       57.83000183105469,
+    +       498.1600036621094,
+    +       337.8300018310547,
+    +       576.6131591796875,
+    +     ],
+    +     "other": Array [
+    +       207.97312927246094,
+    +       472.057861328125,
+    +       251.97312927246094,
+    +       516.057861328125,
+    +     ],
+    +     "sample": 3,
+    +     "vs": "twin0",
+    +     "walk": 2,
+    +   },
+    +   Object {
+    +     "atWalkEnd": false,
+    +     "hero": Array [
+    +       54.160003662109375,
+    +       509.8399963378906,
+    +       334.1600036621094,
+    +       588.2930908203125,
+    +     ],
+    +     "other": Array [
+    +       208.8190155029297,
+    +       473.22515869140625,
+    +       252.8190155029297,
+    +       517.2251586914062,
+    +     ],
+    +     "sample": 4,
+    +     "vs": "twin0",
+    +     "walk": 2,
+    +   },
+    + ]
+
+      670 |   });
+      671 |   console.log(`T-HERO-BAND-WALK: samples=${totalSamples} overlaps=${JSON.stringify(overlaps.slice(0, 20))}`);
+    > 672 |   expect(overlaps).toEqual([]);
+          |                    ^
+      673 |   await context.close();
+      674 | });
+      675 |
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:672:20
+
+    Error Context: test-results/tests-feedback-round-camer-566b1-rlaps-a-marker-during-walks/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camer-566b1-rlaps-a-marker-during-walks/error-context.md
+
+  1 failed
+    tests/feedback-round/camera.spec.ts:579:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks 
+  18 passed (18.0m)

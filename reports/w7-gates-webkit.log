@@ -1,0 +1,719 @@
+
+Running 147 tests using 1 worker
+
+T-S04-1 containment: {"320":{"fits":false,"rightEdge":559},"360":{"fits":false,"rightEdge":607},"390":{"fits":false,"rightEdge":607},"768":{"fits":true,"rightEdge":623},"1024":{"fits":true,"rightEdge":623},"1440":{"fits":true,"rightEdge":639},"2560":{"fits":true,"rightEdge":639}}
+  ✓    1 [webkit] › tests/chrome.spec.ts:34:1 › T-S04-1 keymap never wraps (15.4s)
+  ✓    2 [webkit] › tests/chrome.spec.ts:68:1 › T-S04-2 coarse targets at least 44x44 (3.0s)
+  ✓    3 [webkit] › tests/chrome.spec.ts:118:1 › T-S04-3 axe clean on all routes, sheets closed and open (32.1s)
+  ✘    4 [webkit] › tests/chrome.spec.ts:160:1 › T-S04-4 copy paths (122ms)
+  ✓    5 [webkit] › tests/chrome.spec.ts:204:1 › T-S04-5 focus returns to the keymap button on sheet close (2.3s)
+  ✓    6 [webkit] › tests/chrome.spec.ts:238:1 › T-S04-6 keyboard-only tab order (1.9s)
+  ✓    7 [webkit] › tests/chrome.spec.ts:265:1 › T-S04-7 sheet open animation at most 300ms (2.0s)
+  ✓    8 [webkit] › tests/feedback-round/asset-prefetch.spec.ts:9:1 › T-ASSET-5: no brand request before the first field frame (4.8s)
+  ✓    9 [webkit] › tests/feedback-round/asset.spec.ts:44:1 › T-ASSET-1: manifest matches the files and SOURCES.json (110ms)
+  ✓   10 [webkit] › tests/feedback-round/asset.spec.ts:79:1 › T-ASSET-2: shipped GIF and PNG files are under budget (9ms)
+  ✓   11 [webkit] › tests/feedback-round/asset.spec.ts:98:1 › T-ASSET-3: GIF frame 0 equals the PNG pixel for pixel (1.9s)
+  ✓   12 [webkit] › tests/feedback-round/asset.spec.ts:127:1 › T-ASSET-4: no near-white edge pixels on the navy field (604ms)
+CAM-RESULT {"test":"T-SQ-CAM-1 cold load","browser":"webkit","verdict":"pass","samples":2,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"trigger":"coldLoad","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   13 [webkit] › tests/feedback-round/camera.spec.ts:293:1 › T-SQ-CAM-1 cold load (2.3s)
+CAM-RESULT {"test":"T-SQ-CAM-1 reload","browser":"webkit","verdict":"pass","samples":3,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"trigger":"reload","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   14 [webkit] › tests/feedback-round/camera.spec.ts:303:1 › T-SQ-CAM-1 reload (4.1s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   15 [webkit] › tests/feedback-round/camera.spec.ts:315:1 › T-SQ-CAM-1 morph from server (4.0m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   16 [webkit] › tests/feedback-round/camera.spec.ts:329:1 › T-SQ-CAM-1 morph from leaflink (4.0m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   17 [webkit] › tests/feedback-round/camera.spec.ts:343:1 › T-SQ-CAM-1 fast retarget (4.1m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   18 [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 1 (9.4s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   19 [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 2 (10.0s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   20 [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 3 (9.1s)
+CAM-RESULT {"test":"T-SQ-CAM-1 resize and orientation change","browser":"webkit","verdict":"pass","samples":6,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"resizeOrientation","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   21 [webkit] › tests/feedback-round/camera.spec.ts:380:1 › T-SQ-CAM-1 resize and orientation change (5.9s)
+CAM-RESULT {"test":"T-SQ-CAM-1 visibility hidden 60s then shown","browser":"webkit","verdict":"pass","samples":709,"minPitch":-64.48669073907853,"maxPitch":-64.48669073907847,"firstOutside":null,"extra":{"trigger":"visibility","method":"idle-60s-no-cdp","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   22 [webkit] › tests/feedback-round/camera.spec.ts:397:1 › T-SQ-CAM-1 visibility hidden 60s then shown (1.1m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   23 [webkit] › tests/feedback-round/camera.spec.ts:421:1 › T-SQ-CAM-1 reduced motion morph (4.0m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   24 [webkit] › tests/feedback-round/camera.spec.ts:443:1 › T-SQ-CAM-1 back and forward restore (4.1m)
+T-SQ-CAM-2 clamped pitch: -75.0000000000041
+CAM-RESULT {"test":"T-SQ-CAM-2 forced flat pose","browser":"webkit","verdict":"pass","samples":11,"minPitch":-75.0000000000041,"maxPitch":-75.0000000000041,"firstOutside":null,"extra":{"trigger":"forcedFlat","clampedPitch":-75.0000000000041,"walkCompleted":true,"morphPMin":null,"morphPMax":null,"callsMin":3,"callsMax":3}}
+  ✓   25 [webkit] › tests/feedback-round/camera.spec.ts:466:1 › T-SQ-CAM-2 forced flat pose clamps and walk completes (6.7s)
+CAM-RESULT {"test":"T-SQ-CAM-3 reduced motion jump","browser":"webkit","verdict":"pass","samples":185,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"distinctPitches":[-64.49]}}
+  ✓   26 [webkit] › tests/feedback-round/camera.spec.ts:504:1 › T-SQ-CAM-3 reduced motion jump to resting pose (7.2s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   27 [webkit] › tests/feedback-round/camera.spec.ts:540:1 › T-SQ-CAM fine walk lean on all trails (8.1s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✘   28 [webkit] › tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks (8.0s)
+CAM-RESULT {"test":"T-SQ-CAM rest name title readout and lanes","browser":"webkit","verdict":"pass","samples":20,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"failed":[]}}
+  ✓   29 [webkit] › tests/feedback-round/camera.spec.ts:695:1 › T-SQ-CAM rest name title readout and lanes (5.2s)
+CAM-RESULT {"test":"T-SQ-CAM pageshow persisted attempt","browser":"webkit","verdict":"not-exercised","samples":1,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"events":[{"persisted":false}],"url":"/sidequests","pitchBefore":-64.48669073907851,"pitchAfter":-64.48669073907851,"laneCount":6144,"calls":1,"exercised":false}}
+T-SQ-CAM pageshow: events=[{"persisted":false}] url=/sidequests pitchBefore=-64.48669073907851 pitchAfter=-64.48669073907851
+  ✓   30 [webkit] › tests/feedback-round/camera.spec.ts:767:1 › T-SQ-CAM pageshow persisted attempt (9.8s)
+CAM-RESULT {"test":"T-SQ-CAM-2 world harness forced flat pose","browser":"webkit","verdict":"pass","samples":1,"minPitch":-75.0000000000041,"maxPitch":-75.0000000000041,"firstOutside":null,"extra":{"clampedPitch":-75.0000000000041,"pos":[0,30,0]}}
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✓   31 [webkit] › tests/feedback-round/camera.spec.ts:827:1 › T-SQ-CAM-2 world harness forced flat pose (1.9s)
+T-DEV-1 dev HUD text: jp-dev-hud
+laneCount: 6144
+calls: 1
+pitchDeg: -64.49
+yawDeg: -167.61
+distance: 33.24
+morph: sidequests -> sidequests p=1.00 phase=rest done=true
+hero: sidequests mark anchor=[0.00,0.00] ring=5.00
+frameP95gov: 0.0ms frameP95hud: 0.0ms frameP99hud: 0.0ms frames: 0
+degrade: false over=0 longTask=0 max=0.0ms
+  ✓   32 [webkit] › tests/feedback-round/dev-hud.spec.ts:18:1 › T-DEV-1 dev: HUD renders lane field state under ?hud=1 (2.3s)
+T-DEV-1 prod: scanned 9 dist files, hits=0
+  ✓   33 [webkit] › tests/feedback-round/dev-hud.spec.ts:44:1 › T-DEV-1 prod: no HUD marker in the production bundle (164ms)
+T-DEV-1 preview: #jp-dev-hud count=0
+  ✓   34 [webkit] › tests/feedback-round/dev-hud.spec.ts:72:1 › T-DEV-1 preview: no HUD element on the production preview under ?hud=1 (3.9s)
+  ✓   35 [webkit] › tests/feedback-round/hero.spec.ts:93:1 › T-HERO-1: exactly one mark per project route, none on server or whoami (10.4s)
+T-HERO-2 sidequests: unique colors=1 maxDeltaE=0
+T-HERO-2 leaflink: unique colors=392 maxDeltaE=0
+  ✓   36 [webkit] › tests/feedback-round/hero.spec.ts:144:1 › T-HERO-2: shipped mark pixels sit within fingerprintDeltaE of the fingerprint (1.8s)
+  ✓   37 [webkit] › tests/feedback-round/hero.spec.ts:193:1 › T-HERO-ALT: manifest alt text follows the approved rule (6ms)
+T-HERO-2 leaflink hue fraction excluding hero: 0.0011556558346861843
+T-HERO-2 leaflink hue fraction with planted block: 0.2689685771675426
+  ✓   38 [webkit] › tests/feedback-round/hero.spec.ts:219:1 › T-HERO-2: hue gate passes with the exclusion, planted pixel outside fails it (3.1s)
+  ✓   39 [webkit] › tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 375x667 (8.0s)
+  ✓   40 [webkit] › tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 375x667 (9.9s)
+  ✓   41 [webkit] › tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 390x844 (10.5s)
+  ✓   42 [webkit] › tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 390x844 (8.9s)
+  ✓   43 [webkit] › tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 430x932 (8.5s)
+  ✓   44 [webkit] › tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 430x932 (10.3s)
+  ✓   45 [webkit] › tests/feedback-round/hero.spec.ts:375:1 › T-HERO-4: reduced motion shows static PNG and identity transform (12.1s)
+  ✓   46 [webkit] › tests/feedback-round/hero.spec.ts:421:1 › T-HERO-5: fallback chain F0 to F2 (20.0s)
+  ✓   47 [webkit] › tests/feedback-round/hero.spec.ts:525:1 › T-HERO-5-F3: hero renders with no field (2.6s)
+  ✓   48 [webkit] › tests/feedback-round/hero.spec.ts:543:1 › T-HERO-6: area cap holds on phones and desktop (18ms)
+  ✓   49 [webkit] › tests/feedback-round/hero.spec.ts:583:1 › T-HERO-UV: mask UV mapping is not mirrored (2.5s)
+  ✓   50 [webkit] › tests/feedback-round/hero.spec.ts:634:1 › T-HERO-UNIT: beat, wander, and placement follow the tokens (121ms)
+  ✓   51 [webkit] › tests/feedback-round/lanefield.spec.ts:44:1 › T-LF-7: ring deflection is C1 across the boundary (7ms)
+  ✓   52 [webkit] › tests/feedback-round/lanefield.spec.ts:75:1 › T-LF-2b: params interpolate and the ring envelope peaks mid-travel (7ms)
+  ✓   53 [webkit] › tests/feedback-round/lanefield.spec.ts:106:1 › T-LF-1: per-lane band, length, and phase attributes (4.4s)
+  ✓   54 [webkit] › tests/feedback-round/lanefield.spec.ts:141:1 › T-LF-2: canvas persists and params land on the target tokens (5.7s)
+T-LF-3 server: lanePixels=243141 inBand=243136
+  ✓   55 [webkit] › tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on server (8.6s)
+T-LF-3 leaflink: lanePixels=77002 inBand=77002
+  ✓   56 [webkit] › tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on leaflink (5.5s)
+T-LF-3 sidequests: lanePixels=21671 inBand=21671
+  ✓   57 [webkit] › tests/feedback-round/lanefield.spec.ts:267:3 › T-LF-3: lane pixels in the hue band on sidequests (4.5s)
+T-LF-5: darkColored=56764 darkInBand=56764
+  ✓   58 [webkit] › tests/feedback-round/lanefield.spec.ts:280:1 › T-LF-5: near-black lane pixels pass the hue gate (10.7s)
+T-LF-4 /: theme fade divs excluded: [
+  'DIV linear-gradient(rgb(21, 23, 27) 60%, rgba(0, 0, 0, 0))',
+  'DIV linear-gradient(rgb(21, 23, 27) 60%, rgba(0, 0, 0, 0))'
+]
+  ✓   59 [webkit] › tests/feedback-round/lanefield.spec.ts:304:3 › T-LF-4: no CSS gradient on route / (6.3s)
+T-LF-4 /leaflink: theme fade divs excluded: [
+  'DIV linear-gradient(rgb(230, 226, 220) 60%, rgba(0, 0, 0, 0))',
+  'DIV linear-gradient(rgb(230, 226, 220) 60%, rgba(0, 0, 0, 0))'
+]
+  ✓   60 [webkit] › tests/feedback-round/lanefield.spec.ts:304:3 › T-LF-4: no CSS gradient on route /leaflink (4.2s)
+T-LF-4 /sidequests: theme fade divs excluded: [
+  'DIV linear-gradient(rgb(24, 54, 98) 60%, rgba(0, 0, 0, 0))',
+  'DIV linear-gradient(rgb(24, 54, 98) 60%, rgba(0, 0, 0, 0))'
+]
+  ✓   61 [webkit] › tests/feedback-round/lanefield.spec.ts:304:3 › T-LF-4: no CSS gradient on route /sidequests (3.6s)
+  ✓   62 [webkit] › tests/feedback-round/lanefield.spec.ts:351:1 › T-LF-6: lane count, draw calls, and attributes fixed through a morph (10.4s)
+  ✓   63 [webkit] › tests/feedback-round/lanefield.spec.ts:408:1 › T-TRANS-1: canvas node persists across routes (7.8s)
+T-SQ-CLAMP-1 clamped pitch: -75.0000000000041 pos: [ 0, 30, 0 ]
+T-SQ-CLAMP-1 rest pitch: -54.549122061956986
+  ✓   64 [webkit] › tests/feedback-round/lanefield.spec.ts:439:1 › T-SQ-CLAMP-1: forced flat pose clamps inside the band (2.2s)
+  ✓   65 [webkit] › tests/feedback-round/morph.spec.ts:75:1 › T-MORPH-DESC: hero descriptors carry anchor, ring, silhouette (8ms)
+  ✓   66 [webkit] › tests/feedback-round/morph.spec.ts:107:1 › T-MORPH-PHASES: sample invariants at every quarter of every pair (185ms)
+  ✓   67 [webkit] › tests/feedback-round/morph.spec.ts:138:1 › T-MORPH-ENV: gather peaks, reveal looms, ends hand off to rest (7ms)
+  ✓   68 [webkit] › tests/feedback-round/morph.spec.ts:161:1 › T-MORPH-BREATH: ring dips to ringBreath, regrows, anchor tracks (2ms)
+  ✓   69 [webkit] › tests/feedback-round/morph.spec.ts:187:1 › T-MORPH-RECEDE: outgoing mark recedes over the 0 to 0.40 window (2ms)
+  ✓   70 [webkit] › tests/feedback-round/morph.spec.ts:202:1 › T-MORPH-RETARGET: second input retargets from the current sample (4ms)
+[morph] degrade latched: silhouette pull 0 for session
+[morph] degrade latched: silhouette pull 0 for session
+  ✓   71 [webkit] › tests/feedback-round/morph.spec.ts:227:1 › T-MORPH-REDUCED-DEGRADE: jump on reduced, latch at 30 frames (6ms)
+  ✓   72 [webkit] › tests/feedback-round/morph.spec.ts:266:1 › T-TRANS-2: lanes, draw call, doc height, no navbar, no cards (26.9s)
+  ✘   73 [webkit] › tests/feedback-round/morph.spec.ts:347:1 › T-TRANS-3: retarget mid-flight ends on sidequests, weights one-hot (2.1m)
+T-TRANS-4: reduced travel wall-clock elapsed 735ms
+  ✘   74 [webkit] › tests/feedback-round/morph.spec.ts:387:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade (5.1s)
+  ✘   75 [webkit] › tests/feedback-round/morph.spec.ts:428:1 › T-TRANS-5: back and forward run the morph with keymap direction (2.2m)
+  ✓   76 [webkit] › tests/feedback-round/morph.spec.ts:483:1 › T-TRANS-6: idle 60s per route causes no navigation (3.2m)
+  ✓   77 [webkit] › tests/feedback-round/morph.spec.ts:512:1 › T-NAME-2: name box never intersects the title box during a morph (9.7s)
+  ✘   78 [webkit] › tests/feedback-round/morph.spec.ts:554:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry (13.6s)
+  ✓   79 [webkit] › tests/feedback-round/name.spec.ts:51:1 › T-NAME-1 name box never intersects the title box (46.9s)
+  ✓   80 [webkit] › tests/feedback-round/name.spec.ts:87:1 › T-NAME-1 sidequests title rests across sampled frames while live (7.7s)
+  ✓   81 [webkit] › tests/feedback-round/silhouette.spec.ts:32:1 › T-LF-9: silhouette pull moves lanes near the contour toward it (6ms)
+  ✓   82 [webkit] › tests/feedback-round/silhouette.spec.ts:53:1 › T-LF-9: mask kind, UV mapping, and envelope follow the route (10ms)
+  ✓   83 [webkit] › tests/feedback-round/silhouette.spec.ts:89:1 › T-LF-9: vertex shader mirrors the pull after the ring (74ms)
+  ✓   84 [webkit] › tests/feedback-round/silhouette.spec.ts:107:1 › T-LF-9: manifest names both per-route mask files (3ms)
+T-LF-8 bound: {
+  laneCount: 6144,
+  calls: 1,
+  silhouette: { kind: 'sidequests', loaded: 'sidequests', width: 128, height: 128 }
+}
+  ✓   85 [webkit] › tests/feedback-round/silhouette.spec.ts:122:1 › T-LF-8: one lane draw call with a mask texture bound (2.4s)
+  ✓   86 [webkit] › tests/feedback-round/theme.spec.ts:14:1 › T-THEME-1: per-route gradient parameters match tokens (20ms)
+T-THEME-2 /home/hatch/workspace/worktrees/personalsite-astryx-w7/public/brand/sidequests.frame0.70fcad6b1476ce70.png: colorfulness=0.1523 edgeDensity=0.0490
+T-THEME-2 /home/hatch/workspace/worktrees/personalsite-astryx-w7/public/brand/logo.538a891a8f0d1fbd.png: colorfulness=0.1087 edgeDensity=0.0133
+  ✓   87 [webkit] › tests/feedback-round/theme.spec.ts:59:1 › T-THEME-2: per-route colorfulness and edge density inside one band (2.2s)
+  ✘   88 [webkit] › tests/feedback-round/toast.spec.ts:17:1 › T-TOAST-1 toast paints above the open Contact sheet (86ms)
+  ✘   89 [webkit] › tests/feedback-round/toast.spec.ts:59:1 › T-TOAST-2 toast inside the open dialog, not inert, announced role (274ms)
+  ✘   90 [webkit] › tests/feedback-round/toast.spec.ts:105:1 › T-TOAST-3 toast does not move focus (281ms)
+  ✓   91 [webkit] › tests/layouts/scatter.test.ts:24:1 › scatter writes 6144 lanes of 8 points, all class 9 (90ms)
+  ✓   92 [webkit] › tests/layouts/scatter.test.ts:37:1 › scatter geometry: centers in sphere, lengths in range, points evenly spaced (73ms)
+  ✓   93 [webkit] › tests/layouts/scatter.test.ts:72:1 › scatter is deterministic across runs (1.7s)
+  ✓   94 [webkit] › tests/layouts/scatter.test.ts:80:1 › scatter generation is under 150ms (63ms)
+  ✓   95 [webkit] › tests/layouts/scatter.test.ts:88:1 › scatter touches only its own layout texels (12ms)
+  ✓   96 [webkit] › tests/scenes/leaflink.spec.ts:51:1 › T-LL-1: exactly 6144 lanes, connected graph (2.5s)
+  ✓   97 [webkit] › tests/scenes/leaflink.spec.ts:93:1 › T-LL-2: deterministic first minute (first 20 events identical) (2.8s)
+  ✘   98 [webkit] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms (4.6s)
+  ✘   99 [webkit] › tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) (4.6s)
+  ✘  100 [webkit] › tests/scenes/leaflink.spec.ts:353:1 › T-LL-5: legend slip contrast (2.8s)
+  ✓  101 [webkit] › tests/scenes/leaflink.spec.ts:390:1 › T-LL-6: no labels in scene (3.8s)
+T-LL-7 hue fraction (chroma > 0.04): 0.004487847222222222
+  ✓  102 [webkit] › tests/scenes/leaflink.spec.ts:417:1 › T-LL-7: hue budget under 10 percent after 30s (36.5s)
+  ✓  103 [webkit] › tests/scenes/notfound.spec.ts:27:1 › T-404-1: unknown path renders the scene (2.8s)
+  ✓  104 [webkit] › tests/scenes/notfound.spec.ts:42:1 › T-404-2: one key home (2.1s)
+  ✓  105 [webkit] › tests/scenes/server.spec.ts:17:1 › T-SRV-1: server layout hand values (12ms)
+  ✓  106 [webkit] › tests/scenes/server.spec.ts:75:1 › T-SRV-3: warp 10 fires in lockstep (12ms)
+  ✓  107 [webkit] › tests/scenes/server.spec.ts:180:3 › T-SRV-2: readout clear at 1440x900 (13.3s)
+  ✓  108 [webkit] › tests/scenes/server.spec.ts:180:3 › T-SRV-2: readout clear at 390x844 (15.7s)
+  ✓  109 [webkit] › tests/scenes/server.spec.ts:237:1 › T-SRV-4: word set equals world.server.words over 12s (16.7s)
+  ✓  110 [webkit] › tests/scenes/server.spec.ts:278:1 › T-SRV-5: server hue budget (8.2s)
+  ✓  111 [webkit] › tests/scenes/server.spec.ts:296:1 › T-SRV-6: LCP element is the H1 (5.3s)
+  ✓  112 [webkit] › tests/scenes/server.spec.ts:324:1 › G-COPY: server readout matches S09 copy (1.7s)
+  ✓  113 [webkit] › tests/scenes/sidequests.spec.ts:183:1 › T-SQ-2: walk feedback (5.8s)
+T-SQ-4: trail0 length=11.83 claimStart=0.850 minDrop=-0.0276 settleErr=0.0000
+  ✓  114 [webkit] › tests/scenes/sidequests.spec.ts:230:1 › T-SQ-4: spring numbers (1.2s)
+  ✓  115 [webkit] › tests/scenes/sidequests.spec.ts:270:1 › T-SQ-5: keyboard (4.2s)
+T-SQ-3: "SideQuests" color=rgb(245, 241, 233) maxBgLum=0.038 contrast=10.62
+T-SQ-3: "Community engagement built as quests: sm" color=rgb(245, 241, 233) maxBgLum=0.046 contrast=9.70
+T-SQ-3: "Hackathon build with Julian Shuster. 2nd" color=rgb(182, 198, 215) maxBgLum=0.047 contrast=6.19
+T-SQ-3: "Built at Hack New Paltz. Working MVP in " color=rgb(182, 198, 215) maxBgLum=0.042 contrast=6.57
+T-SQ-3: "Tap a marker to walk its trail.Click a m" color=rgb(182, 198, 215) maxBgLum=0.038 contrast=6.86
+  ✓  116 [webkit] › tests/scenes/sidequests.spec.ts:292:1 › T-SQ-3: readout contrast (5.4s)
+T-SQ-6: signalPixels=2016 total=1296000 fraction=0.0016
+  ✓  117 [webkit] › tests/scenes/sidequests.spec.ts:339:1 › T-SQ-6: hue budget (8.2s)
+  ✓  118 [webkit] › tests/scenes/sidequests.spec.ts:379:1 › T-SQ-7 (extra): reduced motion (2.5s)
+  ✓  119 [webkit] › tests/travel-prerender.spec.ts:56:1 › prerender: all four route files with correct shell (22.3s)
+  ✓  120 [webkit] › tests/travel-prerender.spec.ts:76:1 › prerender: copy strings match src/copy.ts (3ms)
+  ✓  121 [webkit] › tests/travel-prerender.spec.ts:84:1 › T-S03-5: zero console errors on served prerendered paths (29.0s)
+  ✓  122 [webkit] › tests/travel.spec.ts:202:1 › T-S03-1: no reload across 20 random go calls (3.1s)
+  ✓  123 [webkit] › tests/travel.spec.ts:236:1 › T-S03-2: deep links render the right scene (5.0s)
+  ✓  124 [webkit] › tests/travel.spec.ts:257:1 › T-S03-3: history back and forward stay in sync (3.0s)
+  ✓  125 [webkit] › tests/travel.spec.ts:293:1 › T-S03-4: travel is interruptible (2.2s)
+  ✓  126 [webkit] › tests/travel.spec.ts:314:1 › T-S03-5: clean console on every route (dev harness) (6.2s)
+  ✓  127 [webkit] › tests/travel.spec.ts:330:1 › T-S03-6: DOM feedback under 250ms (2.2s)
+  ✓  128 [webkit] › tests/travel.spec.ts:370:1 › T-S03-7: focus moves to the new H1 and the region announces (2.8s)
+  ✘  129 [webkit] › tests/travel.spec.ts:395:1 › T-S03-8: reduced-motion travel completes within 320ms (2.6s)
+  ✓  130 [webkit] › tests/travel.spec.ts:439:1 › router: path normalization, hash, arrows, sheet replaceState (2.4s)
+  ✓  131 [webkit] › tests/travel.spec.ts:484:1 › router: sheet open disables scene keys but not the sheet key (3.0s)
+  ✓  132 [webkit] › tests/world.engine.spec.ts:52:1 › T-S02-1: 6,144 lanes, one draw call (4.4s)
+  ✓  133 [webkit] › tests/world.engine.spec.ts:60:1 › T-S02-1b: one draw call with ?debug=lanesOnly (2.8s)
+  ✓  134 [webkit] › tests/world.engine.spec.ts:66:1 › T-S02-2: layoutHash identical across two fresh loads (Chromium) (5.4s)
+  ✓  135 [webkit] › tests/world.engine.spec.ts:79:1 › T-S02-3: weights sum to 1 at every frame of a travel (4.3s)
+  ✘  136 [webkit] › tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width (2.4s)
+  ✓  137 [webkit] › tests/world.engine.spec.ts:133:1 › T-S02-6: no shader compile after ready across 3 travels (5.7s)
+  ✓  138 [webkit] › tests/world.engine.spec.ts:148:1 › T-S02-7: context loss recovers with layoutHash unchanged (4.2s)
+  -  139 [webkit] › tests/world.engine.spec.ts:181:6 › T-S02-8: no longtask during startup (SwiftShader; gate is G-PERF-DEVICE)
+  ✓  140 [webkit] › tests/world.layouts.server.spec.ts:26:1 › T-SRV-1: lanes 0, 127, 128, 6143 at k=0 match hand values (160ms)
+  ✓  141 [webkit] › tests/world.layouts.server.spec.ts:44:1 › T-SRV-1: converge points k=6, k=7 for lane 0 mix toward focus (18ms)
+  ✓  142 [webkit] › tests/world.layouts.server.spec.ts:59:1 › server layout: exactly 6144 lanes of 8 points, all finite, all class 0 (88ms)
+  ✓  143 [webkit] › tests/world.layouts.server.spec.ts:80:1 › server layout: deterministic across runs and seeds (pure grid arithmetic) (3.4s)
+  ✓  144 [webkit] › tests/world.layouts.server.spec.ts:91:1 › server layout: generation under 150ms in Node (1ms)
+  ✓  145 [webkit] › tests/world.layouts.server.spec.ts:99:1 › server layout: writes only its own layout slice (2ms)
+  ✓  146 [webkit] › tests/world.tween.spec.ts:5:1 › easeSignature(0.3) is between 0.80 and 0.86 (4ms)
+  ✓  147 [webkit] › tests/world.tween.spec.ts:11:1 › spring(0.7, 3.2) peaks 1.040 to 1.052 and settles within 0.01 of 1 after 0.6s (10ms)
+
+
+  1) [webkit] › tests/chrome.spec.ts:160:1 › T-S04-4 copy paths ────────────────────────────────────
+
+    Error: browserContext.newPage: Unknown permission: clipboard-write
+
+      163 |     permissions: ['clipboard-read', 'clipboard-write'],
+      164 |   });
+    > 165 |   const okPage = await granted.newPage();
+          |                                ^
+      166 |   await gotoRoute(okPage, '/');
+      167 |   await okPage.click('.jp-keymap-item >> text=contact');
+      168 |   await okPage.waitForSelector('text=justinf0829@gmail.com', {
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/chrome.spec.ts:165:32
+
+    Error Context: test-results/tests-chrome-T-S04-4-copy-paths-webkit/error-context.md
+
+  2) [webkit] › tests/feedback-round/camera.spec.ts:315:1 › T-SQ-CAM-1 morph from server ───────────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:321:9
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-morph-from-server-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-morph-from-server-webkit/error-context.md
+
+  3) [webkit] › tests/feedback-round/camera.spec.ts:329:1 › T-SQ-CAM-1 morph from leaflink ─────────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:335:9
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-morph-from-leaflink-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-morph-from-leaflink-webkit/error-context.md
+
+  4) [webkit] › tests/feedback-round/camera.spec.ts:343:1 › T-SQ-CAM-1 fast retarget ───────────────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:351:9
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-fast-retarget-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-fast-retarget-webkit/error-context.md
+
+  5) [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 1 ────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        12 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      365 |     await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      366 |     await waitReady(page);
+    > 367 |     await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                  ^
+      368 |     await page.waitForTimeout(1500);
+      369 |     await startSampler(page);
+      370 |     await walkByKeyboard(page, `Trail ${trail}`);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:367:66
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-1-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-1-webkit/error-context.md
+
+  6) [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 2 ────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        12 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      365 |     await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      366 |     await waitReady(page);
+    > 367 |     await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                  ^
+      368 |     await page.waitForTimeout(1500);
+      369 |     await startSampler(page);
+      370 |     await walkByKeyboard(page, `Trail ${trail}`);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:367:66
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-2-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-2-webkit/error-context.md
+
+  7) [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 3 ────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        12 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      365 |     await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      366 |     await waitReady(page);
+    > 367 |     await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                  ^
+      368 |     await page.waitForTimeout(1500);
+      369 |     await startSampler(page);
+      370 |     await walkByKeyboard(page, `Trail ${trail}`);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:367:66
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-3-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-3-webkit/error-context.md
+
+  8) [webkit] › tests/feedback-round/camera.spec.ts:421:1 › T-SQ-CAM-1 reduced motion morph ────────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:433:9
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-reduced-motion-morph-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-reduced-motion-morph-webkit/error-context.md
+
+  9) [webkit] › tests/feedback-round/camera.spec.ts:443:1 › T-SQ-CAM-1 back and forward restore ────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:448:9
+
+    Error Context: test-results/tests-feedback-round-camer-eee44--1-back-and-forward-restore-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camer-eee44--1-back-and-forward-restore-webkit/error-context.md
+
+  10) [webkit] › tests/feedback-round/camera.spec.ts:540:1 › T-SQ-CAM fine walk lean on all trails ─
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        12 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      543 |   await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      544 |   await waitReady(page);
+    > 545 |   await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                ^
+      546 |   await page.waitForTimeout(1500);
+      547 |   await startSampler(page);
+      548 |   await waitFrames(page, 2);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:545:64
+
+    Error Context: test-results/tests-feedback-round-camer-b1081-ine-walk-lean-on-all-trails-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camer-b1081-ine-walk-lean-on-all-trails-webkit/error-context.md
+
+  11) [webkit] › tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        13 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      598 |   await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      599 |   await waitReady(page);
+    > 600 |   await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                ^
+      601 |   await page.waitForTimeout(1500);
+      602 |   const startInterval = (): Promise<void> =>
+      603 |     page.evaluate(() => {
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:600:64
+
+    Error Context: test-results/tests-feedback-round-camer-566b1-rlaps-a-marker-during-walks-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camer-566b1-rlaps-a-marker-during-walks-webkit/error-context.md
+
+  12) [webkit] › tests/feedback-round/morph.spec.ts:347:1 › T-TRANS-3: retarget mid-flight ends on sidequests, weights one-hot 
+
+    TimeoutError: page.waitForFunction: Timeout 120000ms exceeded.
+
+      361 |   // SwiftShader frames are sparse, so wait for the hook to catch up
+      362 |   // to this travel before asserting it.
+    > 363 |   await page.waitForFunction(
+          |              ^
+      364 |     () =>
+      365 |       (window as unknown as { __morph?: { to?: string; sample?: { done?: boolean } } }).__morph?.to ===
+      366 |         'sidequests' &&
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/morph.spec.ts:363:14
+
+    Error Context: test-results/tests-feedback-round-morph-9f75f--sidequests-weights-one-hot-webkit/error-context.md
+
+  13) [webkit] › tests/feedback-round/morph.spec.ts:387:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade 
+
+    Error: expect(received).toBeCloseTo(expected, precision)
+
+    Expected: 1
+    Received: 0
+
+    Expected precision:    2
+    Expected difference: < 0.005
+    Received difference:   1
+
+      419 |     morph: (window as unknown as { __morph?: { sample?: { p?: number; done?: boolean } } }).__morph?.sample,
+      420 |   }));
+    > 421 |   expect(reduced.weights[1]).toBeCloseTo(1, 2);
+          |                              ^
+      422 |   expect(reduced.morph?.p).toBe(1);
+      423 |   expect(reduced.morph?.done).toBe(true);
+      424 |   await context.close();
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/morph.spec.ts:421:30
+
+    Error Context: test-results/tests-feedback-round-morph-b61d5-jump-with-a-short-crossfade-webkit/error-context.md
+
+  14) [webkit] › tests/feedback-round/morph.spec.ts:428:1 › T-TRANS-5: back and forward run the morph with keymap direction 
+
+    TimeoutError: page.waitForFunction: Timeout 120000ms exceeded.
+
+      439 |   );
+      440 |   await page.waitForTimeout(1500);
+    > 441 |   await page.waitForFunction(
+          |              ^
+      442 |     () =>
+      443 |       (window as unknown as { __morph?: { to?: string } }).__morph?.to ===
+      444 |       'leaflink',
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/morph.spec.ts:441:14
+
+    Error Context: test-results/tests-feedback-round-morph-b6bc4-morph-with-keymap-direction-webkit/error-context.md
+
+  15) [webkit] › tests/feedback-round/morph.spec.ts:554:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 0.01
+    Received:   0.8024664784706144
+
+      590 |   const stats = await analyzeShot(page, shot, box);
+      591 |   expect(stats.total).toBeGreaterThan(0);
+    > 592 |   expect(stats.maxDelta).toBeLessThan(0.01);
+          |                          ^
+      593 | });
+      594 |
+      595 | async function analyzeShot(
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/morph.spec.ts:592:26
+
+    Error Context: test-results/tests-feedback-round-morph-f0f6c-100-percent-of-server-entry-webkit/error-context.md
+
+  16) [webkit] › tests/feedback-round/toast.spec.ts:17:1 › T-TOAST-1 toast paints above the open Contact sheet 
+
+    Error: browserContext.newPage: Unknown permission: clipboard-write
+
+      24 |     permissions: ['clipboard-read', 'clipboard-write'],
+      25 |   });
+    > 26 |   const page = await context.newPage();
+         |                              ^
+      27 |   await openContact(page);
+      28 |   await page.click('text=Copy email');
+      29 |   await page.waitForSelector('text=Copied.', { timeout: 10000 });
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/toast.spec.ts:26:30
+
+    Error Context: test-results/tests-feedback-round-toast-d6d26-bove-the-open-Contact-sheet-webkit/error-context.md
+
+  17) [webkit] › tests/feedback-round/toast.spec.ts:59:1 › T-TOAST-2 toast inside the open dialog, not inert, announced role 
+
+    Error: browserContext.newPage: Unknown permission: clipboard-write
+
+      66 |     permissions: ['clipboard-read', 'clipboard-write'],
+      67 |   });
+    > 68 |   const page = await context.newPage();
+         |                              ^
+      69 |   await openContact(page);
+      70 |   await page.click('text=Copy email');
+      71 |   await page.waitForSelector('text=Copied.', { timeout: 10000 });
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/toast.spec.ts:68:30
+
+    Error Context: test-results/tests-feedback-round-toast-381d9-og-not-inert-announced-role-webkit/error-context.md
+
+  18) [webkit] › tests/feedback-round/toast.spec.ts:105:1 › T-TOAST-3 toast does not move focus ────
+
+    Error: browserContext.newPage: Unknown permission: clipboard-write
+
+      110 |     permissions: ['clipboard-read', 'clipboard-write'],
+      111 |   });
+    > 112 |   const page = await context.newPage();
+          |                              ^
+      113 |   await openContact(page);
+      114 |   await page.click('text=Copy email');
+      115 |   await page.waitForSelector('text=Copied.', { timeout: 10000 });
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/toast.spec.ts:112:30
+
+    Error Context: test-results/tests-feedback-round-toast-ed3be-3-toast-does-not-move-focus-webkit/error-context.md
+
+  19) [webkit] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms ───────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      282 |     }
+      283 |   }, tapAt);
+    > 284 |   expect(found).toBe(true);
+          |                 ^
+      285 |   await disposeReal(page);
+      286 | });
+      287 |
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/scenes/leaflink.spec.ts:284:17
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-3-tap-responds-within-300ms-webkit/error-context.md
+
+  20) [webkit] › tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) ───
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      347 |     }
+      348 |   }, tapAt);
+    > 349 |   expect(found).toBe(true);
+          |                 ^
+      350 |   await disposeReal(page);
+      351 | });
+      352 |
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/scenes/leaflink.spec.ts:349:17
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-d58fc-ard-path-OfferButton-Enter--webkit/error-context.md
+
+  21) [webkit] › tests/scenes/leaflink.spec.ts:353:1 › T-LL-5: legend slip contrast ────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 3
+
+      Array [
+    -   230,
+    -   226,
+    -   220,
+    +   21,
+    +   23,
+    +   27,
+      ]
+
+      378 |   });
+      379 |   // Rendered slip background is the paper.raised token.
+    > 380 |   expect(parseRgb(res.bg)).toEqual(parseHex(res.tokens.raised));
+          |                            ^
+      381 |   // Receipt pairs: paper.text and paper.text2 on paper.raised.
+      382 |   expect(
+      383 |     contrast(parseHex(res.tokens.text), parseHex(res.tokens.raised)),
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/scenes/leaflink.spec.ts:380:28
+
+    Error Context: test-results/tests-scenes-leaflink-T-LL-5-legend-slip-contrast-webkit/error-context.md
+
+  22) [webkit] › tests/travel.spec.ts:395:1 › T-S03-8: reduced-motion travel completes within 320ms 
+
+    Error: expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 320
+    Received:    338
+
+      432 |     return result;
+      433 |   });
+    > 434 |   expect(ms).toBeLessThanOrEqual(320);
+          |              ^
+      435 |   const w = await weights(page);
+      436 |   expect(w).toEqual([0, 1, 0, 0]);
+      437 | });
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/travel.spec.ts:434:14
+
+    Error Context: test-results/tests-travel-T-S03-8-reduc-d5dd9-avel-completes-within-320ms-webkit/error-context.md
+
+  23) [webkit] › tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width 
+
+    Error: expect(received).toBeLessThan(expected)
+
+    Expected: < 0.98
+    Received:   0.9840091589578679
+
+      124 |   const focusFrac = focus[0] / vp.width;
+      125 |   expect(focusFrac).toBeGreaterThan(0.87);
+    > 126 |   expect(focusFrac).toBeLessThan(0.98);
+          |                     ^
+      127 |   console.log(
+      128 |     `T-S02-5 note: focus projects to ${focusFrac.toFixed(3)} of width; ` +
+      129 |       `spec (S02 v1.0.1) tests target at 0.72; focus band is an extra lock.`,
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/world.engine.spec.ts:126:21
+
+    Error Context: test-results/tests-world.engine-T-S02-5-ecea5-y-shift-2-of-viewport-width-webkit/error-context.md
+
+    Error Context: test-results/tests-world.engine-T-S02-5-ecea5-y-shift-2-of-viewport-width-webkit/error-context.md
+
+  23 failed
+    [webkit] › tests/chrome.spec.ts:160:1 › T-S04-4 copy paths ─────────────────────────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:315:1 › T-SQ-CAM-1 morph from server ────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:329:1 › T-SQ-CAM-1 morph from leaflink ──────────
+    [webkit] › tests/feedback-round/camera.spec.ts:343:1 › T-SQ-CAM-1 fast retarget ────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 1 ─────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 2 ─────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 3 ─────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:421:1 › T-SQ-CAM-1 reduced motion morph ─────────
+    [webkit] › tests/feedback-round/camera.spec.ts:443:1 › T-SQ-CAM-1 back and forward restore ─────
+    [webkit] › tests/feedback-round/camera.spec.ts:540:1 › T-SQ-CAM fine walk lean on all trails ───
+    [webkit] › tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks 
+    [webkit] › tests/feedback-round/morph.spec.ts:347:1 › T-TRANS-3: retarget mid-flight ends on sidequests, weights one-hot 
+    [webkit] › tests/feedback-round/morph.spec.ts:387:1 › T-TRANS-4: reduced motion travel is a jump with a short crossfade 
+    [webkit] › tests/feedback-round/morph.spec.ts:428:1 › T-TRANS-5: back and forward run the morph with keymap direction 
+    [webkit] › tests/feedback-round/morph.spec.ts:554:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry 
+    [webkit] › tests/feedback-round/toast.spec.ts:17:1 › T-TOAST-1 toast paints above the open Contact sheet 
+    [webkit] › tests/feedback-round/toast.spec.ts:59:1 › T-TOAST-2 toast inside the open dialog, not inert, announced role 
+    [webkit] › tests/feedback-round/toast.spec.ts:105:1 › T-TOAST-3 toast does not move focus ──────
+    [webkit] › tests/scenes/leaflink.spec.ts:252:1 › T-LL-3: tap responds within 300ms ─────────────
+    [webkit] › tests/scenes/leaflink.spec.ts:288:1 › T-LL-4: keyboard path (OfferButton Enter) ─────
+    [webkit] › tests/scenes/leaflink.spec.ts:353:1 › T-LL-5: legend slip contrast ──────────────────
+    [webkit] › tests/travel.spec.ts:395:1 › T-S03-8: reduced-motion travel completes within 320ms ──
+    [webkit] › tests/world.engine.spec.ts:101:1 › T-S02-5: principal shift moves the image by shift/2 of viewport width 
+  1 skipped
+  123 passed (42.5m)

@@ -1,0 +1,33 @@
+
+Running 6 tests using 1 worker
+
+  ✓  1 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 375x667 (1.2m)
+  ✓  2 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 375x667 (1.5m)
+  ✓  3 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 390x844 (1.3m)
+  ✓  4 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 390x844 (2.0m)
+  ✓  5 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 430x932 (1.7m)
+  ✘  6 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 430x932 (5.0m)
+
+
+  1) tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 430x932 
+
+    Test timeout of 300000ms exceeded.
+
+    Error: page.evaluate: Test ended.
+
+      347 |         // Motion bounds at the sampled frame: beat scale at or under
+      348 |         // the token, wander offset magnitude at or under 10 px.
+    > 349 |         const motion = await page.evaluate(() => {
+          |                                   ^
+      350 |           const el = document.querySelector('[data-brand-mark]') as HTMLElement;
+      351 |           const t = getComputedStyle(el).transform;
+      352 |           if (t === 'none') return { scale: 1, dx: 0, dy: 0 };
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/hero.spec.ts:349:35
+
+    Error Context: test-results/tests-feedback-round-hero--5cec8-arget-on-sidequests-430x932/error-context.md
+
+  Slow test file: tests/feedback-round/hero.spec.ts (12.6m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  1 failed
+    tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 430x932 
+  5 passed (12.8m)

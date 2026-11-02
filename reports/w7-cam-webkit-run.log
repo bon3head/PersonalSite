@@ -1,0 +1,293 @@
+
+Running 19 tests using 1 worker
+
+CAM-RESULT {"test":"T-SQ-CAM-1 cold load","browser":"webkit","verdict":"pass","samples":1,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"trigger":"coldLoad","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   1 [webkit] › tests/feedback-round/camera.spec.ts:293:1 › T-SQ-CAM-1 cold load (9.8s)
+CAM-RESULT {"test":"T-SQ-CAM-1 reload","browser":"webkit","verdict":"pass","samples":3,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"trigger":"reload","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   2 [webkit] › tests/feedback-round/camera.spec.ts:303:1 › T-SQ-CAM-1 reload (7.2s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (3 results)
+  ✘   3 [webkit] › tests/feedback-round/camera.spec.ts:315:1 › T-SQ-CAM-1 morph from server (4.1m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (4 results)
+  ✘   4 [webkit] › tests/feedback-round/camera.spec.ts:329:1 › T-SQ-CAM-1 morph from leaflink (4.1m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (5 results)
+  ✘   5 [webkit] › tests/feedback-round/camera.spec.ts:343:1 › T-SQ-CAM-1 fast retarget (4.1m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (6 results)
+  ✘   6 [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 1 (10.3s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (7 results)
+  ✘   7 [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 2 (8.2s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (8 results)
+  ✘   8 [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 3 (7.7s)
+CAM-RESULT {"test":"T-SQ-CAM-1 resize and orientation change","browser":"webkit","verdict":"pass","samples":5,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"resizeOrientation","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   9 [webkit] › tests/feedback-round/camera.spec.ts:380:1 › T-SQ-CAM-1 resize and orientation change (2.6s)
+CAM-RESULT {"test":"T-SQ-CAM-1 visibility hidden 60s then shown","browser":"webkit","verdict":"pass","samples":777,"minPitch":-64.48669073907853,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"visibility","method":"idle-60s-no-cdp","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓  10 [webkit] › tests/feedback-round/camera.spec.ts:397:1 › T-SQ-CAM-1 visibility hidden 60s then shown (1.0m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (11 results)
+  ✘  11 [webkit] › tests/feedback-round/camera.spec.ts:421:1 › T-SQ-CAM-1 reduced motion morph (4.1m)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (12 results)
+  ✘  12 [webkit] › tests/feedback-round/camera.spec.ts:443:1 › T-SQ-CAM-1 back and forward restore (4.1m)
+T-SQ-CAM-2 clamped pitch: -75.0000000000041
+CAM-RESULT {"test":"T-SQ-CAM-2 forced flat pose","browser":"webkit","verdict":"pass","samples":9,"minPitch":-75.0000000000041,"maxPitch":-75.0000000000041,"firstOutside":null,"extra":{"trigger":"forcedFlat","clampedPitch":-75.0000000000041,"walkCompleted":true,"morphPMin":null,"morphPMax":null,"callsMin":3,"callsMax":3}}
+  ✓  13 [webkit] › tests/feedback-round/camera.spec.ts:466:1 › T-SQ-CAM-2 forced flat pose clamps and walk completes (9.6s)
+CAM-RESULT {"test":"T-SQ-CAM-3 reduced motion jump","browser":"webkit","verdict":"pass","samples":180,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"distinctPitches":[-64.49]}}
+  ✓  14 [webkit] › tests/feedback-round/camera.spec.ts:504:1 › T-SQ-CAM-3 reduced motion jump to resting pose (6.3s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (15 results)
+  ✘  15 [webkit] › tests/feedback-round/camera.spec.ts:540:1 › T-SQ-CAM fine walk lean on all trails (7.8s)
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (16 results)
+  ✘  16 [webkit] › tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks (8.0s)
+CAM-RESULT {"test":"T-SQ-CAM rest name title readout and lanes","browser":"webkit","verdict":"pass","samples":20,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"failed":[]}}
+  ✓  17 [webkit] › tests/feedback-round/camera.spec.ts:695:1 › T-SQ-CAM rest name title readout and lanes (4.5s)
+CAM-RESULT {"test":"T-SQ-CAM pageshow persisted attempt","browser":"webkit","verdict":"not-exercised","samples":1,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"events":[{"persisted":false}],"url":"/sidequests","pitchBefore":-64.48669073907851,"pitchAfter":-64.48669073907851,"laneCount":6144,"calls":1,"exercised":false}}
+T-SQ-CAM pageshow: events=[{"persisted":false}] url=/sidequests pitchBefore=-64.48669073907851 pitchAfter=-64.48669073907851
+  ✓  18 [webkit] › tests/feedback-round/camera.spec.ts:767:1 › T-SQ-CAM pageshow persisted attempt (10.6s)
+CAM-RESULT {"test":"T-SQ-CAM-2 world harness forced flat pose","browser":"webkit","verdict":"pass","samples":1,"minPitch":-75.0000000000041,"maxPitch":-75.0000000000041,"firstOutside":null,"extra":{"clampedPitch":-75.0000000000041,"pos":[0,30,0]}}
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-webkit.json (19 results)
+  ✓  19 [webkit] › tests/feedback-round/camera.spec.ts:827:1 › T-SQ-CAM-2 world harness forced flat pose (2.5s)
+
+
+  1) [webkit] › tests/feedback-round/camera.spec.ts:315:1 › T-SQ-CAM-1 morph from server ───────────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:321:9
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-morph-from-server-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-morph-from-server-webkit/error-context.md
+
+  2) [webkit] › tests/feedback-round/camera.spec.ts:329:1 › T-SQ-CAM-1 morph from leaflink ─────────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:335:9
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-morph-from-leaflink-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-morph-from-leaflink-webkit/error-context.md
+
+  3) [webkit] › tests/feedback-round/camera.spec.ts:343:1 › T-SQ-CAM-1 fast retarget ───────────────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:351:9
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-fast-retarget-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-fast-retarget-webkit/error-context.md
+
+  4) [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 1 ────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        12 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      365 |     await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      366 |     await waitReady(page);
+    > 367 |     await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                  ^
+      368 |     await page.waitForTimeout(1500);
+      369 |     await startSampler(page);
+      370 |     await walkByKeyboard(page, `Trail ${trail}`);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:367:66
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-1-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-1-webkit/error-context.md
+
+  5) [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 2 ────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        13 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      365 |     await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      366 |     await waitReady(page);
+    > 367 |     await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                  ^
+      368 |     await page.waitForTimeout(1500);
+      369 |     await startSampler(page);
+      370 |     await walkByKeyboard(page, `Trail ${trail}`);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:367:66
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-2-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-2-webkit/error-context.md
+
+  6) [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 3 ────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        13 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      365 |     await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      366 |     await waitReady(page);
+    > 367 |     await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                  ^
+      368 |     await page.waitForTimeout(1500);
+      369 |     await startSampler(page);
+      370 |     await walkByKeyboard(page, `Trail ${trail}`);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:367:66
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-3-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-walk-trail-3-webkit/error-context.md
+
+  7) [webkit] › tests/feedback-round/camera.spec.ts:421:1 › T-SQ-CAM-1 reduced motion morph ────────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:433:9
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-reduced-motion-morph-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camera-T-SQ-CAM-1-reduced-motion-morph-webkit/error-context.md
+
+  8) [webkit] › tests/feedback-round/camera.spec.ts:443:1 › T-SQ-CAM-1 back and forward restore ────
+
+    TimeoutError: page.waitForFunction: Timeout 240000ms exceeded.
+
+      174 |
+      175 | async function waitTravelDone(page: Page): Promise<void> {
+    > 176 |   await page.waitForFunction(
+          |              ^
+      177 |     () => {
+      178 |       const m = (window as unknown as Record<string, { sample?: { done?: boolean } | null }>).__morph;
+      179 |       return m !== undefined && m.sample !== null && m.sample !== undefined && m.sample.done === true;
+        at waitTravelDone (/home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:176:14)
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:448:9
+
+    Error Context: test-results/tests-feedback-round-camer-eee44--1-back-and-forward-restore-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camer-eee44--1-back-and-forward-restore-webkit/error-context.md
+
+  9) [webkit] › tests/feedback-round/camera.spec.ts:540:1 › T-SQ-CAM fine walk lean on all trails ──
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        13 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      543 |   await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      544 |   await waitReady(page);
+    > 545 |   await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                ^
+      546 |   await page.waitForTimeout(1500);
+      547 |   await startSampler(page);
+      548 |   await waitFrames(page, 2);
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:545:64
+
+    Error Context: test-results/tests-feedback-round-camer-b1081-ine-walk-lean-on-all-trails-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camer-b1081-ine-walk-lean-on-all-trails-webkit/error-context.md
+
+  10) [webkit] › tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: /Trail \d/ })
+    Expected: 3
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: /Trail \d/ }) with timeout 5000ms
+      - waiting for getByRole('button', { name: /Trail \d/ })
+        12 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      598 |   await page.goto(`${DEV}/sidequests`, { waitUntil: 'domcontentloaded' });
+      599 |   await waitReady(page);
+    > 600 |   await expect(page.getByRole('button', { name: /Trail \d/ })).toHaveCount(3);
+          |                                                                ^
+      601 |   await page.waitForTimeout(1500);
+      602 |   const startInterval = (): Promise<void> =>
+      603 |     page.evaluate(() => {
+        at /home/hatch/workspace/worktrees/personalsite-astryx-w7/tests/feedback-round/camera.spec.ts:600:64
+
+    Error Context: test-results/tests-feedback-round-camer-566b1-rlaps-a-marker-during-walks-webkit/error-context.md
+
+    Error Context: test-results/tests-feedback-round-camer-566b1-rlaps-a-marker-during-walks-webkit/error-context.md
+
+  10 failed
+    [webkit] › tests/feedback-round/camera.spec.ts:315:1 › T-SQ-CAM-1 morph from server ────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:329:1 › T-SQ-CAM-1 morph from leaflink ──────────
+    [webkit] › tests/feedback-round/camera.spec.ts:343:1 › T-SQ-CAM-1 fast retarget ────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 1 ─────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 2 ─────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 3 ─────────────────
+    [webkit] › tests/feedback-round/camera.spec.ts:421:1 › T-SQ-CAM-1 reduced motion morph ─────────
+    [webkit] › tests/feedback-round/camera.spec.ts:443:1 › T-SQ-CAM-1 back and forward restore ─────
+    [webkit] › tests/feedback-round/camera.spec.ts:540:1 › T-SQ-CAM fine walk lean on all trails ───
+    [webkit] › tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks 
+  9 passed (23.7m)

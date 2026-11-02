@@ -1,0 +1,64 @@
+
+> justin-poli-personal-site@0.0.0 build
+> npm run brand && npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs && npm run check:hud
+
+
+> justin-poli-personal-site@0.0.0 brand
+> node tools/build-brand-assets.mjs
+
+build-brand-assets: wrote public/brand/manifest.json
+build-brand-assets: sidequests gif sidequests.60421a79e67ab676.gif (42591 bytes, 16527360 decoded)
+build-brand-assets: sidequests frame0 sidequests.frame0.70fcad6b1476ce70.png (15739 bytes)
+build-brand-assets: leaflink png logo.538a891a8f0d1fbd.png (174622 bytes)
+build-brand-assets: fringe near-white edge pixels 0 on every shipped file
+
+> justin-poli-personal-site@0.0.0 gen
+> node tools/extract-tokens.mjs && node tools/extract-copy.mjs && node tools/copy-fonts.mjs
+
+extract-tokens: wrote tokens from DESIGN.md v1.1.0
+extract-copy: wrote 56 entries to src/copy.ts
+copy-fonts: copied 4 files to public/fonts/
+
+> justin-poli-personal-site@0.0.0 theme
+> astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css
+
+
+Next step: run `npx astryx init` to finish setup and install the Astryx agent prompt.
+[ok] themes/lane/dist/lane.css (12.4 KB, 93 token overrides, 5 component overrides)
+[note] Fonts named but not loaded: "Commit Mono", "Commit Mono Fallback". Load them in your app (recipe: astryx docs typography).
+Run with --detail full for the install example and font recipe.
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 716 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.40 kB │ gzip:   0.71 kB
+dist/assets/worker-DIcFacU6.js   20.54 kB
+dist/assets/index-CNEFZPA3.css  210.47 kB │ gzip:  37.52 kB
+dist/assets/index-BRyFurM-.js   517.59 kB │ gzip: 161.77 kB
+dist/assets/world-31AMVewh.js   729.80 kB │ gzip: 205.95 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 17.19s
+vite v7.3.7 building ssr environment for production...
+transforming...
+✓ 34 modules transformed.
+rendering chunks...
+dist-server/entry-server.js           58.84 kB
+dist-server/assets/world-447r_zSd.js  91.65 kB
+✓ built in 1.69s
+prerender: wrote index.html
+prerender: wrote leaflink/index.html
+prerender: wrote sidequests/index.html
+prerender: wrote 404.html
+(node:34120) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+> justin-poli-personal-site@0.0.0 check:hud
+> node tools/check-dev-hud-absent.mjs dist
+
+check-dev-hud-absent: ok, 9 files scanned in dist, no HUD markers

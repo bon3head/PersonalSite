@@ -1,0 +1,201 @@
+
+> justin-poli-personal-site@0.0.0 gates
+> npm run build && npm run lint && npm run theme:check && node tools/banned-scan.mjs dist && playwright test
+
+
+> justin-poli-personal-site@0.0.0 build
+> npm run brand && npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs && npm run check:hud
+
+
+> justin-poli-personal-site@0.0.0 brand
+> node tools/build-brand-assets.mjs
+
+build-brand-assets: wrote public/brand/manifest.json
+build-brand-assets: sidequests gif sidequests.60421a79e67ab676.gif (42591 bytes, 16527360 decoded)
+build-brand-assets: sidequests frame0 sidequests.frame0.70fcad6b1476ce70.png (15739 bytes)
+build-brand-assets: leaflink png logo.538a891a8f0d1fbd.png (174622 bytes)
+build-brand-assets: fringe near-white edge pixels 0 on every shipped file
+
+> justin-poli-personal-site@0.0.0 gen
+> node tools/extract-tokens.mjs && node tools/extract-copy.mjs && node tools/copy-fonts.mjs
+
+extract-tokens: wrote tokens from DESIGN.md v1.1.0
+extract-copy: wrote 56 entries to src/copy.ts
+copy-fonts: copied 4 files to public/fonts/
+
+> justin-poli-personal-site@0.0.0 theme
+> astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css
+
+
+Next step: run `npx astryx init` to finish setup and install the Astryx agent prompt.
+[ok] themes/lane/dist/lane.css (12.4 KB, 93 token overrides, 5 component overrides)
+[note] Fonts named but not loaded: "Commit Mono", "Commit Mono Fallback". Load them in your app (recipe: astryx docs typography).
+Run with --detail full for the install example and font recipe.
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 716 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.40 kB │ gzip:   0.71 kB
+dist/assets/worker-DIcFacU6.js   20.54 kB
+dist/assets/index-CNEFZPA3.css  210.47 kB │ gzip:  37.52 kB
+dist/assets/index-BRyFurM-.js   517.59 kB │ gzip: 161.77 kB
+dist/assets/world-31AMVewh.js   729.80 kB │ gzip: 205.95 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 14.99s
+vite v7.3.7 building ssr environment for production...
+transforming...
+✓ 34 modules transformed.
+rendering chunks...
+dist-server/entry-server.js           58.84 kB
+dist-server/assets/world-447r_zSd.js  91.65 kB
+✓ built in 1.53s
+prerender: wrote index.html
+prerender: wrote leaflink/index.html
+prerender: wrote sidequests/index.html
+prerender: wrote 404.html
+(node:90449) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+> justin-poli-personal-site@0.0.0 check:hud
+> node tools/check-dev-hud-absent.mjs dist
+
+check-dev-hud-absent: ok, 9 files scanned in dist, no HUD markers
+
+> justin-poli-personal-site@0.0.0 lint
+> node tools/lint-tokens.mjs && node tools/banned-scan.mjs src && python3 -I tools/palette-receipt.py spec/astryx/DESIGN.md
+
+lint-tokens: clean
+banned-scan: clean (/home/hatch/workspace/worktrees/personalsite-astryx-w7/src)
+== Distinctness (identity colors must be >= 0.050 from every reference, >= 0.10 from Meta)
+PASS signal         #7BB5F8 nearest=tailwind indigo-300 dE=0.050 dE_meta=0.120
+PASS signalDim      #4F77A5 nearest=tailwind sky-600 dE=0.064 dE_meta=0.122
+PASS ink            #0E3565 nearest=tailwind sky-900 dE=0.065 dE_meta=0.230
+PASS field.ground   #10294E nearest=tailwind indigo-900 dE=0.103 dE_meta=0.282
+== Contrast
+PASS void.text    on void.ground   15.94 (need 4.5)
+PASS void.text2   on void.ground    8.48 (need 4.5)
+PASS signal       on void.ground    9.15 (need 4.5)
+PASS signal       on void.raised    8.38 (need 4.5)
+PASS signalDim    on void.ground    4.21 (need 3.0)
+PASS void.text    on void.raised   14.61 (need 4.5)
+PASS paper.text   on paper.ground  15.92 (need 4.5)
+PASS paper.text2  on paper.ground   6.82 (need 4.5)
+PASS paper.text2  on paper.raised   6.02 (need 4.5)
+PASS ink          on paper.ground  10.76 (need 4.5)
+PASS ink          on paper.raised   9.49 (need 4.5)
+PASS ink          on inkTint        8.69 (need 4.5)
+PASS chalk        on field.ground  12.86 (need 4.5)
+PASS chalk2       on field.ground   8.31 (need 4.5)
+PASS chalk        on field.raised  10.70 (need 4.5)
+PASS chalk2       on field.raised   6.91 (need 4.5)
+PASS signal       on field.ground   6.77 (need 4.5)
+PASS void.ground  on signal         9.15 (need 4.5)
+PASS paper.ground on ink           10.76 (need 4.5)
+PASS errorDark    on void.ground    7.40 (need 4.5)
+PASS errorLight   on paper.ground   5.74 (need 4.5)
+
+> justin-poli-personal-site@0.0.0 theme:check
+> astryx theme build themes/lane/laneTheme.mjs --out themes/lane/dist/lane.css --check
+
+
+Next step: run `npx astryx init` to finish setup and install the Astryx agent prompt.
+
+Building theme from themes/lane/laneTheme.mjs...
+
+[ok] Theme outputs are up to date with themes/lane/laneTheme.mjs.
+banned-scan: clean (/home/hatch/workspace/worktrees/personalsite-astryx-w7/dist)
+
+Running 147 tests using 1 worker
+
+T-S04-1 containment: {"320":{"fits":false,"rightEdge":574},"360":{"fits":false,"rightEdge":622},"390":{"fits":false,"rightEdge":622},"768":{"fits":true,"rightEdge":638},"1024":{"fits":true,"rightEdge":638},"1440":{"fits":true,"rightEdge":654},"2560":{"fits":true,"rightEdge":654}}
+  ✓    1 tests/chrome.spec.ts:34:1 › T-S04-1 keymap never wraps (5.8s)
+  ✓    2 tests/chrome.spec.ts:68:1 › T-S04-2 coarse targets at least 44x44 (1.8s)
+  ✓    3 tests/chrome.spec.ts:118:1 › T-S04-3 axe clean on all routes, sheets closed and open (26.1s)
+  ✓    4 tests/chrome.spec.ts:160:1 › T-S04-4 copy paths (3.3s)
+  ✓    5 tests/chrome.spec.ts:204:1 › T-S04-5 focus returns to the keymap button on sheet close (1.4s)
+  ✓    6 tests/chrome.spec.ts:238:1 › T-S04-6 keyboard-only tab order (1.2s)
+  ✓    7 tests/chrome.spec.ts:265:1 › T-S04-7 sheet open animation at most 300ms (1.4s)
+  ✓    8 tests/feedback-round/asset-prefetch.spec.ts:9:1 › T-ASSET-5: no brand request before the first field frame (1.2m)
+  ✓    9 tests/feedback-round/asset.spec.ts:44:1 › T-ASSET-1: manifest matches the files and SOURCES.json (165ms)
+  ✓   10 tests/feedback-round/asset.spec.ts:79:1 › T-ASSET-2: shipped GIF and PNG files are under budget (14ms)
+  ✓   11 tests/feedback-round/asset.spec.ts:98:1 › T-ASSET-3: GIF frame 0 equals the PNG pixel for pixel (3.3s)
+  ✓   12 tests/feedback-round/asset.spec.ts:127:1 › T-ASSET-4: no near-white edge pixels on the navy field (1.3s)
+CAM-RESULT {"test":"T-SQ-CAM-1 cold load","browser":"chromium","verdict":"pass","samples":5,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"coldLoad","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   13 tests/feedback-round/camera.spec.ts:293:1 › T-SQ-CAM-1 cold load (21.8s)
+CAM-RESULT {"test":"T-SQ-CAM-1 reload","browser":"chromium","verdict":"pass","samples":6,"minPitch":-64.48669073907853,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"trigger":"reload","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   14 tests/feedback-round/camera.spec.ts:303:1 › T-SQ-CAM-1 reload (40.0s)
+CAM-RESULT {"test":"T-SQ-CAM-1 morph from server","browser":"chromium","verdict":"pass","samples":8,"minPitch":-64.48669073907853,"maxPitch":-10.972126288578632,"firstOutside":null,"extra":{"trigger":"morphFromServer","morphPMin":0.0008571428566158699,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓   15 tests/feedback-round/camera.spec.ts:315:1 › T-SQ-CAM-1 morph from server (55.3s)
+CAM-RESULT {"test":"T-SQ-CAM-1 morph from leaflink","browser":"chromium","verdict":"pass","samples":8,"minPitch":-64.48669073907851,"maxPitch":-64.11297373367333,"firstOutside":null,"extra":{"trigger":"morphFromLeaflink","morphPMin":0.018571428571428572,"morphPMax":1,"callsMin":2,"callsMax":4}}
+  ✓   16 tests/feedback-round/camera.spec.ts:329:1 › T-SQ-CAM-1 morph from leaflink (31.5s)
+CAM-RESULT {"test":"T-SQ-CAM-1 fast retarget","browser":"chromium","verdict":"pass","samples":12,"minPitch":-64.48669073907851,"maxPitch":-10.972126288578629,"firstOutside":null,"extra":{"trigger":"retarget","finalUrl":"http://localhost:5173/sidequests","morphPMin":0.0007142857142857143,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓   17 tests/feedback-round/camera.spec.ts:343:1 › T-SQ-CAM-1 fast retarget (54.2s)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 1","browser":"chromium","verdict":"pass","samples":17,"minPitch":-70.42145120863371,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail1","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   18 tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 1 (51.5s)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 2","browser":"chromium","verdict":"pass","samples":19,"minPitch":-69.6195831050119,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail2","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   19 tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 2 (1.1m)
+CAM-RESULT {"test":"T-SQ-CAM-1 walk trail 3","browser":"chromium","verdict":"pass","samples":21,"minPitch":-69.8772138014388,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"walkTrail3","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   20 tests/feedback-round/camera.spec.ts:363:3 › T-SQ-CAM-1 walk trail 3 (1.3m)
+CAM-RESULT {"test":"T-SQ-CAM-1 resize and orientation change","browser":"chromium","verdict":"pass","samples":13,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"resizeOrientation","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   21 tests/feedback-round/camera.spec.ts:380:1 › T-SQ-CAM-1 resize and orientation change (45.8s)
+CAM-RESULT {"test":"T-SQ-CAM-1 visibility hidden 60s then shown","browser":"chromium","verdict":"pass","samples":31,"minPitch":-64.48669073907853,"maxPitch":-64.48669073907848,"firstOutside":null,"extra":{"trigger":"visibility","method":"cdp-frozen-60s","morphPMin":null,"morphPMax":null,"callsMin":1,"callsMax":1}}
+  ✓   22 tests/feedback-round/camera.spec.ts:397:1 › T-SQ-CAM-1 visibility hidden 60s then shown (1.4m)
+CAM-RESULT {"test":"T-SQ-CAM-1 reduced motion morph","browser":"chromium","verdict":"pass","samples":219,"minPitch":-64.48669073907851,"maxPitch":-10.97212628857863,"firstOutside":null,"extra":{"trigger":"reducedMotionMorph","morphPMin":1,"morphPMax":1,"callsMin":6,"callsMax":6}}
+  ✓   23 tests/feedback-round/camera.spec.ts:421:1 › T-SQ-CAM-1 reduced motion morph (14.5s)
+CAM-RESULT {"test":"T-SQ-CAM-1 back and forward restore","browser":"chromium","verdict":"pass","samples":14,"minPitch":-64.48669073907853,"maxPitch":-10.972126288578629,"firstOutside":null,"extra":{"trigger":"backForward","finalUrl":"http://localhost:5173/","morphPMin":0.001857142856876765,"morphPMax":1,"callsMin":1,"callsMax":3}}
+  ✓   24 tests/feedback-round/camera.spec.ts:443:1 › T-SQ-CAM-1 back and forward restore (1.8m)
+T-SQ-CAM-2 clamped pitch: -75.0000000000041
+CAM-RESULT {"test":"T-SQ-CAM-2 forced flat pose","browser":"chromium","verdict":"pass","samples":17,"minPitch":-75.0000000000041,"maxPitch":-64.48669073907853,"firstOutside":null,"extra":{"trigger":"forcedFlat","clampedPitch":-75.0000000000041,"walkCompleted":true,"morphPMin":null,"morphPMax":null,"callsMin":3,"callsMax":3}}
+  ✓   25 tests/feedback-round/camera.spec.ts:466:1 › T-SQ-CAM-2 forced flat pose clamps and walk completes (57.8s)
+CAM-RESULT {"test":"T-SQ-CAM-3 reduced motion jump","browser":"chromium","verdict":"pass","samples":175,"minPitch":-64.48669073907851,"maxPitch":-64.48669073907851,"firstOutside":null,"extra":{"distinctPitches":[-64.49]}}
+  ✓   26 tests/feedback-round/camera.spec.ts:504:1 › T-SQ-CAM-3 reduced motion jump to resting pose (10.4s)
+CAM-RESULT {"test":"T-SQ-CAM fine walk lean","browser":"chromium","verdict":"pass","samples":6,"minPitch":-54.54912206195701,"maxPitch":-54.54912206195699,"firstOutside":null,"extra":{"restPitch":-54.54912206195699,"trails":[{"trail":1,"samples":18,"walkMin":-59.444953555645625,"walkMax":-54.54912206195699,"steepening":4.8958314936886325,"firstOutside":null},{"trail":2,"samples":16,"walkMin":-59.721642035694174,"walkMax":-54.549122061956986,"steepening":5.172519973737181,"firstOutside":null},{"trail":3,"samples":15,"walkMin":-59.65462779602484,"walkMax":-54.549122061956986,"steepening":5.105505734067847,"firstOutside":null}]}}
+T-SQ-CAM fine walk lean: restPitch=-54.54912206195699 trails=[{"trail":1,"samples":18,"walkMin":-59.444953555645625,"walkMax":-54.54912206195699,"steepening":4.8958314936886325,"firstOutside":null},{"trail":2,"samples":16,"walkMin":-59.721642035694174,"walkMax":-54.549122061956986,"steepening":5.172519973737181,"firstOutside":null},{"trail":3,"samples":15,"walkMin":-59.65462779602484,"walkMax":-54.549122061956986,"steepening":5.105505734067847,"firstOutside":null}]
+  ✓   27 tests/feedback-round/camera.spec.ts:540:1 › T-SQ-CAM fine walk lean on all trails (3.0m)
+CAM-RESULT {"test":"T-HERO-BAND-WALK","browser":"chromium","verdict":"fail","samples":21,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"overlaps":[{"walk":1,"sample":6,"vs":"twin0","hero":[63.75,502.510009765625,343.75,580.963134765625],"other":[208.5107879638672,472.7889404296875,252.5107879638672,516.7889404296875],"atWalkEnd":false},{"walk":3,"sample":4,"vs":"twin0","hero":[49.33000183105469,500.69000244140625,329.3300018310547,579.1431274414062],"other":[208.259521484375,472.4427185058594,252.259521484375,516.4427490234375],"atWalkEnd":false}],"overlapCount":2}}
+T-HERO-BAND-WALK: samples=21 overlaps=[{"walk":1,"sample":6,"vs":"twin0","hero":[63.75,502.510009765625,343.75,580.963134765625],"other":[208.5107879638672,472.7889404296875,252.5107879638672,516.7889404296875],"atWalkEnd":false},{"walk":3,"sample":4,"vs":"twin0","hero":[49.33000183105469,500.69000244140625,329.3300018310547,579.1431274414062],"other":[208.259521484375,472.4427185058594,252.259521484375,516.4427490234375],"atWalkEnd":false}]
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-chromium.json (20 results)
+  ✘   28 tests/feedback-round/camera.spec.ts:596:1 › T-HERO-BAND-WALK hero never overlaps a marker during walks (1.9m)
+CAM-RESULT {"test":"T-SQ-CAM rest name title readout and lanes","browser":"chromium","verdict":"pass","samples":35,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"failed":[]}}
+  ✓   29 tests/feedback-round/camera.spec.ts:695:1 › T-SQ-CAM rest name title readout and lanes (24.9s)
+CAM-RESULT {"test":"T-SQ-CAM pageshow persisted attempt","browser":"chromium","verdict":"not-exercised","samples":1,"minPitch":null,"maxPitch":null,"firstOutside":null,"extra":{"events":[{"persisted":false}],"url":"/sidequests","pitchBefore":-64.48669073907851,"pitchAfter":-64.48669073907851,"laneCount":6144,"calls":1,"exercised":false}}
+T-SQ-CAM pageshow: events=[{"persisted":false}] url=/sidequests pitchBefore=-64.48669073907851 pitchAfter=-64.48669073907851
+  ✓   30 tests/feedback-round/camera.spec.ts:767:1 › T-SQ-CAM pageshow persisted attempt (41.0s)
+CAM-RESULT {"test":"T-SQ-CAM-2 world harness forced flat pose","browser":"chromium","verdict":"pass","samples":1,"minPitch":-75.0000000000041,"maxPitch":-75.0000000000041,"firstOutside":null,"extra":{"clampedPitch":-75.0000000000041,"pos":[0,30,0]}}
+CAM-RESULTS written to /home/hatch/workspace/worktrees/personalsite-astryx-w7/reports/w7-cam-chromium.json (20 results)
+  ✓   31 tests/feedback-round/camera.spec.ts:827:1 › T-SQ-CAM-2 world harness forced flat pose (21.6s)
+T-DEV-1 dev HUD text: jp-dev-hud
+laneCount: 6144
+calls: 1
+pitchDeg: -64.49
+yawDeg: -169.86
+distance: 33.24
+morph: sidequests -> sidequests p=1.00 phase=rest done=true
+hero: sidequests mark anchor=[0.00,0.00] ring=5.00
+frameP95gov: 5902.3ms frameP95hud: 3116.5ms frameP99hud: 5916.4ms frames: 8
+degrade: false over=0 longTask=0 max=0.0ms
+  ✓   32 tests/feedback-round/dev-hud.spec.ts:18:1 › T-DEV-1 dev: HUD renders lane field state under ?hud=1 (30.7s)
+T-DEV-1 prod: scanned 9 dist files, hits=0
+  ✓   33 tests/feedback-round/dev-hud.spec.ts:44:1 › T-DEV-1 prod: no HUD marker in the production bundle (176ms)
+T-DEV-1 preview: #jp-dev-hud count=0
+  ✓   34 tests/feedback-round/dev-hud.spec.ts:72:1 › T-DEV-1 preview: no HUD element on the production preview under ?hud=1 (11.2s)
+  ✓   35 tests/feedback-round/hero.spec.ts:93:1 › T-HERO-1: exactly one mark per project route, none on server or whoami (12.1s)
+T-HERO-2 sidequests: unique colors=1 maxDeltaE=0
+T-HERO-2 leaflink: unique colors=392 maxDeltaE=0
+  ✓   36 tests/feedback-round/hero.spec.ts:144:1 › T-HERO-2: shipped mark pixels sit within fingerprintDeltaE of the fingerprint (3.8s)
+  ✓   37 tests/feedback-round/hero.spec.ts:193:1 › T-HERO-ALT: manifest alt text follows the approved rule (66ms)
+T-HERO-2 leaflink hue fraction excluding hero: 0.028062878505704315
+T-HERO-2 leaflink hue fraction with planted block: 0.28398446660872684
+  ✓   38 tests/feedback-round/hero.spec.ts:219:1 › T-HERO-2: hue gate passes with the exclusion, planted pixel outside fails it (3.8s)
+  ✓   39 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 375x667 (1.6m)
+  ✓   40 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 375x667 (1.8m)
+  ✓   41 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 390x844 (1.3m)
+  ✓   42 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 390x844 (1.9m)
+  ✓   43 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /leaflink 430x932 (1.5m)
+  ✓   44 tests/feedback-round/hero.spec.ts:313:5 › T-HERO-3: hero rectangle avoids every zone and marker target on /sidequests 430x932 (2.0m)

@@ -1,0 +1,273 @@
+{
+  "browser": "webkit",
+  "results": [
+    {
+      "test": "T-SQ-CAM-1 cold load",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 2,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "coldLoad",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 reload",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 3,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "reload",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 morph from server",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "TimeoutError: page.waitForFunction: Timeout 240000ms exceeded."
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 morph from leaflink",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "TimeoutError: page.waitForFunction: Timeout 240000ms exceeded."
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 fast retarget",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "TimeoutError: page.waitForFunction: Timeout 240000ms exceeded."
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 1",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('button', { name: /Trail \\d/ })\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByRole('button', { name: /Trail \\d/ }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Trail \\d/ })\u001b[22m\n\u001b[2m    12 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n"
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 2",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('button', { name: /Trail \\d/ })\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByRole('button', { name: /Trail \\d/ }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Trail \\d/ })\u001b[22m\n\u001b[2m    12 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n"
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 walk trail 3",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('button', { name: /Trail \\d/ })\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByRole('button', { name: /Trail \\d/ }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Trail \\d/ })\u001b[22m\n\u001b[2m    12 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n"
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 resize and orientation change",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 6,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907848,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "resizeOrientation",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 visibility hidden 60s then shown",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 709,
+      "minPitch": -64.48669073907853,
+      "maxPitch": -64.48669073907847,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "visibility",
+        "method": "idle-60s-no-cdp",
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 1,
+        "callsMax": 1
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 reduced motion morph",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "TimeoutError: page.waitForFunction: Timeout 240000ms exceeded."
+      }
+    },
+    {
+      "test": "T-SQ-CAM-1 back and forward restore",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "TimeoutError: page.waitForFunction: Timeout 240000ms exceeded."
+      }
+    },
+    {
+      "test": "T-SQ-CAM-2 forced flat pose",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 11,
+      "minPitch": -75.0000000000041,
+      "maxPitch": -75.0000000000041,
+      "firstOutside": null,
+      "extra": {
+        "trigger": "forcedFlat",
+        "clampedPitch": -75.0000000000041,
+        "walkCompleted": true,
+        "morphPMin": null,
+        "morphPMax": null,
+        "callsMin": 3,
+        "callsMax": 3
+      }
+    },
+    {
+      "test": "T-SQ-CAM-3 reduced motion jump",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 185,
+      "minPitch": -64.48669073907851,
+      "maxPitch": -64.48669073907851,
+      "firstOutside": null,
+      "extra": {
+        "distinctPitches": [
+          -64.49
+        ]
+      }
+    },
+    {
+      "test": "T-SQ-CAM fine walk lean on all trails",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('button', { name: /Trail \\d/ })\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByRole('button', { name: /Trail \\d/ }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Trail \\d/ })\u001b[22m\n\u001b[2m    12 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n"
+      }
+    },
+    {
+      "test": "T-HERO-BAND-WALK hero never overlaps a marker during walks",
+      "browser": "webkit",
+      "verdict": "fail:failed",
+      "samples": 0,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('button', { name: /Trail \\d/ })\nExpected: \u001b[32m3\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByRole('button', { name: /Trail \\d/ }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Trail \\d/ })\u001b[22m\n\u001b[2m    13 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n"
+      }
+    },
+    {
+      "test": "T-SQ-CAM rest name title readout and lanes",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 20,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "failed": []
+      }
+    },
+    {
+      "test": "T-SQ-CAM pageshow persisted attempt",
+      "browser": "webkit",
+      "verdict": "not-exercised",
+      "samples": 1,
+      "minPitch": null,
+      "maxPitch": null,
+      "firstOutside": null,
+      "extra": {
+        "events": [
+          {
+            "persisted": false
+          }
+        ],
+        "url": "/sidequests",
+        "pitchBefore": -64.48669073907851,
+        "pitchAfter": -64.48669073907851,
+        "laneCount": 6144,
+        "calls": 1,
+        "exercised": false
+      }
+    },
+    {
+      "test": "T-SQ-CAM-2 world harness forced flat pose",
+      "browser": "webkit",
+      "verdict": "pass",
+      "samples": 1,
+      "minPitch": -75.0000000000041,
+      "maxPitch": -75.0000000000041,
+      "firstOutside": null,
+      "extra": {
+        "clampedPitch": -75.0000000000041,
+        "pos": [
+          0,
+          30,
+          0
+        ]
+      }
+    }
+  ]
+}

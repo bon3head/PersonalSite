@@ -1,0 +1,20 @@
+
+Running 3 tests using 1 worker
+
+T-DEV-1 dev HUD text: jp-dev-hud
+laneCount: 6144
+calls: 1
+pitchDeg: -64.49
+yawDeg: -169.89
+distance: 33.24
+morph: none
+hero: none
+frameP95gov: 6759.0ms frameP95hud: 2483.2ms frameP99hud: 6799.7ms frames: 8
+degrade: false over=0 longTask=0 max=0.0ms
+  ✓  1 tests/feedback-round/dev-hud.spec.ts:18:1 › T-DEV-1 dev: HUD renders lane field state under ?hud=1 (33.0s)
+T-DEV-1 prod: scanned 9 dist files, hits=0
+  ✓  2 tests/feedback-round/dev-hud.spec.ts:44:1 › T-DEV-1 prod: no HUD marker in the production bundle (198ms)
+T-DEV-1 preview: #jp-dev-hud count=0
+  ✓  3 tests/feedback-round/dev-hud.spec.ts:72:1 › T-DEV-1 preview: no HUD element on the production preview under ?hud=1 (15.5s)
+
+  3 passed (55.7s)
