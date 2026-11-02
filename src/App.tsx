@@ -224,10 +224,24 @@ export default function App(props: AppProps): JSX.Element {
       wireField(detail);
     };
     window.addEventListener('lanefield-ready', onLanefield);
-    // If the App mounted with a field already, wire it now. The
-    // travel controller above already exists by this point, so the
-    // pause rule inside wireField reads its current scene.
-    if (props.lanefield) wireField(props.lanefield);
+    // WIRING-FIX: the event is one-shot and may already have fired
+    // before this effect ran (WebKit / stock Safari: no
+    // requestIdleCallback, so main.tsx's setTimeout(0) fallback
+    // dispatches before createRoot's concurrent render runs this
+    // effect). If main.tsx already recorded the instance in
+    // __lanefieldReady, wire it now instead of waiting for an event
+    // that will never re-fire. The listener above still covers the
+    // other ordering (field arriving after mount). The props path
+    // is unchanged and takes precedence when both are present, so
+    // the field is wired exactly once here.
+    const alreadyReady = (window as unknown as {
+      __lanefieldReady?: Lanefield;
+    }).__lanefieldReady;
+    const existing = props.lanefield ?? alreadyReady ?? null;
+    if (existing) {
+      travel.setLanefield(existing);
+      wireField(existing);
+    }
     return () => {
       window.removeEventListener('lanefield-ready', onLanefield);
       router.dispose();

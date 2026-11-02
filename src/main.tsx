@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App';
 import { createLanefield } from './world/lanefield';
+import type { Lanefield } from './world/types';
 import { parsePath, SCENE_LAYOUT } from './router';
 import { initMotionPref } from './lib/reducedMotion';
 import { initBrandPrefetch } from './lib/brandPrefetch';
@@ -20,6 +21,17 @@ function startWorld(): void {
     initial: SCENE_LAYOUT[parsePath(window.location.pathname)],
   });
   if (lanefield) {
+    // WIRING-FIX: record the instance BEFORE dispatching. The event
+    // is one-shot: on engines without requestIdleCallback (WebKit,
+    // stock Safari) the setTimeout(0) fallback can fire before
+    // createRoot's concurrent render runs App's effects, so no
+    // listener exists yet and the event is lost. App reads this
+    // holder on mount and wires immediately when it is already set,
+    // so both orderings (event before mount, event after mount)
+    // wire. This key is distinct from window.__lanefield, which
+    // holds the debug handle, not the field instance.
+    (window as unknown as { __lanefieldReady?: Lanefield }).__lanefieldReady =
+      lanefield;
     window.dispatchEvent(
       new CustomEvent('lanefield-ready', { detail: lanefield }),
     );
