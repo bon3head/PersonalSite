@@ -332,9 +332,14 @@
     }
   }
 
-  /* LeafLink container: raised fill, 0 radius, hairline ring. */
+  /* LeafLink container: raised fill, 0 radius, hairline ring.
+   * Bound to the paper token directly, not the ambient regime var:
+   * a LeafLink slip is paper by definition, and the ambient var
+   * resolves to void if the page mounts after a manual slip render
+   * sets the regime (T-LL-5 on WebKit: App's initial applyRegime
+   * clobbers a pre-mount paper setting back to void). */
   .jp-readout--leaflink .jp-readout-slip {
-    background: var(--jp-raised);
+    background: var(--jp-paper-raised);
     box-shadow: inset 0 0 0 1px var(--jp-hairline);
     border-radius: 0;
     padding: var(--spacing-4);
