@@ -1,0 +1,11 @@
+
+Running 4 tests using 1 worker
+
+  ✓  1 tests/feedback-round/morph.spec.ts:266:1 › T-TRANS-2: lanes, draw call, doc height, no navbar, no cards (9.9m)
+  ✓  2 tests/feedback-round/morph.spec.ts:483:1 › T-TRANS-6: idle 60s per route causes no navigation (4.4m)
+  ✓  3 tests/feedback-round/morph.spec.ts:512:1 › T-NAME-2: name box never intersects the title box during a morph (2.6m)
+  ✓  4 tests/feedback-round/morph.spec.ts:554:1 › T-SRV-2-ENTRY: readout box clear at 100 percent of server entry (3.1m)
+
+  Slow test file: tests/feedback-round/morph.spec.ts (20.1m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  4 passed (20.2m)
