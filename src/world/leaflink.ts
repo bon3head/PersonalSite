@@ -351,6 +351,89 @@ export function createLeaflinkController(
       if (p.state === 'open' && p.kind === kind) openByNode.set(p.node, p);
     }
     if (openByNode.size === 0) return null;
+    // Fast path for an effectively unbounded hop limit (the visitor
+    // search, maxHops = nodeCount): a shortest path by positive edge
+    // length never repeats a node, so it uses at most nodeCount - 1
+    // hops, and node-only Dijkstra returns the same nearest pin as
+    // the (node, hops) search below. The (node, hops) state space is
+    // nodeCount times larger and, on WebKit, stalls the visitor match
+    // past the tap gate (route at about one and a half seconds from
+    // drop in isolation). Hop-limited callers keep the search below.
+    if (maxHops >= nodeCount) {
+      const distF = new Float64Array(nodeCount).fill(Infinity);
+      const prevF = new Int32Array(nodeCount).fill(-1);
+      const heapF: Array<[number, number]> = [];
+      const pushF = (d: number, v: number): void => {
+        heapF.push([d, v]);
+        let i = heapF.length - 1;
+        while (i > 0) {
+          const parent = (i - 1) >> 1; // lit-ok: heap parent
+          if (heapF[parent][0] <= heapF[i][0]) break;
+          const tmp = heapF[parent];
+          heapF[parent] = heapF[i];
+          heapF[i] = tmp;
+          i = parent;
+        }
+      };
+      const popF = (): [number, number] | null => {
+        if (heapF.length === 0) return null;
+        const top = heapF[0];
+        const last = heapF.pop() as [number, number];
+        if (heapF.length > 0) {
+          heapF[0] = last;
+          let i = 0;
+          for (;;) {
+            const left = i * 2 + 1; // lit-ok: heap child
+            const right = left + 1; // lit-ok: heap child
+            let smallest = i;
+            if (left < heapF.length && heapF[left][0] < heapF[smallest][0]) {
+              smallest = left;
+            }
+            if (right < heapF.length && heapF[right][0] < heapF[smallest][0]) {
+              smallest = right;
+            }
+            if (smallest === i) break;
+            const tmp = heapF[smallest];
+            heapF[smallest] = heapF[i];
+            heapF[i] = tmp;
+            i = smallest;
+          }
+        }
+        return top;
+      };
+      distF[from] = 0;
+      pushF(0, from);
+      while (heapF.length > 0) {
+        const item = popF();
+        if (!item) break;
+        const [d, u] = item;
+        if (d > distF[u]) continue;
+        if (u !== from) {
+          const hit = openByNode.get(u);
+          if (hit) {
+            const path: number[] = [];
+            let v = u;
+            while (v !== -1) {
+              path.push(v);
+              v = prevF[v];
+            }
+            path.reverse();
+            return { pin: hit, path };
+          }
+        }
+        for (const e of side.adjacency[u]) {
+          const edge = side.edges[e];
+          const v = edge.a === u ? edge.b : edge.a;
+          const nd = d + edge.length;
+          if (nd < distF[v]) {
+            distF[v] = nd;
+            prevF[v] = u;
+            pushF(nd, v);
+          }
+        }
+      }
+      return null;
+    }
     const H = maxHops + 1;
     const dist = new Float64Array(nodeCount * H).fill(Infinity);
     const prev = new Int32Array(nodeCount * H).fill(-1);
@@ -980,7 +1063,7 @@ export function createLeaflinkController(
       if (disposed || paused) return;
       processDue();
       updateInstances();
-    }, 50); // lit-ok: sim tick
+    }, 20); // lit-ok: sim tick
   }
 
   if (reduced) {
