@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { T } from '../tokens.generated';
 import { generate, type SideQuestsSideData } from './layouts/sidequests';
 import { poseFor } from './camera';
+import { emitStage } from '../motion/stage';
 import { spring, damp, easePlain, easeSignature } from './tween';
 import type { Lanefield } from './types';
 import type { SceneController } from '../travel';
@@ -32,6 +33,9 @@ export interface SideQuestsController extends SceneController {
   headY(index: number): number;
   headBobY(index: number): number;
   headScreen(index: number): [number, number];
+  // Polish round: marker head at rest (no bob, hover, rise, or claim
+  // drop), for placement against the resting projection.
+  restHead(index: number): [number, number, number];
   onStateChange(cb: () => void): () => void;
   dispose(): void;
 }
@@ -125,8 +129,14 @@ export function createSideQuestsController(
   const restY = marker.poleHeight + marker.radius * marker.squashY;
 
   const markers: MarkerState[] = side.markers.map(([x, z], i) => {
-    let walkLength = 0;
-    for (const len of side.trails[i].arcLengths) walkLength += len;
+    // Walk length is the arc distance to the end of the last dash
+    // (polish round). The dash starts include the gaps (layout:
+    // s += dash + gap), so the old sum of dash lengths alone was the
+    // dash share of the arc (dash over dash plus gap), and the marker
+    // claimed while the light was still that far short of it.
+    const tr = side.trails[i];
+    const last = tr.arcStarts.length - 1;
+    const walkLength = last >= 0 ? tr.arcStarts[last] + tr.arcLengths[last] : 0;
     return {
       x,
       z,
@@ -234,10 +244,16 @@ export function createSideQuestsController(
     for (const cb of stateListeners) cb();
   };
 
+  // The lean base includes the camera focus pan (polish round): the
+  // rig translates position and target together, so the lean must look
+  // at the panned target or it would rotate the panned camera back.
   function baseTarget(): [number, number, number] {
     const pose = poseFor('sidequests');
-    return [pose.target[0], pose.target[1], pose.target[2]];
+    const off = lanefield.focusOffset();
+    return [pose.target[0] + off[0], pose.target[1], pose.target[2] + off[1]];
   }
+  // Release the camera pan once the claim settles (stage grammar).
+  let releaseAt: number | null = null;
 
   function springAt(start: number, t: number): number {
     if (t < start) return 0;
@@ -280,8 +296,17 @@ export function createSideQuestsController(
     m.activity = { lanes, starts, fades, uper };
     m.walking = true;
     m.walkStart = now;
-    const start = trailPointAt(i, 0);
-    followPoint.set(start[0], start[1], start[2]);
+    // The lean starts from where the camera already looks (the base
+    // target, pan included) and damps toward the drawing point. The old
+    // start at the trailhead itself snapped the view to the trailhead on the // lit-ok: comment
+    // first walk frame (device-run-2 trace: pitch from rest to the band // lit-ok: comment
+    // edge in one frame) before damping back.
+    if (!followApplied) {
+      const b0 = baseTarget();
+      followPoint.set(b0[0], b0[1], b0[2]);
+    }
+    releaseAt = null;
+    emitStage({ type: 'subject', layout: 'sidequests', ground: [m.x, m.z] });
     if (reducedMotion()) {
       m.walking = false;
       m.claimed = true;
@@ -289,6 +314,8 @@ export function createSideQuestsController(
       claimAttr.setX(i, 1);
       claimAttr.needsUpdate = true;
       notify();
+      emitStage({ type: 'land', layout: 'sidequests', ground: [m.x, m.z] });
+      emitStage({ type: 'release', layout: 'sidequests' });
     }
   }
 
@@ -299,10 +326,17 @@ export function createSideQuestsController(
     m.claimStart = t;
     m.claimAnimStart = t;
     notify();
+    // The quest lands in the mark: the pulse departs from this marker.
+    emitStage({ type: 'land', layout: 'sidequests', ground: [m.x, m.z] });
+    releaseAt = t + T.motion.ms.travel / 1000; // lit-ok: ms to seconds
   }
 
   const offFrame = lanefield.onFrame((t, dt) => {
     const dtMs = dt * 1000; // lit-ok: seconds to milliseconds
+    if (releaseAt !== null && t >= releaseAt) {
+      releaseAt = null;
+      emitStage({ type: 'release', layout: 'sidequests' });
+    }
     const reduced = reducedMotion();
     let anyWalking = false;
     let walkingTrail = -1;
@@ -409,7 +443,11 @@ export function createSideQuestsController(
     // the frame; when converged the rig resumes full control.
     const base = baseTarget();
     let lean: [number, number, number] | null = null;
-    if (!reduced && anyWalking && walkingTrail >= 0) {
+    // Coarse tracking (polish round): while a stage focus is active the
+    // camera pan follows the drawing point, so the lean yields to it
+    // (a lean would rotate the view away from what the pan brings in).
+    const tracking = lanefield.focusActive();
+    if (!reduced && anyWalking && walkingTrail >= 0 && !tracking) {
       const m = markers[walkingTrail];
       const d = Math.min(
         Math.max((t - m.walkStart) * trailRate, 0),
@@ -481,6 +519,10 @@ export function createSideQuestsController(
     headScreen(index: number): [number, number] {
       const m = markers[index];
       return lanefield.worldToScreen([m.x, headYs[index], m.z]);
+    },
+    restHead(index: number): [number, number, number] {
+      const m = markers[index];
+      return [m.x, restY, m.z];
     },
     onStateChange(cb: () => void): () => void {
       stateListeners.add(cb);

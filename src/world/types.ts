@@ -43,9 +43,33 @@ export interface LaneAttributes {
   phaseJitterSeed: number;
 }
 
+// Polish round (DESIGN polish tokens): a placed hero mark, in CSS px. The
+// engine ground-projects it through the current camera every frame, so
+// the morph ring, the silhouette pull, and every pulse sit under the
+// logo on screen whatever the camera is doing. ringRadiusPx is clamped
+// by the hero to its clearance from the readout, name zone, and keymap,
+// so the bulge never reaches them.
+export interface HeroAnchorPx {
+  x: number;
+  y: number;
+  ringRadiusPx: number;
+  silhouetteRadiusPx: number;
+}
+
+// Camera focus: pan the camera on the ground plane so a ground point
+// sits at a screen point (damped, token focus.halfLifeMs, capped at
+// focus.maxPanWorld). Translation only, never rotation.
+export interface CameraFocus {
+  ground: [number, number];
+  screenPx: [number, number];
+}
+
 export interface Lanefield {
   ready: Promise<void>;
-  travelTo(id: LayoutId, opts?: { instant?: boolean }): Promise<void>;
+  travelTo(
+    id: LayoutId,
+    opts?: { instant?: boolean; originPx?: [number, number] | null },
+  ): Promise<void>;
   setReducedMotion(on: boolean): void;
   // W4: interpolated lane parameters. setParams merges into the current
   // params (and into an in-flight travel target, so travel does not
@@ -66,6 +90,25 @@ export interface Lanefield {
   screenToGround(xCss: number, yCss: number): [number, number] | null;
   worldToScreen(p: [number, number, number]): [number, number];
   onFrame(cb: (tSec: number, dtSec: number) => void): () => void;
+  // Polish round additions (DESIGN polish tokens).
+  setHeroAnchor(layout: LayoutId, anchor: HeroAnchorPx | null): void;
+  heroAnchor(layout: LayoutId): HeroAnchorPx | null;
+  // Current morph sample (hero loom and recede read it), null before
+  // the first frame.
+  morphSample(): import('../motion/morph-controller').MorphSample | null;
+  // One ring pulse at the current layout's hero anchor. The bulge
+  // departs from originPx (when given) and travels into the anchor.
+  pulse(opts?: { originPx?: [number, number] | null; strengthScale?: number }): void;
+  setFocus(focus: CameraFocus | null): void;
+  // Current ground-plane pan [x, z] (SideQuests lean adds it to its base).
+  focusOffset(): [number, number];
+  // True while a focus target is set (the SideQuests lean yields to it).
+  focusActive(): boolean;
+  // Project a world point through a layout's resting pose.
+  projectAtRest(layout: LayoutId, p: [number, number, number]): [number, number];
+  // GLITTERBOX hold: blend toward the scatter layout around a screen
+  // point while held; release re-forms the scene.
+  setGlitter(on: boolean, centerPx?: [number, number]): void;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   dispose(): void;

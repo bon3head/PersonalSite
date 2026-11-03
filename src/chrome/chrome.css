@@ -147,6 +147,21 @@
     color: var(--color-text-primary);
   }
 
+  /* Polish item 6: two groups on one line. Scenes sit left, panels
+   * (whoami, contact) sit right, so the five words read as places
+   * and drawers instead of one undifferentiated row. */
+  .jp-keymap-item[data-route] + .jp-keymap-item[aria-haspopup] {
+    margin-left: auto;
+  }
+
+  /* GLITTERBOX hold: no long-press callout or text selection on the
+   * lane field, so a hold reaches the page. */
+  #world canvas {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
   .jp-keymap-item[aria-current="page"],
   .jp-keymap-item[aria-expanded="true"] {
     color: var(--color-accent);
@@ -391,11 +406,84 @@
     }
   }
 
-  /* SideQuests container: no fill, 1px dashed chalk outline. */
+  /* SideQuests container (polish item 4): the trailhead sign is a
+   * plate cut from the plan. field.raised fill, so no lane ever runs
+   * through a letter (device run 2: dashed trails and building
+   * outlines crossed the copy), 0 radius like the LeafLink paper slip
+   * (one anatomy, each page in its own material), and the 1px dashed
+   * chalk edge kept from S07 as the plate's cut line, now flush on
+   * the plate instead of floating 12px outside bare text. Contrast:
+   * chalk on field.raised 10.70, chalk.2 on field.raised 6.91. */
   .jp-readout--sidequests .jp-readout-slip {
-    outline: 1px dashed var(--color-text-secondary);
-    outline-offset: var(--spacing-3);
-    padding: var(--spacing-3);
+    background: var(--jp-field-raised);
+    outline: 1px dashed var(--jp-chalk-2);
+    outline-offset: 0;
+    border-radius: 0;
+    padding: var(--spacing-4);
+  }
+
+  /* Project slips, coarse rhythm (polish items 3 and 4): on a phone
+   * the slip must show the page verb without scrolling and leave the
+   * open band for the mark and the tracked subject. Tighter steps
+   * than the server readout, all on the Astryx spacing scale. Device
+   * run 2 at 390x658: the LeafLink offer button sat 5px past the 46dvh
+   * slip bottom at the server spacing. */
+  @media (max-width: 767px), (pointer: coarse) and (max-width: 1023px) {
+    .jp-readout--sidequests h1 + p,
+    .jp-readout--leaflink h1 + p {
+      margin-top: var(--spacing-3);
+    }
+
+    .jp-readout--sidequests p + .jp-readout-supporting,
+    .jp-readout--sidequests .jp-readout-supporting + .jp-readout-caption,
+    .jp-readout--leaflink p + .jp-readout-supporting,
+    .jp-readout--leaflink .jp-readout-supporting + .jp-readout-caption {
+      margin-top: var(--spacing-3);
+    }
+
+    .jp-readout--sidequests .jp-readout-links,
+    .jp-readout--leaflink .jp-readout-links {
+      margin-top: var(--spacing-3);
+    }
+  }
+
+  /* SideQuests legend glyphs: a chalk marker diamond and a dashed
+   * trail bar, the plan's own marks, placed before the words they
+   * name (sizes inline from the legend tokens). */
+  .jp-sq-glyph {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: var(--spacing-1);
+    color: var(--jp-chalk);
+  }
+
+  .jp-sq-glyph--marker {
+    box-shadow: inset 0 0 0 1px currentColor;
+    transform: rotate(45deg) scale(0.8);
+  }
+
+  .jp-sq-glyph--trail {
+    border-top-style: dashed;
+    border-top-color: currentColor;
+  }
+
+  /* Coarse trail row: the page verb as three visible controls. A
+   * claimed trail turns accent and its bar goes solid, the same rule
+   * as the active key (accent only on the active control). */
+  .jp-sq-trails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-3);
+  }
+
+  .jp-sq-trail[aria-pressed="true"] {
+    color: var(--color-accent);
+  }
+
+  .jp-sq-trail[aria-pressed="true"] .jp-sq-glyph--trail {
+    border-top-style: solid;
+    color: var(--color-accent);
   }
 
   /* SideQuests hint: one string per pointer (S09 C-SQ-HINT). The

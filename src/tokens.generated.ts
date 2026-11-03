@@ -1,6 +1,6 @@
-// GENERATED from spec/astryx/DESIGN.md v1.1.0. Do not edit.
+// GENERATED from spec/astryx/DESIGN.md v1.2.0. Do not edit.
 export const T = {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -206,8 +206,8 @@ export const T = {
     "coarseMinTargetPx": 44
   },
   "focus": {
-    "widthPx": 2,
-    "offsetPx": 3
+    "halfLifeMs": 200,
+    "maxPanWorld": 20
   },
   "motion": {
     "easePlain": "ease",
@@ -255,12 +255,20 @@ export const T = {
         0.3
       ],
       "gather": [
-        0.15,
+        0.22,
         0.75
       ],
       "reveal": [
         0.55,
         1
+      ],
+      "loom": [
+        0.3,
+        0.7
+      ],
+      "recede": [
+        0,
+        0.2
       ]
     }
   },
@@ -922,7 +930,41 @@ export const T = {
     "sizePx": 280,
     "minSizePx": 160,
     "tiltMaxDeg": 8,
-    "beatScale": 1.015
+    "beatScale": 1.015,
+    "ringPadPx": 12,
+    "landBeatScale": 1.04
+  },
+  "entropy": {
+    "seedParam": "seed",
+    "pullScale": [
+      0.85,
+      1.15
+    ],
+    "pulseSwirl": 0.6,
+    "scene": {
+      "server": {
+        "bowWorld": 0,
+        "swirl": 0
+      },
+      "leaflink": {
+        "bowWorld": 1.5,
+        "swirl": 0.35
+      },
+      "sidequests": {
+        "bowWorld": 2.5,
+        "swirl": 0.7
+      },
+      "scatter": {
+        "bowWorld": 2,
+        "swirl": 0.9
+      }
+    }
+  },
+  "glitter": {
+    "holdMs": 500,
+    "maxWeight": 0.85,
+    "ringRadiusPx": 120,
+    "swirl": 0.9
   },
   "brand": {
     "gifMaxBytes": 900000,

@@ -23,6 +23,9 @@ export function ringFalloffDerivative(d: number, radius: number): number {
   return (-4 * d) / (radius * radius) * (1 - x * x); // lit-ok:
 }
 
+// swirl (polish round, uRingSwirl in the shader) adds a tangential
+// share on the same falloff, so the swirled push is still C1 across the
+// boundary and zero outside the ring.
 export function deflectPoint(
   x: number,
   z: number,
@@ -30,6 +33,7 @@ export function deflectPoint(
   centerZ: number,
   radius: number,
   strength: number,
+  swirl = 0,
 ): [number, number] {
   if (radius <= 0 || strength === 0) return [x, z];
   const dx = x - centerX;
@@ -37,5 +41,7 @@ export function deflectPoint(
   const d = Math.sqrt(dx * dx + dz * dz);
   if (d < 1e-9 || d >= radius) return [x, z]; // lit-ok:
   const mag = strength * ringFalloff(d, radius);
-  return [x + (dx / d) * mag, z + (dz / d) * mag];
+  const ux = dx / d;
+  const uz = dz / d;
+  return [x + (ux - uz * swirl) * mag, z + (uz + ux * swirl) * mag];
 }

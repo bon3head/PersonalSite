@@ -110,6 +110,7 @@ export class CameraRig {
   private composed: Pose;
   private smoothX = 0;
   private smoothY = 0;
+  private scratch = new THREE.PerspectiveCamera();
 
   constructor(camera: THREE.PerspectiveCamera) {
     this.camera = camera;
@@ -143,6 +144,10 @@ export class CameraRig {
   // Compose one frame's camera from a base pose: idle yaw (weights blend
   // the amplitude during travel), leaflink drift, pointer parallax.
   // All three are off under reduced motion.
+  // offset is a ground-plane translation [x, z] applied to position
+  // and target together (polish round: focus pan plus morph bow). A
+  // pure translation never changes pitch, so the SideQuests camera
+  // band is unaffected by it.
   update(
     base: Pose,
     tSec: number,
@@ -151,9 +156,10 @@ export class CameraRig {
     dtMs: number,
     reduced: boolean,
     finePointer: boolean,
+    offset: readonly [number, number] = [0, 0],
   ): void {
-    this.pos.set(base.pos[0], base.pos[1], base.pos[2]);
-    this.target.set(base.target[0], base.target[1], base.target[2]);
+    this.pos.set(base.pos[0] + offset[0], base.pos[1], base.pos[2] + offset[1]);
+    this.target.set(base.target[0] + offset[0], base.target[1], base.target[2] + offset[1]);
     if (!reduced) {
       let yaw = 0;
       for (const name of IDLE_YAW_LAYOUTS) {
@@ -232,6 +238,27 @@ export class CameraRig {
     const px = this.camera.position.x + dir.x * dist;
     const pz = this.camera.position.z + dir.z * dist;
     return [px, pz];
+  }
+
+  // Project a world point through a resting pose (no yaw, drift,
+  // parallax, lean, or pan) on a scratch camera, so geometry that must
+  // not follow the camera (hero placement against marker rest
+  // positions) reads one stable answer. The real camera is untouched.
+  projectAtPose(pose: Pose, p: [number, number, number], cssW: number, cssH: number): [number, number] {
+    const cam = this.scratch;
+    cam.near = this.camera.near;
+    cam.far = this.camera.far;
+    cam.aspect = cssW / cssH;
+    cam.position.set(pose.pos[0], pose.pos[1], pose.pos[2]);
+    cam.lookAt(pose.target[0], pose.target[1], pose.target[2]);
+    cam.fov = pose.fov;
+    cam.updateProjectionMatrix();
+    cam.projectionMatrix.elements[8] = -pose.shift[0];
+    cam.projectionMatrix.elements[9] = -pose.shift[1];
+    cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert();
+    cam.updateMatrixWorld();
+    this.tmp.set(p[0], p[1], p[2]).project(cam);
+    return [(this.tmp.x + 1) / 2 * cssW, (1 - this.tmp.y) / 2 * cssH];
   }
 
   // Project a world point to CSS px through the shifted matrix.

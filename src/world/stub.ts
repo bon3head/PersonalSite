@@ -163,6 +163,25 @@ export function createLanefield(
     worldToScreen(): [number, number] {
       return [0, 0];
     },
+    setHeroAnchor(): void {},
+    heroAnchor(): null {
+      return null;
+    },
+    morphSample(): null {
+      return null;
+    },
+    pulse(): void {},
+    setFocus(): void {},
+    focusActive(): boolean {
+      return false;
+    },
+    focusOffset(): [number, number] {
+      return [0, 0];
+    },
+    projectAtRest(): [number, number] {
+      return [0, 0];
+    },
+    setGlitter(): void {},
     onFrame(): () => void {
       return () => {
         // Stub has no render loop; nothing to unsubscribe.

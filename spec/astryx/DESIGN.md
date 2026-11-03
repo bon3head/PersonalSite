@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.1.0, 2026-11-01. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.2.0, 2026-11-02. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -166,6 +166,8 @@ Durations (Astryx motion config `{fast: 150, medium: 300, ratio: 0.67}`, verifie
 
 Feedback is never over 250ms: the keymap item turns accent in 150ms and the lanes start moving on the next frame. Travel itself is 700ms of expo-out, which places 80% of the displacement in the first 210ms; the remaining 490ms is deceleration that never blocks input (a second key press mid-travel retargets from the current state, S03). So the perceived response is under 250ms and the full settle is a surface transition that never makes anyone wait. This is the deliberate reading of MOTION-LANGUAGE rules 1 to 4, recorded here so nobody "fixes" the 700ms.
 
+**1.2.0 note (device run 2).** The camera curve and the 700ms stay. What read as a jarring camera re-adjust was three DOM and ring defects that landed at the moment the camera settled (the mark parked at the viewport center while the readout was display none and jumped 160px when it returned; the ring sat at the camera target, off the mark; a ring strength survived every morph as a frozen bulge), plus an empty window between camera arrival (about 0.17 of travel) and the text (0.55). The mark now looms in over `motion.morph.loom` (0.30 to 0.70), inside that window, at its final position, with the ring growing under it; see 6.7.
+
 ### 6.3 Motion signature per scene (the three must never be swapped)
 
 | Scene | Signature | Mechanism |
@@ -214,10 +216,17 @@ Motion is never the only carrier of information: every fact on a scene is in DOM
 All phases run inside `--jp-duration-travel` (700ms) with the signature curve unless stated. Times are fractions of travel and overlap on purpose. Values are proposed tokens (`motion.morph`, `morph.*`); the device run confirms them.
 
 - **Release** (0.00 to 0.30): the outgoing signature loosens: Lockstep sync to free, heartbeat amplitude to 0, or wander damped. Gradient parameters start interpolating. Curve: signature.
-- **Gather** (0.15 to 0.75): the deflection ring grows from 0 to r at the target anchor, so lanes bend open around a circle. Silhouette pull (strength `morph.silhouettePull` 0.35, proposed) draws lanes near the ring toward the logo alpha-mask contour, so the lanes visibly become the logo outline. Curve: signature for radius; `curve.track` if the anchor moves.
-- **Reveal** (0.55 to 1.00): the logo looms in: opacity 0 to 1, scale `morph.loomFrom` 0.92 to 1.00. The incoming signature starts at 1.00. The SideQuests spring overshoot is allowed only in its own arrival. Curve: signature.
+- **Gather** (0.22 to 0.75, 1.2.0; was 0.15): the deflection ring grows from 0 to r at the target anchor, so lanes bend open around a circle. Silhouette pull (strength `morph.silhouettePull` 0.35 times the seeded pull scale, 6.11) draws lanes near the ring toward the logo alpha-mask contour, so the lanes visibly become the logo outline. Curve: signature for radius; `curve.track` for center travel. Gather starts after the readout swap (0.214), because the anchor is the placed mark (below), which exists from the swap commit; if an anchor is not resolved by Gather start, Gather begins at the first frame it resolves, and a ring never renders at an unresolved position.
+- **Loom** (0.30 to 0.70, 1.2.0): the logo looms in at its final position: opacity 0 to 1, scale `morph.loomFrom` 0.92 to 1.00, while the camera settles and before the text. Curve: signature.
+- **Reveal** (0.55 to 1.00): the incoming title and copy enter. The incoming signature starts at 1.00. The SideQuests spring overshoot is allowed only in its own arrival. Curve: signature.
 
-**Other directions.** Project to server or whoami: the logo recedes (scale 1.00 to `morph.recedeTo` 0.96, opacity to 0, window 0 to 0.40), the ring collapses (0.20 to 0.80), and Lockstep or Quiet re-forms (0.50 to 1.00). Project to project (for example LeafLink to SideQuests): logo A recedes, the ring shrinks to `morph.ringBreath` 0.6r and regrows to r (a breath), the ring travels between anchors on `curve.track` if the anchors differ, and logo B looms in during Reveal.
+**Anchor (1.2.0).** The ring and silhouette center on the placed hero mark, not on the camera target: the hero registers its screen center and two radii (`lanefield.setHeroAnchor`), and the engine ground-projects them through the current camera after the final camera write of every frame. The ring radius is the larger mark half-extent plus `hero.ringPadPx`, clamped to the mark center's clearance from the readout, the name zone, and the keymap, so the bulge never reaches them. The silhouette radius is the mark half-extent, so the mask square spans the mark. Field to project morphs depart from the pressed keymap item (ground-projected per frame) and travel to the anchor on `curve.track` over Gather.
+
+**Rest invariant (1.2.0).** Outside a morph, ring and silhouette strength are zero unless a pulse or a GLITTERBOX hold is active. Ring fields are engine owned: `setParams` no longer writes them into the travel target, and travel end zeroes both strengths.
+
+**No categorical snaps (1.2.0).** Light mode crossfades from the outgoing to the incoming mode over the param curve (`uLightModeFrom`, `uLightMix`) instead of switching at the midpoint. Both silhouette masks load once after the first frame and are uploaded before use, so no morph swaps a mask in mid-flight.
+
+**Other directions.** Project to server or whoami: the logo recedes (scale 1.00 to `morph.recedeTo` 0.96, opacity to 0, window `motion.morph.recede` 0 to 0.20, 1.2.0; was 0 to 0.40, which ran past the readout swap at 0.214 where the mark unmounts, so the mark popped out), the ring collapses (0.20 to 0.80), and Lockstep or Quiet re-forms (0.50 to 1.00). Project to project (for example LeafLink to SideQuests): logo A recedes, the ring shrinks to `morph.ringBreath` 0.6r and regrows to r (a breath), the ring travels between anchors on `curve.track` if the anchors differ, and logo B looms in during Reveal.
 
 **Controller rules.** State is snapshot, target, and start time. Navigate takes a snapshot of the current interpolated values, sets the target and start time, and pushes history immediately, so back works mid-flight. The previous morph is discarded, never queued (retargeting). Direction follows keymap order 1, 2, 3, W; history back and forward use the same path with direction from that order. Outgoing title and copy exit over 150ms at t = 0. The incoming title arrives at Reveal start. Focus moves to the new H1 at Reveal start, under the existing focus condition (only if focus was inside the old readout or on the keymap), and never while the Contact sheet focus lock is active. No per-lane start-time stagger: all lanes start at t = 0 and vary only in path, never in start time.
 
@@ -231,9 +240,11 @@ All phases run inside `--jp-duration-travel` (700ms) with the signature curve un
 
 **Placement.** Outside the name clear zone, the readout clear zone, and the keymap. Minimum hero size (`hero.minSizePx`) keeps 375x667 at document height equal to viewport height. The displayed rectangle must also satisfy the brand area cap (section 3.5); W6 fits each mark inside the cap from its aspect ratio.
 
-**Passive motion.** Continuous, never pausing and restarting on a timer. LeafLink: a small scale on each beat, peak `hero.beatScale` 1.015 (proposed). SideQuests: drift along the wander path, settling with the existing spring.
+**Placement (1.2.0).** Computed once per page configuration in the readout swap commit (travel conceals the readout with visibility, inert, and aria-hidden, so its rect exists), against the name zone, the readout, the keymap, and the SideQuests marker tap targets at their resting projection. Never re-tracked per frame; recomputed only on viewport resize.
 
-**Active motion.** Pointer or touch-drag tilts the plane within `hero.tiltMaxDeg` 8 (proposed) and shifts the lane depth bands for parallax. A tap sends one ripple through the ring: 150ms out, 700ms settle. No gyroscope, because it needs a permission prompt on iOS.
+**Passive motion.** LeafLink (1.2.0): event driven, never periodic (section 6.3). Each LeafLink match that lands beats the mark once (`hero.beatScale` 1.015 over `motion.ms.medium`); the visitor's own match lands with `hero.landBeatScale` 1.04. The shipped periodic beat contradicted 6.3 and is removed. SideQuests: drift along the wander path, settling with the existing spring. Both marks carry `hero.landBeatScale` headroom in the area cap.
+
+**Active motion.** Pointer or touch-drag tilts the plane within `hero.tiltMaxDeg` 8 and shifts the lane depth bands for parallax. A tap on the mark is the page verb (1.2.0): LeafLink drops an offer at the map center, SideQuests walks the next open trail, with an immediate half-strength pulse from the tap point as feedback. No gyroscope, because it needs a permission prompt on iOS.
 
 ### 6.9 Lane field variant B
 
@@ -243,6 +254,28 @@ Variant B values (all proposed, token `lanefield.variance`): three depth bands, 
 
 Budget, held on every route and during morphs (tokens `perf.*`): p95 frame time 16.7ms or less, p99 33ms or less, no long task over 50ms during a morph. Measurement: a dev-only HUD reading requestAnimationFrame deltas, the Safari Web Inspector timeline over a cable, normal mode and Low Power Mode, with whatever frame rate Low Power Mode produces recorded rather than assumed. Device run 2 measures against this budget; if a budget number is wrong, it changes here with the measurement, never by quiet lowering.
 
+### 6.11 Seeded entropy (1.2.0)
+
+One 32-bit session seed drives every random motion choice: `?seed=<uint32>` (token `entropy.seedParam`) replays a run exactly; otherwise one value from `crypto.getRandomValues`. The seed is read once at app boot, before the router's first `pushState` drops the query. Draws are counter based: draw(channel, n) is a pure hash of (seed, channel, n) (splitmix32 finalizer), so a value depends only on the seed and how many draws that channel has made, never on frame timing. Channels: morph bow, morph swirl, morph pull, pulse swirl, glitter swirl. `Math.random` is not used for motion. The layout seed `world.seed` is separate and never changes (layout hash, LeafLink sim sequence, T-LL-2 stay fixed).
+
+| Parameter | Range | Applied |
+|---|---|---|
+| Camera bow | signed, magnitude up to `entropy.scene.<to>.bowWorld` (server 0, LeafLink 1.5, SideQuests 2.5, scatter 2.0) | Lateral ground translation of camera position and target, times sin(pi times the signature-eased progress): zero at both ends, rides the camera's own curve, never changes pitch |
+| Ring swirl | signed, up to `entropy.scene.<to>.swirl` (server 0, LeafLink 0.35, SideQuests 0.7, scatter 0.9) | Tangential share of the ring push on the same falloff, so the swirled push stays C1 and zero outside the ring |
+| Pull scale | `entropy.pullScale` 0.85 to 1.15 | Multiplier on `morph.silhouettePull` |
+| Pulse swirl | signed, up to `entropy.pulseSwirl` 0.6 | Ring swirl for taps and land pulses |
+| Glitter swirl | signed, up to `glitter.swirl` 0.9 | Swirl direction for a GLITTERBOX hold |
+
+Per page variation is keyed by the destination, so each page keeps its signature: server arrives rigid (Lockstep, no bow, no swirl), LeafLink moderate, SideQuests widest. Reduced motion disables entropy: every draw takes its neutral value (bow 0, swirl 0, pull scale 1), identical for every seed. Cost is uniform-only (one float uniform, `uRingSwirl`, and a ground offset on the camera), no new draw call, so the 16.7ms p95 budget is unchanged.
+
+### 6.12 Stage grammar and camera tracking (1.2.0)
+
+One interaction grammar for both project pages (src/motion/stage.ts): **subject** (the page verb started: the visitor's LeafLink match routing, a SideQuests walk) recedes the mark and, on coarse viewports, pans the camera so the subject (the destination: the request node, the trail's marker) sits at a focus spot just above or below the mark, its center `size.coarseMinTargetPx` plus `hero.ringPadPx` plus the mark's motion margin from the mark edge. Only a spot whose straight pan never sweeps the subject under the mark counts (T-HERO-BAND-WALK); of those, the nearest; with none, no pan. The pan holds that spot for the whole walk, so the drawing head travels toward a marker already in view; **land** (route reached the request, trail claimed) sends a pulse from the subject's screen position into the mark and looms the mark back with one land beat; **beat** (any LeafLink match landing) beats the mark once; **release** returns the camera. The pan is a ground translation (pitch never changes, the camera band is untouched), damped with `focus.halfLifeMs` 200 and capped at `focus.maxPanWorld` 20. Fine viewports never pan: the whole plan and map are in view, and the S07 lean stays. On coarse, the lean yields to the pan. Reduced motion: no pan, no recede, no pulse; the verb still works.
+
+### 6.13 GLITTERBOX (1.2.0)
+
+Press and hold the lane field for `glitter.holdMs` 500 (the LeafLink tap limit, so taps keep their meaning), or hold the g key, and the drawn layout weights blend toward the scatter layout up to `glitter.maxWeight` 0.85 while a swirled ring of `glitter.ringRadiusPx` 120 follows the pointer; release re-forms the scene over `motion.ms.travel` on the signature curve, reaching exactly zero (no exponential tail). It never changes the route, the readout, the travel weights, or any copy, and it is off under reduced motion, while a sheet is open, and during travel. Lanes stay lanes (each still one of the 6,144 cores); section 10's particle rule is met because the mode is opt-in and draws nothing but the existing lane field.
+
 ## 7. Component signatures
 
 Named for their role on this site. Each has at least two variants or it is plain on purpose.
@@ -251,12 +284,12 @@ Named for their role on this site. Each has at least two variants or it is plain
 |---|---|---|---|
 | `Lanefield` | The 6,144-lane world (WebGL) | none, authored (S02) | layouts: server, leaflink, sidequests, scatter |
 | `Keymap` | The only navigation, one TUI line at the bottom edge | `Kbd` for key glyphs, `useHotkeys` for bindings | fine pointer (keys shown) / coarse pointer (keys hidden, 44px targets); item states: idle, hover, active |
-| `Readout` | A scene's DOM text block | none, plain HTML on tokens | `server` (no container, left column), `leaflink` (paper.raised slip, 0 radius, hairline ring, legend position), `sidequests` (chalk dashed outline, trailhead position) |
+| `Readout` | A scene's DOM text block | none, plain HTML on tokens | `server` (no container, left column), `leaflink` (paper.raised slip, 0 radius, hairline ring, legend position; 1.2.0 order: H1, P1, legend, SIM, OfferButton, rule, facts, stack, code), `sidequests` (1.2.0: field.raised plate, 0 radius, 1px dashed chalk.2 edge flush on the plate; legend glyphs in the hint; coarse trail row) |
 | `WhoamiSheet` | Education and campus roles | `BottomSheet` (purpose info, height hug) | open, closed |
 | `ContactSheet` | Email, copy, links | `BottomSheet`, `Button`, `Link` | open, closed; copy idle, copied, failed |
 | `CopyConfirm` | Copy result | `Toast` via `useToast` | info "Copied." / error "Copy failed. The address is selected." |
 | `OfferButton` | LeafLink keyboard path to drop an offer | `Button` variant `secondary` | idle, pressed |
-| `QuestMarker` | SideQuests marker (WebGL plus DOM button twin) | none in WebGL; DOM twin is a `Button` ghost | open, lit, claimed |
+| `QuestMarker` | SideQuests marker (WebGL plus DOM button twin) | none in WebGL; DOM twin is a `Button` ghost (transition none) | open, lit, claimed; fine: twins are the accessible controls; coarse (1.2.0): the accessible controls dock in the plate as a visible Trail 1, 2, 3 row, and twins are pointer-only (aria-hidden, tabindex -1) |
 | `BrandHero` | Project hero mark (LeafLink, SideQuests) | none; `picture` markup over the lane field | F0 animated GIF, F1 first-frame PNG, F2 text mark, F3 image without deflection |
 
 Theme component overrides (in `themes/lane/laneTheme.mjs`, legal keys verified with `astryx theme targets <Name> --json` in S01): Button `base` radius `--radius-element`, no shadow, label weight 700; Button `variant:primary` background `--color-accent`, color `--color-on-accent`; Kbd `base` background transparent, hairline ring, radius 2px; BottomSheet `base` background `--jp-raised`, radius 0 on the top corners (a TUI pane, not a phone card), no shadow.
@@ -321,7 +354,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
 
 ```json design-tokens
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -468,8 +501,10 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
     "feedbackMaxMs": 250,
     "morph": {
       "release": [0.0, 0.3],
-      "gather": [0.15, 0.75],
-      "reveal": [0.55, 1.0]
+      "gather": [0.22, 0.75],
+      "reveal": [0.55, 1.0],
+      "loom": [0.3, 0.7],
+      "recede": [0.0, 0.2]
     }
   },
   "world": {
@@ -854,7 +889,30 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
     "sizePx": 280,
     "minSizePx": 160,
     "tiltMaxDeg": 8,
-    "beatScale": 1.015
+    "beatScale": 1.015,
+    "ringPadPx": 12,
+    "landBeatScale": 1.04
+  },
+  "entropy": {
+    "seedParam": "seed",
+    "pullScale": [0.85, 1.15],
+    "pulseSwirl": 0.6,
+    "scene": {
+      "server": {"bowWorld": 0.0, "swirl": 0.0},
+      "leaflink": {"bowWorld": 1.5, "swirl": 0.35},
+      "sidequests": {"bowWorld": 2.5, "swirl": 0.7},
+      "scatter": {"bowWorld": 2.0, "swirl": 0.9}
+    }
+  },
+  "focus": {
+    "halfLifeMs": 200,
+    "maxPanWorld": 20.0
+  },
+  "glitter": {
+    "holdMs": 500,
+    "maxWeight": 0.85,
+    "ringRadiusPx": 120,
+    "swirl": 0.9
   },
   "brand": {
     "gifMaxBytes": 900000,
@@ -928,6 +986,19 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.2.0, 2026-11-02: polish round 2 (device run 2). Every line traces to a repro in FINAL-POLISH-SPEC-2026-11-02.md.
+  - "motion.morph.gather 0.15 to 0.22: the ring starts after the readout swap, where the placed mark (its anchor) first exists."
+  - "motion.morph.loom 0.30 to 0.70 (new): the mark looms at its final position while the camera settles, filling the empty window before the text."
+  - "motion.morph.recede 0 to 0.20 (new token; was a 0 to 0.40 prose constant that ran past the swap, so the outgoing mark popped out)."
+  - "Ring and silhouette center on the placed mark (screen anchor, ground-projected per frame), radius clamped to clearance; rest invariant: zero strength outside a morph, pulse, or hold. Measured at 390x658: ring to mark after Gather 135px to 0px (LeafLink); rest strength 1.27 to 0."
+  - "Hero placement once per configuration in the swap commit, against a laid-out readout; no per-frame re-track. Measured LeafLink mark move during a morph 172px to 0px."
+  - "Light mode crossfades; both masks preload after the first frame."
+  - "hero.ringPadPx 12, hero.landBeatScale 1.04 (new); LeafLink beat event driven (the periodic beat contradicted 6.3)."
+  - "entropy.* (new): seeded bow, swirl, pull scale, pulse and glitter swirl; reduced motion neutral."
+  - "focus.halfLifeMs 200, focus.maxPanWorld 20 (new): coarse camera pan to a focus spot beside the mark, never sweeping a marker under it (T-HERO-BAND-WALK passes at 390x844). Pitch constant. At 390x658 trail 3 has no such pan and stays unpanned (open item)."
+  - "glitter.* (new): GLITTERBOX hold mode."
+  - "Readout: LeafLink verb first (offer button was 5px below the 46dvh slip at 390x658); SideQuests plate, legend glyphs, coarse trail row; coarse rhythm on both project slips."
+  - "Proposed values: entropy ranges, focus, glitter, loom, and landBeatScale are proposed; device run 3 confirms them."
 - 1.1.0, 2026-11-01: W1 feedback round spec patch.
   - "Gradients permitted inside lane-field motion only, cooked in OKLab from signal, ink and field."
   - "Server hero is the field; project heroes are brand marks; three-phase morph between them."

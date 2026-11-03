@@ -62,14 +62,11 @@ export default function LeaflinkReadout(props: LeaflinkReadoutProps): JSX.Elemen
     <div className="jp-readout-slip">
       <h1 id="h-leaflink">{C['C-LL-H1']}</h1>
       <p>{C['C-LL-P1']}</p>
-      <p className="jp-readout-supporting">{C['C-LL-FACTS']}</p>
-      <p className="jp-readout-supporting">{C['C-LL-STACK']}</p>
-      <div className="jp-readout-links">
-        <Link href={C['C-LL-CODE'].href} isExternalLink>
-          {C['C-LL-CODE'].label}
-        </Link>
-      </div>
-      <hr className="jp-readout-rule" style={ruleStyle} />
+      {/* Polish round (item 3): the page verb and the key to the map
+          come right after the claim, so on a phone they sit inside the
+          46dvh slip without scrolling (device run 2: the slip showed
+          through the Code link only, the offer button was below the
+          fold). Facts, stack, and code follow the rule. Copy unchanged. */}
       <p className="jp-readout-supporting">
         <LegendGlyphs />
       </p>
@@ -80,6 +77,14 @@ export default function LeaflinkReadout(props: LeaflinkReadoutProps): JSX.Elemen
         label={C['C-LL-OFFER']}
         onClick={props.onOffer}
       />
+      <hr className="jp-readout-rule" style={ruleStyle} />
+      <p className="jp-readout-supporting">{C['C-LL-FACTS']}</p>
+      <p className="jp-readout-supporting">{C['C-LL-STACK']}</p>
+      <div className="jp-readout-links">
+        <Link href={C['C-LL-CODE'].href} isExternalLink>
+          {C['C-LL-CODE'].label}
+        </Link>
+      </div>
     </div>
   );
 }

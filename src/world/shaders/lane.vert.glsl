@@ -18,6 +18,7 @@ uniform vec3 uBandAlpha;       // lanefield.variance.bandAlpha // lit-ok: shader
 uniform vec2 uRingCenter;      // deflection ring center, world XZ // lit-ok: shader constant
 uniform float uRingRadius;     // deflection ring radius, world units // lit-ok: shader constant
 uniform float uRingStrength;   // deflection ring strength, world units // lit-ok: shader constant
+uniform float uRingSwirl;      // tangential share of the push, seeded per morph or pulse // lit-ok: shader constant
 uniform sampler2D uSilhouetteMask; // logo alpha mask, small square texture // lit-ok: shader constant
 uniform vec2 uSilhouetteCenter;    // pull center, world XZ, tracks the ring // lit-ok: shader constant
 uniform float uSilhouetteRadius;   // pull radius, world units, tracks the ring // lit-ok: shader constant
@@ -42,7 +43,9 @@ float hash11(float p) { p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; retur
 // P-LF-4a ring deflection, mirroring src/world/deflection.ts: radial
 // push with falloff (1 - (d / r)^2)^2 inside the ring, zero outside.
 // Falloff and its derivative are both zero at d = r, so the first
-// derivative is continuous across the boundary.
+// derivative is continuous across the boundary. Polish round: a seeded
+// tangential share (uRingSwirl) rides the same falloff, so the swirl
+// keeps the C1 boundary and is zero wherever the push is zero.
 vec2 deflectXZ(vec2 p) { // lit-ok: shader constant
   if (uRingRadius <= 0.0 || uRingStrength == 0.0) return p; // lit-ok: shader constant
   vec2 d = p - uRingCenter; // lit-ok: shader constant
@@ -50,7 +53,9 @@ vec2 deflectXZ(vec2 p) { // lit-ok: shader constant
   if (dist >= uRingRadius || dist < 0.0001) return p; // lit-ok: shader constant
   float x = dist / uRingRadius; // lit-ok: shader constant
   float f = 1.0 - x * x; // lit-ok: shader constant
-  return p + (d / dist) * (uRingStrength * f * f); // lit-ok: shader constant
+  vec2 dir = d / dist; // lit-ok: shader constant
+  vec2 tangent = vec2(-dir.y, dir.x); // lit-ok: shader constant
+  return p + (dir + tangent * uRingSwirl) * (uRingStrength * f * f); // lit-ok: shader constant
 }
 
 // P-LF-4b silhouette pull, mirroring src/world/silhouette.ts: the

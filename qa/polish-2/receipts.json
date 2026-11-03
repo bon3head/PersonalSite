@@ -1,0 +1,125 @@
+{
+ "morph": {
+  "before_server_to_leaflink": {
+   "viewport": [
+    390,
+    658
+   ],
+   "hero_center_first": [
+    198,
+    326
+   ],
+   "hero_center_last": [
+    262,
+    166
+   ],
+   "hero_move_px": 172.3,
+   "ring_to_hero_after_gather_max_px": 135.5,
+   "ring_strength_at_rest_max": 1.268,
+   "hero_loom_frames": 0
+  },
+  "after_server_to_leaflink": {
+   "viewport": [
+    390,
+    658
+   ],
+   "hero_center_first": [
+    268,
+    164
+   ],
+   "hero_center_last": [
+    268,
+    164
+   ],
+   "hero_move_px": 0.0,
+   "ring_to_hero_after_gather_max_px": 0.0,
+   "ring_strength_at_rest_max": 0,
+   "hero_loom_frames": 13
+  },
+  "before_server_to_sidequests": {
+   "viewport": [
+    390,
+    658
+   ],
+   "hero_center_first": [
+    189,
+    525
+   ],
+   "hero_center_last": [
+    195,
+    521
+   ],
+   "hero_move_px": 7.2,
+   "ring_to_hero_after_gather_max_px": 352.0,
+   "ring_strength_at_rest_max": 0.932,
+   "hero_loom_frames": 0
+  },
+  "after_server_to_sidequests": {
+   "viewport": [
+    390,
+    658
+   ],
+   "hero_center_first": [
+    192,
+    538
+   ],
+   "hero_center_last": [
+    204,
+    542
+   ],
+   "hero_move_px": 12.6,
+   "ring_to_hero_after_gather_max_px": 8.1,
+   "ring_strength_at_rest_max": 0,
+   "hero_loom_frames": 13
+  }
+ },
+ "sidequests_trail3_tracking": {
+  "claim_ms": 1728,
+  "marker_first_in_clear_band_ms": 1568,
+  "marker_to_mark_px_after_claim_min": 8,
+  "pitch_range": [
+   -64.49,
+   -64.49
+  ],
+  "max_pan_world": 18.66
+ },
+ "leaflink_offer_button": {
+  "before": {
+   "button_rect": [
+    571,
+    603
+   ],
+   "slip_bottom": 598,
+   "visible": false
+  },
+  "after": {
+   "button_rect": [
+    535,
+    567
+   ],
+   "slip_bottom": 598,
+   "visible": true
+  }
+ },
+ "glitterbox_hold": {
+  "activated_at_ms": 496,
+  "ring_follows_pointer": true
+ },
+ "sidequests_fine_walk": {
+  "max_pan_world": 0,
+  "pitch_range": [
+   -56.94,
+   -54.55
+  ]
+ },
+ "reduced_motion_server_to_leaflink": {
+  "hero_opacity_values": [
+   "1"
+  ],
+  "ring_strength_max": 0
+ },
+ "twin_transition_before": {
+  "transitionProperty": "background-image, background-color, color, opacity, transform",
+  "transitionDuration": "0.15s"
+ }
+}

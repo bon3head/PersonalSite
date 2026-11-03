@@ -5,7 +5,7 @@
 // skipped: its H1 is the name itself, and the wordmark is hidden
 // on server, so it cannot intersect a visible name box; shrinking
 // it would change the server hero for no zone benefit.
-import { useEffect, type RefObject } from 'react';
+import { useLayoutEffect, type RefObject } from 'react';
 import type { SceneId } from '../router';
 
 const MIN_PX = 13;
@@ -44,7 +44,10 @@ export function useTitleFit(
   sectionRef: RefObject<HTMLElement | null>,
   scene: SceneId,
 ): void {
-  useEffect(() => {
+  // Layout effect (polish round): the title settles in the same commit
+  // as the readout swap, before the hero (a later sibling) measures the
+  // readout rect, so the hero never places against a pre-fit title.
+  useLayoutEffect(() => {
     const section = sectionRef.current;
     if (section === null) return;
     const compute = (): void => fitTitle(section);

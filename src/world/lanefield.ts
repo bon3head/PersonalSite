@@ -3,8 +3,8 @@
 // one draw call, morphing between four layouts by uniform weights.
 import * as THREE from 'three';
 import { T } from '../tokens.generated';
-import type { LaneParams, Lanefield, LayoutId } from './types';
-import { easeSignature, easePlain } from './tween';
+import type { CameraFocus, HeroAnchorPx, LaneParams, Lanefield, LayoutId } from './types';
+import { easeSignature, easePlain, damp, cubicBezier } from './tween';
 import { CameraRig, poseFor, lerpPoseInto, clampSideQuestsPitch, type Pose } from './camera';
 import { Governor } from './governor';
 import { createDebugView } from './debug';
@@ -20,8 +20,12 @@ import {
 } from './silhouette';
 import {
   createMorphController,
+  type MorphAnchor,
+  type MorphSample,
   type MorphSnapshot,
 } from '../motion/morph-controller';
+import { morphEntropy, signed, setEntropyEnabled } from '../motion/entropy';
+import { loadBrandManifest } from '../lib/brandManifest';
 import { descriptorForLayout } from '../motion/hero-descriptors';
 import type { SilhouetteMaskKind } from './types';
 import laneVert from './shaders/lane.vert.glsl?raw';
@@ -228,7 +232,6 @@ export function createLanefield(
   placeholderTex.needsUpdate = true;
   let maskTexture: THREE.Texture = placeholderTex;
   let maskLoadedKind: SilhouetteMaskKind = 'none';
-  let maskRequestedKind: SilhouetteMaskKind = 'none';
   let framesRendered = 0;
 
   const fire = T.world.server.fire;
@@ -274,6 +277,11 @@ export function createLanefield(
     uRingCenter: { value: new THREE.Vector2(0, 0) },
     uRingRadius: { value: 0 },
     uRingStrength: { value: 0 },
+    // Polish round: tangential share of the ring push (seeded swirl),
+    // and the light mode crossfade (no midpoint snap during travel).
+    uRingSwirl: { value: 0 },
+    uLightModeFrom: { value: lightModeIndex(initialParams.lightMode) },
+    uLightMix: { value: 1 },
     // P-LF-4b silhouette pull, zero strength at rest.
     uSilhouetteMask: { value: placeholderTex },
     uSilhouetteCenter: { value: new THREE.Vector2(0, 0) },
@@ -327,7 +335,11 @@ export function createLanefield(
   // envelope. updateTravel samples it per frame; the debug hook
   // below is a stable object whose fields update in place, so
   // tests can read the current sample without a new interface method.
-  const morph = createMorphController(opts.initial);
+  setEntropyEnabled(!opts.reducedMotion);
+  const morph = createMorphController(opts.initial, {
+    anchorFor: (layout) => resolveAnchor(layout),
+    groundAt: (px) => groundAt(px[0], px[1]),
+  });
   const morphDebug: {
     from: LayoutId;
     to: LayoutId;
@@ -335,6 +347,7 @@ export function createLanefield(
     degraded: boolean;
     degrade: () => void;
     degradeState: () => ReturnType<typeof morph.degradeState>;
+    stage: () => unknown;
   } = {
     from: opts.initial,
     to: opts.initial,
@@ -342,8 +355,36 @@ export function createLanefield(
     degraded: false,
     degrade: () => morph.forceDegrade(),
     degradeState: () => morph.degradeState(),
+    // Polish round test hook: focus target, pan, glitter, pulse state.
+    stage: () => ({
+      focus,
+      pan: [...pan],
+      groundUnderFocus: focus ? groundAt(focus.screenPx[0], focus.screenPx[1]) : null,
+      glitter: { ...glitter, centerPx: [...glitter.centerPx] },
+      pulse: pulseState ? { ...pulseState } : null,
+    }),
   };
   (window as unknown as { __morph?: typeof morphDebug }).__morph = morphDebug;
+  // Polish round state (DESIGN polish tokens). Hero anchors are CSS px with
+  // the viewport they were measured in; a stale viewport resolves null.
+  const anchors = new Map<LayoutId, { a: HeroAnchorPx; w: number; h: number }>();
+  let ringSwirl = 0;
+  let lightModeFrom = lightModeIndex(initialParams.lightMode);
+  let lightMix = 1;
+  let pulseState: {
+    startSec: number;
+    originPx: [number, number] | null;
+    swirl: number;
+    scale: number;
+  } | null = null;
+  let focus: CameraFocus | null = null;
+  const pan: [number, number] = [0, 0];
+  const bow = { amount: 0, dir: [0, 0] as [number, number], now: 0 };
+  const camOffset: [number, number] = [0, 0];
+  const glitter = { target: 0, value: 0, centerPx: [0, 0] as [number, number], swirl: 0, releaseAt: -1, releaseFrom: 0 };
+  const drawWeights: number[] = [0, 0, 0, 0];
+  const scatterIndex = LAYOUT_ORDER.indexOf('scatter');
+  const trackEase = cubicBezier(...T.curve.track);
   const pointer = { x: 0, y: 0 };
   const clearColor = new THREE.Color();
   const governor = new Governor();
@@ -393,30 +434,27 @@ export function createLanefield(
     }
     lerpPoseInto(travelFromPose, travelToPose, e, basePose);
     // W4 params interpolate with the signature curve, same as weights.
+    // The ring and silhouette fields are not lerped: applyRing owns
+    // them after the final camera write (polish round).
     paramsCurrent = lerpParams(paramsFrom, paramsTo, e);
-    // P-MORPH-1: the ring and silhouette fields come from the morph
-    // controller sample, whose centers are the hero descriptor
-    // anchors and whose envelope is the Release, Gather, Reveal
-    // state machine. The gradient and light fields above still come
-    // from the param lerp; only the ring and silhouette envelope
-    // moved into the controller, so endpoint params are unchanged.
-    // Peak ring strength is half the radius, as in W4.
-    const morphSample = morph.sample(t * SEC_TO_MS);
-    paramsCurrent.ringCenter = [...morphSample.ringCenter];
-    paramsCurrent.ringRadius = morphSample.ringRadius;
-    paramsCurrent.ringStrength = morphSample.ringStrength;
-    paramsCurrent.silhouetteCenter = [...morphSample.silhouetteCenter];
-    paramsCurrent.silhouetteRadius = morphSample.silhouetteRadius;
-    paramsCurrent.silhouetteStrength = morphSample.silhouetteStrength;
-    morphDebug.from = morphSample.from;
-    morphDebug.to = morphSample.to;
-    morphDebug.sample = morphSample;
-    morphDebug.degraded = morphSample.degraded;
+    // Light mode crossfades instead of switching at the midpoint.
+    lightModeFrom = lightModeIndex(paramsFrom.lightMode);
+    lightMix = e;
+    // Camera bow: a lateral arc on the camera's own curve, zero at
+    // both ends (seeded, keyed by the destination layout).
+    bow.now = bow.amount * Math.sin(Math.PI * e);
     if (p >= 1) {
       travel = null;
+      bow.now = 0;
+      lightMix = 1;
       oneHot(current, weights);
       for (let i = 0; i < LAYOUT_ORDER.length; i++) groundWeights[i] = weights[i];
       paramsCurrent = cloneParams(paramsTo);
+      // Rest invariant: no ring or pull survives a morph. A strength
+      // carried into the target params (the pre-polish registration
+      // path) would otherwise persist as a permanent bulge.
+      paramsCurrent.ringStrength = 0;
+      paramsCurrent.silhouetteStrength = 0;
       const pose = poseFor(current, variant);
       basePose.pos[0] = pose.pos[0];
       basePose.pos[1] = pose.pos[1];
@@ -439,88 +477,211 @@ export function createLanefield(
     }
   }
 
-  // P-LF-4b mask load: resolve the params mask kind through the
-  // brand manifest (SideQuests frame 0 PNG, LeafLink logo PNG), draw
-  // it letterboxed into a small square canvas so aspect is preserved
-  // and the contour band is texel-wide, and upload it as the lane
-  // material texture. A load that finishes after the route moved on
-  // is discarded, never applied to the wrong route. Any failure leaves
-  // the placeholder bound, so lanes render unchanged.
-  async function loadMask(kind: SilhouetteMaskKind): Promise<void> {
-    if (kind === 'none') return;
-    try {
-      const res = await fetch('/brand/manifest.json');
-      if (!res.ok) {
-        if (maskRequestedKind === kind) maskRequestedKind = 'none';
-        return;
+  // P-LF-4b mask load, polish round: both masks load once, right after
+  // the first rendered frame (brand bytes never precede it), into a
+  // cache keyed by kind. The uniform picks the cached texture for the
+  // current mask kind every frame, so a first visit never swaps the
+  // mask in mid-morph. Each mask is the brand PNG letterboxed into a
+  // small square canvas (aspect preserved, contour band texel wide).
+  // Any failure leaves the placeholder bound, so lanes render unchanged.
+  const maskCache = new Map<SilhouetteMaskKind, THREE.Texture>();
+  let masksRequested = false;
+  async function loadMaskTexture(file: string): Promise<THREE.Texture | null> {
+    const img = new Image();
+    img.src = `/brand/${file}`;
+    await img.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = SILHOUETTE_MASK_SIZE;
+    canvas.height = SILHOUETTE_MASK_SIZE;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    const scale = Math.min(
+      SILHOUETTE_MASK_SIZE / img.naturalWidth,
+      SILHOUETTE_MASK_SIZE / img.naturalHeight,
+    );
+    const w = img.naturalWidth * scale;
+    const h = img.naturalHeight * scale;
+    ctx.clearRect(0, 0, SILHOUETTE_MASK_SIZE, SILHOUETTE_MASK_SIZE);
+    ctx.drawImage(img, (SILHOUETTE_MASK_SIZE - w) / 2, (SILHOUETTE_MASK_SIZE - h) / 2, w, h);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.magFilter = THREE.LinearFilter;
+    tex.minFilter = THREE.LinearFilter;
+    tex.generateMipmaps = false;
+    tex.flipY = false;
+    tex.colorSpace = THREE.NoColorSpace;
+    tex.needsUpdate = true;
+    // Upload now, outside any morph, so first use costs no frame.
+    renderer.initTexture(tex);
+    return tex;
+  }
+  async function preloadMasks(): Promise<void> {
+    const manifest = await loadBrandManifest();
+    if (!manifest || disposed) return;
+    const files: Array<[SilhouetteMaskKind, string | undefined]> = [
+      ['sidequests', manifest.heroes?.sidequests?.frame0?.file],
+      ['leaflink', manifest.heroes?.leaflink?.png?.file],
+    ];
+    for (const [kind, file] of files) {
+      if (!file) continue;
+      try {
+        const tex = await loadMaskTexture(file);
+        if (!tex) continue;
+        if (disposed) {
+          tex.dispose();
+          return;
+        }
+        maskCache.set(kind, tex);
+      } catch {
+        // Mask failure is not a field failure; the placeholder stays.
       }
-      const manifest = (await res.json()) as {
-        heroes?: {
-          sidequests?: { frame0?: { file?: string } };
-          leaflink?: { png?: { file?: string } };
-        };
-      };
-      const file =
-        kind === 'sidequests'
-          ? manifest.heroes?.sidequests?.frame0?.file
-          : manifest.heroes?.leaflink?.png?.file;
-      if (!file) {
-        if (maskRequestedKind === kind) maskRequestedKind = 'none';
-        return;
-      }
-      const img = new Image();
-      img.src = `/brand/${file}`;
-      await img.decode();
-      const canvas = document.createElement('canvas');
-      canvas.width = SILHOUETTE_MASK_SIZE;
-      canvas.height = SILHOUETTE_MASK_SIZE;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        if (maskRequestedKind === kind) maskRequestedKind = 'none';
-        return;
-      }
-      const scale = Math.min(
-        SILHOUETTE_MASK_SIZE / img.naturalWidth,
-        SILHOUETTE_MASK_SIZE / img.naturalHeight,
-      );
-      const w = img.naturalWidth * scale;
-      const h = img.naturalHeight * scale;
-      ctx.clearRect(0, 0, SILHOUETTE_MASK_SIZE, SILHOUETTE_MASK_SIZE);
-      ctx.drawImage(img, (SILHOUETTE_MASK_SIZE - w) / 2, (SILHOUETTE_MASK_SIZE - h) / 2, w, h);
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.magFilter = THREE.LinearFilter;
-      tex.minFilter = THREE.LinearFilter;
-      tex.generateMipmaps = false;
-      tex.flipY = false;
-      tex.colorSpace = THREE.NoColorSpace;
-      tex.needsUpdate = true;
-      if (disposed) {
-        tex.dispose();
-        return;
-      }
-      if (paramsCurrent.silhouetteMask !== kind) {
-        tex.dispose();
-        return;
-      }
-      const old = maskTexture;
-      maskTexture = tex;
-      maskLoadedKind = kind;
-      if (old !== placeholderTex) old.dispose();
-    } catch {
-      // Mask failure is not a field failure; the placeholder stays,
-      // and a later route change may retry the load.
-      if (maskRequestedKind === kind) maskRequestedKind = 'none';
     }
   }
-
   function syncMask(): void {
+    if (!masksRequested && framesRendered >= 1) {
+      masksRequested = true;
+      void preloadMasks();
+    }
     const kind = paramsCurrent.silhouetteMask;
-    if (kind === 'none' || kind === maskLoadedKind || kind === maskRequestedKind) return;
-    // Brand bytes never precede the first field frame: the load starts
-    // only after a frame has rendered.
-    if (framesRendered < 1) return;
-    maskRequestedKind = kind;
-    void loadMask(kind);
+    const tex = kind === 'none' ? undefined : maskCache.get(kind);
+    maskTexture = tex ?? placeholderTex;
+    maskLoadedKind = tex ? kind : 'none';
+  }
+
+  // --- Polish round: screen anchors, focus pan, pulse, glitter. ---
+  function groundAt(x: number, y: number): [number, number] | null {
+    return rig.screenToGround(x, y, cssW, cssH);
+  }
+
+  // Ground-project a hero anchor through the current camera. Called
+  // only after the final camera write of the frame (applyRing) or at
+  // navigate time, so the ring lands under the logo on screen.
+  function resolveAnchor(layout: LayoutId): MorphAnchor | null {
+    const rec = anchors.get(layout);
+    if (!rec || rec.w !== cssW || rec.h !== cssH) return null;
+    const c = groundAt(rec.a.x, rec.a.y);
+    const r = groundAt(rec.a.x + rec.a.ringRadiusPx, rec.a.y);
+    const sr = groundAt(rec.a.x + rec.a.silhouetteRadiusPx, rec.a.y);
+    if (!c || !r || !sr) return null;
+    return {
+      center: c,
+      ringRadius: Math.hypot(r[0] - c[0], r[1] - c[1]),
+      silhouetteRadius: Math.hypot(sr[0] - c[0], sr[1] - c[1]),
+    };
+  }
+
+  function updatePan(dtMs: number): void {
+    let tx = 0;
+    let tz = 0;
+    if (focus && !reduced) {
+      const g = groundAt(focus.screenPx[0], focus.screenPx[1]);
+      if (g) {
+        // The ground under a fixed screen point moves by exactly the
+        // camera translation, so the target pan is one subtraction.
+        tx = pan[0] + focus.ground[0] - g[0];
+        tz = pan[1] + focus.ground[1] - g[1];
+        const len = Math.hypot(tx, tz);
+        const cap = T.focus.maxPanWorld;
+        if (len > cap) {
+          tx *= cap / len;
+          tz *= cap / len;
+        }
+      } else {
+        tx = pan[0];
+        tz = pan[1];
+      }
+    }
+    pan[0] = reduced ? tx : damp(pan[0], tx, T.focus.halfLifeMs, dtMs);
+    pan[1] = reduced ? tz : damp(pan[1], tz, T.focus.halfLifeMs, dtMs);
+  }
+
+  function setRingFields(
+    center: [number, number],
+    radius: number,
+    strength: number,
+    silCenter: [number, number],
+    silRadius: number,
+    silStrength: number,
+    swirl: number,
+  ): void {
+    paramsCurrent.ringCenter = center;
+    paramsCurrent.ringRadius = radius;
+    paramsCurrent.ringStrength = strength;
+    paramsCurrent.silhouetteCenter = silCenter;
+    paramsCurrent.silhouetteRadius = silRadius;
+    paramsCurrent.silhouetteStrength = silStrength;
+    ringSwirl = swirl;
+  }
+
+  // Single owner of the ring and silhouette fields, after the final
+  // camera write: the morph envelope while traveling, otherwise the
+  // glitter hold or a pulse at the current layout's anchor, otherwise
+  // zero strength (the rest invariant).
+  function applyRing(t: number, dtMs: number): void {
+    const s = morph.sample(t * SEC_TO_MS);
+    morphDebug.from = s.from;
+    morphDebug.to = s.to;
+    morphDebug.sample = s;
+    morphDebug.degraded = s.degraded;
+    if (!s.done) {
+      setRingFields(
+        [...s.ringCenter], s.ringRadius, s.ringStrength,
+        [...s.silhouetteCenter], s.silhouetteRadius, s.silhouetteStrength,
+        s.ringSwirl,
+      );
+      return;
+    }
+    // Glitter hold: the ring follows the finger, swirled.
+    // Rise damps toward the cap; release is a finite signature ramp
+    // over one travel duration, so the scene is exactly re-formed (and
+    // the rest invariant holds again) at a known time, with no
+    // exponential tail and no epsilon snap.
+    if (glitter.target > 0) {
+      glitter.releaseAt = -1;
+      glitter.value = damp(glitter.value, T.glitter.maxWeight, T.motion.ms.fast, dtMs);
+    } else if (glitter.value > 0) {
+      if (glitter.releaseAt < 0) {
+        glitter.releaseAt = t;
+        glitter.releaseFrom = glitter.value;
+      }
+      const q = ((t - glitter.releaseAt) * SEC_TO_MS) / T.motion.ms.travel;
+      glitter.value = q >= 1 ? 0 : glitter.releaseFrom * (1 - easeSignature(q));
+    }
+    if (glitter.value > 0) {
+      const c = groundAt(glitter.centerPx[0], glitter.centerPx[1]);
+      const r = groundAt(glitter.centerPx[0] + T.glitter.ringRadiusPx, glitter.centerPx[1]);
+      if (c && r) {
+        const radius = Math.hypot(r[0] - c[0], r[1] - c[1]);
+        const k = glitter.value / T.glitter.maxWeight;
+        setRingFields(c, radius, radius * 0.5 * k, c, radius, 0, glitter.swirl);
+        return;
+      }
+    }
+    const a = resolveAnchor(current);
+    if (pulseState && a) {
+      const age = t - pulseState.startSec;
+      const out = T.motion.ms.fast * MS_TO_SEC;
+      const settle = T.motion.ms.travel * MS_TO_SEC;
+      if (age >= out + settle) {
+        pulseState = null;
+      } else if (age >= 0) {
+        const env = age < out ? easeSignature(age / out) : 1 - easePlain((age - out) / settle);
+        const q = trackEase(Math.min(1, age / (out + settle * 0.5)));
+        const o = pulseState.originPx ? groundAt(pulseState.originPx[0], pulseState.originPx[1]) : null;
+        const from = o ?? a.center;
+        const center: [number, number] = [
+          from[0] + (a.center[0] - from[0]) * q,
+          from[1] + (a.center[1] - from[1]) * q,
+        ];
+        const k = env * pulseState.scale;
+        setRingFields(
+          center, a.ringRadius, a.ringRadius * 0.5 * k,
+          [...a.center], a.silhouetteRadius, T.morph.silhouettePull * 0.5 * k,
+          pulseState.swirl,
+        );
+        return;
+      }
+    }
+    setRingFields(a ? [...a.center] : [0, 0], a ? a.ringRadius : 0, 0, a ? [...a.center] : [0, 0], a ? a.silhouetteRadius : 0, 0, 0);
   }
 
   function doFrame(t: number, dt: number, sampleGovernor: boolean): void {
@@ -529,7 +690,10 @@ export function createLanefield(
     // count, and the controller itself gates on its own sample, so
     // a completed morph stops counting without extra state here.
     if (travel) morph.observeFrame(dt * SEC_TO_MS, performance.now());
-    rig.update(basePose, t, weights, pointer, dt * SEC_TO_MS, reduced, finePointer);
+    updatePan(dt * SEC_TO_MS);
+    camOffset[0] = pan[0] + bow.dir[0] * bow.now;
+    camOffset[1] = pan[1] + bow.dir[1] * bow.now;
+    rig.update(basePose, t, weights, pointer, dt * SEC_TO_MS, reduced, finePointer, camOffset);
     for (const cb of callbacks) cb(t, dt);
     // ITEM 6 clamp, the single and last camera write guard: after rig // lit-ok:
     // interpolation, walk lean (a callback above), and parallax have
@@ -537,15 +701,25 @@ export function createLanefield(
     // layout has any weight, which covers morph transit and the walk.
     // Other layouts keep their own poses untouched.
     if (weights[layoutIndex('sidequests')] > 0) clampSideQuestsPitch(camera);
+    // Ring, silhouette, pulse, and glitter after the final camera write.
+    applyRing(t, dt * SEC_TO_MS);
+    // GLITTERBOX: the drawn weights blend toward the scatter layout;
+    // the travel weights (and every test reading them) are untouched.
+    for (let i = 0; i < LAYOUT_ORDER.length; i++) {
+      drawWeights[i] = weights[i] * (1 - glitter.value) + (i === scatterIndex ? glitter.value : 0);
+    }
     (uniforms.uTime.value as number) = t;
-    (uniforms.uW.value as THREE.Vector4).set(weights[0], weights[1], weights[2], weights[3]);
+    (uniforms.uW.value as THREE.Vector4).set(drawWeights[0], drawWeights[1], drawWeights[2], drawWeights[3]);
     (uniforms.uFrozen.value as number) = reduced ? 1 : 0;
     // W4 param uniforms, from the interpolated current params.
     (uniforms.uGradLead.value as THREE.Vector3).set(...paramsCurrent.leadOklab);
     (uniforms.uGradTail.value as THREE.Vector3).set(...paramsCurrent.tailOklab);
     (uniforms.uSignalOklab.value as THREE.Vector3).set(...paramsCurrent.signalOklab);
     (uniforms.uGradTailLength.value as number) = paramsCurrent.tailLength;
-    (uniforms.uLightMode.value as number) = lightModeIndex(paramsCurrent.lightMode);
+    (uniforms.uLightMode.value as number) = lightModeIndex(travel ? paramsTo.lightMode : paramsCurrent.lightMode);
+    (uniforms.uLightModeFrom.value as number) = travel ? lightModeFrom : lightModeIndex(paramsCurrent.lightMode);
+    (uniforms.uLightMix.value as number) = travel ? lightMix : 1;
+    (uniforms.uRingSwirl.value as number) = ringSwirl;
     (uniforms.uLightRadius.value as number) = paramsCurrent.lightRadius;
     (uniforms.uLightGain.value as number) = paramsCurrent.lightGain;
     (uniforms.uRingCenter.value as THREE.Vector2).set(...paramsCurrent.ringCenter);
@@ -818,10 +992,21 @@ export function createLanefield(
 
   const field: Lanefield = {
     ready,
-    travelTo(id: LayoutId, travelOpts?: { instant?: boolean }): Promise<void> {
+    travelTo(
+      id: LayoutId,
+      travelOpts?: { instant?: boolean; originPx?: [number, number] | null },
+    ): Promise<void> {
       if (disposed || failed) return Promise.resolve();
       if (!travel && current === id) return Promise.resolve();
+      // A route change ends any pulse or glitter hold and drops focus.
+      pulseState = null;
+      glitter.target = 0;
+      focus = null;
       if (travelOpts?.instant || reduced) {
+        glitter.value = 0;
+        bow.amount = 0;
+        bow.now = 0;
+        lightMix = 1;
         current = id;
         oneHot(id, weights);
         for (let i = 0; i < LAYOUT_ORDER.length; i++) groundWeights[i] = weights[i];
@@ -861,30 +1046,35 @@ export function createLanefield(
       // fields are zero and the center is the origin, so a project
       // rest state snapshots its descriptor anchor instead; a field
       // rest state keeps the zero center, which collapses in place.
-      const morphSnapshot: MorphSnapshot = travel
-        ? {
-            center: [...paramsCurrent.ringCenter],
-            silhouetteCenter: [...paramsCurrent.silhouetteCenter],
-            ringRadius: paramsCurrent.ringRadius,
-            ringStrength: paramsCurrent.ringStrength,
-            silhouetteRadius: paramsCurrent.silhouetteRadius,
-            silhouetteStrength: paramsCurrent.silhouetteStrength,
-          }
-        : (() => {
-            const restDesc = descriptorForLayout(current);
-            const atProject = restDesc.kind === 'mark';
-            return {
-              center: atProject ? [...restDesc.anchor] : [...paramsCurrent.ringCenter],
-              silhouetteCenter: atProject
-                ? [...restDesc.silhouetteCenter]
-                : [...paramsCurrent.silhouetteCenter],
-              ringRadius: paramsCurrent.ringRadius,
-              ringStrength: paramsCurrent.ringStrength,
-              silhouetteRadius: paramsCurrent.silhouetteRadius,
-              silhouetteStrength: paramsCurrent.silhouetteStrength,
-            };
-          })();
-      morph.navigate(id, now() * SEC_TO_MS, morphSnapshot);
+      // At rest the ring fields already sit on the current layout's
+      // resolved hero anchor (applyRing), so one snapshot form covers
+      // mid-flight and rest; a project with no placed hero falls back
+      // to its descriptor anchor so a collapse still has a center.
+      const restDesc = descriptorForLayout(current);
+      const restAnchor = !travel && restDesc.kind === 'mark' ? resolveAnchor(current) : null;
+      const morphSnapshot: MorphSnapshot = {
+        center: restAnchor
+          ? [...restAnchor.center]
+          : !travel && restDesc.kind === 'mark'
+            ? [...restDesc.anchor]
+            : [...paramsCurrent.ringCenter],
+        silhouetteCenter: restAnchor
+          ? [...restAnchor.center]
+          : !travel && restDesc.kind === 'mark'
+            ? [...restDesc.silhouetteCenter]
+            : [...paramsCurrent.silhouetteCenter],
+        ringRadius: restAnchor ? restAnchor.ringRadius : paramsCurrent.ringRadius,
+        ringStrength: paramsCurrent.ringStrength,
+        silhouetteRadius: restAnchor ? restAnchor.silhouetteRadius : paramsCurrent.silhouetteRadius,
+        silhouetteStrength: paramsCurrent.silhouetteStrength,
+      };
+      // Seeded per-morph variety, keyed by the destination layout
+      // (neutral under reduced motion, which never reaches here).
+      const ent = morphEntropy(id);
+      morph.navigate(id, now() * SEC_TO_MS, morphSnapshot, {
+        originPx: travelOpts?.originPx ?? null,
+        entropy: ent,
+      });
       paramsFrom = cloneParams(paramsCurrent);
       paramsTo = paramsForLayout(id);
       travelFromPose.pos[0] = basePose.pos[0];
@@ -906,6 +1096,25 @@ export function createLanefield(
       travelToPose.fov = pose.fov;
       travelToPose.shift[0] = pose.shift[0];
       travelToPose.shift[1] = pose.shift[1];
+      // Bow direction: perpendicular to the target travel on the
+      // ground, or the destination camera's right axis when the two
+      // targets nearly coincide (LeafLink and SideQuests do).
+      {
+        const dx = travelToPose.target[0] - travelFromPose.target[0];
+        const dz = travelToPose.target[2] - travelFromPose.target[2];
+        const len = Math.hypot(dx, dz);
+        if (len > 0.5) {
+          bow.dir[0] = -dz / len;
+          bow.dir[1] = dx / len;
+        } else {
+          const fx = travelToPose.target[0] - travelToPose.pos[0];
+          const fz = travelToPose.target[2] - travelToPose.pos[2];
+          const fl = Math.hypot(fx, fz) || 1;
+          bow.dir[0] = -fz / fl;
+          bow.dir[1] = fx / fl;
+        }
+        bow.amount = ent.bow;
+      }
       current = id;
       travel = { start: now(), dur: T.motion.ms.travel * MS_TO_SEC };
       return new Promise<void>((resolve) => {
@@ -915,6 +1124,12 @@ export function createLanefield(
     setReducedMotion(on: boolean): void {
       if (reduced === on) return;
       reduced = on;
+      setEntropyEnabled(!on);
+      if (on) {
+        pulseState = null;
+        glitter.target = 0;
+        glitter.value = 0;
+      }
       (uniforms.uFrozen.value as number) = on ? 1 : 0;
       if (on) {
         stopLoop();
@@ -960,8 +1175,13 @@ export function createLanefield(
     getParams(): LaneParams {
       return cloneParams(paramsCurrent);
     },
+    // Ring and silhouette center, radius, and strength are owned by the
+    // morph envelope, pulses, and glitter (applyRing): setParams keeps
+    // accepting them for compatibility, but applyRing rewrites them on
+    // the next frame, and they never enter the travel target, so an
+    // override can no longer outlive a morph as a frozen bulge.
     setParams(p: Partial<LaneParams>): void {
-      const apply = (target: LaneParams): void => {
+      const apply = (target: LaneParams, includeRing: boolean): void => {
         if (p.leadOklab) target.leadOklab = [...p.leadOklab];
         if (p.tailOklab) target.tailOklab = [...p.tailOklab];
         if (p.signalOklab) target.signalOklab = [...p.signalOklab];
@@ -969,16 +1189,17 @@ export function createLanefield(
         if (p.lightMode !== undefined) target.lightMode = p.lightMode;
         if (p.lightRadius !== undefined) target.lightRadius = p.lightRadius;
         if (p.lightGain !== undefined) target.lightGain = p.lightGain;
+        if (p.silhouetteMask !== undefined) target.silhouetteMask = p.silhouetteMask;
+        if (!includeRing) return;
         if (p.ringCenter) target.ringCenter = [...p.ringCenter];
         if (p.ringRadius !== undefined) target.ringRadius = p.ringRadius;
         if (p.ringStrength !== undefined) target.ringStrength = p.ringStrength;
-        if (p.silhouetteMask !== undefined) target.silhouetteMask = p.silhouetteMask;
         if (p.silhouetteCenter) target.silhouetteCenter = [...p.silhouetteCenter];
         if (p.silhouetteRadius !== undefined) target.silhouetteRadius = p.silhouetteRadius;
         if (p.silhouetteStrength !== undefined) target.silhouetteStrength = p.silhouetteStrength;
       };
-      apply(paramsCurrent);
-      if (travel) apply(paramsTo);
+      apply(paramsCurrent, true);
+      if (travel) apply(paramsTo, false);
     },
     laneAttributes(lane: number) {
       return laneAttributesFor(lane, weights[layoutIndex('server')]);
@@ -996,6 +1217,49 @@ export function createLanefield(
         callbacks.delete(cb);
       };
     },
+    setHeroAnchor(layout: LayoutId, anchor: HeroAnchorPx | null): void {
+      if (anchor) anchors.set(layout, { a: { ...anchor }, w: cssW, h: cssH });
+      else anchors.delete(layout);
+    },
+    heroAnchor(layout: LayoutId): HeroAnchorPx | null {
+      const rec = anchors.get(layout);
+      return rec && rec.w === cssW && rec.h === cssH ? { ...rec.a } : null;
+    },
+    morphSample(): MorphSample | null {
+      return morphDebug.sample;
+    },
+    pulse(p?: { originPx?: [number, number] | null; strengthScale?: number }): void {
+      if (reduced || disposed || travel) return;
+      pulseState = {
+        startSec: now(),
+        originPx: p?.originPx ?? null,
+        swirl: signed('pulse-swirl') * T.entropy.pulseSwirl,
+        scale: p?.strengthScale ?? 1,
+      };
+    },
+    setFocus(next: CameraFocus | null): void {
+      focus = next ? { ground: [...next.ground], screenPx: [...next.screenPx] } : null;
+    },
+    focusOffset(): [number, number] {
+      return [pan[0], pan[1]];
+    },
+    focusActive(): boolean {
+      return focus !== null;
+    },
+    projectAtRest(layout: LayoutId, p: [number, number, number]): [number, number] {
+      return rig.projectAtPose(poseFor(layout, variant), p, cssW, cssH);
+    },
+    setGlitter(on: boolean, centerPx?: [number, number]): void {
+      const allowed = on && !reduced && !travel && !disposed;
+      if (allowed && glitter.target === 0) {
+        glitter.swirl = signed('glitter-swirl') * T.glitter.swirl;
+      }
+      glitter.target = allowed ? 1 : 0;
+      if (centerPx) {
+        glitter.centerPx[0] = centerPx[0];
+        glitter.centerPx[1] = centerPx[1];
+      }
+    },
     scene,
     camera,
     dispose(): void {
@@ -1012,7 +1276,8 @@ export function createLanefield(
       material.dispose();
       layoutTex.dispose();
       activityTex.dispose();
-      if (maskTexture !== placeholderTex) maskTexture.dispose();
+      for (const tex of maskCache.values()) tex.dispose();
+      maskCache.clear();
       placeholderTex.dispose();
       renderer.dispose();
       canvas.remove();

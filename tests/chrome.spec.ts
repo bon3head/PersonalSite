@@ -248,13 +248,14 @@ test('T-S04-6 keyboard-only tab order', async ({ page }) => {
     });
     order.push(label);
   }
-  // Wordmark first, then the readout Code link, then the OfferButton
-  // (leaflink scene control, S06), then the five keymap items in
+  // Wordmark first, then the OfferButton (the page verb leads the
+  // slip since DESIGN 1.2.0, so it is visible without scrolling on a
+  // phone), then the readout Code link, then the five keymap items in
   // order (labels: server, leaflink, sidequests, whoami, contact;
   // keymap items render as "1server" etc. with the Kbd).
   expect(order[0]).toBe('Justin Poli');
-  expect(order[1]).toContain('Code');
-  expect(order[2]).toContain('Drop an offer');
+  expect(order[1]).toContain('Drop an offer');
+  expect(order[2]).toContain('Code');
   expect(order[3]).toContain('server');
   expect(order[4]).toContain('leaflink');
   expect(order[5]).toContain('sidequests');

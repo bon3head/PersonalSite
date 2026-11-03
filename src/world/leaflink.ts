@@ -22,6 +22,7 @@ import {
 } from './layouts/leaflink';
 import type { Lanefield } from './types';
 import type { SceneController } from '../travel';
+import { emitStage } from '../motion/stage';
 
 export type LeaflinkPinKind = 'request' | 'offer';
 
@@ -56,6 +57,8 @@ interface Match {
   uPerSecs: Float32Array;
   tEnd: number;
   state: 'routing' | 'halo' | 'fading';
+  // Polish round: the visitor's own match carries the stage story.
+  visitor: boolean;
 }
 
 interface Ripple {
@@ -609,7 +612,13 @@ export function createLeaflinkController(
     m.off.fadingAt = tNow;
   }
 
-  function createMatch(req: Pin, off: Pin, path: number[], tNow: number): void {
+  function createMatch(
+    req: Pin,
+    off: Pin,
+    path: number[],
+    tNow: number,
+    visitor = false,
+  ): void {
     const route = buildRoute(path, tNow);
     lanefield.setActivity(route.lanes, route.starts, route.fadeAts, 1, route.uPerSecs);
     matches.push({
@@ -622,9 +631,21 @@ export function createLeaflinkController(
       uPerSecs: route.uPerSecs,
       tEnd: route.tEnd,
       state: 'routing',
+      visitor,
     });
     req.state = 'matched';
     off.state = 'matched';
+    if (visitor) {
+      // Subject: the camera pans the route into the hero's clear spot.
+      emitStage({
+        type: 'subject',
+        layout: 'leaflink',
+        ground: [
+          (nodeX(req.node) + nodeX(off.node)) / 2,
+          (nodeZ(req.node) + nodeZ(off.node)) / 2,
+        ],
+      });
+    }
   }
 
   function tryMatch(pin: Pin, tNow: number, hopLimit: number): void {
@@ -651,7 +672,7 @@ export function createLeaflinkController(
     if (activeMatchCount() >= P.maxMatches) return;
     const found = nearestOpenPin(pin.node, 'request', nodeCount);
     if (!found) return;
-    createMatch(found.pin, pin, found.path, tNow);
+    createMatch(found.pin, pin, found.path, tNow, true);
   }
 
   // --- Spawns. ---
@@ -767,10 +788,22 @@ export function createLeaflinkController(
         m.off.state = 'halo';
         m.req.haloBornAt = m.tEnd;
         m.off.haloBornAt = m.tEnd;
+        // Heartbeat: every match that lands beats the mark once, at the
+        // moment it lands (event driven, DESIGN motion signatures). The visitor's own
+        // match also lands in the mark from the neighbor's pin.
+        emitStage({ type: 'beat', layout: 'leaflink' });
+        if (m.visitor) {
+          emitStage({
+            type: 'land',
+            layout: 'leaflink',
+            ground: [nodeX(m.req.node), nodeZ(m.req.node)],
+          });
+        }
       } else if (
         m.state === 'halo' &&
         m.tEnd + P.holdMs / 1000 <= now // lit-ok: ms to sec
       ) {
+        if (m.visitor) emitStage({ type: 'release', layout: 'leaflink' });
         m.state = 'fading';
         m.req.state = 'fading';
         m.off.state = 'fading';
@@ -953,6 +986,7 @@ export function createLeaflinkController(
         uPerSecs: route.uPerSecs,
         tEnd: tNow - 10, // lit-ok: already done
         state: 'halo',
+        visitor: false,
       });
       req.state = 'halo';
       off.state = 'halo';
@@ -1000,6 +1034,7 @@ export function createLeaflinkController(
           uPerSecs: route.uPerSecs,
           tEnd: tNow - 10, // lit-ok: already done
           state: 'halo',
+          visitor: true,
         });
         found.pin.state = 'halo';
         found.pin.haloBornAt = tNow - 10; // lit-ok: halo already full

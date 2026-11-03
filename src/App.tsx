@@ -19,6 +19,7 @@
 //   prop defaults to null (DOM travel only, reduced timing) until the
 //   coordinator wires the world instance through (see BUILD-STATE).
 import { useEffect, useRef, useState, type JSX } from 'react';
+import { flushSync } from 'react-dom';
 import { Theme } from '@astryxdesign/core/theme';
 import { LayerProvider } from '@astryxdesign/core';
 // B1's laneTheme.mjs ships no declarations, and a sibling .d.ts would
@@ -58,7 +59,11 @@ import {
   type SideQuestsController,
 } from './world/sidequests';
 import { createNotfoundController } from './world/notfound';
-import SideQuestsTwins from './scenes/sidequests';
+import SideQuestsTwins, { MARKER_LABELS, TrailRow, useTrailClaims } from './scenes/sidequests';
+import { useCoarse } from './lib/coarse';
+import { useGlitterbox } from './chrome/glitterbox';
+import { T } from './tokens.generated';
+import type { Rect } from './hero/heroGeometry';
 import BrandHero from './hero/BrandHero';
 import { C } from './copy';
 import Keymap from './chrome/Keymap';
@@ -66,6 +71,12 @@ import Wordmark from './chrome/Wordmark';
 import Readout from './chrome/Readout';
 import WhoamiSheet from './chrome/WhoamiSheet';
 import ContactSheet from './chrome/ContactSheet';
+import { entropySeed } from './motion/entropy';
+
+// Polish item 5: read ?seed before the router's first pushState drops
+// the query (the first draw happens inside travel, after the push), so
+// a seeded URL replays. Browser only; prerender never draws.
+if (typeof window !== 'undefined') entropySeed();
 
 export interface AppProps {
   initialScene?: SceneId;
@@ -199,7 +210,10 @@ export default function App(props: AppProps): JSX.Element {
           document.querySelector(`[data-scene="${s}"]`),
       },
       isReducedMotion: prefersReducedMotion,
-      onSwap: (next: SceneId) => setScene(next),
+      // Synchronous commit (polish round): the incoming readout and the
+      // hero mount, lay out, and register the hero anchor inside the
+      // swap callback, before the next frame samples the morph.
+      onSwap: (next: SceneId) => flushSync(() => setScene(next)),
     });
     travelRef.current = travel;
     const router = createRouter(
@@ -259,6 +273,34 @@ export default function App(props: AppProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Polish round wiring (DESIGN 6.12, 6.13).
+  const coarse = useCoarse();
+  const claims = useTrailClaims(wired?.sidequests ?? null);
+  const lastWalkRef = useRef<number>(-1);
+  const walkTrail = wired
+    ? (i: number): void => {
+        lastWalkRef.current = i;
+        wired.sidequests.walk(i);
+      }
+    : null;
+  // SideQuests page verb from the mark: the first open trail, else the
+  // next one after the last walked.
+  const nextTrail = (): number => {
+    const open = claims.findIndex((c) => !c);
+    return open >= 0 ? open : (lastWalkRef.current + 1) % MARKER_LABELS.length;
+  };
+  // Marker tap targets at rest (resting projection, not the moving camera).
+  const sqRestBlockers = wired
+    ? (): Rect[] => {
+        const r = T.world.sidequests.marker.hitRadiusPx;
+        return MARKER_LABELS.map((_, i) => {
+          const [x, y] = wired.field.projectAtRest('sidequests', wired.sidequests.restHead(i));
+          return { left: x - r, top: y - r, right: x + r, bottom: y + r };
+        });
+      }
+    : null;
+  useGlitterbox(wired?.field ?? null, sheet !== null);
+
   function toggleSheet(target: Exclude<SheetId, null>): void {
     const router = routerRef.current;
     if (!router) return;
@@ -280,11 +322,17 @@ export default function App(props: AppProps): JSX.Element {
             onOffer={
               wired ? () => wired.leaflink.dropOfferAtCenter() : undefined
             }
+            trailRow={
+              scene === 'sidequests' && coarse ? (
+                <TrailRow claimed={claims} onWalk={walkTrail} />
+              ) : null
+            }
           />
           {scene === 'sidequests' && wired && (
             <SideQuestsTwins
               controller={wired.sidequests}
               lanefield={wired.field}
+              trailRowDocked
             />
           )}
           {/* P-HERO-1: exactly one brand mark per project route, none
@@ -295,10 +343,19 @@ export default function App(props: AppProps): JSX.Element {
               WebGL. wired is null until lanefield-ready; the hero
               takes the field when it exists and null otherwise. */}
           {scene === 'leaflink' && sheet === null && (
-            <BrandHero project="leaflink" lanefield={wired?.field ?? null} />
+            <BrandHero
+              project="leaflink"
+              lanefield={wired?.field ?? null}
+              onVerb={wired ? () => wired.leaflink.dropOfferAtCenter() : null}
+            />
           )}
           {scene === 'sidequests' && sheet === null && (
-            <BrandHero project="sidequests" lanefield={wired?.field ?? null} />
+            <BrandHero
+              project="sidequests"
+              lanefield={wired?.field ?? null}
+              onVerb={walkTrail ? () => walkTrail(nextTrail()) : null}
+              restBlockers={sqRestBlockers}
+            />
           )}
           {alt !== null && (
             <div role="img" aria-label={alt} />

@@ -14,6 +14,8 @@
 //
 // Under reduced motion only PNG files are prefetched, since the
 // animated GIF is never shown in that mode.
+import { loadBrandManifest } from './brandManifest';
+
 type FrameSource = {
   onFrame: (cb: () => void) => () => void;
 };
@@ -33,9 +35,10 @@ async function prefetch(): Promise<void> {
   const w = window as BrandWindow;
   if (w.__brandPrefetched) return;
   try {
-    const res = await fetch('/brand/manifest.json');
-    if (!res.ok) return;
-    const manifest = (await res.json()) as { prefetch?: string[] };
+    // Shared cache (polish round): the hero reads the same parsed
+    // manifest synchronously at the readout swap.
+    const manifest = await loadBrandManifest();
+    if (!manifest) return;
     const files = Array.isArray(manifest.prefetch) ? manifest.prefetch : [];
     const reduced = document.documentElement.classList.contains(
       'reduced-motion',

@@ -19,6 +19,8 @@ uniform vec3 uGradTail;       // scene gradient tail stop, OKLab, build-time con
 uniform vec3 uSignalOklab;    // signal, OKLab, build-time converted // lit-ok: shader constant
 uniform float uGradTailLength; // scene gradient tailLength // lit-ok: shader constant
 uniform float uLightMode;     // 0 band, 1 radial, 2 wander, 3 static // lit-ok: shader constant
+uniform float uLightModeFrom; // outgoing light mode during travel // lit-ok: shader constant
+uniform float uLightMix;      // 0 outgoing mode, 1 incoming mode // lit-ok: shader constant
 uniform float uLightRadius;   // scene gradient light radius // lit-ok: shader constant
 uniform float uLightGain;     // scene gradient light gain // lit-ok: shader constant
 
@@ -41,6 +43,20 @@ vec3 oklabToSrgb(vec3 c) { // lit-ok: shader constant
   vec3 lo = lin * 12.92; // lit-ok: shader constant
   vec3 hi = 1.055 * pow(max(lin, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055; // lit-ok: shader constant
   return clamp(mix(lo, hi, step(0.0031308, lin)), 0.0, 1.0); // lit-ok: shader constant
+}
+
+// Light bump along the lane for one light mode (polish round: both the
+// outgoing and incoming modes are evaluated during travel and mixed by
+// uLightMix, so the light never jumps at the travel midpoint).
+float lightAt(float mode) { // lit-ok: shader constant
+  float centerU; // lit-ok: shader constant
+  if (mode < 0.5) centerU = fract(uTime / uSweepPeriod); // lit-ok: shader constant
+  else if (mode < 1.5) centerU = 0.5; // lit-ok: shader constant
+  else if (mode < 2.5) centerU = fract(uTime / uSweepPeriod + hash11(float(vLane) * 0.37 + 11.0) * 0.5); // lit-ok: shader constant
+  else centerU = 0.5; // lit-ok: shader constant
+  float ldd = vU - centerU; ldd -= floor(ldd + 0.5); // lit-ok: shader constant
+  float lw = uLightRadius * 0.02; // lit-ok: shader constant
+  return exp(-(ldd * ldd) / (lw * lw)) * uLightGain; // lit-ok: shader constant
 }
 
 float fire(int lane, float u, float t) {
@@ -73,14 +89,7 @@ void main() {
   // the light brightens without recoloring the lane into signal.
   float g = clamp(vU / max(uGradTailLength, 0.001), 0.0, 1.0); // lit-ok: shader constant
   vec3 gradOklab = mix(uGradLead, uGradTail, g); // lit-ok: shader constant
-  float centerU; // lit-ok: shader constant
-  if (uLightMode < 0.5) centerU = fract(uTime / uSweepPeriod); // lit-ok: shader constant
-  else if (uLightMode < 1.5) centerU = 0.5; // lit-ok: shader constant
-  else if (uLightMode < 2.5) centerU = fract(uTime / uSweepPeriod + hash11(float(vLane) * 0.37 + 11.0) * 0.5); // lit-ok: shader constant
-  else centerU = 0.5; // lit-ok: shader constant
-  float ldd = vU - centerU; ldd -= floor(ldd + 0.5); // lit-ok: shader constant
-  float lw = uLightRadius * 0.02; // lit-ok: shader constant
-  float lightF = exp(-(ldd * ldd) / (lw * lw)) * uLightGain; // lit-ok: shader constant
+  float lightF = mix(lightAt(uLightModeFrom), lightAt(uLightMode), uLightMix); // lit-ok: shader constant
   gradOklab = mix(gradOklab, uSignalOklab, clamp(lightF, 0.0, 1.0) * 0.35); // lit-ok: shader constant
 
   // Luminance-only dither: perturb OKLab lightness L by at most 0.004 // lit-ok:

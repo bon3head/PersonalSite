@@ -147,7 +147,10 @@ test('T-MORPH-ENV: gather peaks, reveal looms, ends hand off to rest', () => {
   expect(mid.ringStrength).toBeGreaterThan(0);
   expect(mid.silhouetteStrength).toBeGreaterThan(0);
   expect(mid.silhouetteStrength).toBeLessThanOrEqual(T.morph.silhouettePull);
-  const revealMid = c.sample(0.775 * TRAVEL_MS);
+  // Loom window is a token (motion.morph.loom, DESIGN 1.2.0): sample
+  // its midpoint, where the mark is part way in.
+  const loomMid = 0.5 * (T.motion.morph.loom[0] + T.motion.morph.loom[1]);
+  const revealMid = c.sample(loomMid * TRAVEL_MS);
   expect(revealMid.heroOpacityIn).toBeGreaterThan(0);
   expect(revealMid.heroOpacityIn).toBeLessThan(1);
   expect(revealMid.heroScaleIn).toBeGreaterThan(T.morph.loomFrom);
@@ -162,8 +165,10 @@ test('T-MORPH-BREATH: ring dips to ringBreath, regrows, anchor tracks', () => {
   const c = createMorphController('leaflink');
   c.navigate('sidequests', 0);
   // Gather middle: gather raw progress 0.5, handoff still 0, so the
-  // ring factor equals the breath token exactly.
-  const dip = c.sample(0.45 * TRAVEL_MS);
+  // ring factor equals the breath token exactly. The middle comes from
+  // the gather token (DESIGN 1.2.0 moved its start to 0.22).
+  const gatherMid = 0.5 * (T.motion.morph.gather[0] + T.motion.morph.gather[1]);
+  const dip = c.sample(gatherMid * TRAVEL_MS);
   expect(dip.ringFactor).toBeCloseTo(T.morph.ringBreath, 10);
   const regrown = c.sample(0.75 * TRAVEL_MS);
   expect(regrown.ringFactor).toBeGreaterThan(0.95);
@@ -184,10 +189,15 @@ test('T-MORPH-BREATH: ring dips to ringBreath, regrows, anchor tracks', () => {
 });
 
 // ---- Controller: recede on travel to a field route.
-test('T-MORPH-RECEDE: outgoing mark recedes over the 0 to 0.40 window', () => {
+test('T-MORPH-RECEDE: outgoing mark recedes over motion.morph.recede', () => {
   const c = createMorphController('leaflink');
   c.navigate('server', 0);
-  const mid = c.sample(0.2 * TRAVEL_MS);
+  // The recede window ends before the readout hidden point, so the
+  // outgoing mark is gone before its DOM unmounts at the swap.
+  expect(T.motion.morph.recede[1] * TRAVEL_MS).toBeLessThan(
+    T.chrome.travelDom.readoutHiddenAtMs,
+  );
+  const mid = c.sample(0.5 * T.motion.morph.recede[1] * TRAVEL_MS);
   expect(mid.heroOpacityOut).toBeGreaterThan(0);
   expect(mid.heroOpacityOut).toBeLessThan(1);
   expect(mid.heroScaleOut).toBeGreaterThanOrEqual(T.morph.recedeTo);

@@ -164,21 +164,107 @@ export function placeHero(
   };
 }
 
-// Passive motion (DESIGN section 6.8), pure functions of time so
-// tests can pin them exactly. LeafLink beat: a smooth bump from 1
-// to hero.beatScale and back, with a period equal to the midpoint
-// of the LeafLink event interval token (1000 to 1600 ms), so the
-// pulse is continuous, never a timer restart. SideQuests wander:
-// drift along a slow path at the marker bob period, settling with
-// the existing spring shape (a sine pair, no overshoot on the hero
-// itself; the spring belongs to the markers).
-export function heroBeatScaleAt(tMs: number): number {
-  const interval = T.motion.leaflinkEventIntervalMs;
-  const period = (interval[0] + interval[1]) / 2;
-  const phase = (tMs % period) / period;
-  const bump = 0.5 * (1 - Math.cos(2 * Math.PI * phase));
-  return 1 + (T.hero.beatScale - 1) * bump;
+// Distance from a point to the nearest blocker edge (0 inside one).
+// The hero clamps its ring radius to this, so the bulge never reaches
+// the readout, the name zone, or the keymap.
+export function clearanceFrom(x: number, y: number, blockers: Rect[]): number {
+  let best = Infinity;
+  for (const b of blockers) {
+    const dx = Math.max(b.left - x, 0, x - b.right);
+    const dy = Math.max(b.top - y, 0, y - b.bottom);
+    const d = Math.hypot(dx, dy);
+    if (d < best) best = d;
+  }
+  return best;
 }
+
+// Stage focus spots (DESIGN 6.12, polish round): the screen points
+// the coarse camera pan may bring the subject to. Not the mark center:
+// the claimed marker would then land under the mark, and the mark (a
+// tap target) would cover the marker's tap target (T-HERO-BAND-WALK).
+// One spot above and one below the mark, each kept only if it fits
+// clear of the readout, name zone, and keymap. The caller picks the
+// spot on the subject's own side, so the pan is short (inside
+// focus.maxPanWorld) and never drags the subject across the mark.
+export function focusSpotsFor(
+  mark: Rect,
+  vw: number,
+  vh: number,
+  blockers: Rect[],
+  project: HeroProject,
+): Array<[number, number]> {
+  const half = T.size.coarseMinTargetPx / 2;
+  // Marker center to mark edge: the marker's own half target, one more
+  // half target of separation (the damped pan can leave the subject
+  // short of the spot while it settles), the ring pad, and the mark's
+  // motion margin (it drifts by that much).
+  const gap = 2 * half + T.hero.ringPadPx + heroMotionMargin(project);
+  const cx = (mark.left + mark.right) / 2;
+  const out: Array<[number, number]> = [];
+  for (const y of [mark.top - gap, mark.bottom + gap]) {
+    if (y - half < 0 || y + half > vh || cx - half < 0 || cx + half > vw) continue;
+    if (clearanceFrom(cx, y, blockers) >= half) out.push([cx, y]);
+  }
+  return out;
+}
+
+// True when moving a coarse target in a straight line from `from` to
+// `to` would pass over the mark (expanded by the motion margin and the
+// target's half size). A pan moves the whole plan in a straight line,
+// so such a pan would sweep the subject under the mark.
+export function pathCrossesMark(
+  from: [number, number],
+  to: [number, number],
+  mark: Rect,
+  project: HeroProject,
+): boolean {
+  const pad = T.size.coarseMinTargetPx / 2 + heroMotionMargin(project);
+  const steps = 32; // lit-ok: segment samples, at most a few px apart on a phone
+  for (let i = 0; i <= steps; i++) {
+    const k = i / steps;
+    const x = from[0] + (to[0] - from[0]) * k;
+    const y = from[1] + (to[1] - from[1]) * k;
+    if (x > mark.left - pad && x < mark.right + pad && y > mark.top - pad && y < mark.bottom + pad) return true;
+  }
+  return false;
+}
+
+// The spot nearest the subject's current screen position.
+export function nearestSpot(
+  spots: Array<[number, number]>,
+  at: [number, number],
+): [number, number] | null {
+  let best: [number, number] | null = null;
+  let d = Infinity;
+  for (const s of spots) {
+    const k = Math.hypot(s[0] - at[0], s[1] - at[1]);
+    if (k < d) {
+      d = k;
+      best = s;
+    }
+  }
+  return best;
+}
+
+// Passive motion (DESIGN sections 6.3 and 6.8), pure functions of time
+// so tests can pin them exactly.
+//
+// LeafLink beat (polish round): event driven, never periodic. DESIGN
+// 6.3 says the LeafLink heartbeat is "event-driven at irregular
+// intervals ... never periodic"; the shipped beat was a fixed-period
+// sine at the interval midpoint, which contradicted it. A beat is now
+// one smooth bump of duration motion.ms.medium, started by a stage
+// event (a match landing), peak 1 + amplitude. Overlapping beats take
+// the larger value, so a burst of matches reads as one strong beat.
+export function heroBeatEnvelope(msSinceBeat: number, amplitude: number): number {
+  const d = T.motion.ms.medium;
+  if (msSinceBeat < 0 || msSinceBeat >= d) return 1;
+  return 1 + amplitude * Math.sin((Math.PI * msSinceBeat) / d);
+}
+
+// SideQuests wander: drift along a slow path at the marker bob period,
+// settling with the existing spring shape (a sine pair, no overshoot
+// on the hero itself; the spring belongs to the markers).
 
 export function heroWanderOffsetAt(tMs: number): { dx: number; dy: number } {
   const periodMs = T.world.sidequests.marker.bobPeriodSec * 1000;

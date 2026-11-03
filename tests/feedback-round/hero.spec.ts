@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { T } from '../../src/tokens.generated';
 import {
   heroDisplayedSize,
-  heroBeatScaleAt,
+  heroBeatEnvelope,
   heroWanderOffsetAt,
   placeHero,
   rectsIntersect,
@@ -548,17 +548,19 @@ test('T-HERO-6: area cap holds on phones and desktop', () => {
     { width: 1440, height: 900 },
   ];
   for (const vp of viewports) {
+    // Polish round: both marks peak at the land beat
+    // (hero.landBeatScale), so both sizes carry that headroom and the
+    // peak area stays under the cap.
+    const peak = T.hero.landBeatScale;
     // SideQuests: landscape mark, capped by sizePx.
-    const sq = heroDisplayedSize(vp.width, vp.height, 1920, 538, 1);
+    const sq = heroDisplayedSize(vp.width, vp.height, 1920, 538, peak);
     expect(sq.areaRatio).toBeLessThanOrEqual(T.brand.areaCap);
+    expect(sq.areaRatio * peak * peak).toBeLessThanOrEqual(T.brand.areaCap + 1e-9);
     expect(sq.width).toBeLessThanOrEqual(T.hero.sizePx);
-    // LeafLink: square mark, area-capped on phones, with beat
-    // headroom so the peak area stays under the cap too.
-    const ll = heroDisplayedSize(vp.width, vp.height, 1024, 1024, T.hero.beatScale);
+    // LeafLink: square mark, area-capped on phones.
+    const ll = heroDisplayedSize(vp.width, vp.height, 1024, 1024, peak);
     expect(ll.areaRatio).toBeLessThanOrEqual(T.brand.areaCap);
-    expect(ll.areaRatio * T.hero.beatScale * T.hero.beatScale).toBeLessThanOrEqual(
-      T.brand.areaCap + 1e-9,
-    );
+    expect(ll.areaRatio * peak * peak).toBeLessThanOrEqual(T.brand.areaCap + 1e-9);
     if (vp.width >= 375) {
       expect(ll.width).toBeGreaterThanOrEqual(T.hero.minSizePx);
     }
@@ -632,13 +634,19 @@ test('T-HERO-UV: mask UV mapping is not mirrored', async ({ browser }) => {
 
 // ---- Unit pins for the pure motion and placement functions.
 test('T-HERO-UNIT: beat, wander, and placement follow the tokens', () => {
-  expect(heroBeatScaleAt(0)).toBe(1);
-  const period = (T.motion.leaflinkEventIntervalMs[0] + T.motion.leaflinkEventIntervalMs[1]) / 2;
-  expect(heroBeatScaleAt(period / 2)).toBeCloseTo(T.hero.beatScale, 10);
-  expect(heroBeatScaleAt(period)).toBeCloseTo(1, 10);
-  for (let t = 0; t < 5000; t += 100) {
-    expect(heroBeatScaleAt(t)).toBeLessThanOrEqual(T.hero.beatScale);
-    expect(heroBeatScaleAt(t)).toBeGreaterThanOrEqual(1);
+  // Event-driven beat (DESIGN 6.3, polish round): one bump of
+  // motion.ms.medium after an event, 1 before and after it, never a
+  // periodic function of time.
+  const amp = T.hero.beatScale - 1;
+  const d = T.motion.ms.medium;
+  expect(heroBeatEnvelope(-1, amp)).toBe(1);
+  expect(heroBeatEnvelope(0, amp)).toBe(1);
+  expect(heroBeatEnvelope(d / 2, amp)).toBeCloseTo(T.hero.beatScale, 10);
+  expect(heroBeatEnvelope(d, amp)).toBe(1);
+  expect(heroBeatEnvelope(d * 5, amp)).toBe(1);
+  for (let t = 0; t < d; t += 10) {
+    expect(heroBeatEnvelope(t, amp)).toBeLessThanOrEqual(T.hero.beatScale + 1e-12);
+    expect(heroBeatEnvelope(t, amp)).toBeGreaterThanOrEqual(1);
   }
   for (let t = 0; t < 5000; t += 100) {
     const w = heroWanderOffsetAt(t);

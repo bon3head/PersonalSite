@@ -64,6 +64,38 @@ export function applyRegime(scene: SceneId): void {
   document.title = SCENE_TITLE[scene];
 }
 
+// Polish round (DESIGN 6.7): the readout is hidden for the swap with
+// visibility plus inert plus aria-hidden instead of the hidden
+// attribute. The hidden attribute is display none, which removed the
+// readout from layout for the whole swap window, so the hero (placed
+// against the readout rect at the swap) saw no readout and parked at
+// the viewport center, then jumped once the readout came back
+// (device-run-2 item 1). With these three, the readout keeps its box,
+// stays out of the accessibility tree and focus order, and paints
+// nothing.
+function concealKeepLayout(el: HTMLElement): void {
+  el.style.visibility = 'hidden';
+  el.inert = true;
+  el.setAttribute('aria-hidden', 'true');
+}
+
+function reveal(el: HTMLElement): void {
+  el.style.visibility = '';
+  el.inert = false;
+  el.removeAttribute('aria-hidden');
+}
+
+// Screen center of the target's keymap item: the morph ring departs
+// from the key the visitor pressed (item 5: the bulge morphs out of
+// another element on the page).
+function keyOrigin(dom: TravelDom, target: SceneId): [number, number] | null {
+  const item = dom.keymapItem(target);
+  if (!item) return null;
+  const r = item.getBoundingClientRect();
+  if (r.width === 0 && r.height === 0) return null;
+  return [r.left + r.width / 2, r.top + r.height / 2];
+}
+
 function setKeymapAccent(
   dom: TravelDom,
   target: SceneId,
@@ -155,6 +187,7 @@ export function createTravelController(
     const worldPromise = lanefield
       ? lanefield.travelTo(SCENE_LAYOUT[target], {
           instant: useReducedTiming,
+          originPx: useReducedTiming ? null : keyOrigin(deps.dom, target),
         })
       : Promise.resolve();
     worldPromise.catch(() => {});
@@ -220,7 +253,10 @@ export function createTravelController(
       // app swaps readout content (via onSwap) while nothing is visible.
       later(hiddenAt, gen, () => {
         const el = dom.readout();
-        if (el) el.hidden = true;
+        if (el) concealKeepLayout(el);
+        // onSwap commits synchronously (App wraps it in flushSync), so
+        // the incoming readout is laid out and the hero has placed
+        // itself and registered its anchor before this callback returns.
         deps.onSwap?.(target);
         const next = dom.readout();
         if (next) {
@@ -243,14 +279,13 @@ export function createTravelController(
       // Readout entrance: opacity 0 to 1, and translateY 8px to 0 on the
       // full timing (no translate on reduced motion, opacity only).
       // Focus moves at Reveal start (P-MORPH-1, S03 morph rule), from
-      // inside this callback after the unhide: a focus call while
-      // the section is still hidden is a no-op, so the focus move
-      // must run after el.hidden flips, not on a parallel timer at
-      // the same millisecond.
+      // inside this callback after the reveal: a focus call while the
+      // section is still inert is a no-op, so the focus move must run
+      // after reveal(), not on a parallel timer at the same millisecond.
       later(inAt, gen, () => {
         const el = dom.readout();
         if (!el) return;
-        el.hidden = false;
+        reveal(el);
         if (useReducedTiming) {
           el.style.transition = `opacity var(--jp-duration-fast) var(--jp-ease-standard)`;
         } else {
