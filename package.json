@@ -24,6 +24,7 @@
   "private": true,
   "scripts": {
     "brand": "node tools/build-brand-assets.mjs",
+    "prebuild": "python3 -c \"import numpy, PIL\" 2>/dev/null || python3 -m pip install --quiet --break-system-packages numpy pillow",
     "build": "npm run brand && npm run gen && npm run theme && tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node tools/prerender.mjs && npm run check:hud",
     "dev": "npm run gen && vite",
     "gates": "npm run build && npm run lint && npm run theme:check && node tools/banned-scan.mjs dist && playwright test",
