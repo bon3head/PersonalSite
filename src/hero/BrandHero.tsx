@@ -1,8 +1,9 @@
 // P-HERO-1, P-HERO-2, P-HERO-3, polish round 2 (DESIGN 1.2.0 sections
 // 3.5, 6.7, 6.8, 6.12, 9): the project hero mark. One data-brand-mark
-// element per project route, none on server or whoami: App renders
-// this component only for leaflink and sidequests with no sheet open,
-// and the attribute sits on the single wrapper element.
+// element per project route, none on server: App renders this
+// component for leaflink and sidequests regardless of sheet state
+// (device run 4: the mark stays visible when a sheet opens), and
+// the attribute sits on the single wrapper element.
 //
 // Markup and fallback chain are unchanged from W6: a picture element
 // whose reduced-motion source is the first-frame PNG and whose img is

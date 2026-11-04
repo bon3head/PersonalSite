@@ -90,7 +90,7 @@ async function zoneRects(page: Page): Promise<{
 }
 
 // ---- T-HERO-1 (unit + browser): exactly one mark per project route.
-test('T-HERO-1: exactly one mark per project route, none on server or whoami', async ({
+test('T-HERO-1: exactly one mark per project route, none on server; mark stays visible with a sheet open', async ({
   browser,
 }) => {
   const cases: Array<{ route: string; count: number; mark: string | null }> = [
@@ -127,16 +127,26 @@ test('T-HERO-1: exactly one mark per project route, none on server or whoami', a
     document.querySelectorAll('[data-brand-mark]').length,
   );
   expect(serverWhoami).toBe(0);
-  // LeafLink route with the whoami sheet open: the sheet state shows
-  // no mark either, since the hero renders only with no sheet open.
+  // LeafLink route with the whoami sheet open (device run 4): the
+  // mark stays mounted and visible when a sheet opens.
   await page.goto(`${DEV}/leaflink?world=0`, { waitUntil: 'domcontentloaded' });
   await waitHero(page);
   await page.keyboard.press('w');
-  await page.waitForTimeout(1200);
-  const leafWhoami = await page.evaluate(() =>
-    document.querySelectorAll('[data-brand-mark]').length,
-  );
-  expect(leafWhoami).toBe(0);
+  await page.waitForSelector('dialog[open]', { timeout: 10000 });
+  await page.waitForTimeout(500);
+  const leafWhoami = await page.evaluate(() => {
+    const el = document.querySelector('[data-brand-mark]') as HTMLElement | null;
+    if (!el) return { count: 0, opacity: 0, box: 0 };
+    const r = el.getBoundingClientRect();
+    return {
+      count: 1,
+      opacity: parseFloat(getComputedStyle(el).opacity),
+      box: (r.right - r.left) * (r.bottom - r.top),
+    };
+  });
+  expect(leafWhoami.count).toBe(1);
+  expect(leafWhoami.opacity).toBeGreaterThanOrEqual(0.99);
+  expect(leafWhoami.box).toBeGreaterThan(0);
   await context.close();
 });
 

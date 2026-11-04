@@ -325,20 +325,21 @@ export default function App(props: AppProps): JSX.Element {
             />
           )}
           {/* P-HERO-1: exactly one brand mark per project route, none
-              on server or whoami. The hero renders with no sheet
-              open, so a whoami or contact sheet shows no mark, and
-              it renders before the field arrives (or with no field
-              at all, the F3 path), so the mark never depends on
-              WebGL. wired is null until lanefield-ready; the hero
-              takes the field when it exists and null otherwise. */}
-          {scene === 'leaflink' && sheet === null && (
+              on server. Device run 4: the hero stays mounted when
+              a sheet opens, so a whoami or contact sheet still
+              shows the mark, and it renders before the field
+              arrives (or with no field at all, the F3 path), so
+              the mark never depends on WebGL. wired is null until
+              lanefield-ready; the hero takes the field when it
+              exists and null otherwise. */}
+          {scene === 'leaflink' && (
             <BrandHero
               project="leaflink"
               lanefield={wired?.field ?? null}
               onVerb={wired ? () => wired.leaflink.dropOfferAtCenter() : null}
             />
           )}
-          {scene === 'sidequests' && sheet === null && (
+          {scene === 'sidequests' && (
             <BrandHero
               project="sidequests"
               lanefield={wired?.field ?? null}
