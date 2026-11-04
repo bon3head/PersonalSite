@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.2.0, 2026-11-02. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.3.0, 2026-11-03. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -270,7 +270,7 @@ Per page variation is keyed by the destination, so each page keeps its signature
 
 ### 6.12 Stage grammar and camera tracking (1.2.0)
 
-One interaction grammar for both project pages (src/motion/stage.ts): **subject** (the page verb started: the visitor's LeafLink match routing, a SideQuests walk) recedes the mark and, on coarse viewports, pans the camera so the subject (the destination: the request node, the trail's marker) sits at a focus spot just above or below the mark, its center `size.coarseMinTargetPx` plus `hero.ringPadPx` plus the mark's motion margin from the mark edge. Only a spot whose straight pan never sweeps the subject under the mark counts (T-HERO-BAND-WALK); of those, the nearest; with none, no pan. The pan holds that spot for the whole walk, so the drawing head travels toward a marker already in view; **land** (route reached the request, trail claimed) sends a pulse from the subject's screen position into the mark and looms the mark back with one land beat; **beat** (any LeafLink match landing) beats the mark once; **release** returns the camera. The pan is a ground translation (pitch never changes, the camera band is untouched), damped with `focus.halfLifeMs` 200 and capped at `focus.maxPanWorld` 20. Fine viewports never pan: the whole plan and map are in view, and the S07 lean stays. On coarse, the lean yields to the pan. Reduced motion: no pan, no recede, no pulse; the verb still works.
+One interaction grammar for both project pages (src/motion/stage.ts): **subject** (the page verb started: the visitor's LeafLink match routing, a SideQuests walk) recedes the mark (LeafLink 1.3.0 exception: no recede, so the logo stays visible on dot taps and dots sit behind it) and, on coarse viewports, pans the camera so the subject (the destination: the request node, the trail's marker) sits at a focus spot just above or below the mark, its center `size.coarseMinTargetPx` plus `hero.ringPadPx` plus the mark's motion margin from the mark edge. Only a spot whose straight pan never sweeps the subject under the mark counts (T-HERO-BAND-WALK); of those, the nearest; with none, no pan. The pan holds that spot for the whole walk, so the drawing head travels toward a marker already in view; **land** (route reached the request, trail claimed) sends a pulse from the subject's screen position into the mark and looms the mark back with one land beat; **beat** (any LeafLink match landing) beats the mark once; **release** returns the camera. The pan is a ground translation (pitch never changes, the camera band is untouched), damped with `focus.halfLifeMs` 200 and capped at `focus.maxPanWorld` 20. Fine viewports never pan: the whole plan and map are in view, and the S07 lean stays. On coarse, the lean yields to the pan. Reduced motion: no pan, no recede, no pulse; the verb still works.
 
 ### 6.13 GLITTERBOX (1.2.0)
 
@@ -284,12 +284,11 @@ Named for their role on this site. Each has at least two variants or it is plain
 |---|---|---|---|
 | `Lanefield` | The 6,144-lane world (WebGL) | none, authored (S02) | layouts: server, leaflink, sidequests, scatter |
 | `Keymap` | The only navigation, one TUI line at the bottom edge | `Kbd` for key glyphs, `useHotkeys` for bindings | fine pointer (keys shown) / coarse pointer (keys hidden, 44px targets); item states: idle, hover, active |
-| `Readout` | A scene's DOM text block | none, plain HTML on tokens | `server` (no container, left column), `leaflink` (paper.raised slip, 0 radius, hairline ring, legend position; 1.2.0 order: H1, P1, legend, SIM, OfferButton, rule, facts, stack, code), `sidequests` (1.2.0: field.raised plate, 0 radius, 1px dashed chalk.2 edge flush on the plate; legend glyphs in the hint; coarse trail row) |
+| `Readout` | A scene's DOM text block | none, plain HTML on tokens | `server` (no container, left column), `leaflink` (paper.raised slip, 0 radius, hairline ring; 1.3.0 order: H1, P1, rule, facts, stack, code), `sidequests` (1.3.0: field.raised plate, 0 radius, 1px dashed chalk.2 edge flush on the plate) |
 | `WhoamiSheet` | Education and campus roles | `BottomSheet` (purpose info, height hug) | open, closed |
 | `ContactSheet` | Email, copy, links | `BottomSheet`, `Button`, `Link` | open, closed; copy idle, copied, failed |
 | `CopyConfirm` | Copy result | `Toast` via `useToast` | info "Copied." / error "Copy failed. The address is selected." |
-| `OfferButton` | LeafLink keyboard path to drop an offer | `Button` variant `secondary` | idle, pressed |
-| `QuestMarker` | SideQuests marker (WebGL plus DOM button twin) | none in WebGL; DOM twin is a `Button` ghost (transition none) | open, lit, claimed; fine: twins are the accessible controls; coarse (1.2.0): the accessible controls dock in the plate as a visible Trail 1, 2, 3 row, and twins are pointer-only (aria-hidden, tabindex -1) |
+| `QuestMarker` | SideQuests marker (WebGL plus DOM button twin) | none in WebGL; DOM twin is a `Button` ghost (transition none) | open, lit, claimed; fine: twins are the accessible controls; coarse (1.3.0): twins are the accessible controls (the tutorial row is cut; device run 3) |
 | `BrandHero` | Project hero mark (LeafLink, SideQuests) | none; `picture` markup over the lane field | F0 animated GIF, F1 first-frame PNG, F2 text mark, F3 image without deflection |
 
 Theme component overrides (in `themes/lane/laneTheme.mjs`, legal keys verified with `astryx theme targets <Name> --json` in S01): Button `base` radius `--radius-element`, no shadow, label weight 700; Button `variant:primary` background `--color-accent`, color `--color-on-accent`; Kbd `base` background transparent, hairline ring, radius 2px; BottomSheet `base` background `--jp-raised`, radius 0 on the top corners (a TUI pane, not a phone card), no shadow.
@@ -354,7 +353,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
 
 ```json design-tokens
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -490,7 +489,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
       "travel": 700,
       "ripple": 900,
       "word": 2600,
-      "wordCadence": 1100,
+      "wordCadence": 1600,
       "readoutInDelay": 400
     },
     "spring": {
@@ -571,9 +570,9 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
         "peakAlpha": 1.0
       },
       "words": ["Go TUI", "Ollama", "Tailscale", "Docker", "Open WebUI", "WSL2 Ubuntu", "Windows 11", "RTX 3070 Ti", "Smithtown, NY"],
-      "wordSize": 0.32,
+      "wordSize": 0.22,
       "wordDrift": [-1.0, 0.5, 1.0],
-      "wordPool": 6,
+      "wordPool": 4,
       "wordSpawnOffsetZ": 0.2,
       "wordColorStops": [0.0, 0.4, 1.0],
       "wordFadeFrom": 0.55,
@@ -986,6 +985,13 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.3.0, 2026-11-03: device run 3 (morphs good, minor interactivity fixes). Every line traces to DEVICE-RUN-3.md.
+  - "Tutorial and offer UI cut: LeafLink legend, SIM caption, and Drop an offer button removed; SideQuests hint and coarse TrailRow removed. Features stay: map taps and logo verb still drop offers, marker twins still walk trails, hero verbs unchanged."
+  - "Coarse SideQuests twins are the accessible set (aria-hidden and tabindex -1 lifted); the cut row was the accessible set, so without this companion change keyboard trail walking would regress to pointer-only."
+  - "LeafLink mark does not recede on subject (6.12 exception): logo stays visible on dot taps, dots sit behind it; SideQuests recede unchanged; coarse pan still applies."
+  - "LeafLink pause hides pin, halo, and ripple meshes and clears activity kind 1, so morphing back to server restores the main blue lane motion instead of leaving dots on screen."
+  - "Server spray blend (provisional, AGY pending): wordSize 0.32 to 0.22, wordPool 6 to 4, wordCadence 1100ms to 1600ms, hot stop signalHot to signal. Words, font, and drift unchanged."
+  - "Tests follow the cut: T-LL-VERB rewritten to assert no offer button and no slip scroll; T-SQ-TRACK walks via the controller (TrailRow gone) and reads claim state from the twins; T-S04-6 tab order drops the offer button (wordmark, Code link, keymap); T-LL-4 removed (its keyboard offer path was the cut button; no keyboard offer path remains)."
 - 1.2.0, 2026-11-02: polish round 2 (device run 2). Every line traces to a repro in FINAL-POLISH-SPEC-2026-11-02.md.
   - "motion.morph.gather 0.15 to 0.22: the ring starts after the readout swap, where the placed mark (its anchor) first exists."
   - "motion.morph.loom 0.30 to 0.70 (new): the mark looms at its final position while the camera settles, filling the empty window before the text."
