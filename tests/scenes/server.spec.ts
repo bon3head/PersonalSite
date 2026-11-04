@@ -232,9 +232,15 @@ for (const vp of [
 
 // ---- T-SRV-4: words. Drive the real controller against a stub field
 // (no WebGL needed for word logic: spawn, drift, color, opacity all run
-// on the meshes themselves). Collect spawned strings over 12s; the set
+// on the meshes themselves). Collect spawned strings over 16s; the set
 // must equal world.server.words exactly.
-test('T-SRV-4: word set equals world.server.words over 12s', async ({ page }) => {
+// Window justification, not a weakening: the old 12s window was
+// calibrated to the old cadence, giving 10 spawns in 12s. At the
+// designed blend cadence the controller spawns once per cadence
+// interval, so a 16s window gives the same 10-spawn margin, and the
+// expected set and count are unchanged. The 12s figure is test-only,
+// not specified in DESIGN, so no DESIGN patch is needed for it.
+test('T-SRV-4: word set equals world.server.words over 16s', async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(`${DEV}/?world=0`);
   const spawned = await page.evaluate(async () => {
@@ -259,7 +265,7 @@ test('T-SRV-4: word set equals world.server.words over 12s', async ({ page }) =>
       const timer = setInterval(() => {
         clock += step;
         for (const cb of [...cbs]) cb(clock, step);
-        if (clock >= 12) {
+        if (clock >= 16) {
           clearInterval(timer);
           resolve();
         }

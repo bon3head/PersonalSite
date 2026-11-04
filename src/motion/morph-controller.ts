@@ -198,6 +198,18 @@ function descriptorAnchor(layout: LayoutId): MorphAnchor {
   };
 }
 
+// Shared morph completion predicate, single domain, no division.
+// Both the controller sample and the lanefield travel check call
+// this exact function with the same millisecond start, sample, and
+// duration, so their done states cannot disagree in floating point.
+// The old split used a seconds-domain ratio in lanefield and a
+// millisecond ratio in the controller, which disagreed at
+// representable timestamps. Elapsed comparison avoids the division
+// rounding entirely.
+export function morphTravelDone(startMs: number, nowMs: number, durationMs: number): boolean {
+  return nowMs - startMs >= durationMs;
+}
+
 export function createMorphController(
   initial: LayoutId,
   opts: MorphOptions = {},
@@ -234,7 +246,7 @@ export function createMorphController(
   function sample(nowMs: number): MorphSample {
     const morph = T.motion.morph;
     const p = jumped ? 1 : clamp01((nowMs - startMs) / durationMs);
-    const done = p >= 1;
+    const done = jumped || morphTravelDone(startMs, nowMs, durationMs);
     const release = windowEased(p, morph.release);
     const toDesc = descriptorForLayout(to);
     const fromDesc = descriptorForLayout(from);

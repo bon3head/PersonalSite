@@ -20,6 +20,7 @@ import {
 } from './silhouette';
 import {
   createMorphController,
+  morphTravelDone,
   type MorphAnchor,
   type MorphSample,
   type MorphSnapshot,
@@ -323,7 +324,10 @@ export function createLanefield(
   const travelToPose: Pose = poseFor(current, variant);
   const travelFromW: number[] = [0, 0, 0, 0];
   const travelToW: number[] = [0, 0, 0, 0];
-  let travel: { start: number; dur: number } | null = null;
+  // startMs is the exact millisecond value handed to the controller,
+  // stored so the travel completion check uses the same inputs as
+  // the controller sample. One stored value, not two computations.
+  let travel: { start: number; dur: number; startMs: number } | null = null;
   let pendingResolves: (() => void)[] = [];
   // W4 interpolated lane params: current value, plus the travel
   // snapshot/target pair. At rest, current equals the scene tokens.
@@ -443,32 +447,43 @@ export function createLanefield(
     // Camera bow: a lateral arc on the camera's own curve, zero at
     // both ends (seeded, keyed by the destination layout).
     bow.now = bow.amount * Math.sin(Math.PI * e);
-    if (p >= 1) {
-      travel = null;
-      bow.now = 0;
-      lightMix = 1;
-      oneHot(current, weights);
-      for (let i = 0; i < LAYOUT_ORDER.length; i++) groundWeights[i] = weights[i];
-      paramsCurrent = cloneParams(paramsTo);
-      // Rest invariant: no ring or pull survives a morph. A strength
-      // carried into the target params (the pre-polish registration
-      // path) would otherwise persist as a permanent bulge.
-      paramsCurrent.ringStrength = 0;
-      paramsCurrent.silhouetteStrength = 0;
-      const pose = poseFor(current, variant);
-      basePose.pos[0] = pose.pos[0];
-      basePose.pos[1] = pose.pos[1];
-      basePose.pos[2] = pose.pos[2];
-      basePose.target[0] = pose.target[0];
-      basePose.target[1] = pose.target[1];
-      basePose.target[2] = pose.target[2];
-      basePose.fov = pose.fov;
-      basePose.shift[0] = pose.shift[0];
-      basePose.shift[1] = pose.shift[1];
-      const resolves = pendingResolves;
-      pendingResolves = [];
-      for (const resolve of resolves) resolve();
+    if (morphTravelDone(travel.startMs, t * SEC_TO_MS, T.motion.ms.travel)) {
+      finishTravel();
     }
+  }
+
+  // Unconditional travel completion: clears travel, publishes the
+  // destination rest state, and drains pending promises, without
+  // going through any floating point completion predicate. Called
+  // from updateTravel when the shared predicate reports done, and
+  // from setReducedMotion when a morph must complete before the
+  // freeze regardless of timestamp rounding.
+  function finishTravel(): void {
+    if (!travel) return;
+    travel = null;
+    bow.now = 0;
+    lightMix = 1;
+    oneHot(current, weights);
+    for (let i = 0; i < LAYOUT_ORDER.length; i++) groundWeights[i] = weights[i];
+    paramsCurrent = cloneParams(paramsTo);
+    // Rest invariant: no ring or pull survives a morph. A strength
+    // carried into the target params (the pre-polish registration
+    // path) would otherwise persist as a permanent bulge.
+    paramsCurrent.ringStrength = 0;
+    paramsCurrent.silhouetteStrength = 0;
+    const pose = poseFor(current, variant);
+    basePose.pos[0] = pose.pos[0];
+    basePose.pos[1] = pose.pos[1];
+    basePose.pos[2] = pose.pos[2];
+    basePose.target[0] = pose.target[0];
+    basePose.target[1] = pose.target[1];
+    basePose.target[2] = pose.target[2];
+    basePose.fov = pose.fov;
+    basePose.shift[0] = pose.shift[0];
+    basePose.shift[1] = pose.shift[1];
+    const resolves = pendingResolves;
+    pendingResolves = [];
+    for (const resolve of resolves) resolve();
   }
 
   function hideNonLaneChildren(): void {
@@ -539,10 +554,6 @@ export function createLanefield(
     }
   }
   function syncMask(): void {
-    if (!masksRequested && framesRendered >= 1) {
-      masksRequested = true;
-      void preloadMasks();
-    }
     // DESIGN 6.7, no categorical snaps: a preload finishing mid-morph // lit-ok: section reference
     // must not replace the bound mask until the morph ends. The mask
     // kind flips at the morph midpoint, so an unguarded adoption would
@@ -751,6 +762,17 @@ export function createLanefield(
     if (lanesOnly) hideNonLaneChildren();
     renderer.render(scene, camera);
     framesRendered += 1;
+    // Mask preload starts right after the first rendered frame, here
+    // rather than in syncMask, because syncMask now runs before
+    // render. Gating it on the frame count inside syncMask delayed
+    // it to a later frame, and on a static page with no further
+    // frame it might never start. Every page renders at least once
+    // at setup, so this trigger always fires on the first frame,
+    // bounding the preload delay to that frame.
+    if (!masksRequested && framesRendered >= 1) {
+      masksRequested = true;
+      void preloadMasks();
+    }
     debugHandle.updateHud();
   }
 
@@ -1089,13 +1111,16 @@ export function createLanefield(
       // Seeded per-morph variety, keyed by the destination layout
       // (neutral under reduced motion, which never reaches here).
       const ent = morphEntropy(id);
-      // Single shared clock: one now call feeds both the morph
-      // controller and travel, so their completion times coincide.
-      // Separate calls let a frame land between the two completions,
+      // Single shared clock and shared completion predicate: one now
+      // call feeds both the morph controller and travel, and both
+      // completion checks call the same predicate with the same
+      // millisecond inputs, so their done states cannot disagree.
+      // Separate calls, or separate predicates, let a frame land
       // with the controller done but travel still non-null, blocking
       // adoption on the first controller-rest frame.
       const t0 = now();
-      morph.navigate(id, t0 * SEC_TO_MS, morphSnapshot, {
+      const startMs = t0 * SEC_TO_MS;
+      morph.navigate(id, startMs, morphSnapshot, {
         originPx: travelOpts?.originPx ?? null,
         entropy: ent,
       });
@@ -1140,7 +1165,7 @@ export function createLanefield(
         bow.amount = ent.bow;
       }
       current = id;
-      travel = { start: t0, dur: T.motion.ms.travel * MS_TO_SEC };
+      travel = { start: t0, dur: T.motion.ms.travel * MS_TO_SEC, startMs };
       return new Promise<void>((resolve) => {
         pendingResolves.push(resolve);
       });
@@ -1158,12 +1183,14 @@ export function createLanefield(
       if (on) {
         // An in-flight morph must complete before the freeze, or the
         // frozen scene keeps a non-null travel and a mid-morph mask.
-        // Forcing updateTravel to completion clears travel, publishes
-        // the destination rest state, and resolves the travel promise;
-        // jumping the controller matches it, so travel null and
+        // finishTravel clears travel, publishes the destination rest
+        // state, and resolves the travel promise unconditionally,
+        // without going through any floating point completion
+        // predicate, so no timestamp rounding can leave travel set.
+        // Jumping the controller matches it, so travel null and
         // controller done coincide in the frozen frame.
         if (travel) {
-          updateTravel(travel.start + travel.dur);
+          finishTravel();
           morph.navigateReduced(current, now() * SEC_TO_MS);
           morphDebug.from = morph.from;
           morphDebug.to = morph.to;
