@@ -1112,11 +1112,22 @@ export function createLeaflinkController(
     if (paused || disposed) return;
     paused = true;
     pausedAt = lanefield.now();
+    // Hide the meshes and clear route activity, so morphing
+    // back to server restores the main blue lane motion instead of leaving
+    // LeafLink dots on screen. The frame callback returns early while
+    // paused, so updateInstances never zeroes counts on its own.
+    pinMesh.mesh.visible = false;
+    haloMesh.mesh.visible = false;
+    rippleMesh.mesh.visible = false;
+    lanefield.clearActivity(1);
   }
 
   function resume(): void {
     if (!paused || disposed) return;
     paused = false;
+    pinMesh.mesh.visible = true;
+    haloMesh.mesh.visible = true;
+    rippleMesh.mesh.visible = true;
     if (pausedAt !== null) {
       pausedTotal += lanefield.now() - pausedAt;
       pausedAt = null;

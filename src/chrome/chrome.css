@@ -360,28 +360,6 @@
     padding: var(--spacing-4);
   }
 
-  /* Legend glyphs: ring, dot, bar, sized from
-   * T.chrome.legendGlyphPx (set inline by Readout). */
-  .jp-legend-glyph {
-    display: inline-block;
-    vertical-align: middle;
-    color: var(--color-text-secondary);
-  }
-
-  .jp-legend-glyph--ring {
-    border: 1px solid currentColor;
-    border-radius: 50%;
-  }
-
-  .jp-legend-glyph--dot {
-    background: currentColor;
-    border-radius: 50%;
-  }
-
-  .jp-legend-glyph--bar {
-    background: currentColor;
-  }
-
   /* SideQuests variant, coarse/narrow: top below the name clear
    * zone, full width minus gutters. Same clear box bottom as the
    * 404 rule above: gutter plus label height plus zone pad. */
@@ -426,8 +404,8 @@
    * the slip must show the page verb without scrolling and leave the
    * open band for the mark and the tracked subject. Tighter steps
    * than the server readout, all on the Astryx spacing scale. Device
-   * run 2 at 390x658: the LeafLink offer button sat 5px past the 46dvh
-   * slip bottom at the server spacing. */
+   * run 3 cut the offer button and trail row; the tight rhythm keeps
+   * the remaining slip inside the 46dvh cap. */
   @media (max-width: 767px), (pointer: coarse) and (max-width: 1023px) {
     .jp-readout--sidequests h1 + p,
     .jp-readout--leaflink h1 + p {
@@ -435,70 +413,13 @@
     }
 
     .jp-readout--sidequests p + .jp-readout-supporting,
-    .jp-readout--sidequests .jp-readout-supporting + .jp-readout-caption,
-    .jp-readout--leaflink p + .jp-readout-supporting,
-    .jp-readout--leaflink .jp-readout-supporting + .jp-readout-caption {
+    .jp-readout--leaflink p + .jp-readout-supporting {
       margin-top: var(--spacing-3);
     }
 
     .jp-readout--sidequests .jp-readout-links,
     .jp-readout--leaflink .jp-readout-links {
       margin-top: var(--spacing-3);
-    }
-  }
-
-  /* SideQuests legend glyphs: a chalk marker diamond and a dashed
-   * trail bar, the plan's own marks, placed before the words they
-   * name (sizes inline from the legend tokens). */
-  .jp-sq-glyph {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: var(--spacing-1);
-    color: var(--jp-chalk);
-  }
-
-  .jp-sq-glyph--marker {
-    box-shadow: inset 0 0 0 1px currentColor;
-    transform: rotate(45deg) scale(0.8);
-  }
-
-  .jp-sq-glyph--trail {
-    border-top-style: dashed;
-    border-top-color: currentColor;
-  }
-
-  /* Coarse trail row: the page verb as three visible controls. A
-   * claimed trail turns accent and its bar goes solid, the same rule
-   * as the active key (accent only on the active control). */
-  .jp-sq-trails {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-2);
-    margin-top: var(--spacing-3);
-  }
-
-  .jp-sq-trail[aria-pressed="true"] {
-    color: var(--color-accent);
-  }
-
-  .jp-sq-trail[aria-pressed="true"] .jp-sq-glyph--trail {
-    border-top-style: solid;
-    color: var(--color-accent);
-  }
-
-  /* SideQuests hint: one string per pointer (S09 C-SQ-HINT). The
-   * hidden one is display none, so it leaves the a11y tree too. */
-  .jp-sq-hint--fine {
-    display: none;
-  }
-
-  @media (pointer: fine) {
-    .jp-sq-hint--coarse {
-      display: none;
-    }
-
-    .jp-sq-hint--fine {
-      display: inline;
     }
   }
 

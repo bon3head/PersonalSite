@@ -207,48 +207,6 @@ async function disposeReal(page: Page): Promise<void> {
   });
 }
 
-// Render the LeafLink readout's OfferButton into a host above App's
-// fullscreen canvas. Self-contained for page.evaluate (no Node closures).
-async function renderOfferButton(): Promise<void> {
-  // Retry dynamic imports: the dev server can restart between
-  // Playwright runs and a cold import can race its warmup.
-  const retryImport = async <T>(spec: string): Promise<T> => {
-    let last: unknown = null;
-    for (let i = 0; i < 5; i++) {
-      try {
-        return (await import(spec)) as T;
-      } catch (err) {
-        last = err;
-        await new Promise((r) => setTimeout(r, 1000));
-      }
-    }
-    throw last;
-  };
-  const render = await retryImport<{
-    renderInto: (
-      host: HTMLElement,
-      comp: unknown,
-      onOffer: () => void,
-    ) => void;
-  }>('/src/scenes/test-render.ts');
-  const scenes = await retryImport<{ default: unknown }>(
-    '/src/scenes/leaflink.tsx',
-  );
-  const t = (window as unknown as Record<string, unknown>).__lltest as {
-    controller: { dropOfferAtCenter: () => void };
-  };
-  const host = document.createElement('div');
-  host.id = 'll-offer-host';
-  // Above App's fullscreen canvas (fixed, z-index 0) or the button
-  // is covered and never visible to the locator.
-  host.style.position = 'relative';
-  host.style.zIndex = '10';
-  document.body.appendChild(host);
-  render.renderInto(host, scenes.default, () =>
-    t.controller.dropOfferAtCenter(),
-  );
-}
-
 test('T-LL-3: tap responds within 300ms', async ({ page }) => {
   test.setTimeout(180000);
   await blockHmr(page);
@@ -285,72 +243,7 @@ test('T-LL-3: tap responds within 300ms', async ({ page }) => {
   await disposeReal(page);
 });
 
-test('T-LL-4: keyboard path (OfferButton Enter)', async ({ page }) => {
-  // 300s harness budget: under sibling load a setup retry (full
-  // realSetup ~60s each) plus the 60s button wait can exceed 180s.
-  // The 300ms response gate below is unchanged.
-  test.setTimeout(300000);
-  // Setup retry: under concurrent sibling Playwright load the vite
-  // server can restart mid-test and the page reloads, destroying the
-  // context between realSetup and the render. Retry the whole setup
-  // on context-destroyed errors only; the 300ms gate below is untouched.
-  let setupDone = false;
-  for (let attempt = 0; attempt < 3 && !setupDone; attempt++) {
-    try {
-      await blockHmr(page);
-      await page.goto(`${DEV}/?world=0`);
-      await realSetup(page, { noAppWorld: true });
-      await page.evaluate(renderOfferButton);
-      setupDone = true;
-    } catch (err) {
-      const msg = String(err);
-      if (
-        /Execution context was destroyed|Target page.*closed|navigation/.test(
-          msg,
-        )
-      ) {
-        try {
-          await disposeReal(page);
-        } catch {
-          /* page gone; next attempt re-gotos */
-        }
-        continue;
-      }
-      throw err;
-    }
-  }
-  if (!setupDone) throw new Error('T-LL-4 setup failed after 3 attempts');
-  const button = page.locator('#ll-offer-host button');
-  // Generous wait: sibling workers run SwiftShader Playwright suites
-  // concurrently, and a React commit can stall under that load. The
-  // 300ms response gate below is unchanged.
-  await button.waitFor({ timeout: 60000 });
-  const tapAt = Date.now();
-  await button.focus();
-  await page.keyboard.press('Enter');
-  const found = await page.evaluate(async (tapAt) => {
-    const t = (window as unknown as Record<string, unknown>).__lltest as {
-      activity: Array<{ kind: number; at: number }>;
-      controller: {
-        snapshotPins: () => Array<{ visitor: boolean }>;
-      };
-    };
-    const deadline = tapAt + 300;
-    for (;;) {
-      const hasRoute = t.activity.some((a) => a.kind === 1);
-      const hasVisitor = t.controller
-        .snapshotPins()
-        .some((p) => p.visitor);
-      if (hasRoute && hasVisitor) return true;
-      if (Date.now() > deadline) return false;
-      await new Promise((r) => setTimeout(r, 10));
-    }
-  }, tapAt);
-  expect(found).toBe(true);
-  await disposeReal(page);
-});
-
-test('T-LL-5: legend slip contrast', async ({ page }) => {
+test('T-LL-5: leaflink slip contrast', async ({ page }) => {
   test.setTimeout(120000);
   await blockHmr(page);
   await page.goto(DEV);

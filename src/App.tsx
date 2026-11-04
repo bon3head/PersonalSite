@@ -59,8 +59,7 @@ import {
   type SideQuestsController,
 } from './world/sidequests';
 import { createNotfoundController } from './world/notfound';
-import SideQuestsTwins, { MARKER_LABELS, TrailRow, useTrailClaims } from './scenes/sidequests';
-import { useCoarse } from './lib/coarse';
+import SideQuestsTwins, { MARKER_LABELS, useTrailClaims } from './scenes/sidequests';
 import { useGlitterbox } from './chrome/glitterbox';
 import { T } from './tokens.generated';
 import type { Rect } from './hero/heroGeometry';
@@ -274,7 +273,6 @@ export default function App(props: AppProps): JSX.Element {
   }, []);
 
   // Polish round wiring (DESIGN 6.12, 6.13).
-  const coarse = useCoarse();
   const claims = useTrailClaims(wired?.sidequests ?? null);
   const lastWalkRef = useRef<number>(-1);
   const walkTrail = wired
@@ -319,20 +317,11 @@ export default function App(props: AppProps): JSX.Element {
           <Readout
             scene={scene}
             sectionRef={readoutRef}
-            onOffer={
-              wired ? () => wired.leaflink.dropOfferAtCenter() : undefined
-            }
-            trailRow={
-              scene === 'sidequests' && coarse ? (
-                <TrailRow claimed={claims} onWalk={walkTrail} />
-              ) : null
-            }
           />
           {scene === 'sidequests' && wired && (
             <SideQuestsTwins
               controller={wired.sidequests}
               lanefield={wired.field}
-              trailRowDocked
             />
           )}
           {/* P-HERO-1: exactly one brand mark per project route, none

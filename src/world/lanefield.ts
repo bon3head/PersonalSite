@@ -541,7 +541,7 @@ export function createLanefield(
       masksRequested = true;
       void preloadMasks();
     }
-    // DESIGN 6.7, no categorical snaps: a preload finishing mid-morph
+    // DESIGN 6.7, no categorical snaps: a preload finishing mid-morph // lit-ok: section reference
     // must not replace the bound mask until the morph ends. The mask
     // kind flips at the morph midpoint, so an unguarded adoption would
     // snap the contour during Gather. At rest the next frame adopts
@@ -1008,7 +1008,7 @@ export function createLanefield(
       // The blend value is zeroed too: applyRing returns early during
       // a morph, so a retained value would keep the field blended
       // toward scatter for the whole travel and push the release past
-      // its 700ms spec (DESIGN 6.13).
+      // its 700ms spec (DESIGN 6.13). // lit-ok: spec value reference
       pulseState = null;
       glitter.target = 0;
       glitter.value = 0;

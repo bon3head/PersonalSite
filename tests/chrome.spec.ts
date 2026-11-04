@@ -237,9 +237,11 @@ test('T-S04-5 focus returns to the keymap button on sheet close', async ({
 
 test('T-S04-6 keyboard-only tab order', async ({ page }) => {
   // Leaflink shows the wordmark and one readout link before the keymap.
+  // Device run 3 cut the OfferButton, so the Code link is the only readout
+  // link in the tab order.
   await gotoRoute(page, '/leaflink');
   const order: string[] = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 7; i++) {
     await page.keyboard.press('Tab');
     const label = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null;
@@ -248,19 +250,17 @@ test('T-S04-6 keyboard-only tab order', async ({ page }) => {
     });
     order.push(label);
   }
-  // Wordmark first, then the OfferButton (the page verb leads the
-  // slip since DESIGN 1.2.0, so it is visible without scrolling on a
-  // phone), then the readout Code link, then the five keymap items in
+  // Wordmark first, then the readout Code link, then the five keymap items in
   // order (labels: server, leaflink, sidequests, whoami, contact;
   // keymap items render as "1server" etc. with the Kbd).
   expect(order[0]).toBe('Justin Poli');
-  expect(order[1]).toContain('Drop an offer');
-  expect(order[2]).toContain('Code');
-  expect(order[3]).toContain('server');
-  expect(order[4]).toContain('leaflink');
-  expect(order[5]).toContain('sidequests');
-  expect(order[6]).toContain('whoami');
-  expect(order[7]).toContain('contact');
+  expect(order[1]).toContain('Code');
+  expect(order[2]).toContain('server');
+  expect(order[3]).toContain('leaflink');
+  expect(order[4]).toContain('sidequests');
+  expect(order[5]).toContain('whoami');
+  expect(order[6]).toContain('contact');
+  expect(order.some((l) => /offer/i.test(l))).toBe(false);
 });
 
 test('T-S04-7 sheet open animation at most 300ms', async ({ page }) => {

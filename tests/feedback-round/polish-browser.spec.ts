@@ -156,18 +156,15 @@ test('T-RING-1: after Gather the ring sits under the mark; at rest it is zero', 
   }
 });
 
-test('T-LL-VERB: the offer button sits inside the phone slip without scrolling', async ({ browser }) => {
+test('T-LL-VERB: device run 3 cut the offer button; the leaflink slip has no offer button and does not scroll', async ({ browser }) => {
   const { ctx, page } = await open(browser, '/leaflink?seed=42');
   const box = await page.evaluate(() => {
     const ro = document.querySelector('.jp-readout') as HTMLElement;
-    const btn = [...ro.querySelectorAll('button')].find((b) => /offer/i.test(b.textContent ?? '')) as HTMLElement;
-    const a = ro.getBoundingClientRect();
-    const b = btn.getBoundingClientRect();
-    return { slipTop: a.top, slipBottom: a.bottom, top: b.top, bottom: b.bottom, scrollTop: ro.scrollTop };
+    const offer = [...ro.querySelectorAll('button')].find((b) => /offer/i.test(b.textContent ?? ''));
+    return { hasOffer: offer !== undefined, scrollTop: ro.scrollTop };
   });
+  expect(box.hasOffer).toBe(false);
   expect(box.scrollTop).toBe(0);
-  expect(box.top).toBeGreaterThanOrEqual(box.slipTop);
-  expect(box.bottom).toBeLessThanOrEqual(box.slipBottom);
   await ctx.close();
 });
 
@@ -176,13 +173,19 @@ test(`T-SQ-TRACK trail ${trail + 1}: on a phone the tapped trail ends in the cle
   // 390x844 (the T-HERO-BAND-WALK phone). At 390x658 there is no focus
   // spot beside the mark clear of the readout and keymap, so no pan
   // happens there (open decision, FINAL-POLISH-SPEC 10.2).
-  // Trails 1 and 3: every straight pan into the clear band sweeps the
-  // marker under the mark, which T-HERO-BAND-WALK forbids, so they get
-  // no pan. Expected to fail until that decision is made.
-  test.fail(trail !== 1, 'no pan keeps this trail clear of the mark (FINAL-POLISH-SPEC 10.2)');
+  // Device run 3 cut the hint and trail row, shrinking the readout, so
+  // the clear band is taller and all three trails now end in the band
+  // at 390x844. The test.fail for trails 1 and 3 is removed. The 390x658
+  // accept-no-pan decision (FINAL-POLISH-SPEC 10.2) is separate and
+  // unchanged; this test runs at 390x844 only.
   const { ctx, page } = await open(browser, '/sidequests?seed=42', { viewport: { width: 390, height: 844 } });
   const keymapTop = await page.evaluate(() => (document.querySelector('.jp-keymap') as HTMLElement).getBoundingClientRect().top);
-  await page.locator('.jp-sq-trail').nth(trail).click();
+  // TrailRow is cut (device run 3); walk via the controller, the same walk
+  // the twins call.
+  await page.evaluate((i) => {
+    const w = window as unknown as { __sceneControllers: Map<string, { walk: (i: number) => void }> };
+    w.__sceneControllers.get('sidequests')?.walk(i);
+  }, trail);
   let claimAt = -1;
   let firstInBand = -1;
   const pitches: number[] = [];
@@ -192,7 +195,7 @@ test(`T-SQ-TRACK trail ${trail + 1}: on a phone the tapped trail ends in the cle
       const w = window as unknown as { __sceneControllers: Map<string, { headScreen: (i: number) => [number, number] }>; __lanefield: { camera: { pitchDeg: number } } };
       const head = w.__sceneControllers.get('sidequests')?.headScreen(i) ?? [0, 0];
       const ro = (document.querySelector('.jp-readout') as HTMLElement).getBoundingClientRect();
-      const pressed = document.querySelectorAll('.jp-sq-trail')[i]?.getAttribute('aria-pressed');
+      const pressed = document.querySelectorAll('[data-twin]')[i]?.getAttribute('aria-pressed');
       return { head, roBottom: ro.bottom, pressed, pitch: w.__lanefield.camera.pitchDeg };
     }, trail);
     pitches.push(s.pitch);

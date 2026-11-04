@@ -40,7 +40,9 @@ const FAST_SEC = T.motion.ms.fast / 1000; // lit-ok: ms to seconds
 
 function colorAt(t: number, out: THREE.Color): THREE.Color {
   const stops = S.wordColorStops;
-  const hot = new THREE.Color(T.color.signalHot);
+  // Blend: spawn at lane signal, not near-white hot, so words
+  // sit in the field instead of flashing.
+  const hot = new THREE.Color(T.color.signal);
   const signal = new THREE.Color(T.color.signal);
   const text2 = new THREE.Color(T.color.void.text2);
   // Stops are fixed by DESIGN (0, mid, 1); no degenerate guard needed.

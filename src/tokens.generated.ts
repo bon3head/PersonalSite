@@ -1,6 +1,6 @@
-// GENERATED from spec/astryx/DESIGN.md v1.2.0. Do not edit.
+// GENERATED from spec/astryx/DESIGN.md v1.3.0. Do not edit.
 export const T = {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -237,7 +237,7 @@ export const T = {
       "travel": 700,
       "ripple": 900,
       "word": 2600,
-      "wordCadence": 1100,
+      "wordCadence": 1600,
       "readoutInDelay": 400
     },
     "spring": {
@@ -376,13 +376,13 @@ export const T = {
         "RTX 3070 Ti",
         "Smithtown, NY"
       ],
-      "wordSize": 0.32,
+      "wordSize": 0.22,
       "wordDrift": [
         -1,
         0.5,
         1
       ],
-      "wordPool": 6,
+      "wordPool": 4,
       "wordSpawnOffsetZ": 0.2,
       "wordColorStops": [
         0,

@@ -367,8 +367,13 @@ export default function BrandHero(props: {
       if (e.type === 'subject') {
         if (center && coarse) lanefield.setFocus({ ground: e.ground, screenPx: center });
         if (reduced) return;
-        st.opacity = { from: rampAt(st.opacity, nowMs), to: 0, startMs: nowMs, durMs: dur };
-        st.scale = { from: rampAt(st.scale, nowMs), to: T.morph.recedeTo, startMs: nowMs, durMs: dur };
+        // Device run 3 (DESIGN 1.3.0, 6.12 exception): LeafLink does not
+        // recede, so the logo stays visible on dot taps and dots sit
+        // behind it. SideQuests recede unchanged.
+        if (project !== 'leaflink') {
+          st.opacity = { from: rampAt(st.opacity, nowMs), to: 0, startMs: nowMs, durMs: dur };
+          st.scale = { from: rampAt(st.scale, nowMs), to: T.morph.recedeTo, startMs: nowMs, durMs: dur };
+        }
       } else if (e.type === 'land') {
         const origin = lanefield.worldToScreen([e.ground[0], 0, e.ground[1]]);
         lanefield.pulse({ originPx: origin });

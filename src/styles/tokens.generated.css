@@ -1,4 +1,4 @@
-/* GENERATED from spec/astryx/DESIGN.md v1.2.0. Do not edit. */
+/* GENERATED from spec/astryx/DESIGN.md v1.3.0. Do not edit. */
 :root {
   --jp-void-ground: #0A0C0F;
   --jp-void-raised: #15171B;
@@ -52,7 +52,7 @@
   --jp-duration-travel: 700ms;
   --jp-duration-ripple: 900ms;
   --jp-duration-word: 2600ms;
-  --jp-duration-wordCadence: 1100ms;
+  --jp-duration-wordCadence: 1600ms;
   --jp-duration-readoutInDelay: 400ms;
   --jp-ease-signature: cubic-bezier(0.23, 1, 0.32, 1);
   --jp-ease-standard: ease;
