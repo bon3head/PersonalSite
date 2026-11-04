@@ -45,6 +45,8 @@ if (params.get('mock') === '1') {
     now: () => simNow,
     screenToGround: () => null,
     worldToScreen: () => [0, 0],
+    focusOffset: () => [0, 0],
+    focusActive: () => false,
     onFrame: (cb) => { cbs.add(cb); return () => cbs.delete(cb); },
     scene,
     camera,
