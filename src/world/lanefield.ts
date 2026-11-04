@@ -510,7 +510,9 @@ export function createLanefield(
     tex.flipY = false;
     tex.colorSpace = THREE.NoColorSpace;
     tex.needsUpdate = true;
-    // Upload now, outside any morph, so first use costs no frame.
+    // Upload now, so first use costs no frame. The upload does not
+    // bind the texture; binding happens only in syncMask, which is
+    // guarded during a morph.
     renderer.initTexture(tex);
     return tex;
   }
@@ -544,8 +546,9 @@ export function createLanefield(
     // DESIGN 6.7, no categorical snaps: a preload finishing mid-morph // lit-ok: section reference
     // must not replace the bound mask until the morph ends. The mask
     // kind flips at the morph midpoint, so an unguarded adoption would
-    // snap the contour during Gather. At rest the next frame adopts
-    // whatever is cached.
+    // snap the contour during Gather. At rest, adoption runs before
+    // the uniform copy, so the adopted texture renders on the same
+    // first at-rest frame.
     if (travel) return;
     const kind = paramsCurrent.silhouetteMask;
     const tex = kind === 'none' ? undefined : maskCache.get(kind);
@@ -692,6 +695,11 @@ export function createLanefield(
 
   function doFrame(t: number, dt: number, sampleGovernor: boolean): void {
     updateTravel(t);
+    // Adoption before the uniform copy, so a texture adopted on the
+    // travel-completion frame renders on that same first at-rest
+    // frame, not the following one. Previously syncMask ran after
+    // render, delaying the adopted texture by one frame.
+    syncMask();
     // P-MORPH-1 degrade observation: only frames inside a morph
     // count, and the controller itself gates on its own sample, so
     // a completed morph stops counting without extra state here.
@@ -743,7 +751,6 @@ export function createLanefield(
     if (lanesOnly) hideNonLaneChildren();
     renderer.render(scene, camera);
     framesRendered += 1;
-    syncMask();
     debugHandle.updateHud();
   }
 
@@ -1082,7 +1089,13 @@ export function createLanefield(
       // Seeded per-morph variety, keyed by the destination layout
       // (neutral under reduced motion, which never reaches here).
       const ent = morphEntropy(id);
-      morph.navigate(id, now() * SEC_TO_MS, morphSnapshot, {
+      // Single shared clock: one now call feeds both the morph
+      // controller and travel, so their completion times coincide.
+      // Separate calls let a frame land between the two completions,
+      // with the controller done but travel still non-null, blocking
+      // adoption on the first controller-rest frame.
+      const t0 = now();
+      morph.navigate(id, t0 * SEC_TO_MS, morphSnapshot, {
         originPx: travelOpts?.originPx ?? null,
         entropy: ent,
       });
@@ -1127,7 +1140,7 @@ export function createLanefield(
         bow.amount = ent.bow;
       }
       current = id;
-      travel = { start: now(), dur: T.motion.ms.travel * MS_TO_SEC };
+      travel = { start: t0, dur: T.motion.ms.travel * MS_TO_SEC };
       return new Promise<void>((resolve) => {
         pendingResolves.push(resolve);
       });
@@ -1143,6 +1156,20 @@ export function createLanefield(
       }
       (uniforms.uFrozen.value as number) = on ? 1 : 0;
       if (on) {
+        // An in-flight morph must complete before the freeze, or the
+        // frozen scene keeps a non-null travel and a mid-morph mask.
+        // Forcing updateTravel to completion clears travel, publishes
+        // the destination rest state, and resolves the travel promise;
+        // jumping the controller matches it, so travel null and
+        // controller done coincide in the frozen frame.
+        if (travel) {
+          updateTravel(travel.start + travel.dur);
+          morph.navigateReduced(current, now() * SEC_TO_MS);
+          morphDebug.from = morph.from;
+          morphDebug.to = morph.to;
+          morphDebug.sample = morph.sample(now() * SEC_TO_MS);
+          morphDebug.degraded = morphDebug.sample.degraded;
+        }
         stopLoop();
         renderOnce();
       } else {
