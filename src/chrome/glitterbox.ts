@@ -66,13 +66,23 @@ export function useGlitterbox(field: Lanefield | null, blocked: boolean): void {
       keyHeld = false;
       field.setGlitter(false);
     };
+    const onBlur = (): void => {
+      // Blur must end a keyboard hold too: the keyup may fire outside
+      // the page and never arrive, which would otherwise leave scatter
+      // mode active indefinitely after returning (DESIGN 6.13).
+      stop();
+      if (keyHeld) {
+        keyHeld = false;
+        field.setGlitter(false);
+      }
+    };
     mount?.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', stop);
     window.addEventListener('pointercancel', stop);
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
-    window.addEventListener('blur', stop);
+    window.addEventListener('blur', onBlur);
     return () => {
       stop();
       if (keyHeld) field.setGlitter(false);
@@ -82,7 +92,7 @@ export function useGlitterbox(field: Lanefield | null, blocked: boolean): void {
       window.removeEventListener('pointercancel', stop);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
-      window.removeEventListener('blur', stop);
+      window.removeEventListener('blur', onBlur);
     };
   }, [field, blocked]);
 }

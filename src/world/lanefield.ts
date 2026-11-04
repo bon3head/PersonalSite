@@ -541,6 +541,12 @@ export function createLanefield(
       masksRequested = true;
       void preloadMasks();
     }
+    // DESIGN 6.7, no categorical snaps: a preload finishing mid-morph
+    // must not replace the bound mask until the morph ends. The mask
+    // kind flips at the morph midpoint, so an unguarded adoption would
+    // snap the contour during Gather. At rest the next frame adopts
+    // whatever is cached.
+    if (travel) return;
     const kind = paramsCurrent.silhouetteMask;
     const tex = kind === 'none' ? undefined : maskCache.get(kind);
     maskTexture = tex ?? placeholderTex;
@@ -999,11 +1005,16 @@ export function createLanefield(
       if (disposed || failed) return Promise.resolve();
       if (!travel && current === id) return Promise.resolve();
       // A route change ends any pulse or glitter hold and drops focus.
+      // The blend value is zeroed too: applyRing returns early during
+      // a morph, so a retained value would keep the field blended
+      // toward scatter for the whole travel and push the release past
+      // its 700ms spec (DESIGN 6.13).
       pulseState = null;
       glitter.target = 0;
+      glitter.value = 0;
+      glitter.releaseAt = -1;
       focus = null;
       if (travelOpts?.instant || reduced) {
-        glitter.value = 0;
         bow.amount = 0;
         bow.now = 0;
         lightMix = 1;
