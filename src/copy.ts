@@ -40,6 +40,7 @@ export const C = {
   'C-WHO-ROLE-1': "Math Club, VP. I run event ops.",
   'C-WHO-ROLE-2': "Eleet Coders, council rep.",
   'C-WHO-ROLE-3': "CS Teams, treasurer.",
+  'C-WHO-GAME': "Favorite game: Sekiro: Shadows Die Twice.",
   'C-WHO-LINK-CB': { label: "Codeberg", href: "https://codeberg.org/bon3head" },
   'C-WHO-LINK-GH': { label: "GitHub", href: "https://github.com/bon3head" },
   'C-WHO-LINK-LI': { label: "LinkedIn", href: "https://www.linkedin.com/in/justin-poli-15406030b" },

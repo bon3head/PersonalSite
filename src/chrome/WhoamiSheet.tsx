@@ -41,6 +41,7 @@ export default function WhoamiSheet(props: WhoamiSheetProps): JSX.Element {
           <li>{C['C-WHO-ROLE-2']}</li>
           <li>{C['C-WHO-ROLE-3']}</li>
         </ul>
+        <p>{C['C-WHO-GAME']}</p>
         <div className="jp-sheet-links">
           <Link href={C['C-WHO-LINK-CB'].href} isExternalLink>
             {C['C-WHO-LINK-CB'].label}
