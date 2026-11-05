@@ -21,3 +21,5 @@ Allow: /
 
 User-agent: PerplexityBot
 Allow: /
+
+Sitemap: https://justinpoli.is-a.dev/sitemap.xml
