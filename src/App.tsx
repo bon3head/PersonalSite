@@ -18,7 +18,7 @@
 //   world on idle but does not hand the instance to App yet, so the
 //   prop defaults to null (DOM travel only, reduced timing) until the
 //   coordinator wires the world instance through (see BUILD-STATE).
-import { useEffect, useRef, useState, type JSX } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState, type JSX } from 'react';
 import { flushSync } from 'react-dom';
 import { Theme } from '@astryxdesign/core/theme';
 import { LayerProvider } from '@astryxdesign/core';
@@ -68,8 +68,12 @@ import { C } from './copy';
 import Keymap from './chrome/Keymap';
 import Wordmark from './chrome/Wordmark';
 import Readout from './chrome/Readout';
-import WhoamiSheet from './chrome/WhoamiSheet';
-import ContactSheet from './chrome/ContactSheet';
+// Sheets load on demand: the BottomSheet closure is the largest
+// astryx cost not needed for first paint, and both sheets start
+// closed. A mount effect preloads them on idle so the first open
+// is instant; Suspense fallback null matches a closed sheet.
+const WhoamiSheet = lazy(() => import('./chrome/WhoamiSheet'));
+const ContactSheet = lazy(() => import('./chrome/ContactSheet'));
 import { entropySeed } from './motion/entropy';
 
 // Polish item 5: read ?seed before the router's first pushState drops
@@ -110,6 +114,14 @@ export default function App(props: AppProps): JSX.Element {
   // go(), so the readout content never changes while visible.
   const [scene, setScene] = useState<SceneId>(initialScene);
   const [sheet, setSheet] = useState<SheetId>(initialSheet);
+  // Mounted flips true in a mount effect. The sheets are lazy and
+  // must not render during hydration: a lazy component suspending
+  // on the hydration pass throws React error 419 (measured: the
+  // baseline is clean, the un-gated lazy sheets throw at ~400ms).
+  // Both sheets start closed, so rendering them only after mount
+  // is behavior-identical; the server and the hydration pass both
+  // render no sheet content.
+  const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState<'dark' | 'light'>(
     () => REGIME_COLOR_SCHEME[SCENE_REGIME[initialScene]],
   );
@@ -146,6 +158,30 @@ export default function App(props: AppProps): JSX.Element {
       attributeFilter: ['data-regime'],
     });
     return () => observer.disconnect();
+  }, []);
+
+  // Preload the sheet chunks on idle: the sheets are lazy (their
+  // BottomSheet closure is not needed for first paint), but the
+  // first open must feel instant, so warm the cache after mount.
+  // requestIdleCallback with a setTimeout fallback, same shape as
+  // main.tsx startOnIdle. Also flips mounted, which gates the
+  // lazy sheets off the hydration pass (see the mounted state).
+  useEffect(() => {
+    setMounted(true);
+    const preload = (): void => {
+      void import('./chrome/WhoamiSheet');
+      void import('./chrome/ContactSheet');
+    };
+    const ric = (
+      window as unknown as {
+        requestIdleCallback?: (cb: () => void) => void;
+      }
+    ).requestIdleCallback;
+    if (ric) {
+      ric(preload);
+    } else {
+      setTimeout(preload, 0);
+    }
   }, []);
 
   // Router + travel, created once, disposed on unmount.
@@ -364,20 +400,24 @@ export default function App(props: AppProps): JSX.Element {
           aria-atomic="true"
           ref={liveRef}
         />
-        <WhoamiSheet
-          isOpen={sheet === 'whoami'}
-          onOpenChange={(open) => {
-            if (!open) routerRef.current?.setSheet(null);
-          }}
-          finalFocusRef={whoamiButtonRef}
-        />
-        <ContactSheet
-          isOpen={sheet === 'contact'}
-          onOpenChange={(open) => {
-            if (!open) routerRef.current?.setSheet(null);
-          }}
-          finalFocusRef={contactButtonRef}
-        />
+        {mounted && (
+          <Suspense fallback={null}>
+            <WhoamiSheet
+              isOpen={sheet === 'whoami'}
+              onOpenChange={(open) => {
+                if (!open) routerRef.current?.setSheet(null);
+              }}
+              finalFocusRef={whoamiButtonRef}
+            />
+            <ContactSheet
+              isOpen={sheet === 'contact'}
+              onOpenChange={(open) => {
+                if (!open) routerRef.current?.setSheet(null);
+              }}
+              finalFocusRef={contactButtonRef}
+            />
+          </Suspense>
+        )}
         <TravelHotkeys
           go={(next: SceneId) => routerRef.current?.go(next)}
           step={(dir: 1 | -1) => {
