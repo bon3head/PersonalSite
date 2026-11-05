@@ -21,7 +21,7 @@ Every word the site shows, with an ID and a source. Builders copy strings from `
 
 ## 3. Strings decided by Justin outside the brief
 
-C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the brief. Justin confirmed it on 2026-10-04 and ruled on 2026-10-30 that it shows (D-SQ-VENUE). It is in the table below with source `MEM`. C-WHO-GAME ("Favorite game: Sekiro.") is not in the brief. Justin confirmed it on 2026-11-05 and it shows in the whoami sheet. It is in the table below with source `MEM`.
+C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the brief. Justin confirmed it on 2026-10-04 and ruled on 2026-10-30 that it shows (D-SQ-VENUE). It is in the table below with source `MEM`. C-WHO-GAME ("Favorite game: Sekiro: Shadows Die Twice.") is not in the brief. Justin confirmed it on 2026-11-05 and it shows in the whoami sheet. It is in the table below with source `MEM`.
 
 ## 4. The table
 
@@ -67,7 +67,7 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-WHO-ROLE-1 | WhoamiSheet | `Math Club, VP. I run event ops.` | BRIEF |
 | C-WHO-ROLE-2 | WhoamiSheet | `Eleet Coders, council rep.` | BRIEF |
 | C-WHO-ROLE-3 | WhoamiSheet | `CS Teams, treasurer.` | BRIEF |
-| C-WHO-GAME | WhoamiSheet | `Favorite game: Sekiro.` | MEM (Justin confirmed; favorite game Sekiro) |
+| C-WHO-GAME | WhoamiSheet | `Favorite game: Sekiro: Shadows Die Twice.` | MEM (Justin confirmed; favorite game Sekiro) |
 | C-WHO-LINK-CB | WhoamiSheet link | label `Codeberg`, href `https://codeberg.org/bon3head` | MEM (Codeberg is the canonical code host) |
 | C-WHO-LINK-GH | WhoamiSheet link | label `GitHub`, href `https://github.com/bon3head` | BRIEF |
 | C-WHO-LINK-LI | WhoamiSheet link | label `LinkedIn`, href `https://www.linkedin.com/in/justin-poli-15406030b` | BRIEF |
@@ -110,4 +110,4 @@ None open. D-SQ-VENUE (shown), D-LEAFLINK-KIND (mutual aid) and D-PHONE (hidden)
 - 1.0.0, 2026-10-30 (taste pass): C-LL-P1 rewritten from a three-beat list ("Someone needs something, someone nearby has it, and the map connects them") to two clauses; the triplet was a rule-of-three flag in TASTE-GATES section 2. Source unchanged: brief "neighbors helping neighbors", "live map", "in real time".
 - 1.1.0, 2026-10-30: Justin's decisions. C-SQ-OPT-1 becomes C-SQ-VENUE and always shows (D-SQ-VENUE); the `optional` flag is removed. Mutual aid and hidden phone confirmed.
 - 1.2.0, 2026-11-05: de-slop pass (Justin approved 2026-11-05). C-SRV-P3 cut: generic claim with no name, number, or date; the server readout now ends on "I wrote its terminal interface in Go." C-SQ-P1 rewritten from jargon ("Community engagement") to plain facts: anyone can host, three trails, everyday places, show up. Source unchanged: BRIEF. Grounded in a read of brittanychiang.com, joshwcomeau.com, leerob.io (one-line identity, named facts, human detail; no adjectives about own skill).
-- 1.3.0, 2026-11-05: human line (Justin approved 2026-11-05). C-WHO-GAME added to the whoami sheet: "Favorite game: Sekiro." Same read as 1.2.0 (Brittany Chiang, Lee Robinson end on a human detail). Source: MEM.
+- 1.3.0, 2026-11-05: human line (Justin approved 2026-11-05). C-WHO-GAME added to the whoami sheet: "Favorite game: Sekiro: Shadows Die Twice." Same read as 1.2.0 (Brittany Chiang, Lee Robinson end on a human detail). Source: MEM.
