@@ -1,6 +1,6 @@
 # S09 Copy deck: every visible string
 
-Version 1.1.0, 2026-10-30. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+Version 1.2.0, 2026-11-05. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
 
 ## 1. Purpose
 
@@ -42,7 +42,6 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-SRV-H1 | Server readout heading | `Justin Poli` | BRIEF |
 | C-SRV-P1 | Server readout | `Computer science senior at SUNY New Paltz, graduating December 2027.` | BRIEF |
 | C-SRV-P2 | Server readout | `I run my own inference. This is the server: an RTX 3070 Ti in a Windows 11 box at home in Smithtown, running WSL2 Ubuntu, Docker, Ollama for local models, Open WebUI, and Tailscale so I can reach it from anywhere. I wrote its terminal interface in Go.` | BRIEF |
-| C-SRV-P3 | Server readout | `I build my own tools and ship under time pressure.` | BRIEF |
 | C-SRV-ALT | `aria-label` of the Server canvas region | `Rendering of the inference server: 6,144 lanes, one per CUDA core on the RTX 3070 Ti, firing 32 at a time.` | BRIEF + R-GPU |
 | C-LL-H1 | LeafLink readout heading | `LeafLink` | BRIEF |
 | C-LL-P1 | LeafLink readout | `Mutual aid on a live map. When a neighbor needs what you have, the map connects you as it happens.` | BRIEF |
@@ -54,7 +53,7 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-LL-OFFER | OfferButton label | `Drop an offer` | n/a |
 | C-LL-ALT | `aria-label` of the LeafLink canvas region | `Simulated LeafLink map: requests and offers appear as pins and matches are traced along the streets.` | n/a |
 | C-SQ-H1 | SideQuests readout heading | `SideQuests` | BRIEF |
-| C-SQ-P1 | SideQuests readout | `Community engagement built as quests: small adventures set in everyday campus spaces, made to get people to show up.` | BRIEF |
+| C-SQ-P1 | SideQuests readout | `A community platform anyone can host, built as quests. Three trails across campus turn everyday places into small adventures, so people show up.` | BRIEF |
 | C-SQ-FACTS | SideQuests readout, supporting | `Hackathon build with Julian Shuster. 2nd place.` | BRIEF |
 | C-SQ-VENUE | SideQuests readout, supporting, directly after C-SQ-FACTS | `Built at Hack New Paltz. Working MVP in 24 hours.` | MEM (Justin 2026-10-04; shown per Justin 2026-10-30, D-SQ-VENUE) |
 | C-SQ-CODE | SideQuests link | label `Code`, href `https://codeberg.org/bon3head/sidequests` | MEM (Justin confirmed 200, 2026-10-04) |
@@ -109,3 +108,4 @@ None open. D-SQ-VENUE (shown), D-LEAFLINK-KIND (mutual aid) and D-PHONE (hidden)
 - 1.0.0, 2026-10-30: initial deck from CONTENT-BRIEF.md.
 - 1.0.0, 2026-10-30 (taste pass): C-LL-P1 rewritten from a three-beat list ("Someone needs something, someone nearby has it, and the map connects them") to two clauses; the triplet was a rule-of-three flag in TASTE-GATES section 2. Source unchanged: brief "neighbors helping neighbors", "live map", "in real time".
 - 1.1.0, 2026-10-30: Justin's decisions. C-SQ-OPT-1 becomes C-SQ-VENUE and always shows (D-SQ-VENUE); the `optional` flag is removed. Mutual aid and hidden phone confirmed.
+- 1.2.0, 2026-11-05: de-slop pass (Justin approved 2026-11-05). C-SRV-P3 cut: generic claim with no name, number, or date; the server readout now ends on "I wrote its terminal interface in Go." C-SQ-P1 rewritten from jargon ("Community engagement") to plain facts: anyone can host, three trails, everyday places, show up. Source unchanged: BRIEF. Grounded in a read of brittanychiang.com, joshwcomeau.com, leerob.io (one-line identity, named facts, human detail; no adjectives about own skill).
