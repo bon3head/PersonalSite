@@ -1,6 +1,7 @@
 # S09 Copy deck: every visible string
 
-Version 1.3.0, 2026-11-05. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+Version 1.4.0, 2026-11-05. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+1.4.0: landing intro. C-SRV-P1 and C-SRV-P2 rewritten to the general intro Justin approved 2026-11-05 (research-backed: name, identity, shipped work, Sekiro last). The detailed server specs leave the readout. The server stays in the visualization and in agent guidance. C-WHO-GAME unchanged.
 
 ## 1. Purpose
 
@@ -40,8 +41,8 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-KEY-C | Keymap item c | key `c`, label `contact` | n/a |
 | C-KEYMAP-LABEL | `aria-label` of the keymap `<nav>` | `Scenes and panels` | n/a |
 | C-SRV-H1 | Server readout heading | `Justin Poli` | BRIEF |
-| C-SRV-P1 | Server readout | `Computer science senior at SUNY New Paltz, graduating December 2027.` | BRIEF |
-| C-SRV-P2 | Server readout | `I run my own inference. This is the server: an RTX 3070 Ti in a Windows 11 box at home in Smithtown, running WSL2 Ubuntu, Docker, Ollama for local models, Open WebUI, and Tailscale so I can reach it from anywhere. I wrote its terminal interface in Go.` | BRIEF |
+| C-SRV-P1 | Server readout | `Computer science senior at SUNY New Paltz. I like to build my own tools.` | BRIEF |
+| C-SRV-P2 | Server readout | `LeafLink and SideQuests both took 2nd place at their hackathons, and I run my own LLM inference server at home.` | BRIEF |
 | C-SRV-ALT | `aria-label` of the Server canvas region | `Rendering of the inference server: 6,144 lanes, one per CUDA core on the RTX 3070 Ti, firing 32 at a time.` | BRIEF + R-GPU |
 | C-LL-H1 | LeafLink readout heading | `LeafLink` | BRIEF |
 | C-LL-P1 | LeafLink readout | `Mutual aid on a live map. When a neighbor needs what you have, the map connects you as it happens.` | BRIEF |

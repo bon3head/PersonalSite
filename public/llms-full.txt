@@ -14,7 +14,7 @@ Justin Poli. Computer science senior at SUNY New Paltz, graduating December 2027
 
 ## About
 
-Computer science senior at SUNY New Paltz, graduating December 2027.
+Computer science senior at SUNY New Paltz. I like to build my own tools.
 
 Home: Smithtown, NY. Campus: New Paltz, NY.
 
@@ -28,7 +28,7 @@ Favorite game: Sekiro: Shadows Die Twice.
 
 ## Server
 
-I run my own inference. This is the server: an RTX 3070 Ti in a Windows 11 box at home in Smithtown, running WSL2 Ubuntu, Docker, Ollama for local models, Open WebUI, and Tailscale so I can reach it from anywhere. I wrote its terminal interface in Go.
+LeafLink and SideQuests both took 2nd place at their hackathons, and I run my own LLM inference server at home.
 
 Rendering of the inference server: 6,144 lanes, one per CUDA core on the RTX 3070 Ti, firing 32 at a time.
 
