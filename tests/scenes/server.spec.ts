@@ -338,5 +338,5 @@ test('G-COPY: server readout matches S09 copy', async ({ page }) => {
   });
   expect(text).not.toBeNull();
   expect(text?.h1).toBe(C['C-SRV-H1']);
-  expect(text?.ps).toEqual([C['C-SRV-P1'], C['C-SRV-P2'], C['C-SRV-P3']]);
+  expect(text?.ps).toEqual([C['C-SRV-P1'], C['C-SRV-P2']]);
 });

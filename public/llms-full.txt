@@ -28,8 +28,6 @@ CS Teams, treasurer.
 
 I run my own inference. This is the server: an RTX 3070 Ti in a Windows 11 box at home in Smithtown, running WSL2 Ubuntu, Docker, Ollama for local models, Open WebUI, and Tailscale so I can reach it from anywhere. I wrote its terminal interface in Go.
 
-I build my own tools and ship under time pressure.
-
 Rendering of the inference server: 6,144 lanes, one per CUDA core on the RTX 3070 Ti, firing 32 at a time.
 
 ## LeafLink
@@ -44,7 +42,7 @@ Code: https://codeberg.org/bon3head/LeafLink
 
 ## SideQuests
 
-Community engagement built as quests: small adventures set in everyday campus spaces, made to get people to show up.
+A community platform anyone can host, built as quests. Three trails across campus turn everyday places into small adventures, so people show up.
 
 Hackathon build with Julian Shuster. 2nd place.
 

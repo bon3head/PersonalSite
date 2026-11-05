@@ -16,7 +16,7 @@
 
 - [Home](https://justinpoli.is-a.dev/): Justin Poli. Computer science senior at SUNY New Paltz, graduating December 2027.
 - [LeafLink](https://justinpoli.is-a.dev/leaflink): Mutual aid on a live map. When a neighbor needs what you have, the map connects you as it happens.
-- [SideQuests](https://justinpoli.is-a.dev/sidequests): Community engagement built as quests: small adventures set in everyday campus spaces, made to get people to show up.
+- [SideQuests](https://justinpoli.is-a.dev/sidequests): A community platform anyone can host, built as quests. Three trails across campus turn everyday places into small adventures, so people show up.
 
 ## Profiles
 

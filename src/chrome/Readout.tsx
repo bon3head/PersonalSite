@@ -70,7 +70,6 @@ export default function Readout(props: ReadoutProps): JSX.Element {
           <h1 id={H1_ID.server}>{C['C-SRV-H1']}</h1>
           <p>{C['C-SRV-P1']}</p>
           <p>{C['C-SRV-P2']}</p>
-          <p>{C['C-SRV-P3']}</p>
         </>
       )}
       {scene === 'leaflink' && (
