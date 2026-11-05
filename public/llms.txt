@@ -1,0 +1,19 @@
+# Justin Poli
+
+> Justin Poli. Computer science senior at SUNY New Paltz, graduating December 2027. Runs his own LLM inference server at home.
+
+## Pages
+
+- [Home](https://justinpoli.is-a.dev/): Justin Poli. Computer science senior at SUNY New Paltz, graduating December 2027.
+- [LeafLink](https://justinpoli.is-a.dev/leaflink): Mutual aid on a live map. When a neighbor needs what you have, the map connects you as it happens.
+- [SideQuests](https://justinpoli.is-a.dev/sidequests): Community engagement built as quests: small adventures set in everyday campus spaces, made to get people to show up.
+
+## Profiles
+
+- [GitHub](https://github.com/bon3head): Justin Poli on GitHub.
+- [Codeberg](https://codeberg.org/bon3head): Justin Poli on Codeberg.
+- [LinkedIn](https://www.linkedin.com/in/justin-poli-15406030b): Justin Poli on LinkedIn.
+
+## Optional
+
+- [llms-full.txt](https://justinpoli.is-a.dev/llms-full.txt): The full text of this site in one file.

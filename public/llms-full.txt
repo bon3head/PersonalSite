@@ -1,0 +1,53 @@
+# Justin Poli
+
+Justin Poli. Computer science senior at SUNY New Paltz, graduating December 2027. Runs his own LLM inference server at home.
+
+## About
+
+Computer science senior at SUNY New Paltz, graduating December 2027.
+
+Home: Smithtown, NY. Campus: New Paltz, NY.
+
+Math Club, VP. I run event ops.
+
+Eleet Coders, council rep.
+
+CS Teams, treasurer.
+
+## Server
+
+I run my own inference. This is the server: an RTX 3070 Ti in a Windows 11 box at home in Smithtown, running WSL2 Ubuntu, Docker, Ollama for local models, Open WebUI, and Tailscale so I can reach it from anywhere. I wrote its terminal interface in Go.
+
+I build my own tools and ship under time pressure.
+
+Rendering of the inference server: 6,144 lanes, one per CUDA core on the RTX 3070 Ti, firing 32 at a time.
+
+## LeafLink
+
+Mutual aid on a live map. When a neighbor needs what you have, the map connects you as it happens.
+
+Week-long hackathon build. Team of four: Justin Poli, Julian Shuster, Devin Perez, Colton A. 2nd place.
+
+WebSocket live feed, Leaflet maps, tag and category search.
+
+Code: https://codeberg.org/bon3head/LeafLink
+
+## SideQuests
+
+Community engagement built as quests: small adventures set in everyday campus spaces, made to get people to show up.
+
+Hackathon build with Julian Shuster. 2nd place.
+
+Built at Hack New Paltz. Working MVP in 24 hours.
+
+Code: https://codeberg.org/bon3head/sidequests
+
+## Contact
+
+Email: justinf0829@gmail.com
+
+GitHub: https://github.com/bon3head
+
+Codeberg: https://codeberg.org/bon3head
+
+LinkedIn: https://www.linkedin.com/in/justin-poli-15406030b
