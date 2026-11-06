@@ -1,7 +1,7 @@
 # S09 Copy deck: every visible string
 
-Version 1.4.0, 2026-11-05. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
-1.4.0: landing intro. C-SRV-P1 and C-SRV-P2 rewritten to the general intro Justin approved 2026-11-05 (research-backed: name, identity, shipped work, Sekiro last). The detailed server specs leave the readout. The server stays in the visualization and in agent guidance. C-WHO-GAME unchanged.
+Version 1.5.0, 2026-11-05. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+1.5.0: C-SQ-P1 rewritten (Justin-approved 2026-11-05): the "three trails / small adventures" line described the site visual, not the app ethos. New line names the ethos (anyone can host, each community runs its own instance) and what it is built on (ActivityPub).
 
 ## 1. Purpose
 
@@ -54,7 +54,7 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-LL-OFFER | OfferButton label | `Drop an offer` | n/a |
 | C-LL-ALT | `aria-label` of the LeafLink canvas region | `Simulated LeafLink map: requests and offers appear as pins and matches are traced along the streets.` | n/a |
 | C-SQ-H1 | SideQuests readout heading | `SideQuests` | BRIEF |
-| C-SQ-P1 | SideQuests readout | `A community platform anyone can host, built as quests. Three trails across campus turn everyday places into small adventures, so people show up.` | BRIEF |
+| C-SQ-P1 | SideQuests readout | `A community platform anyone can host, built as quests on ActivityPub. Each community runs its own instance and sets its own quests.` | BRIEF |
 | C-SQ-FACTS | SideQuests readout, supporting | `Hackathon build with Julian Shuster. 2nd place.` | BRIEF |
 | C-SQ-VENUE | SideQuests readout, supporting, directly after C-SQ-FACTS | `Built at Hack New Paltz. Working MVP in 24 hours.` | MEM (Justin 2026-10-04; shown per Justin 2026-10-30, D-SQ-VENUE) |
 | C-SQ-CODE | SideQuests link | label `Code`, href `https://codeberg.org/bon3head/sidequests` | MEM (Justin confirmed 200, 2026-10-04) |

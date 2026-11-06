@@ -44,7 +44,7 @@ Code: https://codeberg.org/bon3head/LeafLink
 
 ## SideQuests
 
-A community platform anyone can host, built as quests. Three trails across campus turn everyday places into small adventures, so people show up.
+A community platform anyone can host, built as quests on ActivityPub. Each community runs its own instance and sets its own quests.
 
 Hackathon build with Julian Shuster. 2nd place.
 

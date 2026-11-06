@@ -26,7 +26,7 @@ export const C = {
   'C-LL-OFFER': "Drop an offer",
   'C-LL-ALT': "Simulated LeafLink map: requests and offers appear as pins and matches are traced along the streets.",
   'C-SQ-H1': "SideQuests",
-  'C-SQ-P1': "A community platform anyone can host, built as quests. Three trails across campus turn everyday places into small adventures, so people show up.",
+  'C-SQ-P1': "A community platform anyone can host, built as quests on ActivityPub. Each community runs its own instance and sets its own quests.",
   'C-SQ-FACTS': "Hackathon build with Julian Shuster. 2nd place.",
   'C-SQ-VENUE': "Built at Hack New Paltz. Working MVP in 24 hours.",
   'C-SQ-CODE': { label: "Code", href: "https://codeberg.org/bon3head/sidequests" },
