@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.3.0, 2026-11-03. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.4.0, 2026-11-05. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -353,7 +353,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
 
 ```json design-tokens
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -744,10 +744,10 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
           "shiftNdc": [0.62, 0.0]
         },
         "coarse": {
-          "pos": [-3.5, 3.0, 12.0],
+          "pos": [-3.5, 5.0, 12.0],
           "target": [0.3, 0.0, -3.0],
-          "fovDeg": 58,
-          "shiftNdc": [0.0, -0.4]
+          "fovDeg": 52,
+          "shiftNdc": [0.0, -0.3]
         }
       },
       "leaflink": {
@@ -985,6 +985,7 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.4.0, 2026-11-05: coarse server camera refit for the S09 1.4.0 landing intro. The shorter intro left a black band between the copy (readout bottom 33.8% at 390x844) and the lane field (dense from 54%). Coarse server pose only; fine unchanged. pos y 3.0 to 5.0, fovDeg 58 to 52, shiftNdc y -0.4 to -0.3. Pitch -10.97 to -17.91, inside the SideQuests band (-75 to -5) so morph sampling stays in band; no server band exists. Verified geometrically (all 6144 lanes projected through the shifted camera at 390x844): field spans 40.0% to 83.9% (was 54.3% to 86.6%), zero segments in the readout box plus padding, so T-SRV-2 holds. Lane count, grid, and copy unchanged.
 - 1.3.0, 2026-11-03: device run 3 (morphs good, minor interactivity fixes). Every line traces to DEVICE-RUN-3.md.
   - "Tutorial and offer UI cut: LeafLink legend, SIM caption, and Drop an offer button removed; SideQuests hint and coarse TrailRow removed. Features stay: map taps and logo verb still drop offers, marker twins still walk trails, hero verbs unchanged."
   - "Coarse SideQuests twins are the accessible set (aria-hidden and tabindex -1 lifted); the cut row was the accessible set, so without this companion change keyboard trail walking would regress to pointer-only."

@@ -1,6 +1,6 @@
-// GENERATED from spec/astryx/DESIGN.md v1.3.0. Do not edit.
+// GENERATED from spec/astryx/DESIGN.md v1.4.0. Do not edit.
 export const T = {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -614,7 +614,7 @@ export const T = {
         "coarse": {
           "pos": [
             -3.5,
-            3,
+            5,
             12
           ],
           "target": [
@@ -622,10 +622,10 @@ export const T = {
             0,
             -3
           ],
-          "fovDeg": 58,
+          "fovDeg": 52,
           "shiftNdc": [
             0,
-            -0.4
+            -0.3
           ]
         }
       },
