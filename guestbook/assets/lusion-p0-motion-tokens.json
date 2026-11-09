@@ -1,0 +1,151 @@
+{
+  "$description": "Motion tokens extracted by designlang",
+  "duration": {
+    "xs": {
+      "$value": "100ms",
+      "$type": "duration",
+      "ms": 100
+    },
+    "sm": {
+      "$value": "200ms",
+      "$type": "duration",
+      "ms": 200
+    },
+    "md": {
+      "$value": "300ms",
+      "$type": "duration",
+      "ms": 300
+    },
+    "lg": {
+      "$value": "500ms",
+      "$type": "duration",
+      "ms": 500
+    },
+    "xxl": {
+      "$value": "3s",
+      "$type": "duration",
+      "ms": 3000,
+      "$extensions": {
+        "designlang.observed": true
+      }
+    }
+  },
+  "easing": {
+    "custom-899": {
+      "$value": "cubic-bezier(0.4, 0, 0.1, 1)",
+      "$type": "cubicBezier",
+      "family": "custom"
+    },
+    "ease-out-953": {
+      "$value": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "$type": "cubicBezier",
+      "family": "ease-out"
+    },
+    "custom-856": {
+      "$value": "cubic-bezier(0.35, 0, 0, 1)",
+      "$type": "cubicBezier",
+      "family": "custom"
+    },
+    "custom-804": {
+      "$value": "cubic-bezier(0.4, 0, 0, 1)",
+      "$type": "cubicBezier",
+      "family": "custom"
+    }
+  },
+  "spring": {},
+  "$meta": {
+    "feel": "mixed",
+    "scrollLinked": true,
+    "runtime": {
+      "triggers": [
+        "load",
+        "scroll"
+      ],
+      "observed": 10
+    }
+  },
+  "choreography": {
+    "stagger-1": {
+      "$type": "designlang.choreography",
+      "trigger": "load",
+      "staggerMs": 150,
+      "count": 5,
+      "durationMs": 3000,
+      "easing": "linear",
+      "properties": [
+        "transform"
+      ],
+      "selectorPattern": [
+        "div#end-bottom > div:nth-of-type(*) > div:nth-of-type(*)",
+        "div#end-bottom-text"
+      ]
+    },
+    "stagger-2": {
+      "$type": "designlang.choreography",
+      "trigger": "scroll",
+      "staggerMs": 150,
+      "count": 5,
+      "durationMs": 3000,
+      "easing": "linear",
+      "properties": [
+        "transform"
+      ],
+      "selectorPattern": [
+        "div#end-bottom > div:nth-of-type(*) > div:nth-of-type(*)",
+        "div#end-bottom-text"
+      ]
+    }
+  },
+  "scroll": {
+    "parallax-1": {
+      "$type": "designlang.scrollRecipe",
+      "kind": "parallax",
+      "properties": [
+        "transform"
+      ],
+      "durationMs": 3000,
+      "easing": "linear",
+      "selector": "div#end-bottom > div:nth-of-type(1) > div:nth-of-type(1)"
+    },
+    "parallax-2": {
+      "$type": "designlang.scrollRecipe",
+      "kind": "parallax",
+      "properties": [
+        "transform"
+      ],
+      "durationMs": 3000,
+      "easing": "linear",
+      "selector": "div#end-bottom > div:nth-of-type(1) > div:nth-of-type(2)"
+    },
+    "parallax-3": {
+      "$type": "designlang.scrollRecipe",
+      "kind": "parallax",
+      "properties": [
+        "transform"
+      ],
+      "durationMs": 3000,
+      "easing": "linear",
+      "selector": "div#end-bottom-text"
+    },
+    "parallax-4": {
+      "$type": "designlang.scrollRecipe",
+      "kind": "parallax",
+      "properties": [
+        "transform"
+      ],
+      "durationMs": 3000,
+      "easing": "linear",
+      "selector": "div#end-bottom > div:nth-of-type(3) > div:nth-of-type(1)"
+    },
+    "parallax-5": {
+      "$type": "designlang.scrollRecipe",
+      "kind": "parallax",
+      "properties": [
+        "transform"
+      ],
+      "durationMs": 3000,
+      "easing": "linear",
+      "selector": "div#end-bottom > div:nth-of-type(3) > div:nth-of-type(2)"
+    }
+  }
+}
