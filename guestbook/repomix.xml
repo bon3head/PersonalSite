@@ -58,6 +58,7 @@ guestbook/
     lusion-style-brief.md
     routing.md
     site-context.md
+  launch-prompt.md
   prompt.md
   README.md
 spec/
@@ -77,6 +78,382 @@ package.json
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="guestbook/launch-prompt.md">
+# Guestbook signup sheet — launch prompt for browser Claude
+
+Paste this into browser Claude (claude.ai), alongside the attached `guestbook/repomix.xml`. Use this instead of the full `prompt.md` when you want the shortest path. The full brief is in `guestbook/prompt.md` (inside the repomix.xml); this launcher tells Claude to read it.
+
+---
+
+You are building the guestbook signup sheet for Justin Poli's portfolio site. You are in browser Claude (claude.ai). You do NOT have local file access and you do NOT have a repo checkout.
+
+Your sources, in order:
+1. The attached `guestbook/repomix.xml` (the whole context in one XML file, 22 files, ~57,000 tokens). Read every repo file from it by its `<file path="...">` attribute.
+2. The public GitHub repo, for the latest files if the attached pack is stale: https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`. Browse it on the web. It is public.
+3. The web, for design references and the live site: Mobbin https://mobbin.com (free tier, browse it directly, do NOT use the Mobbin product MCP, it is gated off), the reference sites https://lusion.co, https://bruno-simon.com, https://oklou.com, and the live site https://justinpoli.is-a.dev.
+
+Read `guestbook/prompt.md` inside the repomix.xml (it is the build brief) and `guestbook/README.md` (the file map). Then design and build the sheet, following the brief exactly. One verb: build it. Creative direction: entropic and 3D (fresh entropy seed per sign, unique every time; camera dolly, depth, lanes in 3D). GLITTERBOX is NOT used here. Do not add scope beyond the brief. If the brief is missing a load-bearing decision, stop and name it instead of inventing it.
+</file>
+
+<file path="src/world/layouts/server.ts">
+// Server layout generator (S05 layout chapter). Runs in the worker.
+// Pure function: no DOM, no three imports. Writes every lane of the field
+// with its full point set into the layout texture buffer at the slice for
+// layoutIndex. Texel index for a lane, layout, and point follows the worker
+// chapter formula (lane stride times lane, plus layout times points per
+// lane, plus point). RGB is the world position, A is the class id. Every
+// point carries class 0 (server.lane); class 1 (server.converge) is reserved
+// and unused in v1.
+// The layout is pure grid arithmetic: it consumes no randomness, so the
+// seed exists only for interface compatibility with the worker contract
+// (S02 worker chapter: each layout gets its own seeded stream; the server
+// layout draws nothing from it).
+import { T } from '../../tokens.generated';
+
+const POINTS = T.world.pointsPerLane;
+const LAYOUT_COUNT = T.world.layouts.length;
+const LANE_STRIDE = POINTS * LAYOUT_COUNT; // texels per lane across all layouts
+const FLOATS_PER_TEXEL = 4; // lit-ok: RGBA channels
+
+export function generate(seed: number, out: Float32Array, layoutIndex: number): void {
+  void seed; // no randomness consumed: grid arithmetic only, see header
+  const sm = T.world.server.sm;
+  const part = T.world.server.partition;
+  const ln = T.world.server.lane;
+  const zStraight = T.world.server.zStraight;
+  const convergeZ = T.world.server.convergeZ;
+  const convergeMix = T.world.server.convergeMix;
+  const focus = T.world.server.focus;
+  const smColCenter = (sm.cols - 1) / 2;
+  const smRowCenter = (sm.rows - 1) / 2;
+  const partColCenter = (part.cols - 1) / 2;
+  const partRowCenter = (part.rows - 1) / 2;
+  const laneColCenter = (ln.cols - 1) / 2;
+  const laneRowCenter = (ln.rows - 1) / 2;
+  const lanesPerSm = part.perSm * ln.perPartition;
+  const straightPoints = POINTS - 2; // the last two points are converge points
+  const zSpan = zStraight[1] - zStraight[0];
+  const zStep = zSpan / (straightPoints - 1);
+  for (let i = 0; i < T.world.laneCount; i++) {
+    const smIndex = Math.floor(i / lanesPerSm);
+    const partIndex = Math.floor((i % lanesPerSm) / ln.perPartition);
+    const laneIndex = i % ln.perPartition;
+    const smCol = smIndex % sm.cols;
+    const smRow = Math.floor(smIndex / sm.cols);
+    const partCol = partIndex % part.cols;
+    const partRow = Math.floor(partIndex / part.cols);
+    const laneCol = laneIndex % ln.cols;
+    const laneRow = Math.floor(laneIndex / ln.cols);
+    const x =
+      (smCol - smColCenter) * sm.pitch[0] +
+      (partCol - partColCenter) * part.pitch[0] +
+      (laneCol - laneColCenter) * ln.pitch[0];
+    const y =
+      (smRow - smRowCenter) * sm.pitch[1] +
+      (partRow - partRowCenter) * part.pitch[1] +
+      (laneRow - laneRowCenter) * ln.pitch[1];
+    const laneBase = (i * LANE_STRIDE + layoutIndex * POINTS) * FLOATS_PER_TEXEL;
+    for (let k = 0; k < straightPoints; k++) {
+      const base = laneBase + k * FLOATS_PER_TEXEL;
+      out[base] = x;
+      out[base + 1] = y;
+      out[base + 2] = zStraight[0] + k * zStep;
+      out[base + 3] = 0; // lit-ok: S02 class 0 server.lane
+    }
+    const convergeX0 = x + (focus[0] - x) * convergeMix[0];
+    const convergeY0 = y + (focus[1] - y) * convergeMix[0];
+    const base6 = laneBase + straightPoints * FLOATS_PER_TEXEL;
+    out[base6] = convergeX0;
+    out[base6 + 1] = convergeY0;
+    out[base6 + 2] = convergeZ[0];
+    out[base6 + 3] = 0; // lit-ok: S02 class 0 server.lane
+    const convergeX1 = x + (focus[0] - x) * convergeMix[1];
+    const convergeY1 = y + (focus[1] - y) * convergeMix[1];
+    const base7 = laneBase + (straightPoints + 1) * FLOATS_PER_TEXEL;
+    out[base7] = convergeX1;
+    out[base7 + 1] = convergeY1;
+    out[base7 + 2] = convergeZ[1];
+    out[base7 + 3] = 0; // lit-ok: S02 class 0 server.lane
+  }
+}
+</file>
+
+<file path="src/router.ts">
+import { useHotkeys } from '@astryxdesign/core';
+import type { Hotkey } from '@astryxdesign/core';
+import { C } from './copy';
+import type { LayoutId, Regime } from './world/types';
+
+// S03 section 2: routes. Scene order for adjacency keys: server (1),
+// leaflink (2), sidequests (3). The 404 scene is outside the order.
+export type SceneId = 'server' | 'leaflink' | 'sidequests' | 'notfound';
+export type SheetId = 'whoami' | 'contact' | null;
+
+export const SCENE_ORDER: SceneId[] = ['server', 'leaflink', 'sidequests'];
+
+export const SCENE_PATH: Record<SceneId, string> = {
+  server: '/',
+  leaflink: '/leaflink',
+  sidequests: '/sidequests',
+  notfound: '/404',
+};
+
+export const SCENE_LAYOUT: Record<SceneId, LayoutId> = {
+  server: 'server',
+  leaflink: 'leaflink',
+  sidequests: 'sidequests',
+  notfound: 'scatter',
+};
+
+export const SCENE_REGIME: Record<SceneId, Regime> = {
+  server: 'void',
+  leaflink: 'paper',
+  sidequests: 'field',
+  notfound: 'void',
+};
+
+// DESIGN section 3.2 prose: void and field are color-scheme dark, paper
+// is color-scheme light, so Astryx light-dark() tokens resolve correctly.
+export const REGIME_COLOR_SCHEME: Record<Regime, 'dark' | 'light'> = {
+  void: 'dark',
+  paper: 'light',
+  field: 'dark',
+};
+
+export const SCENE_TITLE: Record<SceneId, string> = {
+  server: C['C-TITLE-SERVER'],
+  leaflink: C['C-TITLE-LEAFLINK'],
+  sidequests: C['C-TITLE-SIDEQUESTS'],
+  notfound: C['C-TITLE-404'],
+};
+
+export const SCENE_H1: Record<SceneId, string> = {
+  server: C['C-SRV-H1'],
+  leaflink: C['C-LL-H1'],
+  sidequests: C['C-SQ-H1'],
+  notfound: C['C-404-H1'],
+};
+
+// S03 section 2: trailing slashes normalize to no slash, uppercase
+// normalizes to lowercase. Unknown paths are the 404 scene.
+export function parsePath(pathname: string): SceneId {
+  let p = pathname.toLowerCase();
+  if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+  switch (p) {
+    case '/':
+      return 'server';
+    case '/leaflink':
+      return 'leaflink';
+    case '/sidequests':
+      return 'sidequests';
+    default:
+      return 'notfound';
+  }
+}
+
+export function sceneToPath(scene: SceneId): string {
+  return SCENE_PATH[scene];
+}
+
+// S03 section 2: sheets are not routes. #whoami and #contact open the
+// matching sheet over the current scene.
+export function parseHash(hash: string): SheetId {
+  if (hash === '#whoami') return 'whoami';
+  if (hash === '#contact') return 'contact';
+  return null;
+}
+
+export function sheetToHash(sheet: SheetId): string {
+  if (sheet === 'whoami') return '#whoami';
+  if (sheet === 'contact') return '#contact';
+  return '';
+}
+
+// S03 section 6: ArrowLeft / ArrowRight move in scene order, wrapping.
+// From 404, ArrowRight goes to server; ArrowLeft wraps to the end of the
+// order (sidequests), the symmetric completion of the wrapping rule.
+export function stepScene(current: SceneId, dir: 1 | -1): SceneId {
+  if (current === 'notfound') {
+    return dir === 1 ? 'server' : 'sidequests';
+  }
+  const idx = SCENE_ORDER.indexOf(current);
+  const next = (idx + dir + SCENE_ORDER.length) % SCENE_ORDER.length;
+  return SCENE_ORDER[next];
+}
+
+export interface RouterState {
+  scene: SceneId;
+  sheet: SheetId;
+}
+
+export interface RouterCallbacks {
+  onSceneChange: (scene: SceneId, source: 'go' | 'pop') => void;
+  onSheetChange: (sheet: SheetId) => void;
+}
+
+export interface Router {
+  readonly state: RouterState;
+  go: (scene: SceneId) => void;
+  setSheet: (sheet: SheetId) => void;
+  dispose: () => void;
+}
+
+function currentUrl(scene: SceneId, sheet: SheetId): string {
+  return sceneToPath(scene) + sheetToHash(sheet);
+}
+
+// S03 section 3: go() pushes state then runs travel (via onSceneChange).
+// popstate runs travel without pushing. setSheet uses replaceState, so
+// closing a sheet does not cost a back press.
+export function createRouter(
+  initial: RouterState,
+  callbacks: RouterCallbacks,
+): Router {
+  const state: RouterState = { ...initial };
+
+  function onPopState(): void {
+    const scene = parsePath(window.location.pathname);
+    const sheet = parseHash(window.location.hash);
+    const sceneChanged = scene !== state.scene;
+    const sheetChanged = sheet !== state.sheet;
+    state.scene = scene;
+    state.sheet = sheet;
+    if (sceneChanged) callbacks.onSceneChange(scene, 'pop');
+    if (sheetChanged) callbacks.onSheetChange(sheet);
+  }
+
+  window.addEventListener('popstate', onPopState);
+
+  function onDocumentClick(event: MouseEvent): void {
+    if (event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const anchor = (event.target as HTMLElement | null)?.closest?.('a[data-route]');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href');
+    if (!href) return;
+    let url: URL;
+    try {
+      url = new URL(href, window.location.href);
+    } catch {
+      return;
+    }
+    if (url.origin !== window.location.origin) return;
+    if (anchor.getAttribute('target') && anchor.getAttribute('target') !== '_self') return;
+    event.preventDefault();
+    go(parsePath(url.pathname));
+  }
+
+  document.addEventListener('click', onDocumentClick);
+
+  function go(scene: SceneId): void {
+    if (scene === state.scene) return;
+    state.scene = scene;
+    window.history.pushState({ scene }, '', currentUrl(scene, state.sheet));
+    callbacks.onSceneChange(scene, 'go');
+  }
+
+  function setSheet(sheet: SheetId): void {
+    if (sheet === state.sheet) return;
+    state.sheet = sheet;
+    window.history.replaceState(
+      { scene: state.scene },
+      '',
+      currentUrl(state.scene, sheet),
+    );
+    callbacks.onSheetChange(sheet);
+  }
+
+  return {
+    state,
+    go,
+    setSheet,
+    dispose(): void {
+      window.removeEventListener('popstate', onPopState);
+      document.removeEventListener('click', onDocumentClick);
+    },
+  };
+}
+
+// S03 section 6: keyboard bindings. Registered once with Astryx
+// useHotkeys (S04 owns the visual Keymap). Bindings are disabled while
+// a sheet is open, except the sheet's own key (isDisabled on the
+// entries). Escape is NOT handled here: BottomSheet handles it itself,
+// do not double-handle. Never active inside inputs: useHotkeys defaults
+// allowInInputs to false, which is the guard.
+export interface TravelHotkeysProps {
+  go: (scene: SceneId) => void;
+  step: (dir: 1 | -1) => void;
+  toggleSheet: (sheet: Exclude<SheetId, null>) => void;
+  sheet: SheetId;
+}
+
+function noModifier(event: KeyboardEvent): boolean {
+  return !event.metaKey && !event.ctrlKey && !event.altKey;
+}
+
+export function buildTravelHotkeyEntries(props: TravelHotkeysProps): Hotkey[] {
+  const sheetOpen = props.sheet !== null;
+  return [
+    {
+      keys: '1',
+      onPress: (e) => {
+        if (noModifier(e)) props.go('server');
+      },
+      isDisabled: sheetOpen,
+    },
+    {
+      keys: '2',
+      onPress: (e) => {
+        if (noModifier(e)) props.go('leaflink');
+      },
+      isDisabled: sheetOpen,
+    },
+    {
+      keys: '3',
+      onPress: (e) => {
+        if (noModifier(e)) props.go('sidequests');
+      },
+      isDisabled: sheetOpen,
+    },
+    {
+      keys: 'left',
+      onPress: (e) => {
+        if (noModifier(e)) props.step(-1);
+      },
+      isDisabled: sheetOpen,
+    },
+    {
+      keys: 'right',
+      onPress: (e) => {
+        if (noModifier(e)) props.step(1);
+      },
+      isDisabled: sheetOpen,
+    },
+    {
+      keys: 'w',
+      onPress: (e) => {
+        if (noModifier(e)) props.toggleSheet('whoami');
+      },
+      isDisabled: props.sheet === 'contact',
+    },
+    {
+      keys: 'c',
+      onPress: (e) => {
+        if (noModifier(e)) props.toggleSheet('contact');
+      },
+      isDisabled: props.sheet === 'whoami',
+    },
+  ];
+}
+
+// No JSX: this component only registers hotkeys and renders nothing, so
+// it lives in a .ts file. B4 mounts it inside App in wave 2.
+export function TravelHotkeys(props: TravelHotkeysProps): null {
+  useHotkeys(buildTravelHotkeyEntries(props));
+  return null;
+}
+</file>
 
 <file path="guestbook/assets/motion-notes/bruno-simon-immersion.md">
 # Bruno Simon Immersion Study (2026-10-04)
@@ -1283,11 +1660,19 @@ Astryx is Meta's design system and tooling, the baseline the site is built on. N
 <file path="guestbook/prompt.md">
 # Guestbook signup sheet prompt for Claude
 
-Paste this into Claude (claude.ai project or Claude Code), alongside `guestbook/repomix.xml` (the whole context packed in one XML file, 21 files, ~56,000 tokens). It follows the model-routing framework's Claude greenfield template: multishot examples + XML structure + self-correction chaining + named banned patterns, one verb, explicit boundary and stop condition. Routing: greenfield generation, Claude Opus 5.5 `high`.
+Paste this into browser Claude (claude.ai), alongside the attached `guestbook/repomix.xml` (the whole context packed in one XML file, 22 files, ~57,000 tokens). It follows the model-routing framework's Claude greenfield template: multishot examples + XML structure + self-correction chaining + named banned patterns, one verb, explicit boundary and stop condition. Routing: greenfield generation, Claude Opus 5.5 `high`.
 
 Creative direction (revised 2026-11-09): entropic and 3D. The sheet is driven by entropy (seeded randomness, stochastic variation, unique every time) and by 3D motion (camera dolly, depth, lanes moving in 3D space). GLITTERBOX is NOT the signing gesture and is NOT an asset pool here.
 
 ---
+
+<access>
+You are running in browser Claude (claude.ai). You do NOT have local file access and you do NOT have a repo checkout. Do not try to read local file paths. Your sources are, in order:
+1. The attached `guestbook/repomix.xml`. This is the whole context in one file (repomix 1.18.1, XML style, 22 files, ~57,000 tokens). Every repo file you need is inside it, under a `<file path="...">` attribute. Read the files from the XML by their path. The files are: `guestbook/README.md`, `guestbook/prompt.md` (this brief), `guestbook/launch-prompt.md` (the short launcher), `guestbook/references/asset-pool.md`, `guestbook/references/lusion-style-brief.md`, `guestbook/references/routing.md`, `guestbook/references/site-context.md`, `guestbook/references/astryx-design-spec.md`, `guestbook/assets/lusion-p0-motion-tokens.json`, `guestbook/assets/lusion-p0-motion.css`, `guestbook/assets/lusion-p0-design-tokens.json`, `guestbook/assets/motion-notes/oklou-motion-notes.md`, `guestbook/assets/motion-notes/bruno-simon-immersion.md`, `guestbook/assets/motion-notes/utazon-motion-notes.md`, `guestbook/assets/motion-notes/cleanlystudio-motion-notes.md`, `spec/astryx/DESIGN.md`, `spec/astryx/specs/S09-copy-deck.md`, `src/world/camera.ts`, `src/world/layouts/server.ts`, `src/App.tsx`, `src/router.ts`, `package.json`.
+2. The public GitHub repo, for the latest files if the attached pack is stale: https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`. Browse it on the web. It is public. The guestbook directory is at `guestbook/` on that branch.
+3. The web, for design references and the live site (see the design-reference section below). You can browse the web. Use it.
+If the attached repomix.xml and the GitHub repo disagree, the GitHub repo is newer; say so and use the repo. If a file you need is in neither, stop and name it instead of inventing it.
+</access>
 
 <instructions>
 Build a guestbook signup sheet for Justin Poli's portfolio site, from the brief below. Be clear and direct: follow the explicit output format and constraints given, in the order given.
@@ -1320,13 +1705,13 @@ The site it lives in:
 </context>
 
 <design-reference>
-Step 1 — browse Mobbin free pages BEFORE designing anything. Do NOT use the Mobbin product MCP: it is gated off for this user (account confirmed Free, MCP not included). Free tier: the 4 latest apps and public pages on mobbin.com. Browse for guestbook / signup / "leave a mark" flows and onboarding flows from several relevant products, not one example. Record references: product name + Mobbin URL for each important reference. Separate visible observations from interpretation.
-Step 2 — read the motion references in `guestbook/assets/`:
-- Lusion (`guestbook/references/lusion-style-brief.md`, `guestbook/assets/lusion-p0-motion-tokens.json`, `guestbook/assets/lusion-p0-motion.css`): two-easing system (`cubic-bezier(0.35, 0, 0, 1)` dominant, `cubic-bezier(0.4, 0, 0.1, 1)` soft), 400ms default duration, transform dominates, long moves slow and staggered (menu-open 5000ms, parallax 3000ms linear with 150ms stagger over 5 items), pill CTAs (88px radius, dot + arrow that slides on hover). Steal the motion system, not the hexes or the hero.
-- Oklou 3D boot (`guestbook/assets/motion-notes/oklou-motion-notes.md`): radio tuning into a 3D space. A giant radio tuner in 3D, auto-sweep (frequency digits roll on their own), camera push-in (dollies toward the display), lock-in (display resolves to "FM OK.00" then "AM OKLOU" — noise becomes identity), pull-back reveal (camera pulls to wide). Steal the camera choreography: push-in, lock-in payoff, pull-back. The long cinematic motion lives in the 3D intro, not the DOM.
-- Bruno Simon 3D (`guestbook/assets/motion-notes/bruno-simon-immersion.md`): vehicle as interface, toy car + physics, projects as physical monuments in a 3D world, camera above-and-behind follow cam, discovery by driving. Perf discipline: matcaps (baked lighting) instead of real-time lights, modest object count. Steal the idea that the visitor discovers by moving through 3D space, and the perf discipline.
-- Utazon and Cleanlystudio (`guestbook/assets/motion-notes/utazon-motion-notes.md`, `guestbook/assets/motion-notes/cleanlystudio-motion-notes.md`): the Material-standard ease convergence and the reversible scroll reveal pattern.
-Step 3 — design from those references only. Do not invent an aesthetic from scratch. If the free tier returns no match, fall back to Refero/design-extract reference sites and mark the design as ungrounded.
+Step 1 — browse Mobbin free pages on the web BEFORE designing anything. You are in browser Claude, so browse https://mobbin.com directly. Do NOT use the Mobbin product MCP: it is gated off for this user (account confirmed Free, MCP not included). Free tier: the 4 latest apps and public pages on mobbin.com. Browse for guestbook / signup / "leave a mark" flows and onboarding flows from several relevant products, not one example. Record references: product name + Mobbin URL for each important reference. Separate visible observations from interpretation.
+Step 2 — read the motion references. They are inside the attached repomix.xml (read them by their `<file path="...">` attribute), and they are also on the public GitHub repo at https://github.com/bon3head/PersonalSite (branch `astryx-polish-r2`, under `guestbook/`):
+- Lusion (`guestbook/references/lusion-style-brief.md`, `guestbook/assets/lusion-p0-motion-tokens.json`, `guestbook/assets/lusion-p0-motion.css` in the repomix.xml): two-easing system (`cubic-bezier(0.35, 0, 0, 1)` dominant, `cubic-bezier(0.4, 0, 0.1, 1)` soft), 400ms default duration, transform dominates, long moves slow and staggered (menu-open 5000ms, parallax 3000ms linear with 150ms stagger over 5 items), pill CTAs (88px radius, dot + arrow that slides on hover). Steal the motion system, not the hexes or the hero. You can also browse the live source site https://lusion.co to see the motion in action.
+- Oklou 3D boot (`guestbook/assets/motion-notes/oklou-motion-notes.md` in the repomix.xml): radio tuning into a 3D space. A giant radio tuner in 3D, auto-sweep (frequency digits roll on their own), camera push-in (dollies toward the display), lock-in (display resolves to "FM OK.00" then "AM OKLOU" — noise becomes identity), pull-back reveal (camera pulls to wide). Steal the camera choreography: push-in, lock-in payoff, pull-back. The long cinematic motion lives in the 3D intro, not the DOM. You can also browse https://oklou.com.
+- Bruno Simon 3D (`guestbook/assets/motion-notes/bruno-simon-immersion.md` in the repomix.xml): vehicle as interface, toy car + physics, projects as physical monuments in a 3D world, camera above-and-behind follow cam, discovery by driving. Perf discipline: matcaps (baked lighting) instead of real-time lights, modest object count. Steal the idea that the visitor discovers by moving through 3D space, and the perf discipline. You can also browse https://bruno-simon.com.
+- Utazon and Cleanlystudio (`guestbook/assets/motion-notes/utazon-motion-notes.md`, `guestbook/assets/motion-notes/cleanlystudio-motion-notes.md` in the repomix.xml): the Material-standard ease convergence and the reversible scroll reveal pattern.
+Step 3 — design from those references only. Do not invent an aesthetic from scratch. If the free tier returns no match, fall back to the design-extract outputs already in the repomix.xml (the Lusion brief, the motion notes) and mark the design as ungrounded. You can also browse the live portfolio site https://justinpoli.is-a.dev to see the field and the morphs you are building on.
 </design-reference>
 
 <examples>
@@ -1375,6 +1760,14 @@ A guestbook signup sheet for the portfolio site. Anyone can easily sign, but not
 
 Creative direction (revised 2026-11-09): entropic and 3D. GLITTERBOX is axed from this work (not the signing gesture, not an asset pool).
 
+## How Claude uses this (browser Claude)
+
+This work is built for **browser Claude (claude.ai)**. Browser Claude has no local file access and no repo checkout. Its access paths are:
+1. **Attach `guestbook/repomix.xml`** — the whole context in one XML file (22 files, ~57,000 tokens). Every repo file is inside it under a `<file path="...">` attribute. This is the primary source.
+2. **Paste `guestbook/prompt.md`** — the build brief. It has an `<access>` section that tells Claude exactly where its sources are.
+3. **Browse the web** — Mobbin (https://mobbin.com, free tier), the reference sites (https://lusion.co, https://bruno-simon.com, https://oklou.com), the live site (https://justinpoli.is-a.dev), and the public GitHub repo (https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`, public).
+4. **Launch prompt** — if you want the shortest path, paste the one-paragraph launch prompt in `guestbook/launch-prompt.md` instead of the full `prompt.md`. It tells Claude to read the repo files and the brief. Use the full `prompt.md` when you want the complete brief pasted in.
+
 ## Status
 
 Prompt written 2026-11-09, revised same day (GLITTERBOX axed, entropic + 3D). Not built yet. The prompt in `prompt.md` is the build brief for Claude.
@@ -1383,8 +1776,9 @@ Prompt written 2026-11-09, revised same day (GLITTERBOX axed, entropic + 3D). No
 
 | File | What it is |
 |---|---|
-| `prompt.md` | The build brief for Claude. Paste it into Claude (claude.ai project or Claude Code). One verb, explicit boundary and stop condition. |
-| `repomix.xml` | The whole context packed for Claude in one XML file (repomix 1.18.1). Paste it alongside `prompt.md`, or attach it. 21 files, ~56,000 tokens. Regenerate with the command in the repomix section below after any file change. |
+| `prompt.md` | The build brief for Claude. Paste it into browser Claude (claude.ai), alongside the attached `repomix.xml`. One verb, explicit boundary and stop condition. Has an `<access>` section that tells browser Claude exactly where its sources are. |
+| `launch-prompt.md` | The short launcher. Paste this into browser Claude instead of the full `prompt.md` when you want the shortest path. It tells Claude to read the brief and the context pack from the repomix.xml. |
+| `repomix.xml` | The whole context packed for Claude in one XML file (repomix 1.18.1). Attach it to browser Claude alongside `prompt.md` or `launch-prompt.md`. 22 files, ~57,000 tokens. Regenerate with the command in the repomix section below after any file change. |
 | `references/asset-pool.md` | The deep pool of assets Claude can pull from and transform, with each entry's source, what it offers, and how to transform it. GLITTERBOX is explicitly NOT in this pool. |
 | `references/lusion-style-brief.md` | Lusion design extract, run 2026-11-09 with the design-extract 12-stage fusion pipeline (`--motion-runtime` on). The motion system to steal. Source: lusion.co, lusion.co/projects/everswap, lusion.co/projects/spatial_fusion. |
 | `references/routing.md` | The model-routing framework that governs this work: greenfield generation (row 5), Claude Opus 5.5 `high`, the Claude greenfield prompt template, the Mobbin design-reference step (free-tier browsing, product MCP gated off), and the auto-fire rules. |
@@ -1400,7 +1794,7 @@ Prompt written 2026-11-09, revised same day (GLITTERBOX axed, entropic + 3D). No
 
 ## Repomix package (for Claude)
 
-`repomix.xml` is the whole context in one file, packed with repomix 1.18.1 (XML style). It contains the guestbook directory, `spec/astryx/DESIGN.md`, `spec/astryx/specs/S09-copy-deck.md`, `src/world/camera.ts`, `src/world/layouts/server.ts`, `src/App.tsx`, `src/router.ts`, and `package.json`. 21 files, ~56,000 tokens, ~200,000 chars.
+`repomix.xml` is the whole context in one file, packed with repomix 1.18.1 (XML style). It contains the guestbook directory, `spec/astryx/DESIGN.md`, `spec/astryx/specs/S09-copy-deck.md`, `src/world/camera.ts`, `src/world/layouts/server.ts`, `src/App.tsx`, `src/router.ts`, and `package.json`. 22 files, ~57,000 tokens, ~206,000 chars.
 
 To regenerate after any file change, from the repo root:
 
@@ -1431,365 +1825,6 @@ This work follows the model-routing framework in `~/workspace/model-routing/fram
 ## Open decision
 
 Where signatures are stored. The prompt leaves this for Claude to name rather than invent. Options: a JSON file in the repo, a lightweight form endpoint, or a client-side list with a clear note that it is local-only. If Justin picks one, pin it in `prompt.md` before the build starts.
-</file>
-
-<file path="src/world/layouts/server.ts">
-// Server layout generator (S05 layout chapter). Runs in the worker.
-// Pure function: no DOM, no three imports. Writes every lane of the field
-// with its full point set into the layout texture buffer at the slice for
-// layoutIndex. Texel index for a lane, layout, and point follows the worker
-// chapter formula (lane stride times lane, plus layout times points per
-// lane, plus point). RGB is the world position, A is the class id. Every
-// point carries class 0 (server.lane); class 1 (server.converge) is reserved
-// and unused in v1.
-// The layout is pure grid arithmetic: it consumes no randomness, so the
-// seed exists only for interface compatibility with the worker contract
-// (S02 worker chapter: each layout gets its own seeded stream; the server
-// layout draws nothing from it).
-import { T } from '../../tokens.generated';
-
-const POINTS = T.world.pointsPerLane;
-const LAYOUT_COUNT = T.world.layouts.length;
-const LANE_STRIDE = POINTS * LAYOUT_COUNT; // texels per lane across all layouts
-const FLOATS_PER_TEXEL = 4; // lit-ok: RGBA channels
-
-export function generate(seed: number, out: Float32Array, layoutIndex: number): void {
-  void seed; // no randomness consumed: grid arithmetic only, see header
-  const sm = T.world.server.sm;
-  const part = T.world.server.partition;
-  const ln = T.world.server.lane;
-  const zStraight = T.world.server.zStraight;
-  const convergeZ = T.world.server.convergeZ;
-  const convergeMix = T.world.server.convergeMix;
-  const focus = T.world.server.focus;
-  const smColCenter = (sm.cols - 1) / 2;
-  const smRowCenter = (sm.rows - 1) / 2;
-  const partColCenter = (part.cols - 1) / 2;
-  const partRowCenter = (part.rows - 1) / 2;
-  const laneColCenter = (ln.cols - 1) / 2;
-  const laneRowCenter = (ln.rows - 1) / 2;
-  const lanesPerSm = part.perSm * ln.perPartition;
-  const straightPoints = POINTS - 2; // the last two points are converge points
-  const zSpan = zStraight[1] - zStraight[0];
-  const zStep = zSpan / (straightPoints - 1);
-  for (let i = 0; i < T.world.laneCount; i++) {
-    const smIndex = Math.floor(i / lanesPerSm);
-    const partIndex = Math.floor((i % lanesPerSm) / ln.perPartition);
-    const laneIndex = i % ln.perPartition;
-    const smCol = smIndex % sm.cols;
-    const smRow = Math.floor(smIndex / sm.cols);
-    const partCol = partIndex % part.cols;
-    const partRow = Math.floor(partIndex / part.cols);
-    const laneCol = laneIndex % ln.cols;
-    const laneRow = Math.floor(laneIndex / ln.cols);
-    const x =
-      (smCol - smColCenter) * sm.pitch[0] +
-      (partCol - partColCenter) * part.pitch[0] +
-      (laneCol - laneColCenter) * ln.pitch[0];
-    const y =
-      (smRow - smRowCenter) * sm.pitch[1] +
-      (partRow - partRowCenter) * part.pitch[1] +
-      (laneRow - laneRowCenter) * ln.pitch[1];
-    const laneBase = (i * LANE_STRIDE + layoutIndex * POINTS) * FLOATS_PER_TEXEL;
-    for (let k = 0; k < straightPoints; k++) {
-      const base = laneBase + k * FLOATS_PER_TEXEL;
-      out[base] = x;
-      out[base + 1] = y;
-      out[base + 2] = zStraight[0] + k * zStep;
-      out[base + 3] = 0; // lit-ok: S02 class 0 server.lane
-    }
-    const convergeX0 = x + (focus[0] - x) * convergeMix[0];
-    const convergeY0 = y + (focus[1] - y) * convergeMix[0];
-    const base6 = laneBase + straightPoints * FLOATS_PER_TEXEL;
-    out[base6] = convergeX0;
-    out[base6 + 1] = convergeY0;
-    out[base6 + 2] = convergeZ[0];
-    out[base6 + 3] = 0; // lit-ok: S02 class 0 server.lane
-    const convergeX1 = x + (focus[0] - x) * convergeMix[1];
-    const convergeY1 = y + (focus[1] - y) * convergeMix[1];
-    const base7 = laneBase + (straightPoints + 1) * FLOATS_PER_TEXEL;
-    out[base7] = convergeX1;
-    out[base7 + 1] = convergeY1;
-    out[base7 + 2] = convergeZ[1];
-    out[base7 + 3] = 0; // lit-ok: S02 class 0 server.lane
-  }
-}
-</file>
-
-<file path="src/router.ts">
-import { useHotkeys } from '@astryxdesign/core';
-import type { Hotkey } from '@astryxdesign/core';
-import { C } from './copy';
-import type { LayoutId, Regime } from './world/types';
-
-// S03 section 2: routes. Scene order for adjacency keys: server (1),
-// leaflink (2), sidequests (3). The 404 scene is outside the order.
-export type SceneId = 'server' | 'leaflink' | 'sidequests' | 'notfound';
-export type SheetId = 'whoami' | 'contact' | null;
-
-export const SCENE_ORDER: SceneId[] = ['server', 'leaflink', 'sidequests'];
-
-export const SCENE_PATH: Record<SceneId, string> = {
-  server: '/',
-  leaflink: '/leaflink',
-  sidequests: '/sidequests',
-  notfound: '/404',
-};
-
-export const SCENE_LAYOUT: Record<SceneId, LayoutId> = {
-  server: 'server',
-  leaflink: 'leaflink',
-  sidequests: 'sidequests',
-  notfound: 'scatter',
-};
-
-export const SCENE_REGIME: Record<SceneId, Regime> = {
-  server: 'void',
-  leaflink: 'paper',
-  sidequests: 'field',
-  notfound: 'void',
-};
-
-// DESIGN section 3.2 prose: void and field are color-scheme dark, paper
-// is color-scheme light, so Astryx light-dark() tokens resolve correctly.
-export const REGIME_COLOR_SCHEME: Record<Regime, 'dark' | 'light'> = {
-  void: 'dark',
-  paper: 'light',
-  field: 'dark',
-};
-
-export const SCENE_TITLE: Record<SceneId, string> = {
-  server: C['C-TITLE-SERVER'],
-  leaflink: C['C-TITLE-LEAFLINK'],
-  sidequests: C['C-TITLE-SIDEQUESTS'],
-  notfound: C['C-TITLE-404'],
-};
-
-export const SCENE_H1: Record<SceneId, string> = {
-  server: C['C-SRV-H1'],
-  leaflink: C['C-LL-H1'],
-  sidequests: C['C-SQ-H1'],
-  notfound: C['C-404-H1'],
-};
-
-// S03 section 2: trailing slashes normalize to no slash, uppercase
-// normalizes to lowercase. Unknown paths are the 404 scene.
-export function parsePath(pathname: string): SceneId {
-  let p = pathname.toLowerCase();
-  if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
-  switch (p) {
-    case '/':
-      return 'server';
-    case '/leaflink':
-      return 'leaflink';
-    case '/sidequests':
-      return 'sidequests';
-    default:
-      return 'notfound';
-  }
-}
-
-export function sceneToPath(scene: SceneId): string {
-  return SCENE_PATH[scene];
-}
-
-// S03 section 2: sheets are not routes. #whoami and #contact open the
-// matching sheet over the current scene.
-export function parseHash(hash: string): SheetId {
-  if (hash === '#whoami') return 'whoami';
-  if (hash === '#contact') return 'contact';
-  return null;
-}
-
-export function sheetToHash(sheet: SheetId): string {
-  if (sheet === 'whoami') return '#whoami';
-  if (sheet === 'contact') return '#contact';
-  return '';
-}
-
-// S03 section 6: ArrowLeft / ArrowRight move in scene order, wrapping.
-// From 404, ArrowRight goes to server; ArrowLeft wraps to the end of the
-// order (sidequests), the symmetric completion of the wrapping rule.
-export function stepScene(current: SceneId, dir: 1 | -1): SceneId {
-  if (current === 'notfound') {
-    return dir === 1 ? 'server' : 'sidequests';
-  }
-  const idx = SCENE_ORDER.indexOf(current);
-  const next = (idx + dir + SCENE_ORDER.length) % SCENE_ORDER.length;
-  return SCENE_ORDER[next];
-}
-
-export interface RouterState {
-  scene: SceneId;
-  sheet: SheetId;
-}
-
-export interface RouterCallbacks {
-  onSceneChange: (scene: SceneId, source: 'go' | 'pop') => void;
-  onSheetChange: (sheet: SheetId) => void;
-}
-
-export interface Router {
-  readonly state: RouterState;
-  go: (scene: SceneId) => void;
-  setSheet: (sheet: SheetId) => void;
-  dispose: () => void;
-}
-
-function currentUrl(scene: SceneId, sheet: SheetId): string {
-  return sceneToPath(scene) + sheetToHash(sheet);
-}
-
-// S03 section 3: go() pushes state then runs travel (via onSceneChange).
-// popstate runs travel without pushing. setSheet uses replaceState, so
-// closing a sheet does not cost a back press.
-export function createRouter(
-  initial: RouterState,
-  callbacks: RouterCallbacks,
-): Router {
-  const state: RouterState = { ...initial };
-
-  function onPopState(): void {
-    const scene = parsePath(window.location.pathname);
-    const sheet = parseHash(window.location.hash);
-    const sceneChanged = scene !== state.scene;
-    const sheetChanged = sheet !== state.sheet;
-    state.scene = scene;
-    state.sheet = sheet;
-    if (sceneChanged) callbacks.onSceneChange(scene, 'pop');
-    if (sheetChanged) callbacks.onSheetChange(sheet);
-  }
-
-  window.addEventListener('popstate', onPopState);
-
-  function onDocumentClick(event: MouseEvent): void {
-    if (event.button !== 0) return;
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    const anchor = (event.target as HTMLElement | null)?.closest?.('a[data-route]');
-    if (!anchor) return;
-    const href = anchor.getAttribute('href');
-    if (!href) return;
-    let url: URL;
-    try {
-      url = new URL(href, window.location.href);
-    } catch {
-      return;
-    }
-    if (url.origin !== window.location.origin) return;
-    if (anchor.getAttribute('target') && anchor.getAttribute('target') !== '_self') return;
-    event.preventDefault();
-    go(parsePath(url.pathname));
-  }
-
-  document.addEventListener('click', onDocumentClick);
-
-  function go(scene: SceneId): void {
-    if (scene === state.scene) return;
-    state.scene = scene;
-    window.history.pushState({ scene }, '', currentUrl(scene, state.sheet));
-    callbacks.onSceneChange(scene, 'go');
-  }
-
-  function setSheet(sheet: SheetId): void {
-    if (sheet === state.sheet) return;
-    state.sheet = sheet;
-    window.history.replaceState(
-      { scene: state.scene },
-      '',
-      currentUrl(state.scene, sheet),
-    );
-    callbacks.onSheetChange(sheet);
-  }
-
-  return {
-    state,
-    go,
-    setSheet,
-    dispose(): void {
-      window.removeEventListener('popstate', onPopState);
-      document.removeEventListener('click', onDocumentClick);
-    },
-  };
-}
-
-// S03 section 6: keyboard bindings. Registered once with Astryx
-// useHotkeys (S04 owns the visual Keymap). Bindings are disabled while
-// a sheet is open, except the sheet's own key (isDisabled on the
-// entries). Escape is NOT handled here: BottomSheet handles it itself,
-// do not double-handle. Never active inside inputs: useHotkeys defaults
-// allowInInputs to false, which is the guard.
-export interface TravelHotkeysProps {
-  go: (scene: SceneId) => void;
-  step: (dir: 1 | -1) => void;
-  toggleSheet: (sheet: Exclude<SheetId, null>) => void;
-  sheet: SheetId;
-}
-
-function noModifier(event: KeyboardEvent): boolean {
-  return !event.metaKey && !event.ctrlKey && !event.altKey;
-}
-
-export function buildTravelHotkeyEntries(props: TravelHotkeysProps): Hotkey[] {
-  const sheetOpen = props.sheet !== null;
-  return [
-    {
-      keys: '1',
-      onPress: (e) => {
-        if (noModifier(e)) props.go('server');
-      },
-      isDisabled: sheetOpen,
-    },
-    {
-      keys: '2',
-      onPress: (e) => {
-        if (noModifier(e)) props.go('leaflink');
-      },
-      isDisabled: sheetOpen,
-    },
-    {
-      keys: '3',
-      onPress: (e) => {
-        if (noModifier(e)) props.go('sidequests');
-      },
-      isDisabled: sheetOpen,
-    },
-    {
-      keys: 'left',
-      onPress: (e) => {
-        if (noModifier(e)) props.step(-1);
-      },
-      isDisabled: sheetOpen,
-    },
-    {
-      keys: 'right',
-      onPress: (e) => {
-        if (noModifier(e)) props.step(1);
-      },
-      isDisabled: sheetOpen,
-    },
-    {
-      keys: 'w',
-      onPress: (e) => {
-        if (noModifier(e)) props.toggleSheet('whoami');
-      },
-      isDisabled: props.sheet === 'contact',
-    },
-    {
-      keys: 'c',
-      onPress: (e) => {
-        if (noModifier(e)) props.toggleSheet('contact');
-      },
-      isDisabled: props.sheet === 'whoami',
-    },
-  ];
-}
-
-// No JSX: this component only registers hotkeys and renders nothing, so
-// it lives in a .ts file. B4 mounts it inside App in wave 2.
-export function TravelHotkeys(props: TravelHotkeysProps): null {
-  useHotkeys(buildTravelHotkeyEntries(props));
-  return null;
-}
 </file>
 
 <file path="src/world/camera.ts">
