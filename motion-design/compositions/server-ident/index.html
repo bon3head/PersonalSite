@@ -1,0 +1,192 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"seed","type":"number","label":"Entropy seed (uint32)","default":2718281828,"min":0,"max":4294967295,"step":1}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/lanefield.js"></script>
+    <style>
+      @font-face {
+        font-family: "Commit Mono";
+        src: url("assets/fonts/commit-mono-latin-400-normal.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Commit Mono";
+        src: url("assets/fonts/commit-mono-latin-700-normal.woff2") format("woff2");
+        font-weight: 700;
+        font-style: normal;
+      }
+      /* frame.md colors, verbatim from spec/astryx/DESIGN.md */
+      :root {
+        --void-ground: #0a0c0f;
+        --void-text: #e6e8ea;
+        --void-text2: #a7abb0;
+        --signal: #7bb5f8;
+        --hairline: rgba(230, 232, 234, 0.13);
+        --font: "Commit Mono", ui-monospace, monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--void-ground);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        font-family: var(--font);
+        color: var(--void-text);
+        font-variant-numeric: tabular-nums;
+      }
+      #field {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+      }
+      #readout {
+        position: absolute;
+        left: 192px;
+        top: 300px;
+        width: 700px;
+      }
+      #srv-h1 {
+        font-size: 127px; /* display-name 6.6cqw */
+        font-weight: 400;
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        margin-bottom: 44px;
+      }
+      .srv-p {
+        font-size: 28px; /* body 1.45cqw */
+        line-height: 1.5;
+        color: var(--void-text);
+        margin-bottom: 20px;
+      }
+      #srv-p2 {
+        color: var(--void-text2);
+      }
+      #keymap {
+        position: absolute;
+        left: 192px;
+        right: 192px;
+        bottom: 108px;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        gap: 56px;
+        font-size: 28px; /* key 1.46cqw, video floor */
+        box-shadow: inset 0 1px 0 0 var(--hairline);
+      }
+      .km {
+        display: inline-block;
+        color: var(--void-text2);
+      }
+      .km b {
+        color: var(--signal);
+        font-weight: 700;
+        margin-right: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="12"
+      data-width="1920"
+      data-height="1080"
+    >
+      <canvas id="field" width="1920" height="1080" data-layout-ignore></canvas>
+
+      <div id="readout">
+        <h1 id="srv-h1" class="clip" data-start="2.0" data-duration="10" data-track-index="1">
+          <span id="srv-h1-in" style="display: inline-block">Justin Poli</span>
+        </h1>
+        <p id="srv-p1" class="srv-p clip" data-start="3.0" data-duration="9" data-track-index="2">
+          <span id="srv-p1-in" style="display: inline-block">Computer science senior at SUNY New Paltz. I like to build my own tools.</span>
+        </p>
+        <p id="srv-p2" class="srv-p clip" data-start="3.5" data-duration="8.5" data-track-index="3">
+          <span id="srv-p2-in" style="display: inline-block">LeafLink and SideQuests both took 2nd place at their hackathons, and I run my own LLM inference server at home.</span>
+        </p>
+      </div>
+
+      <nav id="keymap" class="clip" data-start="4.4" data-duration="7.6" data-track-index="4">
+        <span class="km" id="km-1"><b>1</b>server</span>
+        <span class="km" id="km-2"><b>2</b>leaflink</span>
+        <span class="km" id="km-3"><b>3</b>sidequests</span>
+        <span class="km" id="km-w"><b>w</b>whoami</span>
+        <span class="km" id="km-c"><b>c</b>contact</span>
+      </nav>
+    </div>
+
+    <script>
+      (function () {
+        const LF = window.Lanefield;
+        const E = LF.EASE;
+        const ctx = document.getElementById("field").getContext("2d");
+        const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+        const seed = (Number(vars.seed) >>> 0) || 2718281828;
+
+        // camera: DESIGN camera.server.fine is the rest pose; the film opens wider and dollies in
+        // DESIGN camera.server.fine (pos -7.0 2.4 8.0, shiftNdc 0.62) clips the focus at 16:9 video framing;
+        // frame.md re-fits it: same target and fov, camera backed off along the same line, focus inside action-safe
+        const REST = { pos: [-9.6, 3.3, 11.6], target: [0.5, 0.0, -3.0], fov: 48, shift: [0.56, 0.02] };
+        // server arrives rigid: bow 0 (DESIGN 6.11), so the seed only picks the idle drift sign
+        const driftSign = LF.draw(seed, 0, 0) < 0.5 ? -1 : 1;
+        const WIDE = { pos: [-15.0, 5.2, 19.0], target: [0.5, 0.0, -3.0], fov: 48 };
+        const DOLLY_T0 = 0.2, DOLLY_D = 2.1; // web travel 0.7s x3 (frame.md pacing)
+
+        function camAt(t) {
+          const u = E.signature(LF.clamp01((t - DOLLY_T0) / DOLLY_D));
+          const pos = LF.lerp3(WIDE.pos, REST.pos, u);
+          const idle = Math.max(0, t - (DOLLY_T0 + DOLLY_D)); // linear idle drift, no easing
+          pos[0] += driftSign * 0.03 * idle;
+          pos[2] -= 0.04 * idle;
+          return { pos, target: REST.target, fov: LF.lerp(WIDE.fov, REST.fov, u), shift: REST.shift };
+        }
+
+        function renderAt(t) {
+          LF.render(ctx, t, { cam: camAt(t), seed, alpha: 0.16, width: 1.4, words: true, wordsFrom: 1.2 });
+        }
+
+        // readout: loom on the signature curve after the camera settles, transform led
+        const tl = gsap.timeline({ paused: true });
+        const sig = (x) => E.signature(x);
+        tl.fromTo("#srv-h1-in", { opacity: 0, scale: 0.92, y: 24, transformOrigin: "0% 100%" }, { opacity: 1, scale: 1, y: 0, duration: 0.9, ease: sig }, 2.0);
+        tl.fromTo("#srv-p1-in", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.9, ease: sig }, 3.0);
+        tl.fromTo("#srv-p2-in", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.9, ease: sig }, 3.5);
+        ["#km-1", "#km-2", "#km-3", "#km-w", "#km-c"].forEach((id, n) => {
+          tl.fromTo(id, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, ease: sig }, 4.4 + n * 0.08);
+        });
+        // the active key turns signal (feedback 150ms on the web, 0.45s in frame)
+        tl.fromTo("#km-1", { color: "#a7abb0" }, { color: "#7bb5f8", duration: 0.45, ease: E.standard }, 5.6);
+        // hold: canvas drives the rest; a no-op tween pins the timeline to the full length
+        tl.to({}, { duration: 0.01 }, 11.99);
+
+        window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+        window.__hf = window.__hf || {};
+        window.__hf.buildReady = window.__hf.buildReady || {};
+        window.__hf.buildReady["server-ident-fonts"] = document.fonts.load('400 32px "Commit Mono"').then(() => renderAt(0));
+        renderAt(0);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>

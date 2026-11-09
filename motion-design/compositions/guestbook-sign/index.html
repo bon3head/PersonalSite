@@ -1,0 +1,250 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"seed","type":"number","label":"Entropy seed (uint32). Pass a fresh one per render.","default":3141592653,"min":0,"max":4294967295,"step":1}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/lanefield.js"></script>
+    <style>
+      @font-face {
+        font-family: "Commit Mono";
+        src: url("assets/fonts/commit-mono-latin-400-normal.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+      }
+      :root {
+        --void-ground: #0a0c0f;
+        --void-text2: #a7abb0;
+        --signal: #7bb5f8;
+        --font: "Commit Mono", ui-monospace, monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--void-ground);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        font-family: var(--font);
+        font-variant-numeric: tabular-nums;
+      }
+      #field {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+      }
+      #seed-line {
+        position: absolute;
+        left: 192px;
+        bottom: 108px;
+        font-size: 28px;
+        color: var(--void-text2);
+      }
+      #seed-line b {
+        color: var(--signal);
+        font-weight: 400;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="10"
+      data-width="1920"
+      data-height="1080"
+    >
+      <canvas id="field" width="1920" height="1080" data-layout-ignore></canvas>
+      <div id="seed-line" class="clip" data-start="0" data-duration="10" data-track-index="1" data-hold>
+        <span id="seed-in" style="display: inline-block">seed <b id="seed-val">0x00000000</b></span>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const LF = window.Lanefield;
+        const E = LF.EASE;
+        const { lerp, lerp3, clamp01 } = LF;
+        const ctx = document.getElementById("field").getContext("2d");
+        const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+        // On the site the seed is one crypto.getRandomValues draw per sign (guestbook/prompt.md item 3).
+        // In video the seed is a variable so a render is exact per seed and a new seed gives a new film.
+        const seed = (Number(vars.seed) >>> 0) || 3141592653;
+        document.getElementById("seed-val").textContent = "0x" + seed.toString(16).padStart(8, "0");
+        const rnd = (ch, n) => LF.draw(seed, ch, n); // DESIGN 6.11 counter-based draws
+        const sgn = (ch, n) => rnd(ch, n) * 2 - 1;
+
+        // ---- beats (seconds) ----
+        const B = {
+          dollyIn: [0.4, 2.4],    // camera push-in, Lusion main, long move
+          part: [0.6, 2.2],       // lanes part in 3D around the signing point
+          stroke: [2.6, 2.2],     // the mark draws as noise
+          lock: 4.9,              // lock-in: noise becomes identity, every warp fires once
+          settle: [4.9, 0.6],
+          pullBack: [5.9, 2.7],   // camera pulls to wide, Lusion soft
+        };
+        const win = (b, t) => clamp01((t - b[0]) / b[1]);
+
+        // ---- the signing point sits inside the field at a control-point depth ----
+        const M0 = [0.45 + 0.6 * sgn(10, 0), 0.35 + 0.4 * sgn(10, 1), -8.0];
+        const settleZ = -8.0 + 3.0 * sgn(11, 0); // the mark's resting depth in the field
+        const markYaw = 0.55 * sgn(12, 0);       // the mark is 3D: it is turned in depth
+
+        // ---- camera poses ----
+        const WIDE = { pos: [-9.6, 3.3, 11.6], target: [0.5, 0.0, -3.0], fov: 48, shift: [0.0, 0.0] };
+        const close = (M) => ({ pos: [M[0] - 1.6, M[1] + 0.7, M[2] + 5.6], target: M.slice(), fov: 42, shift: [0, 0] });
+        const bowIn = 1.5 * sgn(13, 0);   // DESIGN 6.11 camera bow, signed per seed
+        const bowOut = 2.0 * sgn(13, 1);
+
+        function markCenter(t) {
+          const u = E.lusionSoft(win(B.pullBack, t));
+          return [M0[0], M0[1], lerp(M0[2], settleZ, u)];
+        }
+
+        function camAt(t) {
+          const uin = E.lusionMain(win(B.dollyIn, t));
+          const uout = E.lusionSoft(win(B.pullBack, t));
+          const C1 = close(M0);
+          let pos = lerp3(WIDE.pos, C1.pos, uin);
+          let target = lerp3(WIDE.target, C1.target, uin);
+          let fov = lerp(WIDE.fov, C1.fov, uin);
+          pos[0] += bowIn * Math.sin(Math.PI * uin);
+          // during the lock-in hold the camera keeps a slow seeded drift (never a still frame)
+          const hold = clamp01((t - (B.dollyIn[0] + B.dollyIn[1])) / (B.pullBack[0] - B.dollyIn[0] - B.dollyIn[1]));
+          pos[0] += 0.25 * sgn(14, 0) * hold;
+          pos[2] -= 0.35 * hold;
+          if (uout > 0) {
+            const Ms = [M0[0], M0[1], settleZ]; // wide again, framed on the mark at its settled depth
+            const W2 = { pos: [Ms[0] - 6.6 + 1.0 * sgn(15, 0), Ms[1] + 3.2, Ms[2] + 11.0], target: [Ms[0] + 0.3, Ms[1] - 0.2, Ms[2] - 1.0] };
+            pos = lerp3(pos, W2.pos, uout);
+            target = lerp3(target, W2.target, uout);
+            fov = lerp(fov, 46, uout);
+            pos[0] += bowOut * Math.sin(Math.PI * uout);
+          }
+          return { pos, target, fov, shift: [0, 0] };
+        }
+
+        // ---- parting: lanes near the signing axis move outward and in depth ----
+        function partAt(t) {
+          const open = E.lusionMain(win(B.part, t));
+          const shut = E.lusionSoft(win(B.pullBack, t));
+          return { r: 1.9 * open * (1 - 0.7 * shut), dz: open * (1 - 0.6 * shut) };
+        }
+        let PART = { r: 0, dz: 0 }, MC = M0;
+        function deform(i, k, p) {
+          if (PART.r <= 0) return;
+          const dx = p[0] - MC[0], dy = p[1] - MC[1];
+          const d = Math.hypot(dx, dy);
+          const R = PART.r * (0.85 + 0.4 * rnd(20, i)); // seeded per-lane parting radius
+          if (d >= R * 1.6) return;
+          const zr = (p[2] - MC[2]) / 6.5;
+          const kz = Math.exp(-zr * zr); // gaussian in depth around the signing point
+          if (kz < 0.02) return;
+          const fall = 1 - clamp01(d / (R * 1.6));
+          const push = (R - d * 0.6) * fall * kz;
+          const nx = d > 1e-4 ? dx / d : Math.cos(i), ny = d > 1e-4 ? dy / d : Math.sin(i);
+          p[0] += nx * push;
+          p[1] += ny * push;
+          p[2] += PART.dz * 1.6 * sgn(21, i) * fall * kz; // lanes move in depth, not only x/y
+        }
+
+        // ---- the mark: a seeded 3D stroke ----
+        const N = 220;
+        const f = [1 + Math.floor(rnd(30, 0) * 3), 2 + Math.floor(rnd(30, 1) * 3), 3 + Math.floor(rnd(30, 2) * 4), 2 + Math.floor(rnd(30, 3) * 2)];
+        const ph = [0, 1, 2, 3, 4].map((n) => rnd(31, n) * Math.PI * 2);
+        const loopA = 0.09 + 0.06 * rnd(32, 0);
+        const mark = [];
+        for (let n = 0; n < N; n++) {
+          const u = n / (N - 1);
+          let x = (u - 0.5) * 1.9 + 0.12 * Math.sin(2 * Math.PI * f[0] * u + ph[0]);
+          let y = 0.28 * Math.sin(2 * Math.PI * f[1] * u + ph[1]) * Math.sin(Math.PI * u) + 0.08 * Math.sin(2 * Math.PI * f[2] * u + ph[2]);
+          x += loopA * Math.cos(2 * Math.PI * f[2] * 2 * u + ph[3]);
+          y += loopA * Math.sin(2 * Math.PI * f[2] * 2 * u + ph[3]);
+          const z = 0.32 * Math.sin(2 * Math.PI * f[3] * u + ph[4]);
+          mark.push([x * 1.25, y * 1.25, z * 1.6]);
+        }
+
+        const scr = [0, 0, 0];
+        function drawMark(cam, t) {
+          const prog = E.lusionSoft(win(B.stroke, t));
+          if (prog <= 0) return;
+          const noiseAmp = 0.07 * (1 - E.lusionMain(win(B.settle, t)));
+          const frame = Math.floor(t * 30); // auto-sweep noise: a pure function of the frame index
+          const C = markCenter(t);
+          const cy = Math.cos(markYaw), sy = Math.sin(markYaw);
+          const cooled = clamp01((t - B.lock) / 1.2);
+          const col = LF.mixc(LF.C.hot, LF.C.signal, cooled);
+          const last = Math.floor(prog * (N - 1));
+          const pts = [];
+          for (let n = 0; n <= last; n++) {
+            let [x, y, z] = mark[n];
+            if (noiseAmp > 0) {
+              x += noiseAmp * sgn(40 + (frame % 7), n * 3);
+              y += noiseAmp * sgn(40 + (frame % 7), n * 3 + 1);
+              z += noiseAmp * 2 * sgn(40 + (frame % 7), n * 3 + 2);
+            }
+            const rx = x * cy + z * sy, rz = -x * sy + z * cy;
+            if (LF.project(cam, C[0] + rx, C[1] + y, C[2] + rz, scr)) pts.push([scr[0], scr[1], scr[2]]);
+          }
+          if (pts.length < 2) return;
+          ctx.globalCompositeOperation = "lighter";
+          ctx.lineJoin = "round";
+          ctx.lineCap = "round";
+          const depthScale = Math.max(1.2, Math.min(2.2, 9 / pts[0][2]));
+          const passes = [[LF.C.signal, 0.35, 6.0], [col, 0.95, 2.2]];
+          for (const [c, a, w] of passes) {
+            ctx.strokeStyle = LF.rgba(c, a);
+            ctx.lineWidth = w * depthScale;
+            ctx.beginPath();
+            ctx.moveTo(pts[0][0], pts[0][1]);
+            for (let n = 1; n < pts.length; n++) ctx.lineTo(pts[n][0], pts[n][1]);
+            ctx.stroke();
+          }
+          // the drawing head: a pulse core at the pen (light with a source)
+          if (prog < 1) {
+            const h = pts[pts.length - 1];
+            ctx.fillStyle = LF.rgba(LF.C.hot, 0.9);
+            ctx.beginPath();
+            ctx.arc(h[0], h[1], 3.2 * depthScale, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalCompositeOperation = "source-over";
+        }
+
+        function renderAt(t) {
+          PART = partAt(t);
+          MC = markCenter(t);
+          const cam = camAt(t);
+          const c = LF.render(ctx, t, { cam, seed, alpha: 0.16, width: 1.4, deform, fireAll: { t0: B.lock, speed: 0.9 } });
+          drawMark(c, t);
+        }
+
+        const tl = gsap.timeline({ paused: true });
+        tl.fromTo("#seed-in", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: E.signature }, 0.2);
+        tl.fromTo("#seed-val", { color: "#a7abb0" }, { color: "#7bb5f8", duration: 0.45, ease: E.standard }, B.lock);
+        tl.to({}, { duration: 0.01 }, 9.99);
+
+        window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+        renderAt(0);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>
