@@ -79,23 +79,6 @@ package.json
 <files>
 This section contains the contents of the repository's files.
 
-<file path="guestbook/launch-prompt.md">
-# Guestbook signup sheet — launch prompt for browser Claude
-
-Paste this into browser Claude (claude.ai), alongside the attached `guestbook/repomix.xml`. Use this instead of the full `prompt.md` when you want the shortest path. The full brief is in `guestbook/prompt.md` (inside the repomix.xml); this launcher tells Claude to read it.
-
----
-
-You are building the guestbook signup sheet for Justin Poli's portfolio site. You are in browser Claude (claude.ai). You do NOT have local file access and you do NOT have a repo checkout.
-
-Your sources, in order:
-1. The attached `guestbook/repomix.xml` (the whole context in one XML file, 22 files, ~57,000 tokens). Read every repo file from it by its `<file path="...">` attribute.
-2. The public GitHub repo, for the latest files if the attached pack is stale: https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`. Browse it on the web. It is public.
-3. The web, for design references and the live site: Mobbin https://mobbin.com (free tier, browse it directly, do NOT use the Mobbin product MCP, it is gated off), the reference sites https://lusion.co, https://bruno-simon.com, https://oklou.com, and the live site https://justinpoli.is-a.dev.
-
-Read `guestbook/prompt.md` inside the repomix.xml (it is the build brief) and `guestbook/README.md` (the file map). Then design and build the sheet, following the brief exactly. One verb: build it. Creative direction: entropic and 3D (fresh entropy seed per sign, unique every time; camera dolly, depth, lanes in 3D). GLITTERBOX is NOT used here. Do not add scope beyond the brief. If the brief is missing a load-bearing decision, stop and name it instead of inventing it.
-</file>
-
 <file path="src/world/layouts/server.ts">
 // Server layout generator (S05 layout chapter). Runs in the worker.
 // Pure function: no DOM, no three imports. Writes every lane of the field
@@ -1381,7 +1364,15 @@ A deep pool of assets for the guestbook build. Each entry names what it offers, 
 - **What it offers:** Astryx (Meta's MIT design system, CLI-first) as the design substrate. Load-bearing decisions: Astryx is the FLOOR, design-extract is the CEILING (extract-first ordering; Astryx never replaces reference extraction). Raw templates are banned as shipped output. Substrate-invisibility is an explicit rule (default accent, default neutral theme, and default radius/easing ladder may not ship unmodified). Version pinning is mandatory (CLI beta 0.7.1 verified 2026-10-18).
 - **How to transform it:** Use Astryx tokens/components for discipline (the token system, the component structure), but the style brief (Lusion, oklou, bruno-simon) gives the taste. Do not ship the default Astryx accent, theme, or radius/easing ladder unmodified.
 
-## 6. The site's own 3D field (the material)
+## 7. Refero Styles (design-system reference surface)
+
+**What it is:** https://styles.refero.design/ — a library of 2,000+ design systems extracted from real product websites, each packaged as a DESIGN.md file (colors, typography, spacing, components, dos/don'ts) plus Tailwind v4 CSS, plain CSS variables, and tokens.json. Search by brand name, mood, color, typography, or URL. Each style page is at https://styles.refero.design/style/<id> and the DESIGN.md is in a `<pre><code>` block on the page.
+
+**How to use it:** Browse it on the web (browser Claude). Search for a comparable system's DESIGN.md when you want a reference for how a real token system is structured. Refero gives a system's DESIGN.md tokens; Mobbin gives pattern, flow, and section references. They complement each other. The guestbook already HAS its own design system (the Astryx tokens in `spec/astryx/DESIGN.md`, in the repomix.xml). Refero is a reference and a source of token-system ideas. It does NOT replace the site's own tokens.
+
+**Access:** Web browsing only. Do NOT use the Refero MCP (refero.design/mcp); the web path is the viable one for browser Claude. The site's JSON API returns 403 to non-browser clients, but a browser can read the pages. No account or spend needed for browsing.
+
+## 8. The site's own 3D field (the material)
 
 - **Files (in the repo):** `src/world/camera.ts`, `src/world/layouts/server.ts`, `src/world/lanefield.ts`, `spec/astryx/DESIGN.md` (section 12 token block, section 6.13 GLITTERBOX — not used here)
 - **What it offers:** One WebGL canvas, 6,144 lanes, one draw call. Lanes have x/y/z positions; the camera has a position, target, and field of view. The coarse server camera (DESIGN 1.4.0): pos [-3.5, 5.0, 12.0], target [0.3, 0.0, -3.0], fovDeg 52, shiftNdc [0.0, -0.3], pitch -17.91. Morphs between 3D scene layouts (server, leaflink, sidequests, scatter). Travel 700ms, wordCadence 1600ms.
@@ -1657,6 +1648,23 @@ LCP 2000ms, TTI 3000, TBT 150, CLS 0.02, appShellJsGz 110 KB (at last measuremen
 Astryx is Meta's design system and tooling, the baseline the site is built on. Never call the site, the portfolio, or the mark "Astryx". The mark is Justin Poli's portfolio reasoning mark, built with the Astryx design system.
 </file>
 
+<file path="guestbook/launch-prompt.md">
+# Guestbook signup sheet — launch prompt for browser Claude
+
+Paste this into browser Claude (claude.ai), alongside the attached `guestbook/repomix.xml`. Use this instead of the full `prompt.md` when you want the shortest path. The full brief is in `guestbook/prompt.md` (inside the repomix.xml); this launcher tells Claude to read it.
+
+---
+
+You are building the guestbook signup sheet for Justin Poli's portfolio site. You are in browser Claude (claude.ai). You do NOT have local file access and you do NOT have a repo checkout.
+
+Your sources, in order:
+1. The attached `guestbook/repomix.xml` (the whole context in one XML file, 22 files, ~57,000 tokens). Read every repo file from it by its `<file path="...">` attribute.
+2. The public GitHub repo, for the latest files if the attached pack is stale: https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`. Browse it on the web. It is public.
+3. The web, for design references and the live site: Mobbin https://mobbin.com (free tier, browse it directly, do NOT use the Mobbin product MCP, it is gated off), Refero Styles https://styles.refero.design/ (2,000+ real design systems as DESIGN.md files; browse it directly, search by brand/mood/URL, open a style page and copy the DESIGN.md from the page; do NOT use the Refero MCP), the reference sites https://lusion.co, https://bruno-simon.com, https://oklou.com, and the live site https://justinpoli.is-a.dev.
+
+Read `guestbook/prompt.md` inside the repomix.xml (it is the build brief) and `guestbook/README.md` (the file map). Then design and build the sheet, following the brief exactly. One verb: build it. Creative direction: entropic and 3D (fresh entropy seed per sign, unique every time; camera dolly, depth, lanes in 3D). GLITTERBOX is NOT used here. Do not add scope beyond the brief. If the brief is missing a load-bearing decision, stop and name it instead of inventing it.
+</file>
+
 <file path="guestbook/prompt.md">
 # Guestbook signup sheet prompt for Claude
 
@@ -1711,7 +1719,7 @@ Step 2 — read the motion references. They are inside the attached repomix.xml 
 - Oklou 3D boot (`guestbook/assets/motion-notes/oklou-motion-notes.md` in the repomix.xml): radio tuning into a 3D space. A giant radio tuner in 3D, auto-sweep (frequency digits roll on their own), camera push-in (dollies toward the display), lock-in (display resolves to "FM OK.00" then "AM OKLOU" — noise becomes identity), pull-back reveal (camera pulls to wide). Steal the camera choreography: push-in, lock-in payoff, pull-back. The long cinematic motion lives in the 3D intro, not the DOM. You can also browse https://oklou.com.
 - Bruno Simon 3D (`guestbook/assets/motion-notes/bruno-simon-immersion.md` in the repomix.xml): vehicle as interface, toy car + physics, projects as physical monuments in a 3D world, camera above-and-behind follow cam, discovery by driving. Perf discipline: matcaps (baked lighting) instead of real-time lights, modest object count. Steal the idea that the visitor discovers by moving through 3D space, and the perf discipline. You can also browse https://bruno-simon.com.
 - Utazon and Cleanlystudio (`guestbook/assets/motion-notes/utazon-motion-notes.md`, `guestbook/assets/motion-notes/cleanlystudio-motion-notes.md` in the repomix.xml): the Material-standard ease convergence and the reversible scroll reveal pattern.
-Step 3 — design from those references only. Do not invent an aesthetic from scratch. If the free tier returns no match, fall back to the design-extract outputs already in the repomix.xml (the Lusion brief, the motion notes) and mark the design as ungrounded. You can also browse the live portfolio site https://justinpoli.is-a.dev to see the field and the morphs you are building on.
+Step 3 — design from those references only. Do not invent an aesthetic from scratch. If the Mobbin free tier returns no match, fall back to the design-extract outputs already in the repomix.xml (the Lusion brief, the motion notes) and to Refero Styles, and mark the design as ungrounded. Refero Styles is at https://styles.refero.design/ — a library of 2,000+ design systems extracted from real product websites, each packaged as a DESIGN.md file (colors, typography, spacing, components, dos/don'ts) plus Tailwind CSS, plain CSS variables, and tokens.json. Browse it on the web (you are in browser Claude, so browse it directly): search by brand name, mood, color, typography, or URL, open a style page at https://styles.refero.design/style/<id>, and copy the DESIGN.md from the `<pre><code>` block on the page. Refero gives a system's DESIGN.md tokens; Mobbin gives pattern, flow, and section references. They complement each other. Note: the guestbook already HAS its own design system (the Astryx tokens in `spec/astryx/DESIGN.md`, inside the repomix.xml). Refero is a reference for how a real system's DESIGN.md is structured, and a source of token-system ideas. It does NOT replace the site's own tokens. Do not use the Refero MCP (refero.design/mcp); the web path above is the viable one for browser Claude. The site's JSON API returns 403 to non-browser clients, but you are a browser, so the web pages work. You can also browse the live portfolio site https://justinpoli.is-a.dev to see the field and the morphs you are building on.
 </design-reference>
 
 <examples>
@@ -1765,7 +1773,7 @@ Creative direction (revised 2026-11-09): entropic and 3D. GLITTERBOX is axed fro
 This work is built for **browser Claude (claude.ai)**. Browser Claude has no local file access and no repo checkout. Its access paths are:
 1. **Attach `guestbook/repomix.xml`** — the whole context in one XML file (22 files, ~57,000 tokens). Every repo file is inside it under a `<file path="...">` attribute. This is the primary source.
 2. **Paste `guestbook/prompt.md`** — the build brief. It has an `<access>` section that tells Claude exactly where its sources are.
-3. **Browse the web** — Mobbin (https://mobbin.com, free tier), the reference sites (https://lusion.co, https://bruno-simon.com, https://oklou.com), the live site (https://justinpoli.is-a.dev), and the public GitHub repo (https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`, public).
+3. **Browse the web** — Mobbin (https://mobbin.com, free tier, for screens/flows), Refero Styles (https://styles.refero.design/, 2,000+ real design systems as DESIGN.md files, for token-system references), the reference sites (https://lusion.co, https://bruno-simon.com, https://oklou.com), the live site (https://justinpoli.is-a.dev), and the public GitHub repo (https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`, public).
 4. **Launch prompt** — if you want the shortest path, paste the one-paragraph launch prompt in `guestbook/launch-prompt.md` instead of the full `prompt.md`. It tells Claude to read the repo files and the brief. Use the full `prompt.md` when you want the complete brief pasted in.
 
 ## Status

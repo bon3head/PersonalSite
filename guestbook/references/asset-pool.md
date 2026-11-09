@@ -38,7 +38,15 @@ A deep pool of assets for the guestbook build. Each entry names what it offers, 
 - **What it offers:** Astryx (Meta's MIT design system, CLI-first) as the design substrate. Load-bearing decisions: Astryx is the FLOOR, design-extract is the CEILING (extract-first ordering; Astryx never replaces reference extraction). Raw templates are banned as shipped output. Substrate-invisibility is an explicit rule (default accent, default neutral theme, and default radius/easing ladder may not ship unmodified). Version pinning is mandatory (CLI beta 0.7.1 verified 2026-10-18).
 - **How to transform it:** Use Astryx tokens/components for discipline (the token system, the component structure), but the style brief (Lusion, oklou, bruno-simon) gives the taste. Do not ship the default Astryx accent, theme, or radius/easing ladder unmodified.
 
-## 6. The site's own 3D field (the material)
+## 7. Refero Styles (design-system reference surface)
+
+**What it is:** https://styles.refero.design/ — a library of 2,000+ design systems extracted from real product websites, each packaged as a DESIGN.md file (colors, typography, spacing, components, dos/don'ts) plus Tailwind v4 CSS, plain CSS variables, and tokens.json. Search by brand name, mood, color, typography, or URL. Each style page is at https://styles.refero.design/style/<id> and the DESIGN.md is in a `<pre><code>` block on the page.
+
+**How to use it:** Browse it on the web (browser Claude). Search for a comparable system's DESIGN.md when you want a reference for how a real token system is structured. Refero gives a system's DESIGN.md tokens; Mobbin gives pattern, flow, and section references. They complement each other. The guestbook already HAS its own design system (the Astryx tokens in `spec/astryx/DESIGN.md`, in the repomix.xml). Refero is a reference and a source of token-system ideas. It does NOT replace the site's own tokens.
+
+**Access:** Web browsing only. Do NOT use the Refero MCP (refero.design/mcp); the web path is the viable one for browser Claude. The site's JSON API returns 403 to non-browser clients, but a browser can read the pages. No account or spend needed for browsing.
+
+## 8. The site's own 3D field (the material)
 
 - **Files (in the repo):** `src/world/camera.ts`, `src/world/layouts/server.ts`, `src/world/lanefield.ts`, `spec/astryx/DESIGN.md` (section 12 token block, section 6.13 GLITTERBOX — not used here)
 - **What it offers:** One WebGL canvas, 6,144 lanes, one draw call. Lanes have x/y/z positions; the camera has a position, target, and field of view. The coarse server camera (DESIGN 1.4.0): pos [-3.5, 5.0, 12.0], target [0.3, 0.0, -3.0], fovDeg 52, shiftNdc [0.0, -0.3], pitch -17.91. Morphs between 3D scene layouts (server, leaflink, sidequests, scatter). Travel 700ms, wordCadence 1600ms.
