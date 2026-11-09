@@ -99,10 +99,16 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
     setLedger(readSignatures());
     document.documentElement.setAttribute('data-gb', 'open');
     director.open();
-    const raf = requestAnimationFrame(() => setShown(true));
-    return () => cancelAnimationFrame(raf);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isOpen, field]);
+
+  // One frame after mount the panel moves from depth to 0.
+  useEffect(() => {
+    if (!mounted || !isOpen) return;
+    const raf = requestAnimationFrame(() => setShown(true));
+    return () => cancelAnimationFrame(raf);
+  }, [mounted, isOpen]);
 
   // The panel is visibility hidden until shown; focus the prompt then.
   useEffect(() => {
