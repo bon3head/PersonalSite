@@ -79,23 +79,6 @@ package.json
 <files>
 This section contains the contents of the repository's files.
 
-<file path="guestbook/launch-prompt.md">
-# Guestbook signup sheet — launch prompt for browser Claude
-
-Paste this into browser Claude (claude.ai), alongside the attached `guestbook/repomix.xml`. Use this instead of the full `prompt.md` when you want the shortest path. The full brief is in `guestbook/prompt.md` (inside the repomix.xml); this launcher tells Claude to read it.
-
----
-
-You are building the guestbook signup sheet for Justin Poli's portfolio site. You are in browser Claude (claude.ai). You do NOT have local file access and you do NOT have a repo checkout.
-
-Your sources, in order:
-1. The attached `guestbook/repomix.xml` (the whole context in one XML file, 22 files, ~57,000 tokens). Read every repo file from it by its `<file path="...">` attribute.
-2. The public GitHub repo, for the latest files if the attached pack is stale: https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`. Browse it on the web. It is public.
-3. The web, for design references and the live site: Mobbin https://mobbin.com (free tier, browse it directly, do NOT use the Mobbin product MCP, it is gated off), the reference sites https://lusion.co, https://bruno-simon.com, https://oklou.com, and the live site https://justinpoli.is-a.dev.
-
-Read `guestbook/prompt.md` inside the repomix.xml (it is the build brief) and `guestbook/README.md` (the file map). Then design and build the sheet, following the brief exactly. One verb: build it. Creative direction: entropic and 3D (fresh entropy seed per sign, unique every time; camera dolly, depth, lanes in 3D). GLITTERBOX is NOT used here. Do not add scope beyond the brief. If the brief is missing a load-bearing decision, stop and name it instead of inventing it.
-</file>
-
 <file path="src/world/layouts/server.ts">
 // Server layout generator (S05 layout chapter). Runs in the worker.
 // Pure function: no DOM, no three imports. Writes every lane of the field
@@ -1387,6 +1370,13 @@ A deep pool of assets for the guestbook build. Each entry names what it offers, 
 - **What it offers:** One WebGL canvas, 6,144 lanes, one draw call. Lanes have x/y/z positions; the camera has a position, target, and field of view. The coarse server camera (DESIGN 1.4.0): pos [-3.5, 5.0, 12.0], target [0.3, 0.0, -3.0], fovDeg 52, shiftNdc [0.0, -0.3], pitch -17.91. Morphs between 3D scene layouts (server, leaflink, sidequests, scatter). Travel 700ms, wordCadence 1600ms.
 - **How to transform it:** The guestbook uses this camera and this field. No second WebGL context, no second renderer. The sheet opens as a camera move (dolly in), the lanes part in 3D (z-translation with a seeded random depth offset), the signature is a 3D mark at a depth in the field. The entropy seed drives the depth offsets and the camera drift.
 
+## 7. Inspo (the design-reference surface)
+
+- **Source:** https://inspomcp.dev (gallery), https://github.com/Nutlope/inspo (repo, MIT). Vetted 2026-11-09.
+- **What it offers:** An open-source design-reference archive that replaces both Mobbin and Refero for this work. 832 real production sites, 2,320 captured pages (desktop and mobile), each with traced palettes, real fonts, detected tech stack, and a per-site DESIGN.md (semantic palette roles, type ramp, spacing scale, CSS variables, container width). 68 canonical reference components with copy-pasteable JSX. Semantic search via Together AI embeddings. Free, no account, no paywall, MIT licensed. It gives the screens/flows Mobbin gave and the per-site DESIGN.md tokens Refero gave, in one place.
+- **How to use it:** Browse the gallery at https://inspomcp.dev on the web (browser Claude). Search/filter by component type, layout pattern, or visual style; open a site to see its captures and design notes. Use it for the design-reference step (guestbook/signup/"leave a mark" flows, onboarding flows) before designing. Record the product name and Inspo URL for each important reference. Do NOT use the Inspo MCP server (https://inspomcp.dev/api/mcp); browser Claude cannot connect MCP servers, so the web gallery is the path. Do not use Mobbin (free tier is only the 4 latest apps, Justin does not spend on it) or Refero (paid, proprietary).
+- **Limits (verified):** The archive is a snapshot, not continuously updated; sites that redesign after capture show outdated screens until refreshed. Mobile shots still need a retina-scale re-shoot. Component crops are not yet complete for every entry. The guestbook already HAS its own design system (the Astryx tokens in `spec/astryx/DESIGN.md`, in the repomix.xml); Inspo is a reference for real flows and token systems, not a replacement for the site's own tokens.
+
 ## What is NOT in this pool (axed)
 
 - **GLITTERBOX.** Axed 2026-11-09 by Justin's direction. The GLITTERBOX views (ascii, automata, bio, chaos, fractal, glitter, moire) and the 31 palettes are not in this pool and are not to be used for the guestbook. GLITTERBOX is a separate mode of the site (press-and-hold to scatter, DESIGN 6.13); it does not belong in the guestbook. The guestbook is entropic and 3D, not glitter.
@@ -1557,16 +1547,18 @@ The prompt in `guestbook/prompt.md` follows this template. Rules that apply to e
 - Review prompts must ask whether the output stayed inside the brief's boundary, not only whether it is good.
 - No prompt routes review to the model that generated the artifact, and no review prompt lets the reviewer grade its own output without an independent reference.
 
-## Mobbin design-reference step (before any UI generation)
+## Inspo design-reference step (before any UI generation)
 
-From auto-fire-rules.md. Before generating any UI, use Mobbin free-tier browsing for real reference screens/flows (the design-extract pipeline's reference step, with Mobbin as a curated, searchable source).
+For this work, Inspo replaces the framework's Mobbin/Refero step (Justin's explicit direction, 2026-11-09, after vetting Inspo against both). Before generating any UI, use Inspo web-gallery browsing for real reference screens/flows (the design-extract pipeline's reference step, with Inspo as a curated, searchable source).
 
-- **ACCESS DECISION FINAL:** The product MCP at https://api.mobbin.com/mcp is gated off and NEVER fires for this user. Account confirmed Free (signed in as justinf0829@gmail.com, 2026-11-09), MCP not included, Justin does not spend on Mobbin, Pro purchase path closed including Student Pro.
-- **Free avenues only:** Free-tier browsing as design-extract targets (the 4 latest apps and public pages on mobbin.com), and the docs MCP at docs.mobbin.com/mcp for documentation search only.
-- **Depth gate:** Mobbin is used only for a named screen, flow, or section in the spec AND Justin has Mobbin access; otherwise fall back to Refero and design-extract. The access condition is UNMET. The fallback is the live path, not a fallback: Refero + design-extract carry design reference. Mobbin free-tier browsing is a supplementary reference source alongside them, not a replacement.
-- **Workflow:** Identify the platform, product category, user goal, and design question; browse free-tier screens/flows/sections; review several relevant products rather than relying on one example; preserve the product name and Mobbin URL for each important reference; separate visible observations from interpretation and recommendations; adapt findings to the user's brand, audience, design system, accessibility needs, and product constraints.
-- **Evidence limits (Mobbin's own):** A Mobbin example shows a product used a design; it does not prove the design improved conversion or another metric. A recurring pattern is a convention, not automatically a best practice. Do not copy protected designs, branding, text, or assets verbatim. Evaluate accessibility independently.
-- **Routing:** Design-reference lookup is routing-table row 9 (retrieval, not reasoning, `low` effort + Mobbin free-tier browsing, never the best model at high effort).
+- **What Inspo is:** https://inspomcp.dev — an open-source design-reference archive (MIT, free, no account, no paywall). 832 real production sites, 2,320 captured pages (desktop and mobile), each with traced palettes, real fonts, detected tech stack, and a per-site DESIGN.md (semantic palette roles, type ramp, spacing scale, CSS variables, container width). 68 canonical reference components with copy-pasteable JSX. Semantic search via Together AI embeddings. Repo: https://github.com/Nutlope/inspo. Vetted 2026-11-09: the gallery is live and browsable on the web; the hosted MCP endpoint (https://inspomcp.dev/api/mcp, free, no auth) is confirmed live but is NOT usable by browser Claude, which cannot connect MCP servers.
+- **Why it replaces both:** Inspo gives the screens/flows Mobbin gave (2,320 captured pages, searchable by component type, layout pattern, visual style) and the per-site DESIGN.md tokens Refero gave, in one place, free. Mobbin's free tier is only the 4 latest apps and Justin does not spend on Mobbin; Refero is paid and proprietary. Inspo is MIT and free, so both constraints disappear.
+- **Access path (browser Claude):** Browse the gallery at https://inspomcp.dev directly on the web. Search/filter by component type, layout pattern, or visual style; open a site to see its captures and design notes. Do NOT use the Inspo MCP server (browser Claude cannot connect MCP servers). Do NOT use Mobbin or Refero for this work.
+- **Supersedes:** The framework's standing Mobbin/Refero decision (routing-table row 9, auto-fire-rules.md: product MCP gated off, Free-tier browsing, Refero + design-extract as the live path) is superseded for this guestbook work only, by Justin's explicit direction. The framework files themselves (~/workspace/model-routing/framework/) still record the Mobbin/Refero decision; updating them is a separate program-level decision.
+- **Trade-offs (verified from the source):** The archive is a snapshot, not continuously updated; sites that redesign after capture show outdated screens until refreshed. Mobile shots still need a retina-scale re-shoot. Component crops are not yet complete for every entry. The hosted endpoint logs tool-call metadata (tool name, success, duration) but not query text or IPs.
+- **Workflow:** Identify the platform, product category, user goal, and design question; browse Inspo screens/flows; review several relevant products rather than relying on one example; preserve the product name and Inspo URL for each important reference; separate visible observations from interpretation and recommendations; adapt findings to the user's brand, audience, design system, accessibility needs, and product constraints.
+- **Evidence limits (same as Mobbin's own):** An Inspo example shows a product used a design; it does not prove the design improved conversion or another metric. A recurring pattern is a convention, not automatically a best practice. Do not copy protected designs, branding, text, or assets verbatim. Evaluate accessibility independently.
+- **Routing:** Design-reference lookup is routing-table row 9 (retrieval, not reasoning, `low` effort + Inspo web-gallery browsing, never the best model at high effort).
 
 ## Review (after generation)
 
@@ -1657,6 +1649,23 @@ LCP 2000ms, TTI 3000, TBT 150, CLS 0.02, appShellJsGz 110 KB (at last measuremen
 Astryx is Meta's design system and tooling, the baseline the site is built on. Never call the site, the portfolio, or the mark "Astryx". The mark is Justin Poli's portfolio reasoning mark, built with the Astryx design system.
 </file>
 
+<file path="guestbook/launch-prompt.md">
+# Guestbook signup sheet — launch prompt for browser Claude
+
+Paste this into browser Claude (claude.ai), alongside the attached `guestbook/repomix.xml`. Use this instead of the full `prompt.md` when you want the shortest path. The full brief is in `guestbook/prompt.md` (inside the repomix.xml); this launcher tells Claude to read it.
+
+---
+
+You are building the guestbook signup sheet for Justin Poli's portfolio site. You are in browser Claude (claude.ai). You do NOT have local file access and you do NOT have a repo checkout.
+
+Your sources, in order:
+1. The attached `guestbook/repomix.xml` (the whole context in one XML file, 22 files, ~57,000 tokens). Read every repo file from it by its `<file path="...">` attribute.
+2. The public GitHub repo, for the latest files if the attached pack is stale: https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`. Browse it on the web. It is public.
+3. The web, for design references and the live site: Inspo https://inspomcp.dev (open-source design-reference archive: 832 production sites, 2,320 captured pages, per-site DESIGN.md; free, no account; browse the gallery directly; do NOT use the Inspo MCP server, browser Claude cannot connect MCP servers; Inspo replaces both Mobbin and Refero here), the reference sites https://lusion.co, https://bruno-simon.com, https://oklou.com, and the live site https://justinpoli.is-a.dev.
+
+Read `guestbook/prompt.md` inside the repomix.xml (it is the build brief) and `guestbook/README.md` (the file map). Then design and build the sheet, following the brief exactly. One verb: build it. Creative direction: entropic and 3D (fresh entropy seed per sign, unique every time; camera dolly, depth, lanes in 3D). GLITTERBOX is NOT used here. Do not add scope beyond the brief. If the brief is missing a load-bearing decision, stop and name it instead of inventing it.
+</file>
+
 <file path="guestbook/prompt.md">
 # Guestbook signup sheet prompt for Claude
 
@@ -1705,13 +1714,13 @@ The site it lives in:
 </context>
 
 <design-reference>
-Step 1 — browse Mobbin free pages on the web BEFORE designing anything. You are in browser Claude, so browse https://mobbin.com directly. Do NOT use the Mobbin product MCP: it is gated off for this user (account confirmed Free, MCP not included). Free tier: the 4 latest apps and public pages on mobbin.com. Browse for guestbook / signup / "leave a mark" flows and onboarding flows from several relevant products, not one example. Record references: product name + Mobbin URL for each important reference. Separate visible observations from interpretation.
+Step 1 — browse Inspo on the web BEFORE designing anything. You are in browser Claude, so browse https://inspomcp.dev directly. Inspo is an open-source design-reference archive (MIT, free, no account, no paywall): 832 real production sites, 2,320 captured pages (desktop and mobile), each with traced palettes, real fonts, detected tech stack, and a per-site DESIGN.md (semantic palette roles, type ramp, spacing scale, CSS variables, container width). It replaces both Mobbin and Refero for this work: it gives the screens/flows Mobbin gave and the per-site DESIGN.md tokens Refero gave, in one place, free. Browse the gallery at https://inspomcp.dev, search/filter by component type, layout pattern, or visual style, and open sites to see their captures and design notes. Browse for guestbook / signup / "leave a mark" flows and onboarding flows from several relevant products, not one example. Record references: product name + Inspo URL for each important reference. Separate visible observations from interpretation. Do NOT use the Inspo MCP server (https://inspomcp.dev/api/mcp): browser Claude cannot connect MCP servers; the web gallery is the viable path. Do not use Mobbin (its free tier is only the 4 latest apps and Justin does not spend on it) or Refero (paid, proprietary; Inspo is its open-source replacement).
 Step 2 — read the motion references. They are inside the attached repomix.xml (read them by their `<file path="...">` attribute), and they are also on the public GitHub repo at https://github.com/bon3head/PersonalSite (branch `astryx-polish-r2`, under `guestbook/`):
 - Lusion (`guestbook/references/lusion-style-brief.md`, `guestbook/assets/lusion-p0-motion-tokens.json`, `guestbook/assets/lusion-p0-motion.css` in the repomix.xml): two-easing system (`cubic-bezier(0.35, 0, 0, 1)` dominant, `cubic-bezier(0.4, 0, 0.1, 1)` soft), 400ms default duration, transform dominates, long moves slow and staggered (menu-open 5000ms, parallax 3000ms linear with 150ms stagger over 5 items), pill CTAs (88px radius, dot + arrow that slides on hover). Steal the motion system, not the hexes or the hero. You can also browse the live source site https://lusion.co to see the motion in action.
 - Oklou 3D boot (`guestbook/assets/motion-notes/oklou-motion-notes.md` in the repomix.xml): radio tuning into a 3D space. A giant radio tuner in 3D, auto-sweep (frequency digits roll on their own), camera push-in (dollies toward the display), lock-in (display resolves to "FM OK.00" then "AM OKLOU" — noise becomes identity), pull-back reveal (camera pulls to wide). Steal the camera choreography: push-in, lock-in payoff, pull-back. The long cinematic motion lives in the 3D intro, not the DOM. You can also browse https://oklou.com.
 - Bruno Simon 3D (`guestbook/assets/motion-notes/bruno-simon-immersion.md` in the repomix.xml): vehicle as interface, toy car + physics, projects as physical monuments in a 3D world, camera above-and-behind follow cam, discovery by driving. Perf discipline: matcaps (baked lighting) instead of real-time lights, modest object count. Steal the idea that the visitor discovers by moving through 3D space, and the perf discipline. You can also browse https://bruno-simon.com.
 - Utazon and Cleanlystudio (`guestbook/assets/motion-notes/utazon-motion-notes.md`, `guestbook/assets/motion-notes/cleanlystudio-motion-notes.md` in the repomix.xml): the Material-standard ease convergence and the reversible scroll reveal pattern.
-Step 3 — design from those references only. Do not invent an aesthetic from scratch. If the free tier returns no match, fall back to the design-extract outputs already in the repomix.xml (the Lusion brief, the motion notes) and mark the design as ungrounded. You can also browse the live portfolio site https://justinpoli.is-a.dev to see the field and the morphs you are building on.
+Step 3 — design from those references only. Do not invent an aesthetic from scratch. If Inspo returns no match, fall back to the design-extract outputs already in the repomix.xml (the Lusion brief, the motion notes) and mark the design as ungrounded. You can also browse the live portfolio site https://justinpoli.is-a.dev to see the field and the morphs you are building on.
 </design-reference>
 
 <examples>
@@ -1765,7 +1774,7 @@ Creative direction (revised 2026-11-09): entropic and 3D. GLITTERBOX is axed fro
 This work is built for **browser Claude (claude.ai)**. Browser Claude has no local file access and no repo checkout. Its access paths are:
 1. **Attach `guestbook/repomix.xml`** — the whole context in one XML file (22 files, ~57,000 tokens). Every repo file is inside it under a `<file path="...">` attribute. This is the primary source.
 2. **Paste `guestbook/prompt.md`** — the build brief. It has an `<access>` section that tells Claude exactly where its sources are.
-3. **Browse the web** — Mobbin (https://mobbin.com, free tier), the reference sites (https://lusion.co, https://bruno-simon.com, https://oklou.com), the live site (https://justinpoli.is-a.dev), and the public GitHub repo (https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`, public).
+3. **Browse the web** — Inspo (https://inspomcp.dev, open-source design-reference archive: 832 production sites, 2,320 captured pages, per-site DESIGN.md; free, no account; replaces both Mobbin and Refero), the reference sites (https://lusion.co, https://bruno-simon.com, https://oklou.com), the live site (https://justinpoli.is-a.dev), and the public GitHub repo (https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`, public).
 4. **Launch prompt** — if you want the shortest path, paste the one-paragraph launch prompt in `guestbook/launch-prompt.md` instead of the full `prompt.md`. It tells Claude to read the repo files and the brief. Use the full `prompt.md` when you want the complete brief pasted in.
 
 ## Status
@@ -1781,7 +1790,7 @@ Prompt written 2026-11-09, revised same day (GLITTERBOX axed, entropic + 3D). No
 | `repomix.xml` | The whole context packed for Claude in one XML file (repomix 1.18.1). Attach it to browser Claude alongside `prompt.md` or `launch-prompt.md`. 22 files, ~57,000 tokens. Regenerate with the command in the repomix section below after any file change. |
 | `references/asset-pool.md` | The deep pool of assets Claude can pull from and transform, with each entry's source, what it offers, and how to transform it. GLITTERBOX is explicitly NOT in this pool. |
 | `references/lusion-style-brief.md` | Lusion design extract, run 2026-11-09 with the design-extract 12-stage fusion pipeline (`--motion-runtime` on). The motion system to steal. Source: lusion.co, lusion.co/projects/everswap, lusion.co/projects/spatial_fusion. |
-| `references/routing.md` | The model-routing framework that governs this work: greenfield generation (row 5), Claude Opus 5.5 `high`, the Claude greenfield prompt template, the Mobbin design-reference step (free-tier browsing, product MCP gated off), and the auto-fire rules. |
+| `references/routing.md` | The model-routing framework that governs this work: greenfield generation (row 5), Claude Opus 5.5 `high`, the Claude greenfield prompt template, the Inspo design-reference step (web gallery browsing, replaces Mobbin and Refero), and the auto-fire rules. |
 | `references/site-context.md` | The site the sheet lives in: Astryx design system, DESIGN.md, the 6,144-lane WebGL field, morphs, page transitions, budgets, brand rules. Every claim quoted from DESIGN.md or the code. |
 | `references/astryx-design-spec.md` | The Astryx design skill SPEC (Astryx is the FLOOR, design-extract is the CEILING). |
 | `assets/lusion-p0-motion-tokens.json` | Lusion motion tokens (durations, easings, choreography). |
@@ -1809,7 +1818,7 @@ Note: repomix packs the files as they are on disk when it runs, so regenerate af
 This work follows the model-routing framework in `~/workspace/model-routing/framework/` (routing-table.md, prompt-library.md, auto-fire-rules.md), built from the research program 2026-11-09. The rules that matter here:
 
 1. **Routing.** This is greenfield generation (routing-table row 5): new code and new designs from a brief. Claude Opus 5.5 `high`. The prompt uses the Claude greenfield template: multishot examples + XML structure + self-correction chaining + named banned patterns.
-2. **Design-reference step first.** Before generating any UI, browse Mobbin free-tier pages for real guestbook/signup flows (auto-fire-rules.md). The product MCP at api.mobbin.com/mcp is gated off and never fires (account confirmed Free, Justin does not spend on Mobbin). Free tier: the 4 latest apps and public pages. If the free tier returns no match, fall back to Refero/design-extract and mark the design as ungrounded.
+2. **Design-reference step first.** Before generating any UI, browse Inspo (https://inspomcp.dev) for real guestbook/signup flows. Inspo replaces both Mobbin and Refero here: it gives the screens/flows Mobbin gave and the per-site DESIGN.md tokens Refero gave, in one free open-source archive (832 sites, 2,320 pages, no account, no paywall). Do not use Mobbin (free tier is only the 4 latest apps, Justin does not spend on it) or Refero (paid, proprietary). Do not use the Inspo MCP server; browser Claude cannot connect MCP servers, so the web gallery is the path. If Inspo returns no match, fall back to the design-extract outputs already in the repomix.xml and mark the design as ungrounded.
 3. **Design-extract grounding.** The Lusion extract (`references/lusion-style-brief.md`) is the motion reference. Steal the motion system (two beziers, 400ms default, transform-dominant, staggered long moves), not the hexes or the hero. The oklou 3D boot is the camera choreography reference (push-in, lock-in, pull-back). Bruno Simon is the discovery-by-moving-through-3D-space reference.
 4. **One verb per prompt.** The prompt asks Claude to do one thing: design and build the guestbook signup sheet. Review is a separate prompt, a separate call, on a different model family.
 5. **Boundary and stop condition.** The prompt carries an explicit boundary (no FUN tab, no new route, no new nav item, no backend, no GLITTERBOX, no change to existing copy or scenes) and a stop condition (one design + one build + one refine cycle; a second refine only on a failed external check).
