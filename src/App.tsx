@@ -74,6 +74,7 @@ import Readout from './chrome/Readout';
 // is instant; Suspense fallback null matches a closed sheet.
 const WhoamiSheet = lazy(() => import('./chrome/WhoamiSheet'));
 const ContactSheet = lazy(() => import('./chrome/ContactSheet'));
+const GuestbookSheet = lazy(() => import('./chrome/GuestbookSheet'));
 import { entropySeed } from './motion/entropy';
 
 // Polish item 5: read ?seed before the router's first pushState drops
@@ -122,6 +123,15 @@ export default function App(props: AppProps): JSX.Element {
   // is behavior-identical; the server and the hydration pass both
   // render no sheet content.
   const [mounted, setMounted] = useState(false);
+  // The guestbook chunk loads on first request only (it shares the
+  // engine chunk), and stays mounted after that so its close can move.
+  const [gbRequested, setGbRequested] = useState(initialSheet === 'guestbook');
+  useEffect(() => {
+    if (sheet === 'guestbook') setGbRequested(true);
+    // Warm the guestbook chunk while Contact (its one entry) is open,
+    // so Leave a mark opens without a load gap.
+    if (sheet === 'contact') void import('./chrome/GuestbookSheet');
+  }, [sheet]);
   const [mode, setMode] = useState<'dark' | 'light'>(
     () => REGIME_COLOR_SCHEME[SCENE_REGIME[initialScene]],
   );
@@ -414,6 +424,17 @@ export default function App(props: AppProps): JSX.Element {
               onOpenChange={(open) => {
                 if (!open) routerRef.current?.setSheet(null);
               }}
+              finalFocusRef={contactButtonRef}
+              onLeaveMark={() => routerRef.current?.setSheet('guestbook')}
+            />
+          </Suspense>
+        )}
+        {mounted && gbRequested && (
+          <Suspense fallback={null}>
+            <GuestbookSheet
+              isOpen={sheet === 'guestbook'}
+              onRequestClose={() => routerRef.current?.setSheet(null)}
+              field={wired?.field ?? null}
               finalFocusRef={contactButtonRef}
             />
           </Suspense>

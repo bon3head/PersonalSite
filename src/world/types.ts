@@ -64,6 +64,53 @@ export interface CameraFocus {
   screenPx: [number, number];
 }
 
+// Guestbook part (DESIGN, guestbook section): lanes inside radius move outward by
+// push and to a per-lane seeded height up to depth, per depth band.
+export interface GuestbookPart {
+  center: [number, number];
+  radius: number;
+  push: number;
+  depth: number;
+  seedUnit: number;
+  bands: [number, number, number];
+}
+
+// The resting camera frame the guestbook measures against.
+export interface GuestbookFrame {
+  pos: [number, number, number];
+  target: [number, number, number];
+  distance: number;
+  forward: [number, number];
+  right: [number, number];
+}
+
+// Guestbook camera layer: dolly is the fraction of the camera to well
+// distance travelled toward the well (negative pulls back), yawRad
+// turns about the vertical through the well, rise lifts by a fraction
+// of that distance.
+export interface GuestbookCamera {
+  center: [number, number, number];
+  dolly: number;
+  yawRad: number;
+  rise: number;
+  // Principal-point shift blend: 0 keeps the scene shift, 1 uses shift.
+  shiftMix: number;
+  shift: [number, number];
+}
+
+export interface GuestbookHooks {
+  setCamera(c: GuestbookCamera | null): void;
+  setPart(p: GuestbookPart | null): void;
+  // offsets holds xyz per lane, in lane order. Lanes written before and
+  // missing now return to zero.
+  writeLanes(lanes: readonly number[], offsets: Float32Array): void;
+  laneTip(lane: number, out: [number, number, number]): [number, number, number];
+  nearestLane(x: number, z: number, exclude: ReadonlySet<number>): number;
+  restFrame(): GuestbookFrame;
+  render(): void;
+  reduced(): boolean;
+}
+
 export interface Lanefield {
   ready: Promise<void>;
   travelTo(
@@ -109,6 +156,7 @@ export interface Lanefield {
   // GLITTERBOX hold: blend toward the scatter layout around a screen
   // point while held; release re-forms the scene.
   setGlitter(on: boolean, centerPx?: [number, number]): void;
+  guestbook: GuestbookHooks;
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   dispose(): void;

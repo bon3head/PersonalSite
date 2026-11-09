@@ -23,6 +23,14 @@ uniform sampler2D uSilhouetteMask; // logo alpha mask, small square texture // l
 uniform vec2 uSilhouetteCenter;    // pull center, world XZ, tracks the ring // lit-ok: shader constant
 uniform float uSilhouetteRadius;   // pull radius, world units, tracks the ring // lit-ok: shader constant
 uniform float uSilhouetteStrength; // pull peak displacement, world units // lit-ok: shader constant
+uniform sampler2D uGbOffsets; // guestbook letter lane offsets, one texel per lane // lit-ok: shader constant
+uniform float uGbBend;        // bend power along the lane // lit-ok: shader constant
+uniform vec2 uGbCenter;       // part center, world XZ // lit-ok: shader constant
+uniform float uGbRadius;      // part radius, world units, 0 is off // lit-ok: shader constant
+uniform float uGbPush;        // part outward push, world units // lit-ok: shader constant
+uniform float uGbDepth;       // part seeded height range, world units // lit-ok: shader constant
+uniform float uGbSeed;        // open seed, scaled to a hash-safe range // lit-ok: shader constant
+uniform vec3 uGbPart;         // eased part progress per depth band // lit-ok: shader constant
 
 out float vSide;
 out float vHalf;
@@ -32,6 +40,7 @@ out float vBandSpeed;
 flat out int vLane;
 flat out int vKind;
 flat out vec4 vAct; // lit-ok: shader constant
+flat out float vGb; // lit-ok: shader constant
 
 vec4 pt(int lane, int lay, int k) {          // 'layout' is a GLSL keyword // lit-ok: shader constant
   int idx = lane * 32 + lay * 8 + k; // lit-ok: shader constant
@@ -82,6 +91,24 @@ vec2 pullXZ(vec2 p) { // lit-ok: shader constant
   return p + (grad / g) * mag; // lit-ok: shader constant
 }
 
+// Guestbook part (DESIGN, guestbook section): inside the radius a lane moves outward
+// and to a per-lane height drawn from the open seed, on the ring's
+// (1 - (d / r)^2)^2 falloff, so the part is zero at its edge. Each
+// depth band runs its own eased progress (the stagger).
+vec3 partP(vec3 p, float laneF, int band) { // lit-ok: shader constant
+  vec2 d = p.xz - uGbCenter; // lit-ok: shader constant
+  float dist = length(d); // lit-ok: shader constant
+  if (dist >= uGbRadius) return p; // lit-ok: shader constant
+  float x = dist / uGbRadius; // lit-ok: shader constant
+  float f = 1.0 - x * x; // lit-ok: shader constant
+  f *= f * uGbPart[band]; // lit-ok: shader constant
+  vec2 dir = dist > 0.0001 ? d / dist : vec2(1.0, 0.0); // lit-ok: shader constant
+  float r = hash11(laneF * 0.0173 + uGbSeed) * 2.0 - 1.0; // lit-ok: shader constant
+  p.xz += dir * (uGbPush * f); // lit-ok: shader constant
+  p.y += r * uGbDepth * f; // lit-ok: shader constant
+  return p;
+}
+
 void main() {
   int lane = int(aSeg.x + 0.5); // lit-ok: shader constant
   int k = int(aSeg.y + 0.5); // lit-ok: shader constant
@@ -108,12 +135,25 @@ void main() {
   float lenScale = 1.0 + (hash11(laneF * 0.013 + 7.0) - 0.5) * 2.0 * uLengthVariance; // lit-ok: shader constant
   p0 = start + (p0 - start) * lenScale; // lit-ok: shader constant
   p1 = start + (p1 - start) * lenScale; // lit-ok: shader constant
-  p0.xz = deflectXZ(p0.xz); // lit-ok: shader constant
-  p1.xz = deflectXZ(p1.xz); // lit-ok: shader constant
-  // Silhouette pull runs after the ring deflection, on the deflected
-  // point, so the bunching follows the opened ring shape.
-  p0.xz = pullXZ(p0.xz); // lit-ok: shader constant
-  p1.xz = pullXZ(p1.xz); // lit-ok: shader constant
+  vec4 gb = texelFetch(uGbOffsets, ivec2(lane & 255, lane >> 8), 0); // lit-ok: shader constant
+  vGb = gb.w; // lit-ok: shader constant
+  if (gb.w > 0.0) { // lit-ok: shader constant
+    // Guestbook letter lane: bends toward its glyph, root anchored.
+    // It skips the ring and the pull so the tip matches the glyph.
+    p0 += gb.xyz * pow(float(k) / 7.0, uGbBend); // lit-ok: shader constant
+    p1 += gb.xyz * pow(float(k + 1) / 7.0, uGbBend); // lit-ok: shader constant
+  } else {
+    p0.xz = deflectXZ(p0.xz); // lit-ok: shader constant
+    p1.xz = deflectXZ(p1.xz); // lit-ok: shader constant
+    // Silhouette pull runs after the ring deflection, on the deflected
+    // point, so the bunching follows the opened ring shape.
+    p0.xz = pullXZ(p0.xz); // lit-ok: shader constant
+    p1.xz = pullXZ(p1.xz); // lit-ok: shader constant
+    if (uGbRadius > 0.0) { // lit-ok: shader constant
+      p0 = partP(p0, laneF, band); // lit-ok: shader constant
+      p1 = partP(p1, laneF, band); // lit-ok: shader constant
+    }
+  }
 
   vec4 act = texelFetch(uActivity, ivec2(lane & 255, lane >> 8), 0); // lit-ok: shader constant
   int kind = int(act.b + 0.5); // lit-ok: shader constant

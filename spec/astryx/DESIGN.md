@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.4.0, 2026-11-05. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.5.0, 2026-11-09. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -276,6 +276,33 @@ One interaction grammar for both project pages (src/motion/stage.ts): **subject*
 
 Press and hold the lane field for `glitter.holdMs` 500 (the LeafLink tap limit, so taps keep their meaning), or hold the g key, and the drawn layout weights blend toward the scatter layout up to `glitter.maxWeight` 0.85 while a swirled ring of `glitter.ringRadiusPx` 120 follows the pointer; release re-forms the scene over `motion.ms.travel` on the signature curve, reaching exactly zero (no exponential tail). It never changes the route, the readout, the travel weights, or any copy, and it is off under reduced motion, while a sheet is open, and during travel. Lanes stay lanes (each still one of the 6,144 cores); section 10's particle rule is met because the mode is opt-in and draws nothing but the existing lane field.
 
+### 6.14 Guestbook (1.5.0)
+
+The guestbook is a sheet in the router's sense (S03 section 2: sheets are not routes): hash `#guestbook` over the current scene, opened from one control inside the Contact sheet. No route, no tab, no keymap item. It has no card and no white surface: the lane field is the sheet. Copy is S09 `C-GB-*`.
+
+**Choreography (camera, after the oklou boot: push-in, lock-in, pull-back).**
+
+| Beat | When | Camera | Lanes | Curve |
+|---|---|---|---|---|
+| Open | `motion.ms.travel` 700 | Dolly toward the target by `guestbook.camera.dollyIn` of the target distance, seeded yaw up to `guestbook.camera.yawDeg`, seeded rise up to `guestbook.camera.riseFrac` | Lanes inside `guestbook.part.radiusFrac` part outward by `pushFrac` and move to a per-lane seeded height up to `depthFrac` (y, toward or away from the camera); the three depth bands start `guestbook.ms.bandStagger` apart | Lusion main |
+| Type | each character, `guestbook.ms.letter` 400 in, `letterOut` 300 out | Held | One lane per character bends toward the camera (bend weight `(k / 7)^guestbook.mark.bendPower`) to a seeded height in `heightFrac`, on a baseline with seeded wobble `wobbleFrac`; the glyph rides the lane tip at its true depth. Until lock-in every letter lane carries seeded noise `noiseFrac`, redrawn every `guestbook.ms.noiseStep` | Lusion main |
+| Lock in | `guestbook.ms.lockIn` 400 | Push in a further `pushIn` | Noise goes to zero, heights snap to the sign seed's values, glyphs resolve left to right: noise becomes identity | Lusion soft |
+| Hold | `guestbook.ms.hold` 300 | Held | Held | none |
+| Pull back | `motion.ms.wordCadence` 1600 | Out to `pullBack` (past rest, wide), seeded drift up to `driftYawDeg` | The mark settles at a seeded offset in `settleRadiusFrac` of the part radius and a seeded height scale in `settleScale`; the part relaxes to `part.residual` | Lusion soft |
+| Close | `motion.ms.travel` 700 | Back to rest | Every guestbook offset returns to zero | Lusion main |
+
+The well (part center and mark baseline center) is the scene camera's ground target, where the lanes are. On open the camera's principal-point shift moves with the dolly from the scene value to `guestbook.shiftNdc` (the well rises to the upper middle of the viewport, above the prompt), and the dolly translates the camera along the ray to the well. The readout and hero are hidden while the sheet is open, so the mark has the field to itself. All world fractions are fractions of the camera to well distance at open, so the same mark reads the same size on every scene; letter spacing shrinks when needed so the dollied-in mark fits `guestbook.fitWidthFrac` of the viewport width. Two curves only, both from the Lusion extract (`guestbook.easeMain` `0.35, 0, 0, 1`; `guestbook.easeSoft` `0.4, 0, 0.1, 1`); no spring. Motion is transform: camera, lane positions, glyph translate and perspective scale. The DOM panel moves on translateZ under perspective, never on opacity.
+
+**Entropy.** Two fresh 32-bit seeds per sign: an open seed at open (part heights, camera yaw and rise, baseline wobble, typing noise) and a sign seed at lock-in (lock-in heights, settle offset and scale, pull-back drift, and the hex shown in the seed readout). Source: `crypto.getRandomValues`. With `?seed` in the URL (6.11), each seed is instead `hash32(sessionSeed, channel, n)` for channels `guestbook-open` and `guestbook-sign`, so a run replays. Values derive from a seed by `hash32(seed, param, index)`.
+
+**Engine cost.** One extra RGBA32F data texture the size of the activity texture (256 by 24, 98,304 bytes): per lane xyz offset plus a bend weight, written only while the guestbook moves. Five uniforms for the part. Same mesh, same draw call, same WebGL context. Letter lanes skip the ring and silhouette so the glyph and the lane tip agree. Letter lanes draw in `signalHot` on void and field, `ink` on paper.
+
+**Reduced motion.** No camera move, no noise, no part motion: the field renders once per change with the mark at its seeded resting position and height. Same content, same 3D mark.
+
+**No WebGL.** The sheet works without the field: the name, line, lock in, and storage are DOM; the mark has no 3D.
+
+**Storage.** Open decision (Justin): a JSON file in the repo, a form endpoint, or browser-local only. Until decided, signatures are stored in this browser through one named hook, `storeSignature` in `src/lib/guestbookStore.ts`, key `guestbook.storageKey`, at most `guestbook.ledgerMax` kept, and the sheet says so (`C-GB-LOCAL`).
+
 ## 7. Component signatures
 
 Named for their role on this site. Each has at least two variants or it is plain on purpose.
@@ -353,7 +380,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
 
 ```json design-tokens
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -913,6 +940,57 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
     "ringRadiusPx": 120,
     "swirl": 0.9
   },
+  "guestbook": {
+    "hash": "#guestbook",
+    "storageKey": "jp.guestbook.v1",
+    "nameMaxChars": 24,
+    "lineMaxChars": 80,
+    "ledgerMax": 5,
+    "easeMain": [0.35, 0, 0, 1],
+    "easeSoft": [0.4, 0, 0.1, 1],
+    "ms": {
+      "letter": 400,
+      "letterOut": 300,
+      "lockIn": 400,
+      "hold": 300,
+      "noiseStep": 60,
+      "bandStagger": 75,
+      "panel": 400
+    },
+    "camera": {
+      "dollyIn": 0.26,
+      "pushIn": 0.1,
+      "pullBack": -0.24,
+      "yawDeg": 9,
+      "riseFrac": 0.06,
+      "driftYawDeg": 14
+    },
+    "part": {
+      "radiusFrac": 0.6,
+      "pushFrac": 0.12,
+      "depthFrac": 0.07,
+      "residual": 0.4
+    },
+    "mark": {
+      "spacingFrac": 0.05,
+      "heightFrac": [0.1, 0.125],
+      "wobbleFrac": 0.012,
+      "glyphFrac": 0.055,
+      "noiseFrac": 0.02,
+      "bendPower": 2,
+      "settleRadiusFrac": [0.1, 0.3],
+      "settleScale": [0.55, 0.85],
+      "glyphPx": [14, 96]
+    },
+    "shiftNdc": {
+      "fine": [0.0, 0.14],
+      "coarse": [0.0, 0.16]
+    },
+    "fitWidthFrac": 0.8,
+    "pillRadiusPx": 88,
+    "panelDepthPx": 600,
+    "perspectivePx": 900
+  },
   "brand": {
     "gifMaxBytes": 900000,
     "gifMaxDecoded": 48000000,
@@ -984,6 +1062,8 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
 Scene specs restate some of these numbers inside formulas so a reviewer can check them by hand; the code always reads them from `T` (the generated module), never from the spec text.
 
 ## 13. Changelog
+
+- 1.5.0, 2026-11-09: guestbook (section 6.14, `guestbook.*` new). Brief: `guestbook/prompt.md` on astryx-polish-r2 (entropic and 3D). Two Lusion beziers enter as guestbook-only curves (`guestbook.easeMain`, `guestbook.easeSoft`, from `guestbook/references/lusion-style-brief.md`); the site curves are unchanged. Pill radius 88 from the same extract. Engine adds one RGBA32F 256 by 24 texture (98,304 bytes) and five uniforms; draw calls unchanged. Proposed values: every `guestbook.*` number is proposed until a device run confirms it. Storage is an open decision for Justin.
 
 - 1.4.0, 2026-11-05: coarse server camera refit for the S09 1.4.0 landing intro. The shorter intro left a black band between the copy (readout bottom 33.8% at 390x844) and the lane field (dense from 54%). Coarse server pose only; fine unchanged. pos y 3.0 to 5.0, fovDeg 58 to 52, shiftNdc y -0.4 to -0.3. Pitch -10.97 to -17.91, inside the SideQuests band (-75 to -5) so morph sampling stays in band; no server band exists. Verified geometrically (all 6144 lanes projected through the shifted camera at 390x844): field spans 40.0% to 83.9% (was 54.3% to 86.6%), zero segments in the readout box plus padding, so T-SRV-2 holds. Lane count, grid, and copy unchanged.
 - 1.3.0, 2026-11-03: device run 3 (morphs good, minor interactivity fixes). Every line traces to DEVICE-RUN-3.md.

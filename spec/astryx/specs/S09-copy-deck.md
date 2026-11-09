@@ -1,6 +1,6 @@
 # S09 Copy deck: every visible string
 
-Version 1.5.0, 2026-11-05. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+Version 1.6.0, 2026-11-09. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
 1.5.0: C-SQ-P1 rewritten (Justin-approved 2026-11-05): the "three trails / small adventures" line described the site visual, not the app ethos. New line names the ethos (anyone can host, each community runs its own instance) and what it is built on (ActivityPub).
 
 ## 1. Purpose
@@ -78,6 +78,17 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-CON-COPY | Button, primary | `Copy email` | n/a |
 | C-CON-MAIL | Button, secondary, `href=mailto:justinf0829@gmail.com` | `Open mail app` | n/a |
 | C-CON-LINK-LI | ContactSheet link | label `LinkedIn`, href as C-WHO-LINK-LI | BRIEF |
+| C-CON-GB | ContactSheet control that opens the guestbook | `Leave a mark` | n/a |
+| C-GB-LABEL | Guestbook dialog `aria-label` | `Guestbook` | n/a |
+| C-GB-NAME | Guestbook name prompt, placeholder and `aria-label` | `your name` | n/a |
+| C-GB-LINE | Guestbook line prompt, placeholder and `aria-label` | `one line, optional` | n/a |
+| C-GB-LOCK | Guestbook lock-in control | `Lock in` | n/a |
+| C-GB-SEED | Guestbook seed readout prefix | `seed` | n/a |
+| C-GB-DONE | Guestbook result line after lock-in | `Your mark is in the field.` | n/a |
+| C-GB-LOCAL | Guestbook storage note | `Saved in this browser only.` | n/a |
+| C-GB-AGAIN | Guestbook control to sign again | `Sign again` | n/a |
+| C-GB-CLOSE | Guestbook close control | `Close` | n/a |
+| C-GB-LEDGER | Guestbook ledger `aria-label` | `Marks in this browser` | n/a |
 | C-TOAST-OK | CopyConfirm info | `Copied.` | n/a |
 | C-TOAST-FAIL | CopyConfirm error | `Copy failed. The address is selected.` | n/a |
 | C-404-H1 | 404 readout | `Nothing at this address.` | n/a |
@@ -106,6 +117,8 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 None open. D-SQ-VENUE (shown), D-LEAFLINK-KIND (mutual aid) and D-PHONE (hidden) were decided by Justin on 2026-10-30.
 
 ## 8. Changelog
+
+- 1.6.0, 2026-11-09: guestbook strings (C-CON-GB, C-GB-*), for the guestbook brief on astryx-polish-r2. No existing string changed. Proposed; Justin approves before ship.
 
 - 1.0.0, 2026-10-30: initial deck from CONTENT-BRIEF.md.
 - 1.0.0, 2026-10-30 (taste pass): C-LL-P1 rewritten from a three-beat list ("Someone needs something, someone nearby has it, and the map connects them") to two clauses; the triplet was a rule-of-three flag in TASTE-GATES section 2. Source unchanged: brief "neighbors helping neighbors", "live map", "in real time".

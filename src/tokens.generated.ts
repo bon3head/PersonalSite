@@ -1,6 +1,6 @@
-// GENERATED from spec/astryx/DESIGN.md v1.4.0. Do not edit.
+// GENERATED from spec/astryx/DESIGN.md v1.5.0. Do not edit.
 export const T = {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -965,6 +965,85 @@ export const T = {
     "maxWeight": 0.85,
     "ringRadiusPx": 120,
     "swirl": 0.9
+  },
+  "guestbook": {
+    "hash": "#guestbook",
+    "storageKey": "jp.guestbook.v1",
+    "nameMaxChars": 24,
+    "lineMaxChars": 80,
+    "ledgerMax": 5,
+    "easeMain": [
+      0.35,
+      0,
+      0,
+      1
+    ],
+    "easeSoft": [
+      0.4,
+      0,
+      0.1,
+      1
+    ],
+    "ms": {
+      "letter": 400,
+      "letterOut": 300,
+      "lockIn": 400,
+      "hold": 300,
+      "noiseStep": 60,
+      "bandStagger": 75,
+      "panel": 400
+    },
+    "camera": {
+      "dollyIn": 0.26,
+      "pushIn": 0.1,
+      "pullBack": -0.24,
+      "yawDeg": 9,
+      "riseFrac": 0.06,
+      "driftYawDeg": 14
+    },
+    "part": {
+      "radiusFrac": 0.6,
+      "pushFrac": 0.12,
+      "depthFrac": 0.07,
+      "residual": 0.4
+    },
+    "mark": {
+      "spacingFrac": 0.05,
+      "heightFrac": [
+        0.1,
+        0.125
+      ],
+      "wobbleFrac": 0.012,
+      "glyphFrac": 0.055,
+      "noiseFrac": 0.02,
+      "bendPower": 2,
+      "settleRadiusFrac": [
+        0.1,
+        0.3
+      ],
+      "settleScale": [
+        0.55,
+        0.85
+      ],
+      "glyphPx": [
+        14,
+        96
+      ]
+    },
+    "shiftNdc": {
+      "fine": [
+        0,
+        0.14
+      ],
+      "coarse": [
+        0,
+        0.16
+      ]
+    },
+    "fitWidthFrac": 0.8,
+    "pillRadiusPx": 88,
+    "panelDepthPx": 600,
+    "perspectivePx": 900
   },
   "brand": {
     "gifMaxBytes": 900000,

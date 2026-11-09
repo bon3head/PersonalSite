@@ -125,6 +125,14 @@ for (const [key, value] of Object.entries(tokens.motion.ms)) {
 }
 push('--jp-ease-signature', `cubic-bezier(${tokens.motion.easeSignature.join(', ')})`);
 push('--jp-ease-standard', tokens.motion.easePlain);
+push('--jp-ease-gb-main', `cubic-bezier(${tokens.guestbook.easeMain.join(', ')})`);
+push('--jp-ease-gb-soft', `cubic-bezier(${tokens.guestbook.easeSoft.join(', ')})`);
+push('--jp-duration-gb-panel', `${tokens.guestbook.ms.panel}ms`);
+push('--jp-gb-pill-radius', `${tokens.guestbook.pillRadiusPx}px`);
+push('--jp-gb-panel-depth', `${tokens.guestbook.panelDepthPx}px`);
+push('--jp-gb-perspective', `${tokens.guestbook.perspectivePx}px`);
+push('--jp-gb-glyph-max', `${tokens.guestbook.mark.glyphPx[1]}px`);
+push('--jp-sheet-max-width', `${tokens.chrome.sheetMaxWidthPx}px`);
 lines.push('}');
 mkdirSync(join(root, 'src/styles'), { recursive: true });
 writeFileSync(join(root, 'src/styles/tokens.generated.css'), `${lines.join('\n')}\n`);

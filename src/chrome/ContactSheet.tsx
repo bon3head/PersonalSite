@@ -17,6 +17,8 @@ export interface ContactSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   finalFocusRef: RefObject<HTMLElement | null>;
+  // Opens the guestbook (DESIGN 6.14) in place of this sheet.
+  onLeaveMark?: () => void;
 }
 
 export default function ContactSheet(props: ContactSheetProps): JSX.Element {
@@ -55,6 +57,13 @@ export default function ContactSheet(props: ContactSheetProps): JSX.Element {
             label={C['C-CON-MAIL']}
             href={`mailto:${C['C-CON-EMAIL']}`}
           />
+          {props.onLeaveMark && (
+            <Button
+              variant="secondary"
+              label={C['C-CON-GB']}
+              onClick={props.onLeaveMark}
+            />
+          )}
         </div>
         <div className="jp-sheet-links">
           <Link href={C['C-CON-LINK-LI'].href} isExternalLink>
