@@ -4,6 +4,14 @@ A guestbook signup sheet for the portfolio site. Anyone can easily sign, but not
 
 Creative direction (revised 2026-11-09): entropic and 3D. GLITTERBOX is axed from this work (not the signing gesture, not an asset pool).
 
+## How Claude uses this (browser Claude)
+
+This work is built for **browser Claude (claude.ai)**. Browser Claude has no local file access and no repo checkout. Its access paths are:
+1. **Attach `guestbook/repomix.xml`** — the whole context in one XML file (22 files, ~57,000 tokens). Every repo file is inside it under a `<file path="...">` attribute. This is the primary source.
+2. **Paste `guestbook/prompt.md`** — the build brief. It has an `<access>` section that tells Claude exactly where its sources are.
+3. **Browse the web** — Mobbin (https://mobbin.com, free tier), the reference sites (https://lusion.co, https://bruno-simon.com, https://oklou.com), the live site (https://justinpoli.is-a.dev), and the public GitHub repo (https://github.com/bon3head/PersonalSite, branch `astryx-polish-r2`, public).
+4. **Launch prompt** — if you want the shortest path, paste the one-paragraph launch prompt in `guestbook/launch-prompt.md` instead of the full `prompt.md`. It tells Claude to read the repo files and the brief. Use the full `prompt.md` when you want the complete brief pasted in.
+
 ## Status
 
 Prompt written 2026-11-09, revised same day (GLITTERBOX axed, entropic + 3D). Not built yet. The prompt in `prompt.md` is the build brief for Claude.
@@ -12,8 +20,9 @@ Prompt written 2026-11-09, revised same day (GLITTERBOX axed, entropic + 3D). No
 
 | File | What it is |
 |---|---|
-| `prompt.md` | The build brief for Claude. Paste it into Claude (claude.ai project or Claude Code). One verb, explicit boundary and stop condition. |
-| `repomix.xml` | The whole context packed for Claude in one XML file (repomix 1.18.1). Paste it alongside `prompt.md`, or attach it. 21 files, ~56,000 tokens. Regenerate with the command in the repomix section below after any file change. |
+| `prompt.md` | The build brief for Claude. Paste it into browser Claude (claude.ai), alongside the attached `repomix.xml`. One verb, explicit boundary and stop condition. Has an `<access>` section that tells browser Claude exactly where its sources are. |
+| `launch-prompt.md` | The short launcher. Paste this into browser Claude instead of the full `prompt.md` when you want the shortest path. It tells Claude to read the brief and the context pack from the repomix.xml. |
+| `repomix.xml` | The whole context packed for Claude in one XML file (repomix 1.18.1). Attach it to browser Claude alongside `prompt.md` or `launch-prompt.md`. 22 files, ~57,000 tokens. Regenerate with the command in the repomix section below after any file change. |
 | `references/asset-pool.md` | The deep pool of assets Claude can pull from and transform, with each entry's source, what it offers, and how to transform it. GLITTERBOX is explicitly NOT in this pool. |
 | `references/lusion-style-brief.md` | Lusion design extract, run 2026-11-09 with the design-extract 12-stage fusion pipeline (`--motion-runtime` on). The motion system to steal. Source: lusion.co, lusion.co/projects/everswap, lusion.co/projects/spatial_fusion. |
 | `references/routing.md` | The model-routing framework that governs this work: greenfield generation (row 5), Claude Opus 5.5 `high`, the Claude greenfield prompt template, the Mobbin design-reference step (free-tier browsing, product MCP gated off), and the auto-fire rules. |
@@ -29,7 +38,7 @@ Prompt written 2026-11-09, revised same day (GLITTERBOX axed, entropic + 3D). No
 
 ## Repomix package (for Claude)
 
-`repomix.xml` is the whole context in one file, packed with repomix 1.18.1 (XML style). It contains the guestbook directory, `spec/astryx/DESIGN.md`, `spec/astryx/specs/S09-copy-deck.md`, `src/world/camera.ts`, `src/world/layouts/server.ts`, `src/App.tsx`, `src/router.ts`, and `package.json`. 21 files, ~56,000 tokens, ~200,000 chars.
+`repomix.xml` is the whole context in one file, packed with repomix 1.18.1 (XML style). It contains the guestbook directory, `spec/astryx/DESIGN.md`, `spec/astryx/specs/S09-copy-deck.md`, `src/world/camera.ts`, `src/world/layouts/server.ts`, `src/App.tsx`, `src/router.ts`, and `package.json`. 22 files, ~57,000 tokens, ~206,000 chars.
 
 To regenerate after any file change, from the repo root:
 
