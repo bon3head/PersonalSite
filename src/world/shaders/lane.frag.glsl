@@ -3,6 +3,7 @@ precision highp int;
 
 in float vSide; in float vHalf; in float vU; in float vAlpha; in float vBandSpeed; // lit-ok: shader constant
 flat in int vLane; flat in int vKind; flat in vec4 vAct; // lit-ok: shader constant
+flat in float vGb; // lit-ok: shader constant
 
 uniform float uTime;
 uniform vec4 uW; // lit-ok: shader constant
@@ -23,6 +24,7 @@ uniform float uLightModeFrom; // outgoing light mode during travel // lit-ok: sh
 uniform float uLightMix;      // 0 outgoing mode, 1 incoming mode // lit-ok: shader constant
 uniform float uLightRadius;   // scene gradient light radius // lit-ok: shader constant
 uniform float uLightGain;     // scene gradient light gain // lit-ok: shader constant
+uniform vec3 uGbColor;        // guestbook letter lane color: signalHot, ink on paper // lit-ok: shader constant
 
 out vec4 outColor; // lit-ok: shader constant
 
@@ -116,6 +118,11 @@ void main() {
     vec3 target = vKind == 1 ? uRouteColor : mix(uTrailRim, uTrailCore, edge); // lit-ok: shader constant
     col = mix(col, target, on);
     a = mix(a, 1.0, on); // lit-ok: shader constant
+  }
+
+  if (vGb > 0.0) {                              // guestbook letter lanes // lit-ok: shader constant
+    col = uGbColor; // lit-ok: shader constant
+    a = max(a, vU); // lit-ok: shader constant
   }
 
   a *= edge;

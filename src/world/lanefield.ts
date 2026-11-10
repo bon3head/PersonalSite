@@ -3,7 +3,7 @@
 // one draw call, morphing between four layouts by uniform weights.
 import * as THREE from 'three';
 import { T } from '../tokens.generated';
-import type { CameraFocus, HeroAnchorPx, LaneParams, Lanefield, LayoutId } from './types';
+import type { CameraFocus, GuestbookCamera, GuestbookFrame, GuestbookPart, HeroAnchorPx, LaneParams, Lanefield, LayoutId } from './types';
 import { easeSignature, easePlain, damp, cubicBezier } from './tween';
 import { CameraRig, poseFor, lerpPoseInto, clampSideQuestsPitch, type Pose } from './camera';
 import { Governor } from './governor';
@@ -36,6 +36,18 @@ const LAYOUT_ORDER: readonly LayoutId[] = T.world.layouts;
 const TEXEL_FLOATS = 4; // lit-ok: RGBA channels
 const MS_TO_SEC = 0.001; // lit-ok: milliseconds to seconds
 const SEC_TO_MS = 1000; // lit-ok: seconds to milliseconds
+const GB_UP = new THREE.Vector3(0, 1, 0);
+const LANE_STRIDE = 32; // lit-ok: texels per lane in the layout texture (4 layouts x 8 points)
+const POINTS_PER_LAYOUT = 8; // lit-ok: points per lane per layout
+
+// GLSL hash11 port (lane.vert.glsl), for the lane length scale.
+function hash11(p: number): number {
+  let q = p * 0.1031; // lit-ok: shader hash constant
+  q -= Math.floor(q);
+  q *= q + 33.33; // lit-ok: shader hash constant
+  q *= q + q;
+  return q - Math.floor(q);
+}
 
 function layoutIndex(id: LayoutId): number {
   return LAYOUT_ORDER.indexOf(id);
@@ -200,6 +212,24 @@ export function createLanefield(
   activityTex.flipY = false;
   activityTex.needsUpdate = true;
 
+  // Guestbook offsets (DESIGN, guestbook section): one texel per lane, same size as
+  // the activity texture. RGB is a world offset, A the bend flag. Only
+  // letter lanes carry a texel; every other lane reads zero.
+  const gbData = new Float32Array(actSpec.width * actSpec.height * TEXEL_FLOATS);
+  const gbTex = new THREE.DataTexture(
+    gbData,
+    actSpec.width,
+    actSpec.height,
+    THREE.RGBAFormat,
+    THREE.FloatType,
+  );
+  gbTex.magFilter = THREE.NearestFilter;
+  gbTex.minFilter = THREE.NearestFilter;
+  gbTex.generateMipmaps = false;
+  gbTex.flipY = false;
+  gbTex.needsUpdate = true;
+  const gbWritten = new Set<number>();
+
   // Geometry: one instanced quad per segment, all segment instances.
   const geometry = new THREE.InstancedBufferGeometry();
   const quad = new Float32Array([0, -1, 0, 1, -1, 0, 0, 1, 0, 1, 1, 0]);
@@ -288,7 +318,19 @@ export function createLanefield(
     uSilhouetteCenter: { value: new THREE.Vector2(0, 0) },
     uSilhouetteRadius: { value: 0 },
     uSilhouetteStrength: { value: 0 },
+    // Guestbook (DESIGN, guestbook section): letter lane offsets and the 3D part.
+    uGbOffsets: { value: gbTex },
+    uGbBend: { value: T.guestbook.mark.bendPower },
+    uGbCenter: { value: new THREE.Vector2(0, 0) },
+    uGbRadius: { value: 0 },
+    uGbPush: { value: 0 },
+    uGbDepth: { value: 0 },
+    uGbSeed: { value: 0 },
+    uGbPart: { value: new THREE.Vector3(0, 0, 0) },
+    uGbColor: { value: hexToVec3(T.color.signalHot) },
   };
+  const gbHot = hexToVec3(T.color.signalHot);
+  const gbInk = hexToVec3(T.color.ink);
   const material = new THREE.ShaderMaterial({
     uniforms,
     vertexShader: laneVert,
@@ -390,6 +432,12 @@ export function createLanefield(
   const scatterIndex = LAYOUT_ORDER.indexOf('scatter');
   const trackEase = cubicBezier(...T.curve.track);
   const pointer = { x: 0, y: 0 };
+  // Guestbook camera layer (DESIGN, guestbook section): dolly toward the target as a
+  // fraction of the target distance, yaw about the target, rise.
+  let gbCam: GuestbookCamera | null = null;
+  const gbPose: Pose = poseFor(current, variant);
+  const gbVec = new THREE.Vector3();
+  const gbVec2 = new THREE.Vector3();
   const clearColor = new THREE.Color();
   const governor = new Governor();
   let cssW = window.innerWidth;
@@ -718,7 +766,30 @@ export function createLanefield(
     updatePan(dt * SEC_TO_MS);
     camOffset[0] = pan[0] + bow.dir[0] * bow.now;
     camOffset[1] = pan[1] + bow.dir[1] * bow.now;
-    rig.update(basePose, t, weights, pointer, dt * SEC_TO_MS, reduced, finePointer, camOffset);
+    let camBase = basePose;
+    if (gbCam) {
+      // Yaw both points about the vertical through the well, then
+      // translate along the ray to the well (the well keeps its screen
+      // position), then rise. Orientation changes by the yaw only.
+      const c = gbCam.center;
+      gbVec.set(basePose.pos[0] - c[0], basePose.pos[1] - c[1], basePose.pos[2] - c[2]);
+      const dist = gbVec.length();
+      gbVec.applyAxisAngle(GB_UP, gbCam.yawRad);
+      gbVec2.set(basePose.target[0] - c[0], basePose.target[1] - c[1], basePose.target[2] - c[2]);
+      gbVec2.applyAxisAngle(GB_UP, gbCam.yawRad);
+      const lift = gbCam.rise * dist;
+      gbPose.pos[0] = c[0] + gbVec.x * (1 - gbCam.dolly);
+      gbPose.pos[1] = c[1] + gbVec.y * (1 - gbCam.dolly) + lift;
+      gbPose.pos[2] = c[2] + gbVec.z * (1 - gbCam.dolly);
+      gbPose.target[0] = c[0] + gbVec2.x - gbVec.x * gbCam.dolly;
+      gbPose.target[1] = c[1] + gbVec2.y - gbVec.y * gbCam.dolly + lift;
+      gbPose.target[2] = c[2] + gbVec2.z - gbVec.z * gbCam.dolly;
+      gbPose.fov = basePose.fov;
+      gbPose.shift[0] = basePose.shift[0] + (gbCam.shift[0] - basePose.shift[0]) * gbCam.shiftMix;
+      gbPose.shift[1] = basePose.shift[1] + (gbCam.shift[1] - basePose.shift[1]) * gbCam.shiftMix;
+      camBase = gbPose;
+    }
+    rig.update(camBase, t, weights, pointer, dt * SEC_TO_MS, reduced, finePointer, camOffset);
     for (const cb of callbacks) cb(t, dt);
     // ITEM 6 clamp, the single and last camera write guard: after rig // lit-ok:
     // interpolation, walk lean (a callback above), and parallax have
@@ -754,6 +825,8 @@ export function createLanefield(
     (uniforms.uSilhouetteCenter.value as THREE.Vector2).set(...paramsCurrent.silhouetteCenter);
     (uniforms.uSilhouetteRadius.value as number) = paramsCurrent.silhouetteRadius;
     (uniforms.uSilhouetteStrength.value as number) = paramsCurrent.silhouetteStrength;
+    const paperW = groundWeights[layoutIndex('leaflink')];
+    (uniforms.uGbColor.value as THREE.Vector3).copy(gbHot).lerp(gbInk, paperW);
     updateClearColor();
     if (sampleGovernor) {
       governor.sample(dt * SEC_TO_MS, performance.now());
@@ -832,7 +905,7 @@ export function createLanefield(
     },
     getMemoryEstimate: () => {
       const layoutBytes = texSpec.width * texSpec.height * TEXEL_FLOATS * TEXEL_FLOATS; // lit-ok: RGBA32F bytes
-      const activityBytes = actSpec.width * actSpec.height * TEXEL_FLOATS * TEXEL_FLOATS; // lit-ok: RGBA32F bytes
+      const activityBytes = 2 * actSpec.width * actSpec.height * TEXEL_FLOATS * TEXEL_FLOATS; // lit-ok: activity plus guestbook RGBA32F bytes
       const instanceBytes = instanceCount * 2 * TEXEL_FLOATS + 12 * TEXEL_FLOATS + 6 * 2; // lit-ok: aSeg plus quad position plus index
       const drawBytes = cssW * cssH * currentDpr * currentDpr * TEXEL_FLOATS * 2; // lit-ok: double-buffered RGBA
       return (layoutBytes + activityBytes + instanceBytes + drawBytes) / (1024 * 1024); // lit-ok: bytes to MB
@@ -1325,6 +1398,103 @@ export function createLanefield(
         glitter.centerPx[1] = centerPx[1];
       }
     },
+    guestbook: {
+      setCamera(c: GuestbookCamera | null): void {
+        gbCam = c ? { ...c, center: [...c.center], shift: [...c.shift] } : null;
+      },
+      setPart(p: GuestbookPart | null): void {
+        if (!p) {
+          (uniforms.uGbRadius.value as number) = 0;
+          (uniforms.uGbPart.value as THREE.Vector3).set(0, 0, 0);
+          return;
+        }
+        (uniforms.uGbCenter.value as THREE.Vector2).set(p.center[0], p.center[1]);
+        (uniforms.uGbRadius.value as number) = p.radius;
+        (uniforms.uGbPush.value as number) = p.push;
+        (uniforms.uGbDepth.value as number) = p.depth;
+        (uniforms.uGbSeed.value as number) = p.seedUnit * SEC_TO_MS;
+        (uniforms.uGbPart.value as THREE.Vector3).set(p.bands[0], p.bands[1], p.bands[2]);
+      },
+      writeLanes(lanes: readonly number[], offsets: Float32Array): void {
+        const keep = new Set(lanes);
+        for (const lane of gbWritten) {
+          if (keep.has(lane)) continue;
+          gbData.fill(0, lane * TEXEL_FLOATS, lane * TEXEL_FLOATS + TEXEL_FLOATS);
+        }
+        gbWritten.clear();
+        for (let j = 0; j < lanes.length; j++) {
+          const base = lanes[j] * TEXEL_FLOATS;
+          gbData[base] = offsets[j * 3];
+          gbData[base + 1] = offsets[j * 3 + 1];
+          gbData[base + 2] = offsets[j * 3 + 2]; // lit-ok: z component
+          gbData[base + 3] = 1; // lit-ok: alpha channel index
+          gbWritten.add(lanes[j]);
+        }
+        gbTex.needsUpdate = true;
+      },
+      laneTip(lane: number, out: [number, number, number]): [number, number, number] {
+        const tipK = T.world.segmentsPerLane;
+        let sx = 0;
+        let sy = 0;
+        let sz = 0;
+        let tx = 0;
+        let ty = 0;
+        let tz = 0;
+        for (let l = 0; l < LAYOUT_ORDER.length; l++) {
+          const w = weights[l];
+          if (w <= 0) continue;
+          const s0 = (lane * LANE_STRIDE + l * POINTS_PER_LAYOUT) * TEXEL_FLOATS;
+          const s1 = s0 + tipK * TEXEL_FLOATS;
+          sx += w * layoutData[s0];
+          sy += w * layoutData[s0 + 1];
+          sz += w * layoutData[s0 + 2];
+          tx += w * layoutData[s1];
+          ty += w * layoutData[s1 + 1];
+          tz += w * layoutData[s1 + 2];
+        }
+        const len = 1 + (hash11(lane * 0.013 + 7) - 0.5) * 2 * variance.lengthVariance; // lit-ok: shader lenScale constants
+        out[0] = sx + (tx - sx) * len;
+        out[1] = sy + (ty - sy) * len;
+        out[2] = sz + (tz - sz) * len;
+        return out;
+      },
+      nearestLane(x: number, z: number, exclude: ReadonlySet<number>): number {
+        const tip: [number, number, number] = [0, 0, 0];
+        let best = -1;
+        let bestD = Infinity;
+        for (let lane = 0; lane < T.world.laneCount; lane++) {
+          if (exclude.has(lane)) continue;
+          field.guestbook.laneTip(lane, tip);
+          const d = (tip[0] - x) * (tip[0] - x) + (tip[2] - z) * (tip[2] - z);
+          if (d < bestD) {
+            bestD = d;
+            best = lane;
+          }
+        }
+        return best;
+      },
+      restFrame(): GuestbookFrame {
+        const p = basePose;
+        const dx = p.pos[0] - p.target[0];
+        const dy = p.pos[1] - p.target[1];
+        const dz = p.pos[2] - p.target[2];
+        const flat = Math.hypot(dx, dz) || 1;
+        return {
+          pos: [p.pos[0], p.pos[1], p.pos[2]],
+          target: [p.target[0], p.target[1], p.target[2]],
+          distance: Math.hypot(dx, dy, dz),
+          // Ground directions as seen from the camera.
+          forward: [-dx / flat, -dz / flat],
+          right: [dz / flat, -dx / flat],
+        };
+      },
+      render(): void {
+        if (!loopRunning && !disposed && !failed) renderOnce();
+      },
+      reduced(): boolean {
+        return reduced;
+      },
+    },
     scene,
     camera,
     dispose(): void {
@@ -1341,6 +1511,7 @@ export function createLanefield(
       material.dispose();
       layoutTex.dispose();
       activityTex.dispose();
+      gbTex.dispose();
       for (const tex of maskCache.values()) tex.dispose();
       maskCache.clear();
       placeholderTex.dispose();

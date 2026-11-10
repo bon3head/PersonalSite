@@ -182,6 +182,27 @@ export function createLanefield(
       return [0, 0];
     },
     setGlitter(): void {},
+    guestbook: {
+      setCamera(): void {},
+      setPart(): void {},
+      writeLanes(): void {},
+      laneTip(_lane: number, out: [number, number, number]): [number, number, number] {
+        out[0] = 0;
+        out[1] = 0;
+        out[2] = 0;
+        return out;
+      },
+      nearestLane(): number {
+        return 0;
+      },
+      restFrame() {
+        return { pos: [0, 0, 1] as [number, number, number], target: [0, 0, 0] as [number, number, number], distance: 1, forward: [0, -1] as [number, number], right: [1, 0] as [number, number] };
+      },
+      render(): void {},
+      reduced(): boolean {
+        return opts.reducedMotion;
+      },
+    },
     onFrame(): () => void {
       return () => {
         // Stub has no render loop; nothing to unsubscribe.

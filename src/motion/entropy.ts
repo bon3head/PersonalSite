@@ -28,7 +28,9 @@ export type EntropyChannel =
   | 'morph-swirl'
   | 'morph-pull'
   | 'pulse-swirl'
-  | 'glitter-swirl';
+  | 'glitter-swirl'
+  | 'guestbook-open'
+  | 'guestbook-sign';
 
 const CHANNEL_ID: Record<EntropyChannel, number> = {
   'morph-bow': 1,
@@ -36,6 +38,8 @@ const CHANNEL_ID: Record<EntropyChannel, number> = {
   'morph-pull': 3,
   'pulse-swirl': 4,
   'glitter-swirl': 5,
+  'guestbook-open': 6,
+  'guestbook-sign': 7,
 };
 
 export interface MorphEntropy {
@@ -50,6 +54,7 @@ export interface MorphEntropy {
 export const NEUTRAL_ENTROPY: MorphEntropy = { bow: 0, swirl: 0, pullScale: 1 };
 
 let seed: number | null = null;
+let seedFromUrl = false;
 let enabled = true;
 const counters = new Map<EntropyChannel, number>();
 
@@ -61,6 +66,21 @@ export function hash32(s: number, channel: number, index: number): number {
   return (z ^ (z >>> 15)) >>> 0;
 }
 
+// Guestbook (DESIGN 6.14): a fresh 32-bit seed per open and per sign.
+// Source: crypto.getRandomValues, one new value per call. With ?seed in
+// the URL the value is hash32(sessionSeed, channel, n) instead, so a
+// seeded run replays exactly. Never Math.random.
+export function freshSeed(channel: 'guestbook-open' | 'guestbook-sign'): number {
+  entropySeed();
+  const n = counters.get(channel) ?? 0;
+  counters.set(channel, n + 1);
+  publish();
+  if (!seedFromUrl && typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    return crypto.getRandomValues(new Uint32Array(1))[0] >>> 0;
+  }
+  return hash32(entropySeed(), CHANNEL_ID[channel], n);
+}
+
 // Pure draw in [0, 1) for a given seed, channel, and index.
 export function drawAt(s: number, channel: EntropyChannel, index: number): number {
   return hash32(s, CHANNEL_ID[channel], index) / 4294967296;
@@ -69,7 +89,10 @@ export function drawAt(s: number, channel: EntropyChannel, index: number): numbe
 function initialSeed(): number {
   if (typeof window !== 'undefined') {
     const q = new URLSearchParams(window.location.search).get(T.entropy.seedParam);
-    if (q !== null && /^\d{1,10}$/.test(q)) return Number(q) >>> 0;
+    if (q !== null && /^\d{1,10}$/.test(q)) {
+      seedFromUrl = true;
+      return Number(q) >>> 0;
+    }
     if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
       return crypto.getRandomValues(new Uint32Array(1))[0] >>> 0;
     }

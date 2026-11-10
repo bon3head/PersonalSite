@@ -1,12 +1,13 @@
 import { useHotkeys } from '@astryxdesign/core';
 import type { Hotkey } from '@astryxdesign/core';
 import { C } from './copy';
+import { T } from './tokens.generated';
 import type { LayoutId, Regime } from './world/types';
 
 // S03 section 2: routes. Scene order for adjacency keys: server (1),
 // leaflink (2), sidequests (3). The 404 scene is outside the order.
 export type SceneId = 'server' | 'leaflink' | 'sidequests' | 'notfound';
-export type SheetId = 'whoami' | 'contact' | null;
+export type SheetId = 'whoami' | 'contact' | 'guestbook' | null;
 
 export const SCENE_ORDER: SceneId[] = ['server', 'leaflink', 'sidequests'];
 
@@ -79,12 +80,14 @@ export function sceneToPath(scene: SceneId): string {
 export function parseHash(hash: string): SheetId {
   if (hash === '#whoami') return 'whoami';
   if (hash === '#contact') return 'contact';
+  if (hash === T.guestbook.hash) return 'guestbook';
   return null;
 }
 
 export function sheetToHash(sheet: SheetId): string {
   if (sheet === 'whoami') return '#whoami';
   if (sheet === 'contact') return '#contact';
+  if (sheet === 'guestbook') return T.guestbook.hash;
   return '';
 }
 
@@ -253,14 +256,14 @@ export function buildTravelHotkeyEntries(props: TravelHotkeysProps): Hotkey[] {
       onPress: (e) => {
         if (noModifier(e)) props.toggleSheet('whoami');
       },
-      isDisabled: props.sheet === 'contact',
+      isDisabled: props.sheet === 'contact' || props.sheet === 'guestbook',
     },
     {
       keys: 'c',
       onPress: (e) => {
         if (noModifier(e)) props.toggleSheet('contact');
       },
-      isDisabled: props.sheet === 'whoami',
+      isDisabled: props.sheet === 'whoami' || props.sheet === 'guestbook',
     },
   ];
 }

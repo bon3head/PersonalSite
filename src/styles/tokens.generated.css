@@ -1,4 +1,4 @@
-/* GENERATED from spec/astryx/DESIGN.md v1.4.0. Do not edit. */
+/* GENERATED from spec/astryx/DESIGN.md v1.5.0. Do not edit. */
 :root {
   --jp-void-ground: #0A0C0F;
   --jp-void-raised: #15171B;
@@ -56,4 +56,12 @@
   --jp-duration-readoutInDelay: 400ms;
   --jp-ease-signature: cubic-bezier(0.23, 1, 0.32, 1);
   --jp-ease-standard: ease;
+  --jp-ease-gb-main: cubic-bezier(0.35, 0, 0, 1);
+  --jp-ease-gb-soft: cubic-bezier(0.4, 0, 0.1, 1);
+  --jp-duration-gb-panel: 400ms;
+  --jp-gb-pill-radius: 88px;
+  --jp-gb-panel-depth: 600px;
+  --jp-gb-perspective: 900px;
+  --jp-gb-glyph-max: 96px;
+  --jp-sheet-max-width: 640px;
 }

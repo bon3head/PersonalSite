@@ -66,6 +66,6 @@ This work follows the model-routing framework in `~/workspace/model-routing/fram
 4. Read `references/routing.md` for the routing and review rules. The reviewer is a different model family than the generator, never the same run.
 5. Follow the AGENTS.md auto-fire order: goal-gate, verify-stop, checkpoint-rollback, lsp-gate, coordinator health. No DONE claim without a verify-stop binding.
 
-## Open decision
+## Storage decision
 
-Where signatures are stored. The prompt leaves this for Claude to name rather than invent. Options: a JSON file in the repo, a lightweight form endpoint, or a client-side list with a clear note that it is local-only. If Justin picks one, pin it in `prompt.md` before the build starts.
+Where signatures are stored: browser-local only, decided by Justin on 2026-11-10. The other options were a JSON file in the repo and a lightweight form endpoint. The hook is `storeSignature` in `src/lib/guestbookStore.ts`; the sheet says marks are saved in this browser only. A shared store, if wanted later, is its own change.
