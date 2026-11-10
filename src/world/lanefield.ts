@@ -229,6 +229,12 @@ export function createLanefield(
   gbTex.flipY = false;
   gbTex.needsUpdate = true;
   const gbWritten = new Set<number>();
+  // Server words formed from lanes (DESIGN 6.15): word lanes share the // lit-ok: spec section reference
+  // texture, texel alpha 2 plus the pool slot. A guestbook lane is never
+  // taken by a word; a guestbook write takes a lane back from the words.
+  const WORD_ALPHA_BASE = 2; // lit-ok: texel alpha 1 is guestbook, 2 plus slot a word
+  const wordWritten = new Set<number>();
+  const wordTint = Array.from({ length: T.world.server.wordPool }, () => new THREE.Vector4(0, 0, 0, 0));
 
   // Geometry: one instanced quad per segment, all segment instances.
   const geometry = new THREE.InstancedBufferGeometry();
@@ -328,6 +334,8 @@ export function createLanefield(
     uGbSeed: { value: 0 },
     uGbPart: { value: new THREE.Vector3(0, 0, 0) },
     uGbColor: { value: hexToVec3(T.color.signalHot) },
+    // Server word lanes (DESIGN 6.15): sRGB color and opacity per pool slot. // lit-ok: spec section reference
+    uWordTint: { value: wordTint },
     // Guestbook contrast (DESIGN guestbook section, phone polish): lanes behind the panel dim.
     // Box in drawing-buffer px (x0, y0, x1, y1, origin bottom left).
     uGbDimBox: { value: new THREE.Vector4(0, 0, 0, 0) },
@@ -340,6 +348,7 @@ export function createLanefield(
     uniforms,
     vertexShader: laneVert,
     fragmentShader: laneFrag,
+    defines: { WORD_SLOTS: T.world.server.wordPool },
     transparent: true,
     depthTest: false,
     depthWrite: false,
@@ -1436,6 +1445,7 @@ export function createLanefield(
         }
         gbWritten.clear();
         for (let j = 0; j < lanes.length; j++) {
+          wordWritten.delete(lanes[j]);
           const base = lanes[j] * TEXEL_FLOATS;
           gbData[base] = offsets[j * 3];
           gbData[base + 1] = offsets[j * 3 + 1];
@@ -1522,6 +1532,38 @@ export function createLanefield(
       },
       reduced(): boolean {
         return reduced;
+      },
+    },
+    words: {
+      writeLanes(lanes: readonly number[], offsets: Float32Array, slots: readonly number[]): void {
+        const keep = new Set(lanes);
+        for (const lane of wordWritten) {
+          if (keep.has(lane) || gbWritten.has(lane)) continue;
+          gbData.fill(0, lane * TEXEL_FLOATS, lane * TEXEL_FLOATS + TEXEL_FLOATS);
+        }
+        wordWritten.clear();
+        for (let j = 0; j < lanes.length; j++) {
+          if (gbWritten.has(lanes[j])) continue;
+          const base = lanes[j] * TEXEL_FLOATS;
+          gbData[base] = offsets[j * 3];
+          gbData[base + 1] = offsets[j * 3 + 1];
+          gbData[base + 2] = offsets[j * 3 + 2]; // lit-ok: z component
+          gbData[base + 3] = WORD_ALPHA_BASE + slots[j]; // lit-ok: alpha channel index
+          wordWritten.add(lanes[j]);
+        }
+        gbTex.needsUpdate = true;
+      },
+      setTint(slot: number, rgb: readonly [number, number, number], opacity: number): void {
+        const v = wordTint[slot];
+        if (!v) return;
+        v.set(rgb[0], rgb[1], rgb[2], opacity);
+      },
+      held(lane: number): boolean {
+        return gbWritten.has(lane);
+      },
+      texel(lane: number): [number, number, number, number] {
+        const b = lane * TEXEL_FLOATS;
+        return [gbData[b], gbData[b + 1], gbData[b + 2], gbData[b + 3]]; // lit-ok: texel channels
       },
     },
     scene,

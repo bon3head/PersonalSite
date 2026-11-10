@@ -1,6 +1,6 @@
 # S05 Scene: the inference server (home, `/`)
 
-Version 1.2.0, 2026-11-10. Depends on: S02, S03, S04, S09, DESIGN `world.server`, `world.camera.server`. Blocks: S10 poster, S11 scene gates.
+Version 1.3.0, 2026-11-10. Depends on: S02, S03, S04, S09, DESIGN `world.server`, `world.camera.server`. Blocks: S10 poster, S11 scene gates.
 
 ## 1. Purpose
 
@@ -11,7 +11,7 @@ The hero identity. A visitor lands inside a rendering of Justin's local LLM infe
 - Ground: void `#0A0C0F`. Lanes: signal blue at 8% alpha, 1 CSS px, fading with view depth from 7 to 30 units so the far end dissolves into the void. Density builds the brightness: where bundles overlap the field reads bright, where they part you see single lanes. Pulses: signal-hot cores.
 - Geometry: long, straight, parallel lanes receding into depth, organized into 48 visible bundles (the SMs), each bundle a 2 by 2 of partitions, each partition 32 lanes. In the last stretch the lanes bend inward into a horn and meet at one focus.
 - Motion: lockstep. Pulses run in straight lines at constant speed with linear time. Groups of 32 fire together. A slow sweep raises activity across the SM columns every 6s, like load moving across the die.
-- Text in the scene: real stack words (DESIGN `world.server.words`) emerge at the focus, drift toward the viewer, cool from hot to signal to secondary, and vanish.
+- Text in the scene: real stack words (DESIGN `world.server.words`) emerge at the focus, drift toward the viewer, cool from hot to signal to secondary, and vanish. They are formed from lanes (1.3.0, DESIGN 6.15): every character rides the tip of its own lane, which bends out of the horn to carry it and draws it back as the word fades, so the words read as part of the field, never as floating sprites.
 - Not a circuit board: no right-angle turns, no pads, no labels like U1 or SM0, no green, no copper. Not a dashboard: no numbers, no gauges, no "status".
 
 **Hero is the field (W1).** The server hero is the lane-field motion itself: no brand mark, no `data-brand-mark` element, no ring, no logo on this route (descriptor: kind field, ring 0, mark none, DESIGN.md section 6.7). Project heroes morph into this field and back: on entry from a project, the logo recedes (scale 1.00 to `morph.recedeTo`, opacity to 0, window 0 to 0.40) and the ring collapses (0.20 to 0.80) while Lockstep re-forms (0.50 to 1.00). Gradient: `scene.server.gradient` (lead signal, tail field, tailLength 0.6, horizontal band light sweeping in lockstep with the lanes).
@@ -58,13 +58,14 @@ C-SRV-H1 (display-0, weight 200), C-SRV-P1, C-SRV-P2, C-SRV-P3. No links on this
 | Entry (travel in) | Lanes re-form into the server layout, camera settles at the server pose (S03). | 700ms, expo-out |
 | Morph out to a project | The field loosens during Release; the ring grows at the target anchor during Gather; the project mark looms in during Reveal (DESIGN.md section 6.7). No mark ever appears on server itself. | Inside travel 700ms |
 | Idle: pulses | Fragment `fire()` (S02 5.2): warp period hashed in `[3, 7]s`, duty 0.6, head speed 0.55 lane lengths per second, sigma 0.05, SM-column sweep every 6s. | Linear time, always on |
-| Idle: words | Every `wordCadence` (1100ms) the next word in `world.server.words` (cycling) spawns at `focus + (0, 0, 0.2)` from a pool of 6 troika `Text` meshes. Over `--jp-duration-word` (2600ms): position moves by `wordDrift (-1.0, 0.5, 1.0)`, toward the camera and into the frame (y sign alternates per word), color goes signalHot at 0%, signal at 40%, void.text2 at 100%; opacity 1 until 55%, then `easePlain` to 0. Font size `wordSize` 0.32 world units, Commit Mono 400 `.woff`, billboarded (copy camera quaternion each frame), anchor center. | Linear position, eased opacity |
-| Words on phones (1.2.0) | On the coarse camera variant (phones, including 390px wide) each word is kept fully inside the viewport, inset by `--jp-gutter`: after its drift position is computed, the word's billboarded box is projected and, if any edge would cross the inset viewport, the word slides back along the camera's right and up axes by the overflow. Drift direction, timing, color and fade are unchanged; only the clamped position differs. Fine (desktop) words are not clamped, so they still enter from past the right edge as they cool. | Per frame |
-| Guestbook open (1.2.0) | While the guestbook sheet is open (DESIGN 6.14), words fade out over `--duration-fast` as on travel exit and none spawn; on close the cadence restarts. Reduced motion: the statics clear at once on open (no loop carries a fade) and return on close. | 150ms ease |
+| Idle: words | Every `wordCadence` the next word in `world.server.words` (cycling) spawns at `focus + (0, 0, wordSpawnOffsetZ)`, one of `wordPool` slots. Over `--jp-duration-word`: the word's drift point moves by `wordDrift`, toward the camera and into the frame (y sign alternates per word), color goes signal at 0%, signal at 40%, void.text2 at 100% (the 1.3.0 blend keeps hot at signal); opacity 1 until `wordFadeFrom`, then `easePlain` to 0. Font size `wordSize` world units, Commit Mono 400 `.woff`, billboarded (copy camera quaternion each frame). | Linear position, eased opacity |
+| Words formed from lanes (1.3.0) | DESIGN 6.15. Each non-space character is one troika `Text` glyph centered on the word's drift point at the Commit Mono advance, and is carried by one lane: at spawn the character takes the nearest free lane by tip (3D distance to its spawn point; no lane shared with another word on screen or held by the guestbook). Each frame the lane's guestbook-style offset bends its tip to `rest tip + bend x (character point - rest tip)`, with bend = the word's opacity, and the glyph sits exactly on that tip. The lane takes the word's color and lifts its alpha toward the tip by the same opacity. When the word ends its lanes are at rest (bend 0) and are released. | Per frame |
+| Words on phones (1.2.0) | On the coarse camera variant (phones, including 390px wide) each word is kept fully inside the viewport, inset by `--jp-gutter`: after its drift position is computed, the word's billboarded box (all its characters at the advance) is projected and, if any edge would cross the inset viewport, the word slides back along the camera's right and up axes by the overflow. Drift direction, timing, color and fade are unchanged; only the clamped position differs, and the lanes bend to the clamped character points. Fine (desktop) words are not clamped, so they still enter from past the right edge as they cool. | Per frame |
+| Guestbook open (1.2.0) | While the guestbook sheet is open (DESIGN 6.14), words fade out over `--duration-fast` as on travel exit (their lanes relax with them) and none spawn; on close the cadence restarts. Reduced motion: the statics clear at once on open (no loop carries a fade) and return on close. | 150ms ease |
 | Idle: camera | Yaw `±3 deg` around target over 20s sine; pointer parallax up to 1.5 deg (fine pointer). | Damped, half-life 180ms |
 | Interaction | None beyond parallax. The scene does not respond to clicks; it is a machine running, not a toy. | n/a |
-| Exit | Controller pauses words (pool hidden at t = 0 of travel, opacity tween to 0 over `--duration-fast`). Pulses fade with `uW.x`. | 150ms ease |
-| Reduced motion | `uFrozen = 1` (pulses at their t = 0 phases, which still shows lit warps), three words placed at rest at 20%, 50%, 80% of their drift path with their color at those points, camera static. | Static |
+| Exit | Controller pauses words (opacity tween to 0 over `--duration-fast` from t = 0 of travel, lanes relaxing with it, then every word lane is released). Pulses fade with `uW.x`. | 150ms ease |
+| Reduced motion | `uFrozen = 1` (pulses at their t = 0 phases, which still shows lit warps), three words placed at rest at `reducedWordAt` (20%, 50%, 80%) of their drift path with their color, opacity and lane bend at those points (each character on its bent lane tip), camera static. | Static |
 
 ## 5. Content
 
@@ -75,7 +76,8 @@ S09 IDs: C-TITLE-SERVER, C-SRV-H1, C-SRV-P1, C-SRV-P2, C-SRV-P3, C-SRV-ALT. In-s
 | Thing | Start from | Notes |
 |---|---|---|
 | Lanes | S02 Lanefield | layout `server` |
-| Words | `troika-three-text` `Text` | pool of 6, `sync()` once at init per word string (pre-sync all 9 strings into 9 pooled meshes if memory allows; then no `sync()` at runtime) |
+| Words | `troika-three-text` `Text`, one per character | `wordPool` slots, each holding as many glyph meshes as the longest word has characters; one hidden measure glyph gives the Commit Mono advance. A glyph `sync()`s only when its character changes |
+| Word lanes | S02 Lanefield guestbook offset texture | texel alpha 2 + slot marks a word lane; one `vec4` tint per slot (`uWordTint`, sized by `wordPool` through a shader define) |
 | Readout | S04 `Readout variant="server"` | |
 
 ## 7. Kill criteria
@@ -84,6 +86,7 @@ S09 IDs: C-TITLE-SERVER, C-SRV-H1, C-SRV-P1, C-SRV-P2, C-SRV-P3, C-SRV-ALT. In-s
 - K-SRV-2: any lane pixel inside the readout box (contrast violation by construction).
 - K-SRV-3: the scene reads as a circuit board or as a "matrix rain" screensaver to a blind reviewer (S11 G-ANTI asks this question verbatim).
 - K-SRV-4: words appear that are not in `world.server.words`.
+- K-SRV-7: a word glyph that is not on its lane tip, or a lane that jumps when its word ends (1.3.0).
 - K-SRV-5: pulses in a warp are not in lockstep (any of the 32 lanes of a warp out of phase).
 - K-SRV-6: frame p95 above 16.7ms on the reference phone (S11 G-PERF-DEVICE).
 
@@ -94,7 +97,8 @@ S09 IDs: C-TITLE-SERVER, C-SRV-H1, C-SRV-P1, C-SRV-P2, C-SRV-P3, C-SRV-ALT. In-s
 | T-SRV-1 | Geometry matches the formula | read the layout buffer for lanes 0, 127, 128, 6143 at k = 0 and compare to hand values (lane 0: `(-3.565, -2.315, -24)` within 1e-4) |
 | T-SRV-2 | Readout is clear | screenshot at 1440 by 900 and 390 by 844 after 3s idle; inside the readout box plus padding, every pixel that is not text is within ΔE_ok 0.01 of void ground (render once with readout hidden and compare) |
 | T-SRV-3 | Lockstep | in a debug render (`?debug=fire`), sample the fire value for all lanes of warp 10 at one frame: identical |
-| T-SRV-4 | Words | collect troika text strings over 12s: the set equals `world.server.words` |
+| T-SRV-4 | Words | collect spawned word strings over 16s: the set equals `world.server.words` |
+| T-SRV-7 | Words formed from lanes (1.3.0) | in the real app on server: every visible glyph sits on its lane's bent tip (within 1e-3 world units), every lit character holds a distinct lane, the guestbook texture carries a word texel for each, and after the words are hidden and the fade ends no word texel remains |
 | T-SRV-5 | Hue budget | G-HUE: at most 30% of pixels have OKLCH chroma above 0.04 (`hueBudgetPct.server`) |
 | T-SRV-6 | First paint has the name | Lighthouse: LCP element is the H1 `Justin Poli` |
 
@@ -104,6 +108,7 @@ U-SRV-1 (R-GPU): the 48 SM by 128 core structure is NVIDIA's public GA104 spec f
 
 ## 10. Changelog
 
+- 1.3.0, 2026-11-10: words are formed from lanes (Justin's pick on the guestbook phone brief, fix 4b): one lane per character bends out of the horn to carry it and draws it back as the word fades (DESIGN 6.15). The words, their order, timing, drift, color stops and phone clamp are unchanged; every stack name stays. Components row and the stale 1100ms, pool 6, size 0.32 figures follow the tokens. K-SRV-7 and T-SRV-7 are new.
 - 1.2.0, 2026-11-10: words stay inside the viewport on phones, and hide while the guestbook is open (Justin's phone demo brief). The site-wide question (form the words from lanes, or remove them) is open with Justin: C-SRV-P2 no longer carries the stack words, so removal would take them off the site.
 - 1.1.0, 2026-11-01: W1 server hero is the field (section 2) with the server gradient group and morph out row. No lane, camera, or copy change.
 - 1.0.1, 2026-10-30: R-GPU accepted by Justin.

@@ -1,0 +1,356 @@
+{
+  "s1-server-390": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "glyphs": [
+      {
+        "word": "Go TUI",
+        "char": "G",
+        "lane": 0,
+        "opacity": 1,
+        "screen": [
+          234,
+          676
+        ],
+        "tipErr": 3.1642000131171244e-9
+      },
+      {
+        "word": "Go TUI",
+        "char": "o",
+        "lane": 1,
+        "opacity": 1,
+        "screen": [
+          245,
+          676
+        ],
+        "tipErr": 8.409062601799633e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "T",
+        "lane": 2,
+        "opacity": 1,
+        "screen": [
+          265,
+          676
+        ],
+        "tipErr": 2.0181698534571524e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "U",
+        "lane": 3,
+        "opacity": 1,
+        "screen": [
+          275,
+          676
+        ],
+        "tipErr": 1.0743652456568498e-7
+      },
+      {
+        "word": "Go TUI",
+        "char": "I",
+        "lane": 4,
+        "opacity": 1,
+        "screen": [
+          286,
+          676
+        ],
+        "tipErr": 4.372722850476407e-8
+      }
+    ]
+  },
+  "s2-server-1440": {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "glyphs": [
+      {
+        "word": "Go TUI",
+        "char": "G",
+        "lane": 0,
+        "opacity": 1,
+        "screen": [
+          1416,
+          548
+        ],
+        "tipErr": 6.960585041682066e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "o",
+        "lane": 1,
+        "opacity": 1,
+        "screen": [
+          1431,
+          548
+        ],
+        "tipErr": 4.480939885809221e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "T",
+        "lane": 2,
+        "opacity": 1,
+        "screen": [
+          1461,
+          548
+        ],
+        "tipErr": 4.7835047034539e-9
+      },
+      {
+        "word": "Go TUI",
+        "char": "U",
+        "lane": 3,
+        "opacity": 1,
+        "screen": [
+          1476,
+          548
+        ],
+        "tipErr": 2.957995626218235e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "I",
+        "lane": 4,
+        "opacity": 1,
+        "screen": [
+          1492,
+          548
+        ],
+        "tipErr": 5.43764078209108e-8
+      }
+    ]
+  },
+  "s3-server-390-reduced": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "glyphs": [
+      {
+        "word": "Go TUI",
+        "char": "G",
+        "lane": 0,
+        "opacity": 1,
+        "screen": [
+          265,
+          676
+        ],
+        "tipErr": 9.536743217353205e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "o",
+        "lane": 1,
+        "opacity": 1,
+        "screen": [
+          265,
+          676
+        ],
+        "tipErr": 9.536743217353205e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "T",
+        "lane": 2,
+        "opacity": 1,
+        "screen": [
+          265,
+          676
+        ],
+        "tipErr": 9.536743217353205e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "U",
+        "lane": 3,
+        "opacity": 1,
+        "screen": [
+          265,
+          676
+        ],
+        "tipErr": 9.536743217353205e-8
+      },
+      {
+        "word": "Go TUI",
+        "char": "I",
+        "lane": 4,
+        "opacity": 1,
+        "screen": [
+          265,
+          676
+        ],
+        "tipErr": 9.536743217353205e-8
+      },
+      {
+        "word": "Ollama",
+        "char": "O",
+        "lane": 5,
+        "opacity": 1,
+        "screen": [
+          249,
+          715
+        ],
+        "tipErr": 9.536743128535363e-8
+      },
+      {
+        "word": "Ollama",
+        "char": "l",
+        "lane": 6,
+        "opacity": 1,
+        "screen": [
+          249,
+          715
+        ],
+        "tipErr": 9.536743128535363e-8
+      },
+      {
+        "word": "Ollama",
+        "char": "l",
+        "lane": 7,
+        "opacity": 1,
+        "screen": [
+          249,
+          715
+        ],
+        "tipErr": 9.536743128535363e-8
+      },
+      {
+        "word": "Ollama",
+        "char": "a",
+        "lane": 8,
+        "opacity": 1,
+        "screen": [
+          249,
+          715
+        ],
+        "tipErr": 9.536743128535363e-8
+      },
+      {
+        "word": "Ollama",
+        "char": "m",
+        "lane": 9,
+        "opacity": 1,
+        "screen": [
+          249,
+          715
+        ],
+        "tipErr": 9.536743128535363e-8
+      },
+      {
+        "word": "Ollama",
+        "char": "a",
+        "lane": 10,
+        "opacity": 1,
+        "screen": [
+          249,
+          715
+        ],
+        "tipErr": 9.536743128535363e-8
+      },
+      {
+        "word": "Tailscale",
+        "char": "T",
+        "lane": 11,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      },
+      {
+        "word": "Tailscale",
+        "char": "a",
+        "lane": 12,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      },
+      {
+        "word": "Tailscale",
+        "char": "i",
+        "lane": 13,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      },
+      {
+        "word": "Tailscale",
+        "char": "l",
+        "lane": 14,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      },
+      {
+        "word": "Tailscale",
+        "char": "s",
+        "lane": 15,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      },
+      {
+        "word": "Tailscale",
+        "char": "c",
+        "lane": 16,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      },
+      {
+        "word": "Tailscale",
+        "char": "a",
+        "lane": 17,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      },
+      {
+        "word": "Tailscale",
+        "char": "l",
+        "lane": 18,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      },
+      {
+        "word": "Tailscale",
+        "char": "e",
+        "lane": 19,
+        "opacity": 0.148,
+        "screen": [
+          225,
+          616
+        ],
+        "tipErr": 5.6774229761913375e-9
+      }
+    ]
+  }
+}
