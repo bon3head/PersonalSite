@@ -127,8 +127,19 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
         (nameRef.current ?? doneRef.current)?.focus();
       }
     };
+    // Escape closes from anywhere, focus inside the sheet or not.
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      props.onRequestClose();
+    };
     document.addEventListener('focusin', onFocusIn);
-    return () => document.removeEventListener('focusin', onFocusIn);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('focusin', onFocusIn);
+      window.removeEventListener('keydown', onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isOpen]);
 
   useEffect(
@@ -171,13 +182,8 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
     setTimeout(() => nameRef.current?.focus(), 0);
   }
 
-  // Escape closes; Tab stays inside the sheet (aria-modal).
+  // Tab stays inside the sheet (aria-modal).
   function onKeyDown(e: ReactKeyboardEvent<HTMLDivElement>): void {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      props.onRequestClose();
-      return;
-    }
     if (e.key !== 'Tab' || !panelRef.current) return;
     const items = Array.from(
       panelRef.current.querySelectorAll<HTMLElement>('input:not([readonly]), button:not([disabled]), [tabindex="-1"][data-gb-focus]'),

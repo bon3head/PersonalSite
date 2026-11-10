@@ -158,6 +158,8 @@ export function createGuestbookDirector(
   let spacing = 1;
   let glyphWorld = 1;
   let pxPerUnitIn = 1;
+  let targetPx: [number, number] = [0, 0];
+  let baseWell: [number, number, number] = [0, 0, 0];
   let shiftTo: [number, number] = [0, 0];
 
   const dolly = new Tween();
@@ -185,8 +187,24 @@ export function createGuestbookDirector(
     const a = field.worldToScreen(well);
     const b = field.worldToScreen([well[0] + right[0], well[1], well[2] + right[1]]);
     const pxRest = Math.max(1, Math.hypot(b[0] - a[0], b[1] - a[1]));
-    pxPerUnitIn = pxRest / (1 - g.camera.dollyIn);
+    pxPerUnitIn = reduced() ? pxRest : pxRest / (1 - g.camera.dollyIn);
+    targetPx = [a[0], a[1]];
+    baseWell = [...well];
     fitSpacing(Array.from(text).length);
+  }
+
+  // Reduced motion: the camera does not move, so the scene's own
+  // framing stands (on fine server the target sits right of center).
+  // Slide the well along the target's screen row until n letters fit
+  // inside the viewport; the mark stays in the field, at rest.
+  function reframeStill(n: number): void {
+    if (!field) return;
+    const w = window.innerWidth;
+    const half = (n * spacing * pxPerUnitIn) / 2;
+    const margin = (w * (1 - g.fitWidthFrac)) / 2;
+    const x = Math.max(margin + half, Math.min(targetPx[0], w - margin - half));
+    const ground = x === targetPx[0] ? null : field.screenToGround(x, targetPx[1]);
+    well = ground ? [ground[0], baseWell[1], ground[1]] : [...baseWell];
   }
 
   // Letter spacing: the token spacing, shrunk so n letters fit
@@ -249,6 +267,7 @@ export function createGuestbookDirector(
     }
     text = chars.join('');
     fitSpacing(chars.length);
+    if (reduced()) reframeStill(chars.length);
     const used = new Set(letters.map((l) => l.lane));
     const n = chars.length;
     for (let i = keep; i < n; i++) {

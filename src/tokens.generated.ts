@@ -1010,16 +1010,16 @@ export const T = {
     "mark": {
       "spacingFrac": 0.05,
       "heightFrac": [
-        0.1,
-        0.125
+        0.075,
+        0.095
       ],
       "wobbleFrac": 0.012,
       "glyphFrac": 0.055,
       "noiseFrac": 0.02,
       "bendPower": 2,
       "settleRadiusFrac": [
-        0.1,
-        0.3
+        0.05,
+        0.15
       ],
       "settleScale": [
         0.55,
@@ -1033,11 +1033,11 @@ export const T = {
     "shiftNdc": {
       "fine": [
         0,
-        0.14
+        0.02
       ],
       "coarse": [
         0,
-        0.16
+        0.08
       ]
     },
     "fitWidthFrac": 0.8,
