@@ -385,7 +385,9 @@ export function createServerController(
   function placeReducedStatics(): void {
     // Three words at rest at reducedWordAt fractions of their drift path,
     // with color, opacity and lane bend at those points (S05 motion).
-    if (advance <= 0) return;
+    // Placed at once even before the font is measured, so the statics
+    // exist from the first still; the measure callback places them again
+    // at the true advance.
     const at = S.reducedWordAt;
     for (let i = 0; i < at.length; i++) {
       const w = placeWord(WORDS[i % WORDS.length], i % 2 === 0 ? 1 : -1, at[i]);
@@ -411,7 +413,10 @@ export function createServerController(
     if (!bb) return;
     advance = bb[2] - bb[0];
     boxY = [bb[1], bb[3]]; // lit-ok: blockBounds y channels
-    if (reduced && !hidden && !paused && actives.length === 0) placeReducedStatics();
+    if (reduced && !hidden && !paused) {
+      clearWords();
+      placeReducedStatics();
+    }
   });
 
   function onFrame(_tSec: number, dtSec: number): void {
@@ -454,6 +459,8 @@ export function createServerController(
   }
 
   const off = field.onFrame(onFrame);
+
+  if (reduced) placeReducedStatics();
 
   return {
     pause(): void {
