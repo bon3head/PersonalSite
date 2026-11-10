@@ -358,19 +358,18 @@ export function createServerController(
     const offsets = scratchOffsets;
     ids.length = 0;
     slots.length = 0;
-    let j = 0;
     for (const w of actives) {
       for (const g of w.glyphs) {
         if (g.lane < 0) continue;
+        const j = ids.length;
         ids.push(g.lane);
         slots.push(w.slot);
         offsets[j * 3] = g.mesh.position.x - g.rest[0];
         offsets[j * 3 + 1] = g.mesh.position.y - g.rest[1];
         offsets[j * 3 + 2] = g.mesh.position.z - g.rest[2]; // lit-ok: z component
-        j += 1;
       }
     }
-    lanes.words.writeLanes(ids, offsets.subarray(0, j * 3), slots); // lit-ok: xyz per lane
+    lanes.words.writeLanes(ids, offsets, slots); // reads ids.length lanes, so the whole scratch is safe
   }
 
   function spawnWord(): void {
@@ -475,7 +474,7 @@ export function createServerController(
         fadeStartSec = null;
         clearWords();
         f.guestbook?.render();
-      } else if (actives.length > 0) {
+      } else if (actives.length > 0 && fadeStartSec === null) {
         fadeStartSec = field.now();
       }
     },
@@ -506,7 +505,7 @@ export function createServerController(
           fadeStartSec = null;
           clearWords();
           f.guestbook?.render();
-        } else if (actives.length > 0) {
+        } else if (actives.length > 0 && fadeStartSec === null) {
           fadeStartSec = field.now();
         }
         return;
@@ -526,7 +525,7 @@ export function createServerController(
       reduced = on;
       fadeStartSec = null;
       clearWords();
-      if (on && !hidden) {
+      if (on && !hidden && !paused) {
         placeReducedStatics();
       } else if (!paused) {
         accSec = CADENCE_SEC;
