@@ -743,8 +743,8 @@
     }
   ],
   "tools": {
-    "gifsicle": null,
-    "imagemagickPrefix": "/root/workspace/tools/brand-tools/usr",
+    "gifsicle": "/home/hatch/workspace/tools/brand-tools/usr/bin/gifsicle",
+    "imagemagickPrefix": "/home/hatch/workspace/tools/brand-tools/usr",
     "imagemagickNote": "Workspace-local extraction, not installed in /usr. Binaries are convert-im6.q16 and identify-im6.q16; they need LD_LIBRARY_PATH, MAGICK_CONFIGURE_PATH, and MAGICK_CODER_MODULE_PATH pointed at the prefix. Neither tool was needed for the shipped bytes: budgets pass without optimization and fringe counts are zero."
   }
 }

@@ -77,6 +77,8 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
       vv?.removeEventListener('resize', update);
       vv?.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
+      // A remount starts from no lift, so its first update always writes.
+      liftRef.current = 0;
     };
   }, [mounted]);
 
@@ -139,10 +141,12 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isOpen, field]);
 
-  // The panel's height changes with the stage: re-frame the well.
+  // The panel's height changes with the stage, and it reaches its
+  // resting box once shown: re-frame the well and the dim (reduced
+  // motion has no loop, so this is its only render of the final box).
   useEffect(() => {
     directorRef.current?.reframe();
-  }, [stage, ledger]);
+  }, [stage, ledger, shown]);
 
   // One frame after mount the panel moves from depth to 0.
   useEffect(() => {

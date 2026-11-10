@@ -110,6 +110,8 @@ export interface GuestbookDebug {
   bands: [number, number, number];
   letters: { char: string; lane: number; h: number; x: number; z: number }[];
   well: [number, number, number] | null;
+  dim: number;
+  dimBox: [number, number, number, number] | null;
 }
 
 // Where the panel is, for the phone frame and the contrast dim
@@ -186,6 +188,7 @@ export function createGuestbookDirector(
   let shiftTo: [number, number] = [0, 0];
   let regionW = window.innerWidth;
   let regionL = 0;
+  let lastDimBox: [number, number, number, number] | null = null;
 
   const dolly = new Tween();
   const yaw = new Tween();
@@ -221,7 +224,8 @@ export function createGuestbookDirector(
   function updateFrame(t: number, snap: boolean): void {
     const [x, y] = frameShift();
     const eps = 1e-3; // lit-ok: NDC change below a pixel is ignored
-    if (snap) {
+    // While the open blend runs, the target snaps (shiftMix eases it in).
+    if (snap || !shiftMix.done(t)) {
       frameX.go(t, x, 0, easeMain);
       frameY.go(t, y, 0, easeMain);
     } else {
@@ -356,10 +360,13 @@ export function createGuestbookDirector(
     if (!gb || !field) return;
     const t = nowMs();
     // Phone frame and contrast dim (DESIGN 6.14, 1.6.0).
-    if (phase !== 'closing') updateFrame(t, false);
+    // Frame follows the free region only while writing: after lock-in the
+    // settle and pull-back keep their own camera (lock-in unchanged).
+    if (phase === 'open') updateFrame(t, false);
     if (panelSrc) {
       const b = panelSrc.panel.getBoundingClientRect();
-      gb.setDim([b.left, b.top, b.right, b.bottom], dim.value(t));
+      lastDimBox = [b.left, b.top, b.right, b.bottom];
+      gb.setDim(lastDimBox, dim.value(t));
     }
     // Camera and part.
     if (!reduced()) {
@@ -466,6 +473,8 @@ export function createGuestbookDirector(
       bands: [bands[0].value(t), bands[1].value(t), bands[2].value(t)],
       letters: letters.filter((l) => !l.dying).map((l) => ({ char: l.char, lane: l.lane, h: l.h.value(t), x: l.x.value(t), z: l.z.value(t) })),
       well: field ? [...well] : null,
+      dim: dim.value(t),
+      dimBox: lastDimBox,
     };
     (window as unknown as { __guestbook?: GuestbookDebug }).__guestbook = dbg;
   }
@@ -521,6 +530,10 @@ export function createGuestbookDirector(
     setText,
     reframe(): void {
       if (phase === 'closed' || phase === 'closing') return;
+      if (phase !== 'open') {
+        kick();
+        return;
+      }
       const n = Array.from(text).length;
       updateFrame(nowMs(), false);
       fitSpacing(n);
@@ -622,6 +635,7 @@ export function createGuestbookDirector(
       gb.setCamera(null);
       gb.setPart(null);
       gb.setDim(null, 0);
+      lastDimBox = null;
       gb.writeLanes([], new Float32Array(0));
       gb.render();
     }

@@ -280,7 +280,14 @@ export function createServerController(
       if (hidden === on || disposed) return;
       hidden = on;
       if (on) {
-        if (actives.length > 0) fadeStartSec = field.now();
+        // Reduced motion runs no loop to carry a fade: clear and render now.
+        if (reduced) {
+          fadeStartSec = null;
+          clearMeshes();
+          (field as Partial<Lanefield>).guestbook?.render();
+        } else if (actives.length > 0) {
+          fadeStartSec = field.now();
+        }
         return;
       }
       fadeStartSec = null;
