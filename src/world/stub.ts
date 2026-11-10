@@ -207,6 +207,16 @@ export function createLanefield(
         return opts.reducedMotion;
       },
     },
+    words: {
+      writeLanes(): void {},
+      setTint(): void {},
+      held(): boolean {
+        return false;
+      },
+      texel(): [number, number, number, number] {
+        return [0, 0, 0, 0];
+      },
+    },
     onFrame(): () => void {
       return () => {
         // Stub has no render loop; nothing to unsubscribe.

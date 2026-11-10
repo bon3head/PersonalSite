@@ -138,7 +138,7 @@ void main() {
   vec4 gb = texelFetch(uGbOffsets, ivec2(lane & 255, lane >> 8), 0); // lit-ok: shader constant
   vGb = gb.w; // lit-ok: shader constant
   if (gb.w > 0.0) { // lit-ok: shader constant
-    // Guestbook letter lane: bends toward its glyph, root anchored.
+    // Guestbook letter lane or server word lane (DESIGN 6.15): bends toward its glyph, root anchored. // lit-ok: spec section reference
     // It skips the ring and the pull so the tip matches the glyph.
     p0 += gb.xyz * pow(float(k) / 7.0, uGbBend); // lit-ok: shader constant
     p1 += gb.xyz * pow(float(k + 1) / 7.0, uGbBend); // lit-ok: shader constant

@@ -114,6 +114,18 @@ export interface GuestbookHooks {
   reduced(): boolean;
 }
 
+// Server words formed from lanes (DESIGN 6.15). offsets holds xyz per // lit-ok: spec section reference
+// lane, slots the word pool slot per lane. Word lanes written before and
+// missing now return to zero; lanes the guestbook holds are skipped.
+export interface LaneWordHooks {
+  writeLanes(lanes: readonly number[], offsets: Float32Array, slots: readonly number[]): void;
+  // Raw sRGB components (0 to 1) and opacity for one pool slot.
+  setTint(slot: number, rgb: readonly [number, number, number], opacity: number): void;
+  held(lane: number): boolean;
+  // Debug read of one lane's offset texel (T-SRV-7). // lit-ok: spec section reference
+  texel(lane: number): [number, number, number, number];
+}
+
 export interface Lanefield {
   ready: Promise<void>;
   travelTo(
@@ -160,6 +172,7 @@ export interface Lanefield {
   // point while held; release re-forms the scene.
   setGlitter(on: boolean, centerPx?: [number, number]): void;
   guestbook: GuestbookHooks;
+  words: LaneWordHooks;
   // The canvas's CSS size, which the projection uses.
   viewportCss(): [number, number];
   scene: THREE.Scene;

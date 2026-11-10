@@ -340,3 +340,58 @@ test('G-COPY: server readout matches S09 copy', async ({ page }) => {
   expect(text?.h1).toBe(C['C-SRV-H1']);
   expect(text?.ps).toEqual([C['C-SRV-P1'], C['C-SRV-P2']]);
 });
+
+// ---- T-SRV-7: words formed from lanes (S05 1.3.0, DESIGN 6.15). In
+// the real app on server: every lit glyph sits on its lane's bent tip
+// (rest tip plus the lane's offset texel), each character holds its own
+// lane, the texel marks a word lane (alpha 2 plus slot), and once the
+// words are hidden and the fade ends no word texel remains.
+test('T-SRV-7: server words ride their lane tips and release them', async ({ page }) => {
+  test.setTimeout(240000);
+  await page.goto('http://localhost:4173/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
+  type Row = { lane: number; slot: number; glyph: number[]; restTip: number[]; texel: number[]; opacity: number };
+  type Ctl = { wordLanes(): Row[]; setHidden(on: boolean): void };
+  await page.waitForFunction(
+    () => {
+      const m = (window as unknown as { __sceneControllers?: Map<string, Ctl> }).__sceneControllers;
+      return (m?.get('server')?.wordLanes() ?? []).some((r) => r.opacity > 0.5);
+    },
+    null,
+    { timeout: 120000 },
+  );
+  const rows = await page.evaluate(() => {
+    const m = (window as unknown as { __sceneControllers: Map<string, Ctl> }).__sceneControllers;
+    return m.get('server')!.wordLanes();
+  });
+  expect(rows.length).toBeGreaterThan(0);
+  const lanes = new Set<number>();
+  for (const r of rows) {
+    expect(r.lane).toBeGreaterThanOrEqual(0);
+    expect(lanes.has(r.lane)).toBe(false);
+    lanes.add(r.lane);
+    expect(r.texel[3]).toBe(2 + r.slot);
+    for (let i = 0; i < 3; i++) {
+      expect(Math.abs(r.restTip[i] + r.texel[i] - r.glyph[i])).toBeLessThan(1e-3);
+    }
+  }
+  const used = [...lanes];
+  await page.evaluate(() => {
+    const m = (window as unknown as { __sceneControllers: Map<string, Ctl> }).__sceneControllers;
+    m.get('server')!.setHidden(true);
+  });
+  await page.waitForFunction(
+    () => {
+      const m = (window as unknown as { __sceneControllers: Map<string, Ctl> }).__sceneControllers;
+      return m.get('server')!.wordLanes().length === 0;
+    },
+    null,
+    { timeout: 60000 },
+  );
+  const left = await page.evaluate((ids) => {
+    type F = { words: { texel(l: number): number[] } };
+    const f = (window as unknown as { __lanefieldReady: F }).__lanefieldReady;
+    return ids.map((l) => f.words.texel(l)).filter((t) => t.some((v) => v !== 0)).length;
+  }, used);
+  expect(left).toBe(0);
+});
