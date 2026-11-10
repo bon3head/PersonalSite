@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.6.0, 2026-11-10. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.7.0, 2026-11-10. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -299,7 +299,7 @@ The well (part center and mark baseline center) is the scene camera's ground tar
 
 **Contrast.** The lanes behind the panel dim while the sheet is open, so the field itself dims and no surface is drawn: the lane shader multiplies lane alpha by `1 - guestbook.dim.amount` inside the panel's box grown by `guestbook.dim.padPx`, feathering back to full over `guestbook.dim.featherPx` outside it (a rounded falloff, not an edge). Letter lanes dim too where their bodies pass behind the panel (an undimmed letter lane crossing the text measured 2.2:1); the mark itself sits above the panel in the free region, so it is never dimmed. The dim rides the panel's on-screen box every frame (it follows the lift and the depth move) and its amount moves with the panel on open and close. Floor: typed text, placeholder, seed readout and done copy each hold at least 4.5:1 against the brightest pixel behind them, measured over the densest lanes at 390px; the placeholder meets the same floor as typed text. No card, no white surface, no gradient, no shadow.
 
-**Scene words.** The server scene's in-scene words (S05) hide while the sheet is open (they fade out over `motion.ms.fast` like a travel pause and do not spawn; under reduced motion they clear at once, since no loop carries a fade), so the mark has the field to itself; they resume on close. T-GB-6 covers the words, the dim box, the keyboard lift and the focus rule under reduced motion.
+**Scene words.** The server scene's in-scene words (S05, formed from lanes per 6.15) hide while the sheet is open (they fade out over `motion.ms.fast` like a travel pause, their lanes relaxing with them, and do not spawn; under reduced motion they clear at once, since no loop carries a fade), so the mark has the field to itself; they resume on close. T-GB-6 covers the words, the dim box, the keyboard lift and the focus rule under reduced motion.
 
 **Entropy.** Two fresh 32-bit seeds per sign: an open seed at open (part heights, camera yaw and rise, baseline wobble, typing noise) and a sign seed at lock-in (lock-in heights, settle offset and scale, pull-back drift, and the hex shown in the seed readout). Source: `crypto.getRandomValues`. With `?seed` in the URL (6.11), each seed is instead `hash32(sessionSeed, channel, n)` for channels `guestbook-open` and `guestbook-sign`, so a run replays. Values derive from a seed by `hash32(seed, param, index)`.
 
@@ -310,6 +310,14 @@ The well (part center and mark baseline center) is the scene camera's ground tar
 **No WebGL.** The sheet works without the field: the name, line, lock in, and storage are DOM; the mark has no 3D.
 
 **Storage.** Decided by Justin, 2026-11-10: browser-local only. Signatures are stored in this browser through one named hook, `storeSignature` in `src/lib/guestbookStore.ts`, key `guestbook.storageKey`, at most `guestbook.ledgerMax` kept, and the sheet says so (`C-GB-LOCAL`).
+
+### 6.15 Server words formed from lanes (1.7.0)
+
+The server scene's stack words (S05) are carried by the field, never floated over it. Every non-space character of a word rides the tip of its own lane, the way the guestbook mark does (6.14). At spawn each character takes the nearest free lane by tip (3D distance from the lane's resting tip to the character's spawn point at the focus); a lane is never shared by two words on screen and never taken while the guestbook holds it. Each frame that lane's offset bends its tip from rest to the character's point, `tip = rest + bend x (point - rest)`, with the guestbook bend weight `(k / 7)^guestbook.mark.bendPower` along the lane, root anchored, skipping the ring, pull and part, and the glyph sits exactly on the bent tip at its true depth, billboarded. Characters sit on the word's drift point at the Commit Mono advance (measured from the loaded font, as titles are), centered.
+
+Bend is the word's opacity: 1 while the word is lit, then down with the fade after `world.server.wordFadeFrom`, so the lane draws its letter back into the horn and is exactly at rest when the word ends. No lane ever snaps. The lane wears the word: its color mixes to the word's current color and its alpha lifts toward the tip (`max(alpha, u)`), both by the word's opacity, so lane and letter cool and fade together, and the lockstep pulses keep running under it. Pause, travel exit and the guestbook (6.14) fade the words over `motion.ms.fast` with their lanes relaxing, then release every word lane. Reduced motion: the three statics sit on lanes bent and tinted at their `reducedWordAt` points.
+
+Engine: word lanes share the guestbook offset texture (texel alpha 1 is a guestbook letter lane; alpha 2 plus the slot index is a word lane, slot below `world.server.wordPool`) and one `vec4` tint per slot (color, opacity), the slot count passed to the shader as a define from `world.server.wordPool`. One lane draw call, unchanged. Glyphs are one troika Text per character, at most `wordPool` times the longest word in `world.server.words`. No new tokens.
 
 ## 7. Component signatures
 
@@ -1077,6 +1085,7 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.7.0, 2026-11-10: server words formed from lanes (section 6.15, S05 1.3.0), Justin's pick for fix 4b of the guestbook phone brief over removing them, since C-SRV-P2 no longer carries the stack names. Each character rides its own lane tip; bend and tint follow the word's opacity so lanes never snap. Word lanes reuse the guestbook offset texture (alpha 2 plus slot) with one tint per `wordPool` slot; lane draw calls unchanged; no new tokens, no copy change.
 - 1.6.0, 2026-11-10: guestbook on real phones (Justin's iPhone demo, Safari and an in-app browser). Section 6.14 gains phone frame, keyboard, contrast and scene-word rules; tokens `guestbook.dim.*` (amount 0.94, pad 24px, feather 64px) and `guestbook.focusRulePx` 2 are new and proposed until a device run confirms them. Contrast is the lane-dim option because G-TOKENS bans gradients in CSS (a CSS radial scrim would fail the lint). The projection now reads the canvas's CSS box, which was `100dvh` tall while the camera aspect used `innerHeight`. Uniforms nine to twelve; draw calls unchanged. Lock-in choreography unchanged.
 - 1.5.0, 2026-11-09: guestbook (section 6.14, `guestbook.*` new). Brief: `guestbook/prompt.md` on astryx-polish-r2 (entropic and 3D). Two Lusion beziers enter as guestbook-only curves (`guestbook.easeMain`, `guestbook.easeSoft`, from `guestbook/references/lusion-style-brief.md`); the site curves are unchanged. Pill radius 88 from the same extract. Engine adds one RGBA32F 256 by 24 texture (98,304 bytes) and nine uniforms; draw calls unchanged. Proposed values: every `guestbook.*` number is proposed until a device run confirms it. Storage: browser-local only (Justin, 2026-11-10); a shared store, if ever wanted, is a separate change.
 
