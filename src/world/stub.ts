@@ -182,6 +182,9 @@ export function createLanefield(
       return [0, 0];
     },
     setGlitter(): void {},
+    viewportCss(): [number, number] {
+      return [window.innerWidth, window.innerHeight];
+    },
     guestbook: {
       setCamera(): void {},
       setPart(): void {},
@@ -198,6 +201,7 @@ export function createLanefield(
       restFrame() {
         return { pos: [0, 0, 1] as [number, number, number], target: [0, 0, 0] as [number, number, number], distance: 1, forward: [0, -1] as [number, number], right: [1, 0] as [number, number] };
       },
+      setDim(): void {},
       render(): void {},
       reduced(): boolean {
         return opts.reducedMotion;

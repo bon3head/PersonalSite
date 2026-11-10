@@ -4,6 +4,7 @@
 // __lanefield and __guestbook debug state rather than pixels.
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { T } from '../src/tokens.generated';
 
 const DEV = 'http://localhost:5173';
 const PREVIEW = 'http://localhost:4173';
@@ -160,5 +161,97 @@ test('T-GB-5 reduced motion keeps the camera still and the mark', async ({ brows
   expect(Math.abs(r.open - r.rest)).toBeLessThan(0.01);
   expect(Math.abs(r.settled - r.rest)).toBeLessThan(0.01);
   expect(r.letters).toBe(4);
+  await context.close();
+});
+
+// DESIGN 6.14 (1.6.0) and S05 1.2.0, under reduced motion (the path with
+// no render loop): the server words leave while the sheet is open, the
+// lane dim covers the panel's resting box, the panel lifts above a
+// keyboard (simulated: visualViewport shrunk, as iOS reports it), the
+// focused line carries the accent rule, and close clears the dim.
+test('T-GB-6 phone polish: words hide, dim follows the panel, keyboard lift, focus rule', async ({ browser }) => {
+  test.setTimeout(300000);
+  const KB = 336;
+  const context = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  await context.addInitScript(() => {
+    const real = window.visualViewport;
+    const et = new EventTarget();
+    const w = window as unknown as { __kb: number; __setKb: (px: number) => void };
+    w.__kb = 0;
+    const fake = {
+      get offsetLeft() { return 0; },
+      get offsetTop() { return 0; },
+      get width() { return real ? real.width : innerWidth; },
+      get height() { return (real ? real.height : innerHeight) - w.__kb; },
+      get scale() { return 1; },
+      addEventListener: et.addEventListener.bind(et),
+      removeEventListener: et.removeEventListener.bind(et),
+      dispatchEvent: et.dispatchEvent.bind(et),
+    };
+    Object.defineProperty(window, 'visualViewport', { get: () => fake, configurable: true });
+    w.__setKb = (px: number) => {
+      w.__kb = px;
+      fake.dispatchEvent(new Event('resize'));
+    };
+  });
+  const page = await context.newPage();
+  await page.goto(PREVIEW + '/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
+  type Ctl = { activeWords(): string[] };
+  const words = (): Promise<number> =>
+    page.evaluate(() => {
+      const m = (window as unknown as { __sceneControllers?: Map<string, Ctl> }).__sceneControllers;
+      return m?.get('server')?.activeWords().length ?? -1;
+    });
+  expect(await words()).toBeGreaterThan(0);
+  await page.evaluate(() => {
+    location.hash = '#guestbook';
+  });
+  await page.waitForSelector('.jp-gb[data-shown="true"]', { timeout: 60000 });
+  await page.waitForTimeout(1000);
+  expect(await words()).toBe(0);
+  type Dbg = { dim: number; dimBox: number[] | null };
+  const dimCheck = async (): Promise<{ dim: number; off: number }> =>
+    page.evaluate(() => {
+      const g = (window as unknown as { __guestbook: Dbg }).__guestbook;
+      const r = document.querySelector('.jp-gb-panel')!.getBoundingClientRect();
+      const b = g.dimBox ?? [0, 0, 0, 0];
+      const off = Math.max(Math.abs(b[0] - r.left), Math.abs(b[1] - r.top), Math.abs(b[2] - r.right), Math.abs(b[3] - r.bottom));
+      return { dim: g.dim, off };
+    });
+  const before = await dimCheck();
+  expect(before.dim).toBe(1);
+  expect(before.off).toBeLessThan(2);
+  // Keyboard: both lines and the pill stay above it, one gutter clear.
+  await page.focus('.jp-gb-input--line');
+  await page.evaluate((kb) => (window as unknown as { __setKb: (px: number) => void }).__setKb(kb), KB);
+  await page.waitForTimeout(1000);
+  const lifted = await page.evaluate(() => {
+    const vvH = window.visualViewport!.height;
+    const bottom = (s: string): number => document.querySelector(s)!.getBoundingClientRect().bottom;
+    const prompt = document.activeElement!.closest('.jp-gb-prompt') as HTMLElement;
+    return {
+      vvH,
+      panel: bottom('.jp-gb-panel'),
+      name: bottom('.jp-gb-input--name'),
+      line: bottom('.jp-gb-input--line'),
+      pill: bottom('.jp-gb-pill--primary'),
+      rule: getComputedStyle(prompt).boxShadow,
+    };
+  });
+  expect(lifted.vvH).toBe(844 - KB);
+  for (const b of [lifted.name, lifted.line, lifted.pill]) expect(b).toBeLessThanOrEqual(lifted.vvH);
+  // The panel's bottom edge sits one gutter above the keyboard.
+  expect(Math.abs(lifted.vvH - lifted.panel - T.space.gutterPx.base)).toBeLessThanOrEqual(1);
+  expect(lifted.rule).toContain('inset');
+  expect(lifted.rule).toContain(`-${T.guestbook.focusRulePx}px`);
+  const after = await dimCheck();
+  expect(after.off).toBeLessThan(2);
+  // Close: dim off, the three reduced statics return.
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.jp-gb'), null, { timeout: 60000 });
+  await page.waitForTimeout(1000);
+  expect(await page.evaluate(() => (window as unknown as { __guestbook: Dbg }).__guestbook.dim)).toBe(0);
+  expect(await words()).toBeGreaterThan(0);
   await context.close();
 });

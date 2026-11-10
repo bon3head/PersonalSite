@@ -1,6 +1,6 @@
-// GENERATED from spec/astryx/DESIGN.md v1.5.0. Do not edit.
+// GENERATED from spec/astryx/DESIGN.md v1.6.0. Do not edit.
 export const T = {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -1041,6 +1041,12 @@ export const T = {
       ]
     },
     "fitWidthFrac": 0.8,
+    "dim": {
+      "amount": 0.94,
+      "padPx": 24,
+      "featherPx": 64
+    },
+    "focusRulePx": 2,
     "pillRadiusPx": 88,
     "panelDepthPx": 600,
     "perspectivePx": 900

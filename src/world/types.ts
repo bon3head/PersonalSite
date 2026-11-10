@@ -107,6 +107,9 @@ export interface GuestbookHooks {
   laneTip(lane: number, out: [number, number, number]): [number, number, number];
   nearestLane(x: number, z: number, exclude: ReadonlySet<number>): number;
   restFrame(): GuestbookFrame;
+  // Contrast dim (DESIGN guestbook section): lanes inside the CSS px box
+  // [left, top, right, bottom] dim by amount (0 to 1) of guestbook.dim.amount.
+  setDim(box: [number, number, number, number] | null, amount: number): void;
   render(): void;
   reduced(): boolean;
 }
@@ -157,6 +160,8 @@ export interface Lanefield {
   // point while held; release re-forms the scene.
   setGlitter(on: boolean, centerPx?: [number, number]): void;
   guestbook: GuestbookHooks;
+  // The canvas's CSS size, which the projection uses.
+  viewportCss(): [number, number];
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   dispose(): void;

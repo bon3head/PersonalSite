@@ -25,6 +25,9 @@ uniform float uLightMix;      // 0 outgoing mode, 1 incoming mode // lit-ok: sha
 uniform float uLightRadius;   // scene gradient light radius // lit-ok: shader constant
 uniform float uLightGain;     // scene gradient light gain // lit-ok: shader constant
 uniform vec3 uGbColor;        // guestbook letter lane color: signalHot, ink on paper // lit-ok: shader constant
+uniform vec4 uGbDimBox;       // guestbook contrast box, buffer px, x0 y0 x1 y1 // lit-ok: shader constant
+uniform float uGbDim;         // dim amount behind the panel, 0 off // lit-ok: shader constant
+uniform float uGbDimFeather;  // feather outside the box, buffer px // lit-ok: shader constant
 
 out vec4 outColor; // lit-ok: shader constant
 
@@ -123,6 +126,14 @@ void main() {
   if (vGb > 0.0) {                              // guestbook letter lanes // lit-ok: shader constant
     col = uGbColor; // lit-ok: shader constant
     a = max(a, vU); // lit-ok: shader constant
+  }
+
+  if (uGbDim > 0.0) {                           // guestbook contrast: the field dims behind the panel // lit-ok: shader constant
+    vec2 c = 0.5 * (uGbDimBox.xy + uGbDimBox.zw); // lit-ok: shader constant
+    vec2 hs = 0.5 * (uGbDimBox.zw - uGbDimBox.xy); // lit-ok: shader constant
+    float dd = length(max(abs(gl_FragCoord.xy - c) - hs, 0.0)); // lit-ok: shader constant
+    float m = 1.0 - smoothstep(0.0, uGbDimFeather, dd); // lit-ok: shader constant
+    a *= 1.0 - uGbDim * m; // lit-ok: shader constant
   }
 
   a *= edge;

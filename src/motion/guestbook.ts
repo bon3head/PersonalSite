@@ -110,10 +110,34 @@ export interface GuestbookDebug {
   bands: [number, number, number];
   letters: { char: string; lane: number; h: number; x: number; z: number }[];
   well: [number, number, number] | null;
+  dim: number;
+  dimBox: [number, number, number, number] | null;
+}
+
+// Where the panel is, for the phone frame and the contrast dim
+// (DESIGN 6.14, 1.6.0). lift is the keyboard lift in CSS px.
+export interface GuestbookPanelSource {
+  panel: HTMLElement;
+  lift: () => number;
+}
+
+// The free region in layout CSS px: the visual viewport above the
+// panel's resting top edge (no depth move, with the keyboard lift).
+export function freeRegion(src: GuestbookPanelSource | null): { left: number; top: number; width: number; height: number } {
+  const vv = window.visualViewport;
+  const left = vv ? vv.offsetLeft : 0;
+  const top = vv ? vv.offsetTop : 0;
+  const width = vv ? vv.width : window.innerWidth;
+  let bottom = top + (vv ? vv.height : window.innerHeight);
+  if (src) bottom = Math.min(bottom, src.panel.offsetTop - src.lift());
+  return { left, top, width, height: Math.max(1, bottom - top) };
 }
 
 export interface GuestbookDirector {
   open(): void;
+  // The visual viewport or the panel moved: re-measure (renders once
+  // under reduced motion, where no loop runs).
+  reframe(): void;
   setText(name: string): void;
   lock(): Promise<number>;
   again(): void;
@@ -130,6 +154,7 @@ function hex8(n: number): string {
 export function createGuestbookDirector(
   field: Lanefield | null,
   glyphLayer: HTMLElement | null,
+  panelSrc: GuestbookPanelSource | null = null,
 ): GuestbookDirector {
   const g = T.guestbook;
   const gb = field?.guestbook ?? null;
@@ -161,6 +186,9 @@ export function createGuestbookDirector(
   let targetPx: [number, number] = [0, 0];
   let baseWell: [number, number, number] = [0, 0, 0];
   let shiftTo: [number, number] = [0, 0];
+  let regionW = window.innerWidth;
+  let regionL = 0;
+  let lastDimBox: [number, number, number, number] | null = null;
 
   const dolly = new Tween();
   const yaw = new Tween();
@@ -171,13 +199,44 @@ export function createGuestbookDirector(
   const scale = new Tween(1);
   const noise = new Tween();
   const shiftMix = new Tween();
+  // The phone-frame shift eases when the free region changes.
+  const frameX = new Tween();
+  const frameY = new Tween();
+  const dim = new Tween();
 
   const tip: [number, number, number] = [0, 0, 0];
   const glyphPos: [number, number, number] = [0, 0, 0];
 
+  // Canvas NDC that puts the well at the free region's center offset by
+  // shiftNdc in that region's NDC (DESIGN 6.14 phone frame).
+  function frameShift(): [number, number] {
+    const [sx, sy] = g.shiftNdc[currentVariant()];
+    const r = freeRegion(panelSrc);
+    regionW = r.width;
+    regionL = r.left;
+    if (!field) return [sx, sy];
+    const [vw, vh] = field.viewportCss();
+    const px = r.left + (r.width / 2) * (1 + sx);
+    const py = r.top + (r.height / 2) * (1 - sy);
+    return [(px / vw) * 2 - 1, 1 - (py / vh) * 2];
+  }
+
+  function updateFrame(t: number, snap: boolean): void {
+    const [x, y] = frameShift();
+    const eps = 1e-3; // lit-ok: NDC change below a pixel is ignored
+    if (snap) {
+      frameX.go(t, x, 0, easeMain);
+      frameY.go(t, y, 0, easeMain);
+    } else {
+      if (Math.abs(x - frameX.to) > eps) frameX.go(t, x, dur(g.ms.panel), easeMain);
+      if (Math.abs(y - frameY.to) > eps) frameY.go(t, y, dur(g.ms.panel), easeMain);
+    }
+    shiftTo = [frameX.value(t), frameY.value(t)];
+  }
+
   function measureWell(): void {
     if (!field || !gb) return;
-    shiftTo = [...g.shiftNdc[currentVariant()]];
+    updateFrame(nowMs(), true);
     const frame = gb.restFrame();
     well = [...frame.target];
     dist = Math.hypot(frame.pos[0] - well[0], frame.pos[1] - well[1], frame.pos[2] - well[2]) || 1;
@@ -199,10 +258,10 @@ export function createGuestbookDirector(
   // inside the viewport; the mark stays in the field, at rest.
   function reframeStill(n: number): void {
     if (!field) return;
-    const w = window.innerWidth;
+    const w = regionW;
     const half = (n * spacing * pxPerUnitIn) / 2;
     const margin = (w * (1 - g.fitWidthFrac)) / 2;
-    const x = Math.max(margin + half, Math.min(targetPx[0], w - margin - half));
+    const x = Math.max(regionL + margin + half, Math.min(targetPx[0], regionL + w - margin - half));
     const ground = x === targetPx[0] ? null : field.screenToGround(x, targetPx[1]);
     well = ground ? [ground[0], baseWell[1], ground[1]] : [...baseWell];
   }
@@ -210,7 +269,7 @@ export function createGuestbookDirector(
   // Letter spacing: the token spacing, shrunk so n letters fit
   // fitWidthFrac of the viewport width at the dollied-in camera.
   function fitSpacing(n: number): void {
-    const fitWorld = (window.innerWidth * g.fitWidthFrac) / pxPerUnitIn;
+    const fitWorld = (regionW * g.fitWidthFrac) / pxPerUnitIn;
     spacing = Math.min(dist * g.mark.spacingFrac, fitWorld / Math.max(1, n));
     glyphWorld = Math.min(dist * g.mark.glyphFrac, spacing * 1.1);
   }
@@ -299,6 +358,15 @@ export function createGuestbookDirector(
   function frame(): void {
     if (!gb || !field) return;
     const t = nowMs();
+    // Phone frame and contrast dim (DESIGN 6.14, 1.6.0).
+    // Frame follows the free region only while writing: after lock-in the
+    // settle and pull-back keep their own camera (lock-in unchanged).
+    if (phase === 'open') updateFrame(t, false);
+    if (panelSrc) {
+      const b = panelSrc.panel.getBoundingClientRect();
+      lastDimBox = [b.left, b.top, b.right, b.bottom];
+      gb.setDim(lastDimBox, dim.value(t));
+    }
     // Camera and part.
     if (!reduced()) {
       gb.setCamera({
@@ -404,6 +472,8 @@ export function createGuestbookDirector(
       bands: [bands[0].value(t), bands[1].value(t), bands[2].value(t)],
       letters: letters.filter((l) => !l.dying).map((l) => ({ char: l.char, lane: l.lane, h: l.h.value(t), x: l.x.value(t), z: l.z.value(t) })),
       well: field ? [...well] : null,
+      dim: dim.value(t),
+      dimBox: lastDimBox,
     };
     (window as unknown as { __guestbook?: GuestbookDebug }).__guestbook = dbg;
   }
@@ -438,6 +508,7 @@ export function createGuestbookDirector(
     shiftZ.go(t, 0, dur(T.motion.ms.travel), easeMain);
     scale.go(t, 1, dur(T.motion.ms.travel), easeMain);
     noise.go(t, reduced() ? 0 : dist * g.mark.noiseFrac, dur(T.motion.ms.travel), easeMain);
+    dim.go(t, 1, dur(g.ms.panel), easeMain);
   }
 
   return {
@@ -456,6 +527,19 @@ export function createGuestbookDirector(
       kick();
     },
     setText,
+    reframe(): void {
+      if (phase === 'closed' || phase === 'closing') return;
+      if (phase !== 'open') {
+        kick();
+        return;
+      }
+      const n = Array.from(text).length;
+      updateFrame(nowMs(), false);
+      fitSpacing(n);
+      if (reduced()) reframeStill(n);
+      relayout(nowMs());
+      kick();
+    },
     lock(): Promise<number> {
       if (phase !== 'open') return Promise.resolve(signSeed ?? 0);
       const t = nowMs();
@@ -515,7 +599,7 @@ export function createGuestbookDirector(
       const t = nowMs();
       phase = 'closing';
       const d = dur(T.motion.ms.travel);
-      for (const tw of [dolly, yaw, rise, shiftX, shiftZ, noise, shiftMix, ...bands]) tw.go(t, 0, d, easeMain);
+      for (const tw of [dolly, yaw, rise, shiftX, shiftZ, noise, shiftMix, dim, ...bands]) tw.go(t, 0, d, easeMain);
       for (const l of letters) {
         l.dying = true;
         l.rise.go(t, 0, d, easeMain);
@@ -549,6 +633,8 @@ export function createGuestbookDirector(
     if (gb) {
       gb.setCamera(null);
       gb.setPart(null);
+      gb.setDim(null, 0);
+      lastDimBox = null;
       gb.writeLanes([], new Float32Array(0));
       gb.render();
     }

@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 import { C } from '../copy';
 import { T } from '../tokens.generated';
 import type { Lanefield } from '../world/types';
-import { createGuestbookDirector, type GuestbookDirector } from '../motion/guestbook';
+import { createGuestbookDirector, type GuestbookDirector, type GuestbookPanelSource } from '../motion/guestbook';
 import { makeSignature, readSignatures, storeSignature, type Signature } from '../lib/guestbookStore';
 
 export interface GuestbookSheetProps {
@@ -42,6 +42,45 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
   const doneRef = useRef<HTMLParagraphElement | null>(null);
   const directorRef = useRef<GuestbookDirector | null>(null);
   const directorFieldRef = useRef<Lanefield | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const liftRef = useRef(0);
+  const panelSrc = (): GuestbookPanelSource | null =>
+    panelRef.current ? { panel: panelRef.current, lift: () => liftRef.current } : null;
+
+  // Keyboard (DESIGN 6.14, 1.6.0): the visual viewport tells how much of
+  // the layout viewport the keyboard covers; the panel lifts by exactly
+  // that on translateY, and the director re-frames the well above it.
+  useEffect(() => {
+    if (!mounted) return;
+    const vv = window.visualViewport;
+    const update = (): void => {
+      const root = rootRef.current;
+      if (!root) return;
+      const panel = panelRef.current;
+      const covered = vv ? root.clientHeight - (vv.offsetTop + vv.height) : 0;
+      // The panel's resting gap to the layout bottom (keymap plus gutter);
+      // over the keyboard it keeps one gutter (the panel's own inset).
+      const restGap = panel ? root.clientHeight - (panel.offsetTop + panel.offsetHeight) : 0;
+      const gutter = panel ? parseFloat(getComputedStyle(panel).left) || 0 : 0;
+      const lift = covered > 0 ? Math.max(0, Math.round(covered + gutter - restGap)) : 0;
+      if (lift !== liftRef.current) {
+        liftRef.current = lift;
+        root.style.setProperty('--jp-gb-lift', `${lift}px`);
+      }
+      directorRef.current?.reframe();
+    };
+    update();
+    vv?.addEventListener('resize', update);
+    vv?.addEventListener('scroll', update);
+    window.addEventListener('resize', update);
+    return () => {
+      vv?.removeEventListener('resize', update);
+      vv?.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+      // A remount starts from no lift, so its first update always writes.
+      liftRef.current = 0;
+    };
+  }, [mounted]);
 
   // Open and close. The director is created per open so it binds the
   // field as it is now (the field may arrive after first paint).
@@ -79,7 +118,7 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
       // The field arrived while the sheet was open (deep link before
       // the engine started): rebind the director to it, keep the text.
       prev.dispose();
-      const director = createGuestbookDirector(field, glyphRef.current);
+      const director = createGuestbookDirector(field, glyphRef.current, panelSrc());
       directorRef.current = director;
       directorFieldRef.current = field;
       director.onReadout(setSeedHex);
@@ -88,7 +127,7 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
       if (!panelRef.current?.contains(document.activeElement)) nameRef.current?.focus();
       return;
     }
-    const director = createGuestbookDirector(field, glyphRef.current);
+    const director = createGuestbookDirector(field, glyphRef.current, panelSrc());
     directorRef.current = director;
     directorFieldRef.current = field;
     director.onReadout(setSeedHex);
@@ -101,6 +140,13 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isOpen, field]);
+
+  // The panel's height changes with the stage, and it reaches its
+  // resting box once shown: re-frame the well and the dim (reduced
+  // motion has no loop, so this is its only render of the final box).
+  useEffect(() => {
+    directorRef.current?.reframe();
+  }, [stage, ledger, shown]);
 
   // One frame after mount the panel moves from depth to 0.
   useEffect(() => {
@@ -204,6 +250,7 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
   return (
     <div
       className="jp-gb"
+      ref={rootRef}
       role="dialog"
       aria-modal="true"
       aria-label={C['C-GB-LABEL']}
