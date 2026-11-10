@@ -301,7 +301,7 @@ The well (part center and mark baseline center) is the scene camera's ground tar
 
 **No WebGL.** The sheet works without the field: the name, line, lock in, and storage are DOM; the mark has no 3D.
 
-**Storage.** Open decision (Justin): a JSON file in the repo, a form endpoint, or browser-local only. Until decided, signatures are stored in this browser through one named hook, `storeSignature` in `src/lib/guestbookStore.ts`, key `guestbook.storageKey`, at most `guestbook.ledgerMax` kept, and the sheet says so (`C-GB-LOCAL`).
+**Storage.** Decided by Justin, 2026-11-10: browser-local only. Signatures are stored in this browser through one named hook, `storeSignature` in `src/lib/guestbookStore.ts`, key `guestbook.storageKey`, at most `guestbook.ledgerMax` kept, and the sheet says so (`C-GB-LOCAL`).
 
 ## 7. Component signatures
 
@@ -1063,7 +1063,7 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
-- 1.5.0, 2026-11-09: guestbook (section 6.14, `guestbook.*` new). Brief: `guestbook/prompt.md` on astryx-polish-r2 (entropic and 3D). Two Lusion beziers enter as guestbook-only curves (`guestbook.easeMain`, `guestbook.easeSoft`, from `guestbook/references/lusion-style-brief.md`); the site curves are unchanged. Pill radius 88 from the same extract. Engine adds one RGBA32F 256 by 24 texture (98,304 bytes) and nine uniforms; draw calls unchanged. Proposed values: every `guestbook.*` number is proposed until a device run confirms it. Storage is an open decision for Justin.
+- 1.5.0, 2026-11-09: guestbook (section 6.14, `guestbook.*` new). Brief: `guestbook/prompt.md` on astryx-polish-r2 (entropic and 3D). Two Lusion beziers enter as guestbook-only curves (`guestbook.easeMain`, `guestbook.easeSoft`, from `guestbook/references/lusion-style-brief.md`); the site curves are unchanged. Pill radius 88 from the same extract. Engine adds one RGBA32F 256 by 24 texture (98,304 bytes) and nine uniforms; draw calls unchanged. Proposed values: every `guestbook.*` number is proposed until a device run confirms it. Storage: browser-local only (Justin, 2026-11-10); a shared store, if ever wanted, is a separate change.
 
 - 1.4.0, 2026-11-05: coarse server camera refit for the S09 1.4.0 landing intro. The shorter intro left a black band between the copy (readout bottom 33.8% at 390x844) and the lane field (dense from 54%). Coarse server pose only; fine unchanged. pos y 3.0 to 5.0, fovDeg 58 to 52, shiftNdc y -0.4 to -0.3. Pitch -10.97 to -17.91, inside the SideQuests band (-75 to -5) so morph sampling stays in band; no server band exists. Verified geometrically (all 6144 lanes projected through the shifted camera at 390x844): field spans 40.0% to 83.9% (was 54.3% to 86.6%), zero segments in the readout box plus padding, so T-SRV-2 holds. Lane count, grid, and copy unchanged.
 - 1.3.0, 2026-11-03: device run 3 (morphs good, minor interactivity fixes). Every line traces to DEVICE-RUN-3.md.

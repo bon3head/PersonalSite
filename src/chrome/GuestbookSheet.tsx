@@ -5,9 +5,8 @@
 // the field (src/motion/guestbook.ts); this panel moves in depth on
 // translateZ under perspective, never on opacity.
 //
-// Storage is an open decision. storeSignature (src/lib/guestbookStore)
-// is the single hook; today it keeps marks in this browser only, and
-// the sheet says so.
+// Storage is browser-local only (Justin, 2026-11-10). storeSignature
+// (src/lib/guestbookStore) is the single hook, and the sheet says so.
 import type { FormEvent, JSX, KeyboardEvent as ReactKeyboardEvent, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { C } from '../copy';

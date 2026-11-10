@@ -1,10 +1,9 @@
-// Guestbook storage (DESIGN 6.14). Where signatures are stored is an
-// open decision for Justin: a JSON file in the repo, a form endpoint,
-// or browser-local only. No backend exists, so this module keeps them
-// in this browser and says so on the sheet (C-GB-LOCAL).
+// Guestbook storage (DESIGN 6.14). Decided by Justin, 2026-11-10:
+// browser-local only. This module keeps signatures in this browser
+// and the sheet says so (C-GB-LOCAL).
 //
-// storeSignature is the single hook to wire later. Whatever store is
-// chosen replaces its body; the sheet only awaits its result.
+// storeSignature is the single hook. A shared store, if ever wanted,
+// replaces its body in its own change; the sheet only awaits it.
 import { T } from '../tokens.generated';
 import { safeStorage } from './safeStorage';
 

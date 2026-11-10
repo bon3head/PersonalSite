@@ -2,15 +2,16 @@
 
 Build of `guestbook/prompt.md` (branch `astryx-polish-r2`, built on `claude/project-thread-h1kchx`). One design, one build, one refine cycle, per the stop condition. Spec values live in `spec/astryx/DESIGN.md` 1.5.0 section 6.14 and the `guestbook` token block; strings live in `spec/astryx/specs/S09-copy-deck.md` 1.6.0 (`C-CON-GB`, `C-GB-*`).
 
-## Open decision: where signatures are stored
+## Decision: where signatures are stored
 
-Not decided here. The options named in the brief:
+Browser-local only, decided by Justin on 2026-11-10. `storeSignature(sig)` in `src/lib/guestbookStore.ts` keeps marks in this browser (key `jp.guestbook.v1`, newest first, at most 5 kept), and the sheet says "Saved in this browser only." Each visitor sees only their own marks; nothing is shared and nothing leaves the browser.
 
-1. A JSON file in the repo. Durable and reviewable, but a static site cannot write to its own repo, so it needs a write path (a pull request bot, a serverless function with a repo token, or manual curation).
-2. A lightweight form endpoint. Durable and shared across visitors, but it is a third-party service or a function that does not exist in this project today, and it brings spam and moderation questions.
-3. Browser-local only. Works today with no backend; each visitor sees only their own marks; nothing is shared.
+Options that were named and not chosen:
 
-What ships until Justin picks: option 3 behavior through one named hook, `storeSignature(sig)` in `src/lib/guestbookStore.ts` (key `jp.guestbook.v1`, newest first, at most 5 kept). The sheet says "Saved in this browser only." Wiring option 1 or 2 means replacing the body of that one function; the sheet only awaits its result.
+1. A JSON file in the repo. A static site cannot write to its own repo, so it needs a write path (a pull request bot, a serverless function with a repo token, or manual curation).
+2. A lightweight form endpoint. A third-party service or a function that does not exist in this project today, with spam and moderation questions.
+
+If shared marks are wanted later, the recommended shape is a moderated queue as its own pull request: a function files a pending entry, Justin approves it, and the build pulls approved entries into a static JSON file. Wiring it means replacing the body of `storeSignature`; the sheet only awaits its result.
 
 ## Design
 
@@ -65,6 +66,13 @@ Motion references (from the repo): Lusion extract for the two beziers, the 400ms
 | No GLITTERBOX, no conventional form, no page, nav item, asset, font, palette, or second context | Met (T-GB-1 checks no labels, no heading, pill radius, transparent panel, path unchanged, keymap count unchanged; T-GB-4 checks one canvas, 6,144 lanes, at most 12 draw calls) | none |
 | Budgets, no layout shift | Document height equals viewport height while open (T-GB-1); world chunk under budget | none |
 | Claims quoted from the spec or code | Tokens and timings cite DESIGN.md 6.14 and the token block | none |
+
+## Full suite
+
+Headless Chromium on SwiftShader, local harness: 166 passed, 2 failed, 1 skipped of 169. Both failures reproduce on `astryx-polish-r2` without this change, so neither comes from it:
+
+- `T-TRANS-6` (idle 60s, no navigation): the morph weights are still settling at software-rendering frame rates when the test samples them. It fails on the base branch too.
+- `T-S02-5` (principal shift): the off-axis focus point projects to 0.985 of the width against a 0.98 limit. The base branch gives the same 0.985 on three runs.
 
 ## Not verified
 
