@@ -176,6 +176,10 @@ export function createServerController(
   const camUp = new THREE.Vector3();
   const tips = new Float32Array(laneCount * 3); // lit-ok: xyz per lane
   const tip: [number, number, number] = [0, 0, 0];
+  // Reused every frame by writeLanes (no per-frame allocation).
+  const scratchIds: number[] = [];
+  const scratchSlots: number[] = [];
+  const scratchOffsets = new Float32Array(S.wordPool * GLYPHS_PER_SLOT * 3); // lit-ok: xyz per lane
 
   function freeSlot(): number {
     for (let s = 0; s < S.wordPool; s++) {
@@ -349,11 +353,11 @@ export function createServerController(
   // One texture write per frame for every lit word lane.
   function writeLanes(): void {
     if (!lanes) return;
-    const ids: number[] = [];
-    const slots: number[] = [];
-    let count = 0;
-    for (const w of actives) for (const g of w.glyphs) if (g.lane >= 0) count += 1;
-    const offsets = new Float32Array(count * 3); // lit-ok: xyz per lane
+    const ids = scratchIds;
+    const slots = scratchSlots;
+    const offsets = scratchOffsets;
+    ids.length = 0;
+    slots.length = 0;
     let j = 0;
     for (const w of actives) {
       for (const g of w.glyphs) {
@@ -366,7 +370,7 @@ export function createServerController(
         j += 1;
       }
     }
-    lanes.words.writeLanes(ids, offsets, slots);
+    lanes.words.writeLanes(ids, offsets.subarray(0, j * 3), slots); // lit-ok: xyz per lane
   }
 
   function spawnWord(): void {
@@ -466,14 +470,27 @@ export function createServerController(
     pause(): void {
       if (paused || disposed) return;
       paused = true;
-      if (actives.length > 0) fadeStartSec = field.now();
+      // Reduced motion runs no loop to carry a fade: release now.
+      if (reduced) {
+        fadeStartSec = null;
+        clearWords();
+        f.guestbook?.render();
+      } else if (actives.length > 0) {
+        fadeStartSec = field.now();
+      }
     },
     resume(): void {
       if (disposed) return;
       paused = false;
+      if (hidden) return;
+      // A running fade finishes first (lanes never snap); the cadence
+      // restarts once it releases the words.
+      if (fadeStartSec !== null && !reduced) {
+        accSec = CADENCE_SEC;
+        return;
+      }
       fadeStartSec = null;
       clearWords();
-      if (hidden) return;
       if (reduced) {
         placeReducedStatics();
       } else {
@@ -494,9 +511,13 @@ export function createServerController(
         }
         return;
       }
+      if (paused) return;
+      if (fadeStartSec !== null && !reduced) {
+        accSec = CADENCE_SEC;
+        return;
+      }
       fadeStartSec = null;
       clearWords();
-      if (paused) return;
       if (reduced) placeReducedStatics();
       else accSec = CADENCE_SEC;
     },
