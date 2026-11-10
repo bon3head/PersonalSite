@@ -1,0 +1,167 @@
+{
+ "version": "1.0.0",
+ "date": "2026-11-10",
+ "about": "Path to discipline map. Read by tools/agent-map.mjs (seat and impact). A discipline is the knowledge a change needs: which specs to read, which gates prove it, which tests cover it. It is derived from the files touched, never assigned as a title. Sources for every row: spec/astryx/BUILD-ORDER.md section 3 (the Owns lists), spec/astryx/specs/S11-performance-qa.md section 3 (gates), and the spec references in each file's header comments. A file can match several rules; the union applies.",
+ "rules": [
+  {
+   "id": "design-tokens",
+   "discipline": "tokens and design system",
+   "paths": ["spec/astryx/DESIGN.md", "spec/astryx/tools/**", "src/tokens.generated.ts", "src/styles/tokens.generated.css", "themes/lane/tokens.generated.json", "tools/extract-tokens.mjs", "tools/lint-tokens.mjs", "tools/palette-receipt.py"],
+   "specs": ["spec/astryx/DESIGN.md (section 12 token block is authoritative)", "spec/astryx/specs/S00-foundation.md", "spec/astryx/specs/S01-theme.md"],
+   "gates": ["G-TOKENS", "G-CONTRAST"],
+   "tests": ["npm run lint", "npm run gen (then git diff must be empty on generated files)"],
+   "needsJustin": false,
+   "notes": "A value that is not in DESIGN.md does not exist. Change DESIGN.md, bump its version, add a changelog line, run npm run gen. Never hand-edit *.generated.* files."
+  },
+  {
+   "id": "copy",
+   "discipline": "copy and content",
+   "paths": ["spec/astryx/specs/S09-copy-deck.md", "src/copy.ts", "tools/extract-copy.mjs", "tools/banned-scan.mjs", "tools/banned.txt", "public/llms.txt", "public/llms-full.txt"],
+   "specs": ["spec/astryx/specs/S09-copy-deck.md", "spec/astryx/TASTE-GATES.md", "spec/astryx/UNKNOWNS.md"],
+   "gates": ["G-COPY", "G-CONTENT", "G-ANTI question 5"],
+   "tests": ["node tools/banned-scan.mjs src", "node tools/banned-scan.mjs dist"],
+   "needsJustin": true,
+   "notes": "Every visible string comes from S09. New or changed copy needs Justin's approval before it ships. No em or en dashes, no banned words, no invented facts."
+  },
+  {
+   "id": "engine",
+   "discipline": "WebGL lane field engine",
+   "paths": ["src/world/lanefield.ts", "src/world/shaders/**", "src/world/worker.ts", "src/world/camera.ts", "src/world/tween.ts", "src/world/governor.ts", "src/world/debug.ts", "src/world/types.ts", "src/world/stub.ts", "src/world/laneParams.ts", "src/world/deflection.ts", "src/world/silhouette.ts", "tests/world.*.spec.ts", "tests/world-harness.html"],
+   "specs": ["spec/astryx/specs/S02-lanefield-engine.md", "spec/astryx/DESIGN.md sections 6, 8, 12 (world, motion, budgets)"],
+   "gates": ["G-WORLD", "G-PERF-LAB", "G-PERF-DEVICE (Justin, real phone)"],
+   "tests": ["npx playwright test tests/world.engine.spec.ts tests/world.tween.spec.ts"],
+   "needsJustin": false,
+   "notes": "6,144 lanes, one draw call, deterministic. SwiftShader frame times are meaningless; read window.__lanefield debug state, not timing (S11 section 2)."
+  },
+  {
+   "id": "layouts",
+   "discipline": "layout generators (pure functions)",
+   "paths": ["src/world/layouts/**", "tests/layouts/**", "tests/world.layouts.*.spec.ts"],
+   "specs": ["spec/astryx/specs/S02-lanefield-engine.md section 4.4", "the scene spec section 3.1 (S05 server, S06 leaflink, S07 sidequests, S08 scatter)"],
+   "gates": ["layout unit tests", "G-WORLD"],
+   "tests": ["npx playwright test tests/world.layouts.server.spec.ts tests/layouts"],
+   "needsJustin": false,
+   "notes": "Contract: generate(seed, out, layoutIndex) writes 6,144 lanes by 8 points, returns side data. Pure, no DOM, no three.js imports, under 150ms in Node."
+  },
+  {
+   "id": "scenes",
+   "discipline": "scene controllers and readouts",
+   "paths": ["src/world/server.ts", "src/world/leaflink.ts", "src/world/sidequests.ts", "src/world/notfound.ts", "src/scenes/**", "tests/scenes/**"],
+   "specs": ["spec/astryx/specs/S05-scene-server.md", "spec/astryx/specs/S06-scene-leaflink.md", "spec/astryx/specs/S07-scene-sidequests.md", "spec/astryx/specs/S08-scene-notfound.md", "spec/astryx/specs/S04-chrome.md section 6"],
+   "gates": ["G-SCENES", "G-HUE", "G-COPY"],
+   "tests": ["npx playwright test tests/scenes"],
+   "needsJustin": false,
+   "notes": "Read only the spec of the scene you touch. The three motion signatures must never be swapped (DESIGN 6.3)."
+  },
+  {
+   "id": "travel",
+   "discipline": "routing, travel and prerender",
+   "paths": ["src/router.ts", "src/travel.ts", "src/entry-server.tsx", "tools/prerender.mjs", "tests/travel*.spec.ts"],
+   "specs": ["spec/astryx/specs/S03-travel-routing.md", "spec/astryx/DESIGN.md section 6.7 (route morph)"],
+   "gates": ["G-TRAVEL"],
+   "tests": ["npx playwright test tests/travel.spec.ts tests/travel-prerender.spec.ts"],
+   "needsJustin": false,
+   "notes": "No document reload on scene change, feedback under 250ms on a keymap press (S11 kill list)."
+  },
+  {
+   "id": "chrome",
+   "discipline": "chrome, keymap and accessibility",
+   "paths": ["src/chrome/**", "src/App.tsx", "tests/chrome.spec.ts"],
+   "specs": ["spec/astryx/specs/S04-chrome.md", "spec/astryx/specs/S01-theme.md section 5", "spec/astryx/specs/S10-fallbacks-a11y.md"],
+   "gates": ["G-CHROME", "G-FALLBACK"],
+   "tests": ["npx playwright test tests/chrome.spec.ts"],
+   "needsJustin": false,
+   "notes": "Keymap never wraps at 320px, targets 44px, axe clean. src/chrome/glitterbox.ts is DESIGN 6.13 and is not part of the guestbook."
+  },
+  {
+   "id": "motion-dom",
+   "discipline": "hero, morph and entropy motion",
+   "paths": ["src/motion/**", "src/hero/**", "tests/feedback-round/**"],
+   "specs": ["spec/astryx/DESIGN.md sections 6.7, 6.8, 6.11, 6.12", "spec/astryx/FINAL-POLISH-SPEC-2026-11-02.md"],
+   "gates": ["G-TRAVEL", "G-WORLD", "seed replay (FINAL-POLISH 9.2)"],
+   "tests": ["npx playwright test tests/feedback-round"],
+   "needsJustin": false,
+   "notes": "No Math.random in motion code; seeds go through src/motion/entropy.ts so a seed replays exactly."
+  },
+  {
+   "id": "theme",
+   "discipline": "Astryx theme",
+   "paths": ["themes/lane/**", "src/styles/global.css", "src/styles/fonts.css", "theme.template.ts"],
+   "specs": ["spec/astryx/specs/S01-theme.md", "spec/astryx/DESIGN.md section 11"],
+   "gates": ["G-TOKENS", "G-CONTRAST", "theme:check"],
+   "tests": ["npm run theme:check"],
+   "needsJustin": false,
+   "notes": "theme.template.ts is reference only, not imported (BUILD-STATE B1)."
+  },
+  {
+   "id": "foundation",
+   "discipline": "foundation, build and tooling",
+   "paths": ["package.json", "package-lock.json", "tsconfig.json", "vite.config.ts", "playwright.config.ts", "index.html", "src/main.tsx", "src/lib/**", "src/dev/**", "tools/**", "qa/polish-2/*.ts", "qa/polish-2/*.cjs"],
+   "specs": ["spec/astryx/specs/S00-foundation.md", "spec/standard-implementations.md (src/lib snippets verbatim)"],
+   "gates": ["G-BUILD"],
+   "tests": ["npm run build", "npm run lint"],
+   "needsJustin": false,
+   "notes": "Exact pins only. package.json and App.tsx are shared files: one owner per change (BUILD-ORDER rule 4)."
+  },
+  {
+   "id": "brand-assets",
+   "discipline": "brand assets",
+   "paths": ["assets-src/**", "public/brand/**", "tools/build-brand-assets.mjs", "tools/brand-inspect.py", "src/lib/brandManifest.ts", "src/lib/brandPrefetch.ts"],
+   "specs": ["spec/astryx/DESIGN.md sections 3.5 and 9", "assets-src/brand/ASSET-INVENTORY.md"],
+   "gates": ["G-BUILD", "G-ANTI"],
+   "tests": ["npm run brand"],
+   "needsJustin": false,
+   "notes": "All visuals procedural except the brand marks DESIGN 9 lists."
+  },
+  {
+   "id": "verification",
+   "discipline": "QA receipts and gates",
+   "paths": ["qa/**", "tests/**", "reports/**", "BUILD-STATE.md", "spec/astryx/specs/S11-performance-qa.md"],
+   "specs": ["spec/astryx/specs/S11-performance-qa.md", "spec/astryx/BUILD-ORDER.md section 4 (BUILD-STATE format)"],
+   "gates": ["every gate the tested code maps to"],
+   "tests": ["npm run gates (about 20 minutes; read the exit code from a file, never through a pipe)"],
+   "needsJustin": false,
+   "notes": "A gate is never lowered and a test is never skipped to get green."
+  },
+  {
+   "id": "specs",
+   "discipline": "spec authoring",
+   "paths": ["spec/**"],
+   "specs": ["/mnt/project-files/baseline/process/SPEC-DRIVEN-METHOD.md (project files)", "spec/astryx/README.md", "spec/astryx/BUILD-ORDER.md"],
+   "gates": ["TASTE-GATES runs (anti-slop, banned styles, anti-template)"],
+   "tests": ["grep for em and en dashes returns nothing"],
+   "needsJustin": true,
+   "notes": "Spec changes are coordinator-approved, version-stamped and changelogged (BUILD-ORDER rule 8). Design decisions are Justin's."
+  },
+  {
+   "id": "guestbook-pack",
+   "discipline": "guestbook prompt package",
+   "paths": ["guestbook/**"],
+   "specs": ["guestbook/README.md", "guestbook/prompt.md", "guestbook/references/routing.md"],
+   "gates": ["repomix pack regenerated after any change"],
+   "tests": ["regenerate guestbook/repomix.xml with the command in guestbook/README.md"],
+   "needsJustin": false,
+   "notes": "Storage is browser-local (Justin, 2026-11-10). GLITTERBOX is axed from this work."
+  },
+  {
+   "id": "video-motion",
+   "discipline": "video motion design (HyperFrames)",
+   "paths": ["motion-design/**"],
+   "specs": ["motion-design/README.md", "motion-design/hyperframes-skill.md", "motion-design/cloud-brief.md"],
+   "gates": ["npm run check in the composition", "repomix pack regenerated after any change"],
+   "tests": ["./motion-design/hyperframes-render.sh <composition-dir>"],
+   "needsJustin": false,
+   "notes": "Never use HeyGen hosted cloud render without Justin's explicit approval."
+  },
+  {
+   "id": "agent-docs",
+   "discipline": "agent operating docs",
+   "paths": ["AGENTS.md", "CLAUDE.md", "agents/**", ".claude/**", "tools/agent-map.mjs"],
+   "specs": ["agents/SOURCES.md"],
+   "gates": ["node tools/agent-map.mjs build runs clean", "no em or en dashes"],
+   "tests": ["node tools/agent-map.mjs seat AGENTS.md"],
+   "needsJustin": false,
+   "notes": "Keep AGENTS.md under 200 lines (Claude Code memory docs)."
+  }
+ ]
+}
