@@ -123,17 +123,17 @@ void main() {
     a = mix(a, 1.0, on); // lit-ok: shader constant
   }
 
+  if (vGb > 0.0) {                              // guestbook letter lanes // lit-ok: shader constant
+    col = uGbColor; // lit-ok: shader constant
+    a = max(a, vU); // lit-ok: shader constant
+  }
+
   if (uGbDim > 0.0) {                           // guestbook contrast: the field dims behind the panel // lit-ok: shader constant
     vec2 c = 0.5 * (uGbDimBox.xy + uGbDimBox.zw); // lit-ok: shader constant
     vec2 hs = 0.5 * (uGbDimBox.zw - uGbDimBox.xy); // lit-ok: shader constant
     float dd = length(max(abs(gl_FragCoord.xy - c) - hs, 0.0)); // lit-ok: shader constant
     float m = 1.0 - smoothstep(0.0, uGbDimFeather, dd); // lit-ok: shader constant
     a *= 1.0 - uGbDim * m; // lit-ok: shader constant
-  }
-
-  if (vGb > 0.0) {                              // guestbook letter lanes // lit-ok: shader constant
-    col = uGbColor; // lit-ok: shader constant
-    a = max(a, vU); // lit-ok: shader constant
   }
 
   a *= edge;

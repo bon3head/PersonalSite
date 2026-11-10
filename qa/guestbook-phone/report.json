@@ -1,0 +1,380 @@
+{
+  "contrast": [
+    {
+      "state": "signing",
+      "sel": ".jp-gb-input--name",
+      "kind": "typed",
+      "box": [
+        47.796875,
+        633,
+        326.203125,
+        39
+      ],
+      "color": "rgb(230, 232, 234)",
+      "bg": "bg-signing.png"
+    },
+    {
+      "state": "signing",
+      "sel": ".jp-gb-input--line",
+      "kind": "placeholder",
+      "box": [
+        39,
+        688,
+        335,
+        28
+      ],
+      "color": "rgb(167, 171, 176)",
+      "bg": "bg-signing.png"
+    },
+    {
+      "state": "signing",
+      "sel": ".jp-gb-seed",
+      "kind": "seed",
+      "box": [
+        153.203125,
+        752,
+        101.421875,
+        20
+      ],
+      "color": "rgb(167, 171, 176)",
+      "bg": "bg-signing.png"
+    },
+    {
+      "state": "keyboard-open",
+      "sel": ".jp-gb-input--name",
+      "kind": "typed",
+      "box": [
+        47.796875,
+        341,
+        326.203125,
+        39
+      ],
+      "color": "rgb(230, 232, 234)",
+      "bg": "bg-keyboard-open.png"
+    },
+    {
+      "state": "keyboard-open",
+      "sel": ".jp-gb-input--line",
+      "kind": "typed",
+      "box": [
+        39,
+        396,
+        335,
+        28
+      ],
+      "color": "rgb(230, 232, 234)",
+      "bg": "bg-keyboard-open.png"
+    },
+    {
+      "state": "keyboard-open",
+      "sel": ".jp-gb-seed",
+      "kind": "seed",
+      "box": [
+        153.203125,
+        460,
+        101.421875,
+        20
+      ],
+      "color": "rgb(167, 171, 176)",
+      "bg": "bg-keyboard-open.png"
+    },
+    {
+      "state": "done",
+      "sel": ".jp-gb-seed",
+      "kind": "seed",
+      "box": [
+        16,
+        764,
+        101.421875,
+        20
+      ],
+      "color": "rgb(167, 171, 176)",
+      "bg": "bg-done.png"
+    },
+    {
+      "state": "done",
+      "sel": ".jp-gb-done",
+      "kind": "done",
+      "box": [
+        16,
+        548,
+        358,
+        72
+      ],
+      "color": "rgb(230, 232, 234)",
+      "bg": "bg-done.png"
+    },
+    {
+      "state": "done",
+      "sel": ".jp-gb-note",
+      "kind": "note",
+      "box": [
+        16,
+        632,
+        358,
+        20
+      ],
+      "color": "rgb(167, 171, 176)",
+      "bg": "bg-done.png"
+    }
+  ],
+  "geometry": [
+    {
+      "state": "signing",
+      "visualViewportH": 844,
+      "panel": [
+        16,
+        633,
+        374,
+        784
+      ],
+      "name": [
+        48,
+        633,
+        374,
+        672
+      ],
+      "line": [
+        39,
+        688,
+        374,
+        716
+      ],
+      "pill": [
+        16,
+        740,
+        141,
+        784
+      ],
+      "glyphs": [
+        [
+          38,
+          211,
+          73,
+          269
+        ],
+        [
+          85,
+          170,
+          121,
+          229
+        ],
+        [
+          142,
+          160,
+          177,
+          219
+        ],
+        [
+          184,
+          181,
+          218,
+          239
+        ],
+        [
+          237,
+          188,
+          272,
+          246
+        ],
+        [
+          291,
+          155,
+          326,
+          215
+        ]
+      ],
+      "focusedShadow": "rgb(123, 181, 248) 0px -2px 0px 0px inset"
+    },
+    {
+      "state": "keyboard-open",
+      "visualViewportH": 508,
+      "panel": [
+        16,
+        341,
+        374,
+        492
+      ],
+      "name": [
+        48,
+        341,
+        374,
+        380
+      ],
+      "line": [
+        39,
+        396,
+        374,
+        424
+      ],
+      "pill": [
+        16,
+        448,
+        141,
+        492
+      ],
+      "glyphs": [
+        [
+          26,
+          46,
+          61,
+          104
+        ],
+        [
+          78,
+          24,
+          114,
+          83
+        ],
+        [
+          140,
+          37,
+          175,
+          96
+        ],
+        [
+          193,
+          67,
+          227,
+          124
+        ],
+        [
+          233,
+          27,
+          268,
+          85
+        ],
+        [
+          290,
+          50,
+          326,
+          109
+        ]
+      ],
+      "focusedShadow": "rgb(123, 181, 248) 0px -2px 0px 0px inset"
+    },
+    {
+      "state": "done",
+      "visualViewportH": 844,
+      "panel": [
+        16,
+        548,
+        374,
+        784
+      ],
+      "name": null,
+      "line": null,
+      "pill": [
+        16,
+        708,
+        170,
+        752
+      ],
+      "glyphs": [
+        [
+          147,
+          216,
+          168,
+          251
+        ],
+        [
+          179,
+          215,
+          200,
+          250
+        ],
+        [
+          210,
+          214,
+          231,
+          248
+        ],
+        [
+          240,
+          210,
+          260,
+          244
+        ],
+        [
+          270,
+          209,
+          290,
+          243
+        ],
+        [
+          301,
+          208,
+          321,
+          241
+        ]
+      ],
+      "focusedShadow": null
+    }
+  ],
+  "serverWordsWhileOpen": [],
+  "contrastResult": [
+    {
+      "state": "signing",
+      "target": ".jp-gb-input--name",
+      "kind": "typed",
+      "worst": 12.56,
+      "pass": true
+    },
+    {
+      "state": "signing",
+      "target": ".jp-gb-input--line",
+      "kind": "placeholder",
+      "worst": 6.7,
+      "pass": true
+    },
+    {
+      "state": "signing",
+      "target": ".jp-gb-seed",
+      "kind": "seed",
+      "worst": 7.72,
+      "pass": true
+    },
+    {
+      "state": "keyboard-open",
+      "target": ".jp-gb-input--name",
+      "kind": "typed",
+      "worst": 12.53,
+      "pass": true
+    },
+    {
+      "state": "keyboard-open",
+      "target": ".jp-gb-input--line",
+      "kind": "typed",
+      "worst": 12.73,
+      "pass": true
+    },
+    {
+      "state": "keyboard-open",
+      "target": ".jp-gb-seed",
+      "kind": "seed",
+      "worst": 7.18,
+      "pass": true
+    },
+    {
+      "state": "done",
+      "target": ".jp-gb-seed",
+      "kind": "seed",
+      "worst": 8.48,
+      "pass": true
+    },
+    {
+      "state": "done",
+      "target": ".jp-gb-done",
+      "kind": "done",
+      "worst": 15.94,
+      "pass": true
+    },
+    {
+      "state": "done",
+      "target": ".jp-gb-note",
+      "kind": "note",
+      "worst": 8.48,
+      "pass": true
+    }
+  ]
+}
