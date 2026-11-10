@@ -1,0 +1,333 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"signer","type":"string","label":"Typed name (approved copy only until S09 1.6.0 is approved)","default":"Justin Poli","maxLength":24},
+    {"id":"openSeed","type":"number","label":"Open seed (uint32): part heights, camera yaw and rise, wobble, typing noise","default":2718281828,"min":0,"max":4294967295,"step":1},
+    {"id":"signSeed","type":"number","label":"Sign seed (uint32): lock-in heights, settle, pull-back drift, hex readout","default":3141592653,"min":0,"max":4294967295,"step":1}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/lanefield.js"></script>
+    <style>
+      @font-face {
+        font-family: "Commit Mono";
+        src: url("assets/fonts/commit-mono-latin-400-normal.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+      }
+      :root {
+        --void-ground: #0a0c0f;
+        --void-text2: #a7abb0;
+        --signal: #7bb5f8;
+        --font: "Commit Mono", ui-monospace, monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--void-ground);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        font-family: var(--font);
+        font-variant-numeric: tabular-nums;
+      }
+      #field {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+      }
+      /* DESIGN 6.14: the DOM panel moves on translateZ under perspective (guestbook.perspectivePx 900,
+         panelDepthPx 600), never on opacity */
+      #panel {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 108px;
+        height: 80px;
+        perspective: 900px;
+        perspective-origin: 50% 0%;
+      }
+      #seed-hex {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        margin-left: -96px;
+        width: 192px;
+        text-align: center;
+        font-size: 32px;
+        letter-spacing: 0.02em;
+        color: var(--void-text2);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="11"
+      data-width="1920"
+      data-height="1080"
+    >
+      <canvas id="field" width="1920" height="1080" data-layout-ignore></canvas>
+      <div id="panel">
+        <div id="seed-line" class="clip" data-start="0.6" data-duration="10.4" data-track-index="1" data-hold>
+          <span id="seed-hex" style="display: block">00000000</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const LF = window.Lanefield;
+        const { lerp, clamp01 } = LF;
+        const easeMain = LF.EASE.lusionMain; // guestbook.easeMain 0.35, 0, 0, 1
+        const easeSoft = LF.EASE.lusionSoft; // guestbook.easeSoft 0.4, 0, 0.1, 1
+        const ctx = document.getElementById("field").getContext("2d");
+        const hexEl = document.getElementById("seed-hex");
+        const vars = (window.__hyperframes && window.__hyperframes.getVariables && window.__hyperframes.getVariables()) || {};
+        const signer = Array.from(String(vars.signer || "Justin Poli")).slice(0, 24); // guestbook.nameMaxChars
+        const openSeed = (Number(vars.openSeed) >>> 0) || 2718281828;
+        const signSeed = (Number(vars.signSeed) >>> 0) || 3141592653;
+
+        // ---- DESIGN 1.5.0 section 12, guestbook tokens (verbatim) ----
+        const G = {
+          camera: { dollyIn: 0.26, pushIn: 0.1, pullBack: -0.24, yawDeg: 9, riseFrac: 0.06, driftYawDeg: 14 },
+          part: { radiusFrac: 0.6, pushFrac: 0.12, depthFrac: 0.07, residual: 0.4 },
+          mark: {
+            spacingFrac: 0.05, heightFrac: [0.075, 0.095], wobbleFrac: 0.012, glyphFrac: 0.055,
+            noiseFrac: 0.02, bendPower: 2, settleRadiusFrac: [0.05, 0.15], settleScale: [0.55, 0.85],
+            glyphPx: [28, 96], // web 14 to 96; frame.md video floor 28
+          },
+          shiftNdc: [0.0, 0.02],
+          fitWidthFrac: 0.8,
+          panelDepthPx: 600,
+        };
+        // Film beats. DESIGN 6.14 web timings x2 dwell for the camera and lock-in (frame.md pacing);
+        // typing is one keystroke every 0.2s.
+        const B = {
+          open: 0.6, openDur: 1.4, bandStagger: 0.15,  // travel 700ms x2, bandStagger 75ms x2
+          type0: 2.2, keyEvery: 0.2, letterDur: 0.8,     // letter 400ms x2
+          lock: 0, lockDur: 0.8,                          // lockIn 400ms x2
+          holdDur: 0.6,                                   // hold 300ms x2
+          pullDur: 3.2,                                   // wordCadence 1600ms x2
+          noiseStep: 0.06,                                // noiseStep 60ms (unchanged: it is the noise rate)
+        };
+        B.lock = B.type0 + signer.length * B.keyEvery + 0.7;
+        B.pull = B.lock + B.lockDur + B.holdDur;
+
+        // ---- entropy: counter-based draws, hash(seed, PARAM, index) as in src/motion/guestbook.ts ----
+        const PRM = { yaw: 1, rise: 2, wobblePhase: 3, wobbleFreq: 4, wobbleJitter: 5, height: 6, noise: 7, scramble: 8,
+          settleAngle: 9, settleRadius: 10, settleScale: 11, drift: 12, partSeed: 13, readout: 14, laneHeight: 15 };
+        const u = (seed, p, i) => LF.draw(seed, p, i || 0);
+        const sg = (seed, p, i) => u(seed, p, i) * 2 - 1;
+        const hex8 = (n) => (n >>> 0).toString(16).toUpperCase().padStart(8, "0");
+        const NOISE_GLYPHS = "0123456789ABCDEF";
+
+        // ---- rest framing: frame.md server camera ----
+        const REST = { pos: [-9.6, 3.3, 11.6], target: [0.5, 0.0, -3.0], fov: 48, shift: [0.56, 0.02] };
+        const well = REST.target.slice(); // the scene camera's ground target
+        const dist = Math.hypot(REST.pos[0] - well[0], REST.pos[1] - well[1], REST.pos[2] - well[2]);
+        const fwd2 = (() => { const x = well[0] - REST.pos[0], z = well[2] - REST.pos[2], l = Math.hypot(x, z); return [x / l, z / l]; })();
+        const right2 = [-fwd2[1], fwd2[0]];
+
+        // letter layout: spacing shrinks so n letters fit fitWidthFrac of the width at the dollied camera
+        const n = signer.length;
+        const focal = 540 / Math.tan((REST.fov * Math.PI) / 360);
+        const pxPerUnitIn = focal / (dist * (1 - G.camera.dollyIn));
+        const spacing = Math.min(dist * G.mark.spacingFrac, (1920 * G.fitWidthFrac) / pxPerUnitIn / Math.max(1, n));
+        const glyphWorld = Math.min(dist * G.mark.glyphFrac, spacing * 1.1);
+        function slot(i) {
+          const along = (i - (n - 1) / 2) * spacing;
+          const ph = u(openSeed, PRM.wobblePhase) * Math.PI * 2;
+          const fr = lerp(0.35, 0.9, u(openSeed, PRM.wobbleFreq));
+          const wob = dist * G.mark.wobbleFrac * (Math.sin(ph + i * fr) + 0.5 * sg(openSeed, PRM.wobbleJitter, i));
+          return [well[0] + right2[0] * along + fwd2[0] * wob, well[2] + right2[1] * along + fwd2[1] * wob];
+        }
+        const heightFor = (seed, i) => dist * lerp(G.mark.heightFrac[0], G.mark.heightFrac[1], u(seed, PRM.height, i));
+
+        // one lane per non-space character: the lane whose tip is nearest its slot
+        const tipOf = (lane) => { const o = (lane * LF.PTS + LF.PTS - 1) * 3; return [LF.base[o], LF.base[o + 1], LF.base[o + 2]]; };
+        const used = new Set();
+        const letters = signer.map((ch, i) => {
+          const [sx, sz] = slot(i);
+          let lane = -1;
+          if (ch !== " ") {
+            let best = Infinity;
+            for (let L = 0; L < LF.LANES; L++) {
+              if (used.has(L)) continue;
+              const t = tipOf(L);
+              const d = (t[0] - sx) * (t[0] - sx) + (t[2] - sz) * (t[2] - sz);
+              if (d < best) { best = d; lane = L; }
+            }
+            used.add(lane);
+          }
+          return { ch, i, lane, sx, sz, t0: B.type0 + i * B.keyEvery, resolveAt: B.lock + (B.lockDur * (i + 1)) / n };
+        });
+        const letterOf = new Int16Array(LF.LANES).fill(-1);
+        const skip = new Uint8Array(LF.LANES);
+        letters.forEach((l, k) => { if (l.lane >= 0) { letterOf[l.lane] = k; skip[l.lane] = 1; } });
+
+        // settle (sign seed)
+        const settleAng = u(signSeed, PRM.settleAngle) * Math.PI * 2;
+        const settleR = dist * G.part.radiusFrac * lerp(G.mark.settleRadiusFrac[0], G.mark.settleRadiusFrac[1], u(signSeed, PRM.settleRadius));
+        const settleOff = [Math.cos(settleAng) * settleR, Math.sin(settleAng) * settleR];
+        const settleScale = lerp(G.mark.settleScale[0], G.mark.settleScale[1], u(signSeed, PRM.settleScale));
+
+        const win = (t, a, d) => clamp01((t - a) / d);
+
+        function state(t) {
+          const open = easeMain(win(t, B.open, B.openDur));
+          const lock = easeSoft(win(t, B.lock, B.lockDur));
+          const pull = easeSoft(win(t, B.pull, B.pullDur));
+          const bands = [0, 1, 2].map((b) => easeMain(win(t, B.open + b * B.bandStagger, B.openDur)));
+          const dolly = G.camera.dollyIn * open + G.camera.pushIn * lock + (G.camera.pullBack - G.camera.dollyIn - G.camera.pushIn) * pull;
+          const yaw = (G.camera.yawDeg * sg(openSeed, PRM.yaw) * open * (1 - pull) + G.camera.driftYawDeg * sg(signSeed, PRM.drift) * pull) * (Math.PI / 180);
+          const rise = G.camera.riseFrac * sg(openSeed, PRM.rise) * open * (1 - pull);
+          const partK = 1 - (1 - G.part.residual) * pull;
+          const noise = dist * G.mark.noiseFrac * (1 - lock);
+          return { open, lock, pull, bands, dolly, yaw, rise, partK, noise, shiftMix: open * (1 - pull) };
+        }
+
+        function camAt(st) {
+          const off = [REST.pos[0] - well[0], REST.pos[1] - well[1], REST.pos[2] - well[2]];
+          const c = Math.cos(st.yaw), s = Math.sin(st.yaw);
+          const ox = off[0] * c - off[2] * s, oz = off[0] * s + off[2] * c;
+          const k = 1 - st.dolly;
+          const pos = [well[0] + ox * k, well[1] + off[1] * k + st.rise * dist, well[2] + oz * k];
+          const shift = [lerp(REST.shift[0], G.shiftNdc[0], st.shiftMix), lerp(REST.shift[1], G.shiftNdc[1], st.shiftMix)];
+          return { pos, target: well, fov: REST.fov, shift };
+        }
+
+        let ST = null, T = 0;
+        const R = dist * G.part.radiusFrac;
+        function deform(i, k, p) {
+          const li = letterOf[i];
+          if (li >= 0) {
+            const l = letters[li];
+            const rise = easeMain(win(T, l.t0, B.letterDur));
+            if (rise <= 0) return;
+            const tip = tipOf(i);
+            const step = Math.floor(T / B.noiseStep);
+            const n1 = ST.noise * sg(openSeed, PRM.noise, step * 64 + l.i);
+            const n2 = ST.noise * 0.5 * sg(openSeed, PRM.noise, step * 64 + l.i + 32);
+            const h = lerp(heightFor(openSeed, l.i), heightFor(signSeed, l.i), ST.lock) * lerp(1, settleScale, ST.pull);
+            const sx = settleOff[0] * ST.pull, sz = settleOff[1] * ST.pull;
+            const ox = (l.sx + sx + right2[0] * n2 - tip[0]) * rise;
+            const oz = (l.sz + sz + right2[1] * n2 - tip[2]) * rise;
+            const oy = (h + n1 - tip[1]) * rise;
+            const w = Math.pow(k / (LF.PTS - 1), G.mark.bendPower);
+            p[0] += ox * w; p[1] += oy * w; p[2] += oz * w;
+            return;
+          }
+          const dx = p[0] - well[0], dz = p[2] - well[2];
+          const d = Math.hypot(dx, dz);
+          if (d >= R) return;
+          const b = ST.bands[LF.band[i]] * ST.partK;
+          if (b <= 0) return;
+          const q = 1 - d / R;
+          const fall = q * q * (3 - 2 * q); // smooth falloff, C1 at the part edge
+          const push = dist * G.part.pushFrac * fall * b;
+          const nx = d > 1e-4 ? dx / d : 1, nz = d > 1e-4 ? dz / d : 0;
+          p[0] += nx * push;
+          p[2] += nz * push;
+          p[1] += dist * G.part.depthFrac * sg(openSeed, PRM.laneHeight, i) * fall * b; // seeded per-lane height
+        }
+
+        const scr = [0, 0, 0];
+        function drawLetters(cam) {
+          const S = LF.S, V = LF.V, PTS = LF.PTS;
+          ctx.globalCompositeOperation = "lighter";
+          ctx.lineCap = "round";
+          const step = Math.floor(T / B.noiseStep);
+          for (const l of letters) {
+            if (l.lane < 0) continue;
+            const rise = easeMain(win(T, l.t0, B.letterDur));
+            if (rise <= 0) continue;
+            // the letter lane: signalHot on void (DESIGN 6.14)
+            ctx.strokeStyle = LF.rgba(LF.C.hot, 0.35 + 0.5 * rise);
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            let started = false;
+            for (let k = 0; k < PTS; k++) {
+              const a = l.lane * PTS + k;
+              if (!V[a]) { started = false; continue; }
+              if (!started) { ctx.moveTo(S[a * 3], S[a * 3 + 1]); started = true; } else ctx.lineTo(S[a * 3], S[a * 3 + 1]);
+            }
+            ctx.stroke();
+            // the glyph rides the lane tip at its true depth
+            const a = l.lane * PTS + PTS - 1;
+            if (!V[a]) continue;
+            const tip = [LF.P[a * 3], LF.P[a * 3 + 1], LF.P[a * 3 + 2]];
+            const ok1 = LF.project(cam, tip[0], tip[1], tip[2], scr);
+            if (!ok1) continue;
+            const ax = scr[0], ay = scr[1];
+            LF.project(cam, tip[0] + right2[0] * glyphWorld, tip[1], tip[2] + right2[1] * glyphWorld, scr);
+            const size = Math.max(G.mark.glyphPx[0], Math.min(G.mark.glyphPx[1], Math.hypot(scr[0] - ax, scr[1] - ay)));
+            let ch = l.ch;
+            if (T >= B.lock && T < l.resolveAt) ch = NOISE_GLYPHS[Math.floor(u(signSeed, PRM.scramble, step * 64 + l.i) * 16)];
+            ctx.save();
+            ctx.translate(ax, ay);
+            ctx.scale(rise, rise); // glyph motion is translate and perspective scale, not opacity
+            ctx.font = "400 " + size.toFixed(1) + 'px "Commit Mono"';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            const resolved = T >= l.resolveAt;
+            ctx.fillStyle = LF.rgba(resolved ? LF.C.hot : LF.C.signal, 1);
+            ctx.globalCompositeOperation = "source-over";
+            ctx.fillText(ch, 0, -size * 0.12);
+            ctx.restore();
+            ctx.globalCompositeOperation = "lighter";
+          }
+          ctx.globalCompositeOperation = "source-over";
+        }
+
+        function readout(t) {
+          const step = Math.floor(t / B.noiseStep);
+          if (t < B.lock) return hex8(Math.floor(u(openSeed, PRM.readout, step) * 4294967296));
+          const fin = hex8(signSeed);
+          const roll = hex8(Math.floor(u(signSeed, PRM.readout, step) * 4294967296));
+          const k = Math.floor(clamp01((t - B.lock) / B.lockDur) * 8);
+          return fin.slice(0, k) + roll.slice(k);
+        }
+
+        function renderAt(t) {
+          T = t;
+          ST = state(t);
+          const cam = LF.render(ctx, t, { cam: camAt(ST), seed: openSeed, alpha: 0.16, width: 1.4, deform, skip });
+          drawLetters(cam);
+          hexEl.textContent = readout(t);
+          hexEl.style.color = t >= B.lock + B.lockDur ? "#7bb5f8" : "#a7abb0";
+        }
+
+        // the seed readout panel: translateZ under perspective, from panelDepthPx behind the plane
+        const tl = gsap.timeline({ paused: true });
+        tl.fromTo("#seed-hex", { z: -G.panelDepthPx, y: 40 }, { z: 0, y: 0, duration: B.openDur, ease: easeMain }, B.open);
+        tl.to("#seed-hex", { z: -G.panelDepthPx * 0.5, y: 24, duration: B.pullDur, ease: easeSoft }, B.pull);
+        tl.to({}, { duration: 0.01 }, 10.99);
+
+        window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+        window.__hf = window.__hf || {};
+        window.__hf.buildReady = window.__hf.buildReady || {};
+        window.__hf.buildReady["guestbook-fonts"] = document.fonts.load('400 32px "Commit Mono"').then(() => renderAt(0));
+        renderAt(0);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>
