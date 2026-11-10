@@ -49,7 +49,7 @@ import {
 } from './travel';
 import { prefersReducedMotion } from './lib/reducedMotion';
 import type { Lanefield } from './world/types';
-import { createServerController } from './world/server';
+import { createServerController, type ServerController } from './world/server';
 import {
   createLeaflinkController,
   type LeaflinkController,
@@ -317,6 +317,13 @@ export default function App(props: AppProps): JSX.Element {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Guestbook open (DESIGN 6.14, S05 1.2.0): the server words step out
+  // of the field so the mark has it to itself.
+  useEffect(() => {
+    const server = controllersRef.current.get('server') as ServerController | undefined;
+    server?.setHidden?.(sheet === 'guestbook');
+  }, [sheet, wired]);
 
   // Polish round wiring (DESIGN 6.12, 6.13).
   const claims = useTrailClaims(wired?.sidequests ?? null);

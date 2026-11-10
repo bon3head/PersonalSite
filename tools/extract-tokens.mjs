@@ -132,6 +132,7 @@ push('--jp-gb-pill-radius', `${tokens.guestbook.pillRadiusPx}px`);
 push('--jp-gb-panel-depth', `${tokens.guestbook.panelDepthPx}px`);
 push('--jp-gb-perspective', `${tokens.guestbook.perspectivePx}px`);
 push('--jp-gb-glyph-max', `${tokens.guestbook.mark.glyphPx[1]}px`);
+push('--jp-gb-focus-rule', `${tokens.guestbook.focusRulePx}px`);
 push('--jp-sheet-max-width', `${tokens.chrome.sheetMaxWidthPx}px`);
 lines.push('}');
 mkdirSync(join(root, 'src/styles'), { recursive: true });

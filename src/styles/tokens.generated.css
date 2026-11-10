@@ -1,4 +1,4 @@
-/* GENERATED from spec/astryx/DESIGN.md v1.5.0. Do not edit. */
+/* GENERATED from spec/astryx/DESIGN.md v1.6.0. Do not edit. */
 :root {
   --jp-void-ground: #0A0C0F;
   --jp-void-raised: #15171B;
@@ -63,5 +63,6 @@
   --jp-gb-panel-depth: 600px;
   --jp-gb-perspective: 900px;
   --jp-gb-glyph-max: 96px;
+  --jp-gb-focus-rule: 2px;
   --jp-sheet-max-width: 640px;
 }

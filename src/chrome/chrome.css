@@ -546,7 +546,7 @@
     gap: var(--spacing-3);
     margin: 0;
     pointer-events: auto;
-    transform: translate3d(0, 0, calc(-1 * var(--jp-gb-panel-depth)));
+    transform: translate3d(0, calc(-1 * var(--jp-gb-lift, 0px)), calc(-1 * var(--jp-gb-panel-depth)));
     transform-origin: 0 100%;
     visibility: hidden;
     transition:
@@ -555,7 +555,7 @@
   }
 
   .jp-gb[data-shown="true"] .jp-gb-panel {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, calc(-1 * var(--jp-gb-lift, 0px)), 0);
     visibility: visible;
     transition:
       transform var(--jp-duration-gb-panel) var(--jp-ease-gb-main),
@@ -572,6 +572,14 @@
     display: flex;
     align-items: baseline;
     gap: var(--spacing-3);
+    padding-bottom: var(--spacing-1);
+    box-shadow: inset 0 -1px 0 0 var(--jp-hairline);
+  }
+
+  /* Focused line (DESIGN 6.14, 1.6.0): an accent rule along the bottom,
+   * readable over the dimmed field and above the keyboard. */
+  .jp-gb-prompt:focus-within {
+    box-shadow: inset 0 calc(-1 * var(--jp-gb-focus-rule)) 0 0 var(--jp-accent);
   }
 
   .jp-gb-caret {

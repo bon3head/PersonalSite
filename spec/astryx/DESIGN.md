@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.5.0, 2026-11-09. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.6.0, 2026-11-10. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -293,9 +293,17 @@ The guestbook is a sheet in the router's sense (S03 section 2: sheets are not ro
 
 The well (part center and mark baseline center) is the scene camera's ground target, where the lanes are. On open the camera's principal-point shift moves with the dolly from the scene value to `guestbook.shiftNdc` (the well rises to the upper middle of the viewport, above the prompt), and the dolly translates the camera along the ray to the well. The readout and hero are hidden while the sheet is open, so the mark has the field to itself. All world fractions are fractions of the camera to well distance at open, so the same mark reads the same size on every scene; letter spacing shrinks when needed so the dollied-in mark fits `guestbook.fitWidthFrac` of the viewport width. Two curves only, both from the Lusion extract (`guestbook.easeMain` `0.35, 0, 0, 1`; `guestbook.easeSoft` `0.4, 0, 0.1, 1`); no spring. Motion is transform: camera, lane positions, glyph translate and perspective scale. The DOM panel moves on translateZ under perspective, never on opacity.
 
+**Phone frame (1.6.0).** Every guestbook measurement reads the screen the visitor actually sees, so the mark and the panel land in the same place in Safari and in in-app browsers. The field's projection uses the canvas's own CSS box (it is drawn at `100vw` by `100dvh`), never `innerWidth` and `innerHeight`, which disagree with it on phones. The free region is the visual viewport (`window.visualViewport`, falling back to the layout viewport) above the panel's top edge; the well lands at the free region's center offset by `guestbook.shiftNdc` in that region's NDC, and fit width (`fitWidthFrac`) is a fraction of the free region's width. The director recomputes this on every frame; when it changes (the keyboard opening, a toolbar collapsing) the shift eases to the new value over `guestbook.ms.panel` on the Lusion main curve, never a jump.
+
+**Keyboard.** While the sheet is open the panel listens to visual viewport resize and scroll. When the keyboard covers the bottom of the layout viewport, the panel lifts on translateY by exactly the covered height, so its bottom edge sits `--jp-gutter` above the keyboard and both prompt lines and the lock in pill stay fully visible. The lift moves on the panel transition (`guestbook.ms.panel`, Lusion main). The focused prompt line carries an inset rule of `guestbook.focusRulePx` in `accent` along its bottom edge; unfocused lines carry a 1px `hairline`. No outline box, no fill.
+
+**Contrast.** The lanes behind the panel dim while the sheet is open, so the field itself dims and no surface is drawn: the lane shader multiplies lane alpha by `1 - guestbook.dim.amount` inside the panel's box grown by `guestbook.dim.padPx`, feathering back to full over `guestbook.dim.featherPx` outside it (a rounded falloff, not an edge). Letter lanes are exempt, so the mark is never dimmed. The dim rides the panel's on-screen box every frame (it follows the lift and the depth move) and its amount moves with the panel on open and close. Floor: typed text, placeholder, seed readout and done copy each hold at least 4.5:1 against the brightest pixel behind them, measured over the densest lanes at 390px; the placeholder meets the same floor as typed text. No card, no white surface, no gradient, no shadow.
+
+**Scene words.** The server scene's in-scene words (S05) hide while the sheet is open (they fade out over `motion.ms.fast` like a travel pause and do not spawn), so the mark has the field to itself; they resume on close.
+
 **Entropy.** Two fresh 32-bit seeds per sign: an open seed at open (part heights, camera yaw and rise, baseline wobble, typing noise) and a sign seed at lock-in (lock-in heights, settle offset and scale, pull-back drift, and the hex shown in the seed readout). Source: `crypto.getRandomValues`. With `?seed` in the URL (6.11), each seed is instead `hash32(sessionSeed, channel, n)` for channels `guestbook-open` and `guestbook-sign`, so a run replays. Values derive from a seed by `hash32(seed, param, index)`.
 
-**Engine cost.** One extra RGBA32F data texture the size of the activity texture (256 by 24, 98,304 bytes): per lane xyz offset plus a bend flag, written only while the guestbook moves. Nine uniforms (that texture, bend power, part center, radius, push, depth, seed, band progress, letter color). Same mesh, same draw call, same WebGL context. Letter lanes skip the ring and silhouette so the glyph and the lane tip agree. Letter lanes draw in `signalHot` on void and field, `ink` on paper.
+**Engine cost.** One extra RGBA32F data texture the size of the activity texture (256 by 24, 98,304 bytes): per lane xyz offset plus a bend flag, written only while the guestbook moves. Twelve uniforms (that texture, bend power, part center, radius, push, depth, seed, band progress, letter color, and from 1.6.0 the dim box, dim amount and dim feather). Same mesh, same draw call, same WebGL context. Letter lanes skip the ring and silhouette so the glyph and the lane tip agree. Letter lanes draw in `signalHot` on void and field, `ink` on paper.
 
 **Reduced motion.** No camera move, no noise, no part motion: the field renders once per change with the mark at its seeded resting position and height. Same content, same 3D mark.
 
@@ -380,7 +388,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
 
 ```json design-tokens
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -987,6 +995,12 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
       "coarse": [0.0, 0.08]
     },
     "fitWidthFrac": 0.8,
+    "dim": {
+      "amount": 0.94,
+      "padPx": 24,
+      "featherPx": 64
+    },
+    "focusRulePx": 2,
     "pillRadiusPx": 88,
     "panelDepthPx": 600,
     "perspectivePx": 900
@@ -1063,6 +1077,7 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.6.0, 2026-11-10: guestbook on real phones (Justin's iPhone demo, Safari and an in-app browser). Section 6.14 gains phone frame, keyboard, contrast and scene-word rules; tokens `guestbook.dim.*` (amount 0.94, pad 24px, feather 64px) and `guestbook.focusRulePx` 2 are new and proposed until a device run confirms them. Contrast is the lane-dim option because G-TOKENS bans gradients in CSS (a CSS radial scrim would fail the lint). The projection now reads the canvas's CSS box, which was `100dvh` tall while the camera aspect used `innerHeight`. Uniforms nine to twelve; draw calls unchanged. Lock-in choreography unchanged.
 - 1.5.0, 2026-11-09: guestbook (section 6.14, `guestbook.*` new). Brief: `guestbook/prompt.md` on astryx-polish-r2 (entropic and 3D). Two Lusion beziers enter as guestbook-only curves (`guestbook.easeMain`, `guestbook.easeSoft`, from `guestbook/references/lusion-style-brief.md`); the site curves are unchanged. Pill radius 88 from the same extract. Engine adds one RGBA32F 256 by 24 texture (98,304 bytes) and nine uniforms; draw calls unchanged. Proposed values: every `guestbook.*` number is proposed until a device run confirms it. Storage: browser-local only (Justin, 2026-11-10); a shared store, if ever wanted, is a separate change.
 
 - 1.4.0, 2026-11-05: coarse server camera refit for the S09 1.4.0 landing intro. The shorter intro left a black band between the copy (readout bottom 33.8% at 390x844) and the lane field (dense from 54%). Coarse server pose only; fine unchanged. pos y 3.0 to 5.0, fovDeg 58 to 52, shiftNdc y -0.4 to -0.3. Pitch -10.97 to -17.91, inside the SideQuests band (-75 to -5) so morph sampling stays in band; no server band exists. Verified geometrically (all 6144 lanes projected through the shifted camera at 390x844): field spans 40.0% to 83.9% (was 54.3% to 86.6%), zero segments in the readout box plus padding, so T-SRV-2 holds. Lane count, grid, and copy unchanged.

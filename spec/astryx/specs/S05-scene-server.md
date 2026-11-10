@@ -1,6 +1,6 @@
 # S05 Scene: the inference server (home, `/`)
 
-Version 1.1.0, 2026-11-01. Depends on: S02, S03, S04, S09, DESIGN `world.server`, `world.camera.server`. Blocks: S10 poster, S11 scene gates.
+Version 1.2.0, 2026-11-10. Depends on: S02, S03, S04, S09, DESIGN `world.server`, `world.camera.server`. Blocks: S10 poster, S11 scene gates.
 
 ## 1. Purpose
 
@@ -59,6 +59,8 @@ C-SRV-H1 (display-0, weight 200), C-SRV-P1, C-SRV-P2, C-SRV-P3. No links on this
 | Morph out to a project | The field loosens during Release; the ring grows at the target anchor during Gather; the project mark looms in during Reveal (DESIGN.md section 6.7). No mark ever appears on server itself. | Inside travel 700ms |
 | Idle: pulses | Fragment `fire()` (S02 5.2): warp period hashed in `[3, 7]s`, duty 0.6, head speed 0.55 lane lengths per second, sigma 0.05, SM-column sweep every 6s. | Linear time, always on |
 | Idle: words | Every `wordCadence` (1100ms) the next word in `world.server.words` (cycling) spawns at `focus + (0, 0, 0.2)` from a pool of 6 troika `Text` meshes. Over `--jp-duration-word` (2600ms): position moves by `wordDrift (-1.0, 0.5, 1.0)`, toward the camera and into the frame (y sign alternates per word), color goes signalHot at 0%, signal at 40%, void.text2 at 100%; opacity 1 until 55%, then `easePlain` to 0. Font size `wordSize` 0.32 world units, Commit Mono 400 `.woff`, billboarded (copy camera quaternion each frame), anchor center. | Linear position, eased opacity |
+| Words on phones (1.2.0) | On the coarse camera variant (phones, including 390px wide) each word is kept fully inside the viewport, inset by `--jp-gutter`: after its drift position is computed, the word's billboarded box is projected and, if any edge would cross the inset viewport, the word slides back along the camera's right and up axes by the overflow. Drift direction, timing, color and fade are unchanged; only the clamped position differs. Fine (desktop) words are not clamped, so they still enter from past the right edge as they cool. | Per frame |
+| Guestbook open (1.2.0) | While the guestbook sheet is open (DESIGN 6.14), words fade out over `--duration-fast` as on travel exit and none spawn; on close the cadence restarts (reduced motion: the three statics return). | 150ms ease |
 | Idle: camera | Yaw `±3 deg` around target over 20s sine; pointer parallax up to 1.5 deg (fine pointer). | Damped, half-life 180ms |
 | Interaction | None beyond parallax. The scene does not respond to clicks; it is a machine running, not a toy. | n/a |
 | Exit | Controller pauses words (pool hidden at t = 0 of travel, opacity tween to 0 over `--duration-fast`). Pulses fade with `uW.x`. | 150ms ease |
@@ -102,6 +104,7 @@ U-SRV-1 (R-GPU): the 48 SM by 128 core structure is NVIDIA's public GA104 spec f
 
 ## 10. Changelog
 
+- 1.2.0, 2026-11-10: words stay inside the viewport on phones, and hide while the guestbook is open (Justin's phone demo brief). The site-wide question (form the words from lanes, or remove them) is open with Justin: C-SRV-P2 no longer carries the stack words, so removal would take them off the site.
 - 1.1.0, 2026-11-01: W1 server hero is the field (section 2) with the server gradient group and morph out row. No lane, camera, or copy change.
 - 1.0.1, 2026-10-30: R-GPU accepted by Justin.
 - 1.0.0, 2026-10-30: initial.

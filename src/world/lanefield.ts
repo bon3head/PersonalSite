@@ -328,6 +328,11 @@ export function createLanefield(
     uGbSeed: { value: 0 },
     uGbPart: { value: new THREE.Vector3(0, 0, 0) },
     uGbColor: { value: hexToVec3(T.color.signalHot) },
+    // Guestbook contrast (DESIGN guestbook section, phone polish): lanes behind the panel dim.
+    // Box in drawing-buffer px (x0, y0, x1, y1, origin bottom left).
+    uGbDimBox: { value: new THREE.Vector4(0, 0, 0, 0) },
+    uGbDim: { value: 0 },
+    uGbDimFeather: { value: 1 },
   };
   const gbHot = hexToVec3(T.color.signalHot);
   const gbInk = hexToVec3(T.color.ink);
@@ -440,8 +445,14 @@ export function createLanefield(
   const gbVec2 = new THREE.Vector3();
   const clearColor = new THREE.Color();
   const governor = new Governor();
-  let cssW = window.innerWidth;
-  let cssH = window.innerHeight;
+  // Projection size is the canvas's own CSS box (100vw by 100dvh), not
+  // innerWidth/innerHeight, which differ from it on phones (DESIGN guestbook section).
+  function canvasCss(): [number, number] {
+    const w = canvas.clientWidth || window.innerWidth;
+    const h = canvas.clientHeight || window.innerHeight;
+    return [w, h];
+  }
+  let [cssW, cssH] = canvasCss();
   let currentDpr = 1;
   let raf = 0;
   let loopRunning = false;
@@ -915,8 +926,7 @@ export function createLanefield(
   });
 
   function onResize(): void {
-    cssW = window.innerWidth;
-    cssH = window.innerHeight;
+    [cssW, cssH] = canvasCss();
     camera.aspect = cssW / cssH;
     const nextVariant: 'coarse' | 'fine' = window.innerWidth < T.breakpoints.coarseOrNarrowBelowPx ||
       (window.matchMedia('(pointer: coarse)').matches && window.innerWidth < T.breakpoints.desktopFromPx)
@@ -1349,6 +1359,9 @@ export function createLanefield(
     worldToScreen(p: [number, number, number]): [number, number] {
       return rig.worldToScreen(p, cssW, cssH);
     },
+    viewportCss(): [number, number] {
+      return [cssW, cssH];
+    },
     onFrame(cb: (tSec: number, dtSec: number) => void): () => void {
       callbacks.add(cb);
       return () => {
@@ -1487,6 +1500,22 @@ export function createLanefield(
           forward: [-dx / flat, -dz / flat],
           right: [dz / flat, -dx / flat],
         };
+      },
+      setDim(box: [number, number, number, number] | null, amount: number): void {
+        if (!box || amount <= 0) {
+          (uniforms.uGbDim.value as number) = 0;
+          return;
+        }
+        const pad = T.guestbook.dim.padPx;
+        const d = currentDpr;
+        (uniforms.uGbDimBox.value as THREE.Vector4).set(
+          (box[0] - pad) * d,
+          (cssH - box[3] - pad) * d,
+          (box[2] + pad) * d,
+          (cssH - box[1] + pad) * d,
+        );
+        (uniforms.uGbDimFeather.value as number) = T.guestbook.dim.featherPx * d;
+        (uniforms.uGbDim.value as number) = Math.min(1, amount) * T.guestbook.dim.amount;
       },
       render(): void {
         if (!loopRunning && !disposed && !failed) renderOnce();
