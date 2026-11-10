@@ -4,6 +4,7 @@
 // __lanefield and __guestbook debug state rather than pixels.
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { T } from '../src/tokens.generated';
 
 const DEV = 'http://localhost:5173';
 const PREVIEW = 'http://localhost:4173';
@@ -239,9 +240,11 @@ test('T-GB-6 phone polish: words hide, dim follows the panel, keyboard lift, foc
     };
   });
   expect(lifted.vvH).toBe(844 - KB);
-  for (const b of [lifted.panel, lifted.name, lifted.line, lifted.pill]) expect(b).toBeLessThanOrEqual(lifted.vvH);
+  for (const b of [lifted.name, lifted.line, lifted.pill]) expect(b).toBeLessThanOrEqual(lifted.vvH);
+  // The panel's bottom edge sits one gutter above the keyboard.
+  expect(Math.abs(lifted.vvH - lifted.panel - T.space.gutterPx.base)).toBeLessThanOrEqual(1);
   expect(lifted.rule).toContain('inset');
-  expect(lifted.rule).toMatch(/-2px/);
+  expect(lifted.rule).toContain(`-${T.guestbook.focusRulePx}px`);
   const after = await dimCheck();
   expect(after.off).toBeLessThan(2);
   // Close: dim off, the three reduced statics return.

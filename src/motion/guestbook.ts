@@ -224,8 +224,7 @@ export function createGuestbookDirector(
   function updateFrame(t: number, snap: boolean): void {
     const [x, y] = frameShift();
     const eps = 1e-3; // lit-ok: NDC change below a pixel is ignored
-    // While the open blend runs, the target snaps (shiftMix eases it in).
-    if (snap || !shiftMix.done(t)) {
+    if (snap) {
       frameX.go(t, x, 0, easeMain);
       frameY.go(t, y, 0, easeMain);
     } else {
