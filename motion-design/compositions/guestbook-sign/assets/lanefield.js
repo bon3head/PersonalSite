@@ -146,6 +146,7 @@
    *   opts.width    lane width px (frame.md: 1.4)
    *   opts.deform   optional fn(i, k, p) mutating p=[x,y,z] (parting ring, 3D offsets)
    *   opts.fireAll  optional {t0} : every warp fires one lockstep front at t0
+ *   opts.skip     optional Uint8Array(LANES): lanes the caller draws itself (S, V exported)
    *   opts.words    boolean, draw world.server.words at the focus
    *   opts.wordsFrom seconds when the word cadence starts
    */
@@ -185,6 +186,7 @@
         let any = false;
         for (let i = 0; i < LANES; i++) {
           if (band[i] !== b) continue;
+          if (o.skip && o.skip[i]) continue;
           for (let k = 0; k < PTS - 1; k++) {
             const a = i * PTS + k;
             if (!V[a] || !V[a + 1]) continue;
@@ -289,5 +291,5 @@
     }
   }
 
-  window.Lanefield = { render, project, camera, draw, EASE, lerp, lerp3, clamp01, rgba, mixc, C, T, LANES, PTS, base, band };
+  window.Lanefield = { S, V, P, zs, render, project, camera, draw, EASE, lerp, lerp3, clamp01, rgba, mixc, C, T, LANES, PTS, base, band };
 })();
