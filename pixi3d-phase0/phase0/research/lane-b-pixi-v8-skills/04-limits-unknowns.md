@@ -1,5 +1,7 @@
 # Lane B — Limits and unknowns
 
+> ERRATUM per independent review F9, 2026-11-12. Lane A resolved the npm versions from the registry API: @pixi/3d 0.1.0 with peer pixi.js ^8.23.0, pixi.js latest 8.23.0, recorded in Lane A 01-sources.md entries 7-8. The UNKNOWN entries in item 1 below refer to the npmjs.com UI fetch returning 403, not to the registry API. Distinguish npmjs.com UI failure from registry.npmjs.org API success. Pin @pixi/3d 0.1.0 and pixi.js 8.23.0, and re-verify at build time from the installed package.
+
 ## What was NOT verified
 
 1. npm package metadata — UNKNOWN
