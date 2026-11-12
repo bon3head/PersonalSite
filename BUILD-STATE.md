@@ -315,3 +315,19 @@ commit:
 tests:
 receipts:
 notes:
+
+## Critique 2026-11-12 (guestbook/critique-2026-11-12-brief.md)
+status: in progress
+agent: cloud thread "Fix guestbook after Nov 12 critique"
+commit: c237d1f (spec), d59c8db (code items 2 and 3), c8c762e (T-GB-8)
+tests:
+- Item 2 mark color: T-GB-7 PASS (two signs, pool color from the sign seed, replayed by markPoolHex, glyph and lane carry it).
+- Item 3 nodes only: T-SRV-4, T-SRV-4b (no stack names in dist/ scripts or token JSON), T-SRV-7 PASS. T-GB-6 PASS reading nodes.
+- Item 5 show the box: T-GB-8 PASS at 390px (phone) and 1440px on server, leaflink, sidequests.
+receipts: qa/critique-2026-11-12/
+notes:
+- BLOCKED: item 1, field restart on name focus on desktop web, not reproduced. Traced __guestbook (openSeed, dolly, phase), the camera pose and DOM mutations while clicking the name input and typing at 1440x900 on server and sidequests (dev build, SwiftShader): one open seed, no re-dolly, no remount. Live site is unreachable from the cloud sandbox. Need a screen recording or steps (browser, scene, how the sheet was opened) before fixing (DESIGN 6.14). Lead to check first: if the sheet opens before the field arrives (requestIdleCallback can wait on desktop Chrome, Safari uses setTimeout 0), GuestbookSheet rebinds the director and the dolly restarts from rest.
+- BLOCKED: item 4, bulge on LeafLink and SideQuests. At 390x844 (touch) and 1440x900, opening the guestbook, typing and pressing Lock in keeps document height equal to the viewport on all three scenes and the pill takes clicks (elementFromPoint). The three iPhone screenshots the brief cites are not in the repo or this session. Need them to tell layout overflow apart from the in-field part ring (DESIGN 6.14 part, residual 0.4 after pull back) before changing anything.
+- Pending Justin: C-SRV-ALT still names the RTX 3070 Ti (S09); the brief's dist/ check excludes it until he picks. C-WHO-PLACE (Smithtown, NY) stays: whoami is out of scope per the brief.
+- Finding, not fixed (out of scope): at 390px with a fine pointer (narrow desktop window) the keymap overflows; whoami and contact sit at x 402 to 607, off screen, so Contact and Leave a mark cannot be reached there. Phones (coarse) are fine.
+- T-GB-4 failed once in the targeted run (letters 0 after a 3s wait on SwiftShader) and passed alone; timing, not logic.
