@@ -302,3 +302,33 @@ test('T-GB-7 every mark takes a seeded pool color', async ({ page }) => {
   expect(markPoolAll('dark')).toEqual(dark);
   for (const x of signs) expect(markPoolHex('dark', x.signSeed!)).toBe(x.color);
 });
+
+// Critique brief item 5 (show the box): the "Leave a mark" entry is
+// visible inside the viewport in the Contact sheet on every scene, at
+// phone and desktop width, and opens the guestbook from there.
+for (const [w, h] of [[390, 844], [1440, 900]] as const) {
+  test(`T-GB-8 Leave a mark is visible on every scene at ${w}px`, async ({ browser }) => {
+    test.setTimeout(180000);
+    // 390px is a phone (coarse pointer, touch), 1440px a desktop.
+    const phone = w < 600;
+    const context = await browser.newContext({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone });
+    const page = await context.newPage();
+    for (const path of ['/', '/leaflink', '/sidequests']) {
+      await page.goto(DEV + path + '?world=0', { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.jp-keymap', { timeout: 30000 });
+      await page.click('.jp-keymap button[aria-haspopup="dialog"] >> text=contact');
+      const entry = page.getByRole('button', { name: C['C-CON-GB'] });
+      await expect(entry).toBeVisible({ timeout: 30000 });
+      // The sheet rises into place; poll until the entry rests inside the viewport.
+      await expect
+        .poll(async () => {
+          const box = await entry.boundingBox();
+          return !!box && box.y >= 0 && box.y + box.height <= h && box.x >= 0 && box.x + box.width <= w;
+        }, { timeout: 30000 })
+        .toBe(true);
+      await entry.click();
+      await page.waitForSelector('.jp-gb[data-shown="true"]', { timeout: 30000 });
+    }
+    await context.close();
+  });
+}
