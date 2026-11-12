@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.7.0, 2026-11-10. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.9.0, 2026-11-12. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -1085,6 +1085,7 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.9.0, 2026-11-12: resume. ContactSheet gains a secondary button C-CON-RESUME (S04 7.2, S09 1.7.0) that opens `public/resume.pdf` in a new tab. One static asset, no new token, no lane or draw-call change. Numbered 1.9.0 because 1.8.0 is the guestbook critique change in flight on another branch.
 - 1.7.0, 2026-11-10: server words formed from lanes (section 6.15, S05 1.3.0), Justin's pick for fix 4b of the guestbook phone brief over removing them, since C-SRV-P2 no longer carries the stack names. Each character rides its own lane tip; bend and tint follow the word's opacity so lanes never snap. Word lanes reuse the guestbook offset texture (alpha 2 plus slot) with one tint per `wordPool` slot; lane draw calls unchanged; no new tokens, no copy change.
 - 1.6.0, 2026-11-10: guestbook on real phones (Justin's iPhone demo, Safari and an in-app browser). Section 6.14 gains phone frame, keyboard, contrast and scene-word rules; tokens `guestbook.dim.*` (amount 0.94, pad 24px, feather 64px) and `guestbook.focusRulePx` 2 are new and proposed until a device run confirms them. Contrast is the lane-dim option because G-TOKENS bans gradients in CSS (a CSS radial scrim would fail the lint). The projection now reads the canvas's CSS box, which was `100dvh` tall while the camera aspect used `innerHeight`. Uniforms nine to twelve; draw calls unchanged. Lock-in choreography unchanged.
 - 1.5.0, 2026-11-09: guestbook (section 6.14, `guestbook.*` new). Brief: `guestbook/prompt.md` on astryx-polish-r2 (entropic and 3D). Two Lusion beziers enter as guestbook-only curves (`guestbook.easeMain`, `guestbook.easeSoft`, from `guestbook/references/lusion-style-brief.md`); the site curves are unchanged. Pill radius 88 from the same extract. Engine adds one RGBA32F 256 by 24 texture (98,304 bytes) and nine uniforms; draw calls unchanged. Proposed values: every `guestbook.*` number is proposed until a device run confirms it. Storage: browser-local only (Justin, 2026-11-10); a shared store, if ever wanted, is a separate change.
