@@ -998,7 +998,13 @@ export const T = {
       "radiusFrac": 0.6,
       "pushFrac": 0.12,
       "depthFrac": 0.07,
-      "residual": 0.4
+      "residual": 0.4,
+      "layoutScale": {
+        "server": 1,
+        "leaflink": 0,
+        "sidequests": 0,
+        "scatter": 0
+      }
     },
     "mark": {
       "spacingFrac": 0.05,

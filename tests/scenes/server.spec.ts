@@ -303,7 +303,7 @@ test('T-SRV-4: node groups, seeded and uncrowded, no words', async ({ page }) =>
 test('T-SRV-4b: no stack names in dist scripts or tokens', async () => {
   const { readdirSync, readFileSync } = await import('node:fs');
   const { join } = await import('node:path');
-  const names = ['Go TUI', 'Ollama', 'Tailscale', 'Docker', 'Open WebUI', 'WSL2 Ubuntu', 'Windows 11'];
+  const names = ['Go TUI', 'Ollama', 'Tailscale', 'Docker', 'Open WebUI', 'WSL2 Ubuntu', 'Windows 11', 'RTX 3070'];
   const files: string[] = [];
   const walk = (d: string): void => {
     for (const e of readdirSync(d, { withFileTypes: true })) {

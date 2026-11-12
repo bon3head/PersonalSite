@@ -20,6 +20,7 @@ import { cubicBezier } from '../world/tween';
 import { currentVariant } from '../world/camera';
 import { freshSeed, hash32 } from './entropy';
 import { markPoolHex, type MarkRegime } from './markPool';
+import { parsePath, SCENE_LAYOUT } from '../router';
 
 const easeMain = cubicBezier(...T.guestbook.easeMain);
 const easeSoft = cubicBezier(...T.guestbook.easeSoft);
@@ -117,6 +118,8 @@ export interface GuestbookDebug {
   // Mark color (1.8.0): the sign seed's pool color, null before lock-in.
   color: string | null;
   colorMix: number;
+  // Part per scene (1.8.0): the layoutScale in effect.
+  partScale: number;
 }
 
 // Where the panel is, for the phone frame and the contrast dim
@@ -150,6 +153,13 @@ export interface GuestbookDirector {
   // Seed readout: rolling hex before lock-in, the sign seed after.
   onReadout(cb: (hex: string) => void): void;
   dispose(): void;
+}
+
+// Part per scene (DESIGN 6.14, 1.8.0): the part is scaled by
+// guestbook.part.layoutScale for the scene under the sheet (off on the
+// flat ground scenes, where it read as one huge ring).
+function partScale(): number {
+  return T.guestbook.part.layoutScale[SCENE_LAYOUT[parsePath(window.location.pathname)]];
 }
 
 // Regime of the scene under the sheet (travel.applyRegime sets it).
@@ -400,11 +410,12 @@ export function createGuestbookDirector(
       gb.setCamera(null);
     }
     const partRadius = dist * g.part.radiusFrac;
+    const ps = partScale();
     gb.setPart({
       center: [well[0], well[2]],
       radius: partRadius,
-      push: dist * g.part.pushFrac,
-      depth: dist * g.part.depthFrac,
+      push: dist * g.part.pushFrac * ps,
+      depth: dist * g.part.depthFrac * ps,
       seedUnit: u(openSeed, P.partSeed),
       bands: [bands[0].value(t), bands[1].value(t), bands[2].value(t)],
     });
@@ -499,6 +510,7 @@ export function createGuestbookDirector(
       dimBox: lastDimBox,
       color: markHex,
       colorMix: colorMix.value(t),
+      partScale: partScale(),
     };
     (window as unknown as { __guestbook?: GuestbookDebug }).__guestbook = dbg;
   }

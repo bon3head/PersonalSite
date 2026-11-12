@@ -15,7 +15,7 @@ export const C = {
   'C-SRV-H1': "Justin Poli",
   'C-SRV-P1': "Computer science senior at SUNY New Paltz. I like to build my own tools.",
   'C-SRV-P2': "LeafLink and SideQuests both took 2nd place at their hackathons, and I run my own LLM inference server at home.",
-  'C-SRV-ALT': "Rendering of the inference server: 6,144 lanes, one per CUDA core on the RTX 3070 Ti, firing 32 at a time.",
+  'C-SRV-ALT': "Rendering of the inference server: 6,144 lanes, one per CUDA core on its GPU, firing 32 at a time.",
   'C-LL-H1': "LeafLink",
   'C-LL-P1': "Mutual aid on a live map. When a neighbor needs what you have, the map connects you as it happens.",
   'C-LL-FACTS': "Week-long hackathon build. Team of four: Justin Poli, Julian Shuster, Devin Perez, Colton A. 2nd place.",

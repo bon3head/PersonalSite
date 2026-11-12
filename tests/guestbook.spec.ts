@@ -332,3 +332,55 @@ for (const [w, h] of [[390, 844], [1440, 900]] as const) {
     await context.close();
   });
 }
+
+// Critique brief item 4 (the bulge, Justin's Nov 12 iPhone screenshots):
+// on LeafLink and SideQuests the guestbook part read as one huge ring.
+// DESIGN 6.14 (1.8.0) turns the part off on the flat ground scenes. On
+// each scene at phone and desktop width: open, type, Lock in; the part
+// scale matches the token, document height equals the viewport, the
+// pill takes the click, and the done state shows. Server is the
+// regression check (part kept).
+for (const [w, h] of [[390, 844], [1440, 900]] as const) {
+  test(`T-GB-9 no bulge on any scene at ${w}px`, async ({ browser }) => {
+    test.setTimeout(600000);
+    const phone = w < 600;
+    const context = await browser.newContext({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone });
+    const page = await context.newPage();
+    for (const scene of ['leaflink', 'sidequests', 'server'] as const) {
+      await page.goto(`${PREVIEW}/${scene === 'server' ? '' : scene}`, { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
+      await page.evaluate(() => {
+        location.hash = '#guestbook';
+      });
+      await page.waitForSelector('.jp-gb[data-shown="true"]', { timeout: 60000 });
+      await page.waitForFunction(() => document.activeElement?.classList.contains('jp-gb-input--name'), null, { timeout: 30000 });
+      await page.keyboard.type('Ada');
+      const before = await page.evaluate(() => ({
+        docH: document.documentElement.scrollHeight,
+        docW: document.documentElement.scrollWidth,
+        vh: innerHeight,
+        vw: innerWidth,
+        part: (window as unknown as { __guestbook: { partScale: number } }).__guestbook.partScale,
+      }));
+      expect(before.part).toBe(T.guestbook.part.layoutScale[scene]);
+      expect(before.docH).toBe(before.vh);
+      expect(before.docW).toBe(before.vw);
+      // The pill is the topmost element at its own center, then takes the click.
+      const hit = await page.evaluate(() => {
+        const pill = document.querySelector('.jp-gb-pill--primary') as HTMLElement;
+        const r = pill.getBoundingClientRect();
+        const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return !!el && pill.contains(el);
+      });
+      expect(hit).toBe(true);
+      await page.click('.jp-gb-pill--primary');
+      await page.waitForSelector('.jp-gb-done', { timeout: 120000 });
+      const after = await page.evaluate(() => ({ docH: document.documentElement.scrollHeight, vh: innerHeight, sy: scrollY }));
+      expect(after.docH).toBe(after.vh);
+      expect(after.sy).toBe(0);
+      await page.keyboard.press('Escape');
+      await page.waitForSelector('.jp-gb', { state: 'detached', timeout: 60000 });
+    }
+    await context.close();
+  });
+}
