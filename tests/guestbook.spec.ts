@@ -5,6 +5,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { T } from '../src/tokens.generated';
+import { markPoolAll, markPoolHex } from '../src/motion/markPool';
+import { C } from '../src/copy';
 
 const DEV = 'http://localhost:5173';
 const PREVIEW = 'http://localhost:4173';
@@ -165,11 +167,11 @@ test('T-GB-5 reduced motion keeps the camera still and the mark', async ({ brows
 });
 
 // DESIGN 6.14 (1.6.0) and S05 1.2.0, under reduced motion (the path with
-// no render loop): the server words leave while the sheet is open, the
+// no render loop): the server nodes leave while the sheet is open, the
 // lane dim covers the panel's resting box, the panel lifts above a
 // keyboard (simulated: visualViewport shrunk, as iOS reports it), the
 // focused line carries the accent rule, and close clears the dim.
-test('T-GB-6 phone polish: words hide, dim follows the panel, keyboard lift, focus rule', async ({ browser }) => {
+test('T-GB-6 phone polish: nodes hide, dim follows the panel, keyboard lift, focus rule', async ({ browser }) => {
   test.setTimeout(300000);
   const KB = 336;
   const context = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
@@ -197,11 +199,11 @@ test('T-GB-6 phone polish: words hide, dim follows the panel, keyboard lift, foc
   const page = await context.newPage();
   await page.goto(PREVIEW + '/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
-  type Ctl = { activeWords(): string[] };
+  type Ctl = { activeGroups(): unknown[] };
   const words = (): Promise<number> =>
     page.evaluate(() => {
       const m = (window as unknown as { __sceneControllers?: Map<string, Ctl> }).__sceneControllers;
-      return m?.get('server')?.activeWords().length ?? -1;
+      return m?.get('server')?.activeGroups().length ?? -1;
     });
   expect(await words()).toBeGreaterThan(0);
   await page.evaluate(() => {
@@ -254,4 +256,49 @@ test('T-GB-6 phone polish: words hide, dim follows the panel, keyboard lift, foc
   expect(await page.evaluate(() => (window as unknown as { __guestbook: Dbg }).__guestbook.dim)).toBe(0);
   expect(await words()).toBeGreaterThan(0);
   await context.close();
+});
+
+// DESIGN 6.14 Mark color (1.8.0), critique brief item 2: each sign takes
+// a color from guestbook.mark.colorPool by its sign seed. Two signs with
+// different seeds differ (color, or heights when the pool repeats); the
+// color is reproducible from the seed (markPoolHex is pure); it is a
+// pool entry for the regime; and the lane uniform and glyphs carry it.
+test('T-GB-7 every mark takes a seeded pool color', async ({ page }) => {
+  test.setTimeout(300000);
+  await page.goto(PREVIEW + '/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
+  await page.evaluate(() => {
+    location.hash = '#guestbook';
+  });
+  await page.waitForSelector('.jp-gb[data-shown="true"]', { timeout: 60000 });
+  type Dbg = { signSeed: number | null; color: string | null; colorMix: number; letters: { h: number }[]; phase: string };
+  const signs: Dbg[] = [];
+  for (let i = 0; i < 2; i++) {
+    await page.waitForFunction(() => document.activeElement?.classList.contains('jp-gb-input--name'), null, { timeout: 30000 });
+    await page.keyboard.type('Ada');
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('.jp-gb-done', { timeout: 120000 });
+    await page.waitForFunction(() => (window as unknown as { __guestbook: Dbg }).__guestbook.colorMix >= 1, null, { timeout: 60000 });
+    signs.push(await page.evaluate(() => JSON.parse(JSON.stringify((window as unknown as { __guestbook: Dbg }).__guestbook))));
+    const glyph = await page.evaluate(() => {
+      const el = document.querySelector('.jp-gb-glyph') as HTMLElement | null;
+      return el ? getComputedStyle(el).color : '';
+    });
+    const hex = signs[i].color!;
+    const rgb = [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
+    const got = (glyph.match(/[\d.]+/g) ?? []).map(Number);
+    const scale = glyph.startsWith('color(srgb') ? 255 : 1;
+    for (let k = 0; k < 3; k++) expect(Math.abs(got[k] * scale - rgb[k])).toBeLessThanOrEqual(1);
+    if (i === 0) await page.click(`text=${C['C-GB-AGAIN']}`);
+  }
+  expect(signs[0].signSeed).not.toBe(signs[1].signSeed);
+  const dark = T.guestbook.mark.colorPool.dark.map((n) => n.split('.').reduce((o: unknown, k) => (o as Record<string, unknown>)[k], T.color) as string);
+  for (const x of signs) expect(dark).toContain(x.color);
+  const sameColor = signs[0].color === signs[1].color;
+  const sameHeights = signs[0].letters.every((l, i) => Math.abs(l.h - signs[1].letters[i].h) < 1e-6);
+  expect(sameColor && sameHeights).toBe(false);
+  // Same seed, same color: the pure helper replays each sign.
+  expect(markPoolAll('dark')).toEqual(dark);
+  for (const x of signs) expect(markPoolHex('dark', x.signSeed!)).toBe(x.color);
 });

@@ -234,7 +234,7 @@ export function createLanefield(
   // taken by a word; a guestbook write takes a lane back from the words.
   const WORD_ALPHA_BASE = 2; // lit-ok: texel alpha 1 is guestbook, 2 plus slot a word
   const wordWritten = new Set<number>();
-  const wordTint = Array.from({ length: T.world.server.wordPool }, () => new THREE.Vector4(0, 0, 0, 0));
+  const wordTint = Array.from({ length: T.world.server.nodes.pool }, () => new THREE.Vector4(0, 0, 0, 0));
 
   // Geometry: one instanced quad per segment, all segment instances.
   const geometry = new THREE.InstancedBufferGeometry();
@@ -344,11 +344,14 @@ export function createLanefield(
   };
   const gbHot = hexToVec3(T.color.signalHot);
   const gbInk = hexToVec3(T.color.ink);
+  // Mark color (DESIGN 6.14, 1.8.0): the signature's pool color, mixed in by gbMarkMix. // lit-ok: spec section reference
+  const gbMark = new THREE.Vector3(0, 0, 0);
+  let gbMarkMix = 0;
   const material = new THREE.ShaderMaterial({
     uniforms,
     vertexShader: laneVert,
     fragmentShader: laneFrag,
-    defines: { WORD_SLOTS: T.world.server.wordPool },
+    defines: { WORD_SLOTS: T.world.server.nodes.pool },
     transparent: true,
     depthTest: false,
     depthWrite: false,
@@ -846,7 +849,7 @@ export function createLanefield(
     (uniforms.uSilhouetteRadius.value as number) = paramsCurrent.silhouetteRadius;
     (uniforms.uSilhouetteStrength.value as number) = paramsCurrent.silhouetteStrength;
     const paperW = groundWeights[layoutIndex('leaflink')];
-    (uniforms.uGbColor.value as THREE.Vector3).copy(gbHot).lerp(gbInk, paperW);
+    (uniforms.uGbColor.value as THREE.Vector3).copy(gbHot).lerp(gbInk, paperW).lerp(gbMark, gbMarkMix);
     updateClearColor();
     if (sampleGovernor) {
       governor.sample(dt * SEC_TO_MS, performance.now());
@@ -1423,6 +1426,14 @@ export function createLanefield(
     guestbook: {
       setCamera(c: GuestbookCamera | null): void {
         gbCam = c ? { ...c, center: [...c.center], shift: [...c.shift] } : null;
+      },
+      setColor(rgb: readonly [number, number, number] | null, amount: number): void {
+        if (!rgb || amount <= 0) {
+          gbMarkMix = 0;
+          return;
+        }
+        gbMark.set(rgb[0], rgb[1], rgb[2]);
+        gbMarkMix = Math.min(1, amount);
       },
       setPart(p: GuestbookPart | null): void {
         if (!p) {

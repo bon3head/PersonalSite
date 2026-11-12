@@ -318,7 +318,7 @@ export default function App(props: AppProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Guestbook open (DESIGN 6.14, S05 1.2.0): the server words step out
+  // Guestbook open (DESIGN 6.14, S05 1.4.0): the server nodes step out
   // of the field so the mark has it to itself.
   useEffect(() => {
     const server = controllersRef.current.get('server') as ServerController | undefined;

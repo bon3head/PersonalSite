@@ -1,6 +1,6 @@
-// GENERATED from spec/astryx/DESIGN.md v1.6.0. Do not edit.
+// GENERATED from spec/astryx/DESIGN.md v1.8.0. Do not edit.
 export const T = {
-  "version": "1.6.0",
+  "version": "1.8.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -365,36 +365,29 @@ export const T = {
         "sweepPeriodSec": 6,
         "peakAlpha": 1
       },
-      "words": [
-        "Go TUI",
-        "Ollama",
-        "Tailscale",
-        "Docker",
-        "Open WebUI",
-        "WSL2 Ubuntu",
-        "Windows 11",
-        "RTX 3070 Ti",
-        "Smithtown, NY"
-      ],
-      "wordSize": 0.22,
       "wordDrift": [
         -1,
         0.5,
         1
       ],
-      "wordPool": 4,
       "wordSpawnOffsetZ": 0.2,
-      "wordColorStops": [
-        0,
-        0.4,
-        1
-      ],
-      "wordFadeFrom": 0.55,
-      "reducedWordAt": [
-        0.2,
-        0.5,
-        0.8
-      ],
+      "nodes": {
+        "pool": 4,
+        "count": [
+          3,
+          6
+        ],
+        "radius": 0.035,
+        "segments": 16,
+        "spreadFrac": 0.22,
+        "minGap": 0.12,
+        "fadeFrom": 0.55,
+        "reducedAt": [
+          0.2,
+          0.5,
+          0.8
+        ]
+      },
       "fog": [
         7,
         30
@@ -1028,7 +1021,22 @@ export const T = {
       "glyphPx": [
         14,
         96
-      ]
+      ],
+      "colorPool": {
+        "dark": [
+          "signalHot",
+          "signal",
+          "inkTint",
+          "chalk",
+          "chalk2"
+        ],
+        "paper": [
+          "ink",
+          "signalDim",
+          "paper.text",
+          "paper.text2"
+        ]
+      }
     },
     "shiftNdc": {
       "fine": [

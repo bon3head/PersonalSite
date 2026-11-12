@@ -230,26 +230,23 @@ for (const vp of [
   });
 }
 
-// ---- T-SRV-4: words. Drive the real controller against a stub field
-// (no WebGL needed for word logic: spawn, drift, color, opacity all run
-// on the meshes themselves). Collect spawned strings over 16s; the set
-// must equal world.server.words exactly.
-// Window justification, not a weakening: the old 12s window was
-// calibrated to the old cadence, giving 10 spawns in 12s. At the
-// designed blend cadence the controller spawns once per cadence
-// interval, so a 16s window gives the same 10-spawn margin, and the
-// expected set and count are unchanged. The 12s figure is test-only,
-// not specified in DESIGN, so no DESIGN patch is needed for it.
-test('T-SRV-4: word set equals world.server.words over 16s', async ({ page }) => {
+// ---- T-SRV-4: nodes, no words (S05 1.4.0, DESIGN 6.15). Drive the
+// real controller against a stub field for 16s: groups spawn, each
+// count sits inside nodes.count, no two nodes of a group closer than
+// nodes.minGap, every color is a colorPool.dark entry, two seeds give
+// different groups, and the same seed gives the same group. The scene
+// holds no text mesh (the controller adds only node meshes).
+test('T-SRV-4: node groups, seeded and uncrowded, no words', async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(`${DEV}/?world=0`);
-  const spawned = await page.evaluate(async () => {
+  const r = await page.evaluate(async () => {
     const serverMod = await import('/src/world/server.ts');
     const cbs: Array<(t: number, dt: number) => void> = [];
+    const added: string[] = [];
     let clock = 0;
     const field = {
-      scene: { add: () => {}, remove: () => {} },
-      camera: { quaternion: { x: 0, y: 0, z: 0, w: 1 } },
+      scene: { add: (o: { type: string }) => added.push(o.type), remove: () => {} },
+      camera: { quaternion: { x: 0, y: 0, z: 0, w: 1, _x: 0, _y: 0, _z: 0, _w: 1 } },
       now: () => clock,
       onFrame: (cb: (t: number, dt: number) => void) => {
         cbs.push(cb);
@@ -271,12 +268,57 @@ test('T-SRV-4: word set equals world.server.words over 16s', async ({ page }) =>
         }
       }, 50);
     });
-    const out = ctl.spawnedWords();
+    const groups = ctl.spawnedGroups();
+    const again = groups.map((g) => ctl.groupFor(g.seed));
     ctl.dispose();
-    return out;
+    return { groups, again, added: [...new Set(added)] };
   });
-  expect(new Set(spawned)).toEqual(new Set(T.world.server.words));
-  expect(spawned.length).toBeGreaterThanOrEqual(T.world.server.words.length);
+  expect(r.added).toEqual(['Mesh']);
+  expect(r.groups.length).toBeGreaterThanOrEqual(8);
+  const dark = T.guestbook.mark.colorPool.dark.map((n) => n.split('.').reduce((o: unknown, k) => (o as Record<string, unknown>)[k], T.color) as string);
+  const shapes = new Set<string>();
+  r.groups.forEach((g, i) => {
+    expect(g.count).toBeGreaterThanOrEqual(T.world.server.nodes.count[0]);
+    expect(g.count).toBeLessThanOrEqual(T.world.server.nodes.count[1]);
+    expect(dark).toContain(g.color);
+    for (let a = 0; a < g.offsets.length; a++) {
+      for (let b = a + 1; b < g.offsets.length; b++) {
+        const d = Math.hypot(g.offsets[a][0] - g.offsets[b][0], g.offsets[a][1] - g.offsets[b][1]);
+        expect(d).toBeGreaterThanOrEqual(T.world.server.nodes.minGap - 1e-9);
+      }
+    }
+    // Same seed, same group.
+    expect(r.again[i].count).toBe(g.count);
+    expect(r.again[i].color).toBe(g.color);
+    expect(r.again[i].offsets).toEqual(g.offsets);
+    shapes.add(JSON.stringify([g.color, g.offsets]));
+  });
+  // Different seeds, different groups.
+  expect(new Set(r.groups.map((g) => g.seed)).size).toBe(r.groups.length);
+  expect(shapes.size).toBe(r.groups.length);
+});
+
+// The 1.3.0 stack names are gone from the shipped scene: none appears in
+// any dist/ script or the token JSON (critique brief item 3).
+test('T-SRV-4b: no stack names in dist scripts or tokens', async () => {
+  const { readdirSync, readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const names = ['Go TUI', 'Ollama', 'Tailscale', 'Docker', 'Open WebUI', 'WSL2 Ubuntu', 'Windows 11'];
+  const files: string[] = [];
+  const walk = (d: string): void => {
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      const p = join(d, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (/\.(js|json)$/.test(e.name)) files.push(p);
+    }
+  };
+  walk('dist');
+  files.push('themes/lane/tokens.generated.json');
+  expect(files.length).toBeGreaterThan(1);
+  for (const f of files) {
+    const text = readFileSync(f, 'utf8');
+    for (const n of names) expect(text.includes(n), `${n} in ${f}`).toBe(false);
+  }
 });
 
 // ---- T-SRV-5: hue budget. At most 30% of pixels have OKLCH chroma
@@ -341,28 +383,28 @@ test('G-COPY: server readout matches S09 copy', async ({ page }) => {
   expect(text?.ps).toEqual([C['C-SRV-P1'], C['C-SRV-P2']]);
 });
 
-// ---- T-SRV-7: words formed from lanes (S05 1.3.0, DESIGN 6.15). In
-// the real app on server: every lit glyph sits on its lane's bent tip
-// (rest tip plus the lane's offset texel), each character holds its own
-// lane, the texel marks a word lane (alpha 2 plus slot), and once the
-// words are hidden and the fade ends no word texel remains.
-test('T-SRV-7: server words ride their lane tips and release them', async ({ page }) => {
+// ---- T-SRV-7: nodes on lanes (S05 1.4.0, DESIGN 6.15). In the real
+// app on server: every lit node sits on its lane's bent tip (rest tip
+// plus the lane's offset texel), each node holds its own lane, the texel
+// marks a node lane (alpha 2 plus slot), and once the nodes are hidden
+// and the fade ends no node texel remains.
+test('T-SRV-7: server nodes ride their lane tips and release them', async ({ page }) => {
   test.setTimeout(240000);
   await page.goto('http://localhost:4173/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
-  type Row = { lane: number; slot: number; glyph: number[]; restTip: number[]; texel: number[]; opacity: number };
-  type Ctl = { wordLanes(): Row[]; setHidden(on: boolean): void };
+  type Row = { lane: number; slot: number; node: number[]; restTip: number[]; texel: number[]; opacity: number };
+  type Ctl = { nodeLanes(): Row[]; setHidden(on: boolean): void };
   await page.waitForFunction(
     () => {
       const m = (window as unknown as { __sceneControllers?: Map<string, Ctl> }).__sceneControllers;
-      return (m?.get('server')?.wordLanes() ?? []).some((r) => r.opacity > 0.5);
+      return (m?.get('server')?.nodeLanes() ?? []).some((r) => r.opacity > 0.5);
     },
     null,
     { timeout: 120000 },
   );
   const rows = await page.evaluate(() => {
     const m = (window as unknown as { __sceneControllers: Map<string, Ctl> }).__sceneControllers;
-    return m.get('server')!.wordLanes();
+    return m.get('server')!.nodeLanes();
   });
   expect(rows.length).toBeGreaterThan(0);
   const lanes = new Set<number>();
@@ -372,7 +414,7 @@ test('T-SRV-7: server words ride their lane tips and release them', async ({ pag
     lanes.add(r.lane);
     expect(r.texel[3]).toBe(2 + r.slot);
     for (let i = 0; i < 3; i++) {
-      expect(Math.abs(r.restTip[i] + r.texel[i] - r.glyph[i])).toBeLessThan(1e-3);
+      expect(Math.abs(r.restTip[i] + r.texel[i] - r.node[i])).toBeLessThan(1e-3);
     }
   }
   const used = [...lanes];
@@ -383,7 +425,7 @@ test('T-SRV-7: server words ride their lane tips and release them', async ({ pag
   await page.waitForFunction(
     () => {
       const m = (window as unknown as { __sceneControllers: Map<string, Ctl> }).__sceneControllers;
-      return m.get('server')!.wordLanes().length === 0;
+      return m.get('server')!.nodeLanes().length === 0;
     },
     null,
     { timeout: 60000 },

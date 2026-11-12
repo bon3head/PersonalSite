@@ -101,6 +101,9 @@ export interface GuestbookCamera {
 export interface GuestbookHooks {
   setCamera(c: GuestbookCamera | null): void;
   setPart(p: GuestbookPart | null): void;
+  // Mark color (DESIGN 6.14, 1.8.0): letter lanes mix from the regime // lit-ok: spec section reference
+  // default toward rgb (raw sRGB, 0 to 1) by amount; null or 0 is the default.
+  setColor(rgb: readonly [number, number, number] | null, amount: number): void;
   // offsets holds xyz per lane, in lane order. Lanes written before and
   // missing now return to zero.
   writeLanes(lanes: readonly number[], offsets: Float32Array): void;

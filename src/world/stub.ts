@@ -188,6 +188,7 @@ export function createLanefield(
     guestbook: {
       setCamera(): void {},
       setPart(): void {},
+      setColor(): void {},
       writeLanes(): void {},
       laneTip(_lane: number, out: [number, number, number]): [number, number, number] {
         out[0] = 0;

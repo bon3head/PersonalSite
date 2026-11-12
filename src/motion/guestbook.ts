@@ -9,7 +9,8 @@
 //   open seed: part heights (shader, uGbSeed), camera yaw and rise,
 //              baseline wobble, letter heights while typing, noise.
 //   sign seed: lock-in heights, settle offset and scale, pull-back
-//              drift, and the hex in the seed readout.
+//              drift, the mark color from guestbook.mark.colorPool
+//              (1.8.0), and the hex in the seed readout.
 // Each value is hash32(seed, PARAM, index), so a seed fully decides it.
 //
 // Curves: the two Lusion beziers only (T.guestbook.easeMain, easeSoft).
@@ -18,6 +19,7 @@ import type { Lanefield } from '../world/types';
 import { cubicBezier } from '../world/tween';
 import { currentVariant } from '../world/camera';
 import { freshSeed, hash32 } from './entropy';
+import { markPoolHex, type MarkRegime } from './markPool';
 
 const easeMain = cubicBezier(...T.guestbook.easeMain);
 const easeSoft = cubicBezier(...T.guestbook.easeSoft);
@@ -112,6 +114,9 @@ export interface GuestbookDebug {
   well: [number, number, number] | null;
   dim: number;
   dimBox: [number, number, number, number] | null;
+  // Mark color (1.8.0): the sign seed's pool color, null before lock-in.
+  color: string | null;
+  colorMix: number;
 }
 
 // Where the panel is, for the phone frame and the contrast dim
@@ -145,6 +150,16 @@ export interface GuestbookDirector {
   // Seed readout: rolling hex before lock-in, the sign seed after.
   onReadout(cb: (hex: string) => void): void;
   dispose(): void;
+}
+
+// Regime of the scene under the sheet (travel.applyRegime sets it).
+function regimeNow(): MarkRegime {
+  return document.documentElement.dataset.regime === 'paper' ? 'paper' : 'dark';
+}
+
+function hexRgb(hex: string): [number, number, number] {
+  const c = (i: number): number => parseInt(hex.slice(i, i + 2), 16) / 255;
+  return [c(1), c(3), c(5)];
 }
 
 function hex8(n: number): string {
@@ -203,6 +218,10 @@ export function createGuestbookDirector(
   const frameX = new Tween();
   const frameY = new Tween();
   const dim = new Tween();
+  // Mark color (1.8.0): 0 is the regime default, 1 the pool color.
+  const colorMix = new Tween();
+  let markHex: string | null = null;
+  let markRgb: [number, number, number] | null = null;
 
   const tip: [number, number, number] = [0, 0, 0];
   const glyphPos: [number, number, number] = [0, 0, 0];
@@ -416,6 +435,7 @@ export function createGuestbookDirector(
       placeGlyph(l, glyphPos, r, step);
     }
     gb.writeLanes(lanes, new Float32Array(offsets));
+    gb.setColor(markRgb, colorMix.value(t));
     // Retire finished dying letters.
     letters = letters.filter((l) => {
       if (l.dying && l.rise.done(t)) {
@@ -458,6 +478,9 @@ export function createGuestbookDirector(
       if (t < l.resolveAt) ch = NOISE_GLYPHS[hash32(signSeed, P.scramble, step * 64 + l.index) % NOISE_GLYPHS.length];
     }
     if (span.textContent !== ch) span.textContent = ch;
+    const mix = colorMix.value(nowMs());
+    const color = markHex && mix > 0 ? `color-mix(in srgb, ${markHex} ${(mix * 100).toFixed(1)}%, var(--jp-accent))` : '';
+    if (span.style.color !== color) span.style.color = color;
     span.style.transform = `translate3d(${a[0].toFixed(1)}px, ${a[1].toFixed(1)}px, 0) translate(-50%, -100%) scale(${k.toFixed(4)})`;
   }
 
@@ -474,6 +497,8 @@ export function createGuestbookDirector(
       well: field ? [...well] : null,
       dim: dim.value(t),
       dimBox: lastDimBox,
+      color: markHex,
+      colorMix: colorMix.value(t),
     };
     (window as unknown as { __guestbook?: GuestbookDebug }).__guestbook = dbg;
   }
@@ -509,6 +534,10 @@ export function createGuestbookDirector(
     scale.go(t, 1, dur(T.motion.ms.travel), easeMain);
     noise.go(t, reduced() ? 0 : dist * g.mark.noiseFrac, dur(T.motion.ms.travel), easeMain);
     dim.go(t, 1, dur(g.ms.panel), easeMain);
+    // A fresh open (and sign again) starts from the default color.
+    colorMix.go(t, 0, 0, easeMain);
+    markHex = null;
+    markRgb = null;
   }
 
   return {
@@ -555,6 +584,10 @@ export function createGuestbookDirector(
         l.resolveAt = t + (g.ms.lockIn * (i + 1)) / n;
       });
       noise.go(t, 0, dur(g.ms.lockIn), easeSoft);
+      // Mark color (DESIGN 6.14, 1.8.0): the sign seed picks the pool color.
+      markHex = markPoolHex(regimeNow(), seed);
+      markRgb = hexRgb(markHex);
+      colorMix.go(t, 1, dur(g.ms.lockIn), easeSoft);
       if (!reduced()) dolly.go(t, g.camera.dollyIn + g.camera.pushIn, g.ms.lockIn, easeSoft);
       // Pull back to wide after the hold, and settle the mark.
       const back = dur(g.ms.lockIn + g.ms.hold);
@@ -633,6 +666,7 @@ export function createGuestbookDirector(
     if (gb) {
       gb.setCamera(null);
       gb.setPart(null);
+      gb.setColor(null, 0);
       gb.setDim(null, 0);
       lastDimBox = null;
       gb.writeLanes([], new Float32Array(0));
