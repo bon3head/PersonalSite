@@ -2,7 +2,8 @@
 // height hug, scrim on, label from S09, controlled by router state.
 // The address is selectable text; the copy button uses CopyConfirm
 // (copyText plus toast, Range selection on failure); the mail button
-// is a secondary Button rendered as a mailto link.
+// is a secondary Button rendered as a mailto link; the resume button
+// opens public/resume.pdf in a new tab (C-CON-RESUME).
 import type { CSSProperties, JSX, RefObject } from 'react';
 import { useRef } from 'react';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
@@ -56,6 +57,13 @@ export default function ContactSheet(props: ContactSheetProps): JSX.Element {
             variant="secondary"
             label={C['C-CON-MAIL']}
             href={`mailto:${C['C-CON-EMAIL']}`}
+          />
+          <Button
+            variant="secondary"
+            label={C['C-CON-RESUME'].label}
+            href={C['C-CON-RESUME'].href}
+            target="_blank"
+            rel="noopener"
           />
           {props.onLeaveMark && (
             <Button

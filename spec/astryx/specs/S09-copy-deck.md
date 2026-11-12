@@ -1,6 +1,6 @@
 # S09 Copy deck: every visible string
 
-Version 1.6.0, 2026-11-09. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+Version 1.7.0, 2026-11-12. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
 1.5.0: C-SQ-P1 rewritten (Justin-approved 2026-11-05): the "three trails / small adventures" line described the site visual, not the app ethos. New line names the ethos (anyone can host, each community runs its own instance) and what it is built on (ActivityPub).
 
 ## 1. Purpose
@@ -77,6 +77,7 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-CON-EMAIL | ContactSheet, selectable text | `justinf0829@gmail.com` | BRIEF |
 | C-CON-COPY | Button, primary | `Copy email` | n/a |
 | C-CON-MAIL | Button, secondary, `href=mailto:justinf0829@gmail.com` | `Open mail app` | n/a |
+| C-CON-RESUME | Button, secondary, opens the PDF in a new tab (`target=_blank`, `rel=noopener`) | label `Resume`, href `/resume.pdf` | Justin's resume PDF (sent 2026-11-12), phone line removed |
 | C-CON-LINK-LI | ContactSheet link | label `LinkedIn`, href as C-WHO-LINK-LI | BRIEF |
 | C-CON-GB | ContactSheet control that opens the guestbook | `Leave a mark` | n/a |
 | C-GB-LABEL | Guestbook dialog `aria-label` | `Guestbook` | n/a |
@@ -118,6 +119,7 @@ None open. D-SQ-VENUE (shown), D-LEAFLINK-KIND (mutual aid) and D-PHONE (hidden)
 
 ## 8. Changelog
 
+- 1.7.0, 2026-11-12: C-CON-RESUME added (Justin asked 2026-11-12 for his resume on the site as a clean button that opens it). The file is `public/resume.pdf`, his PDF sent 2026-11-12 with the phone number removed from the header (phone hidden, decided) and the email re-centered; nothing else in it changed. No existing string changed. Proposed; Justin approves before ship.
 - 1.6.0, 2026-11-09: guestbook strings (C-CON-GB, C-GB-*), for the guestbook brief on astryx-polish-r2. No existing string changed. Proposed; Justin approves before ship.
 
 - 1.0.0, 2026-10-30: initial deck from CONTENT-BRIEF.md.

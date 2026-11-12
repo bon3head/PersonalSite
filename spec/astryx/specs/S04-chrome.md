@@ -1,6 +1,6 @@
 # S04 Chrome: Keymap, Readout, sheets, wordmark
 
-Version 1.1.0, 2026-11-01. Depends on: S00, S01, S03, S09. Blocks: S05 to S08, S10, S11.
+Version 1.2.0, 2026-11-12. Depends on: S00, S01, S03, S09. Blocks: S05 to S08, S10, S11.
 
 ## 1. Purpose
 
@@ -80,7 +80,7 @@ Heading `<h2>` C-WHO-H. Lines in order: C-WHO-EDU, C-WHO-PLACE, then the three r
 
 ### 7.2 ContactSheet
 
-Heading `<h2>` C-CON-H. The address C-CON-EMAIL as selectable text in `--text-large` weight 700 (`user-select: all`). A button row: `Button variant="primary" label=C-CON-COPY` and `Button variant="secondary" label=C-CON-MAIL href="mailto:justinf0829@gmail.com"`. Then C-CON-LINK-LI.
+Heading `<h2>` C-CON-H. The address C-CON-EMAIL as selectable text in `--text-large` weight 700 (`user-select: all`). A button row: `Button variant="primary" label=C-CON-COPY` , `Button variant="secondary" label=C-CON-MAIL href="mailto:justinf0829@gmail.com"`, and `Button variant="secondary"` with C-CON-RESUME (label and href `/resume.pdf`, `target="_blank"`, `rel="noopener"`), so the resume opens in the browser's PDF viewer in a new tab and the scene keeps its state. Then C-CON-LINK-LI.
 
 Copy behavior: `copyText` from `src/lib/copyText.ts` (verbatim from repo `spec/standard-implementations.md`). On `true`: `showToast({body: C-TOAST-OK, type: 'info', uniqueID: 'copy'})`. On `false`: select the address text node with a `Range`, `showToast({body: C-TOAST-FAIL, type: 'error', uniqueID: 'copy'})`. Never silent.
 
@@ -132,5 +132,6 @@ U-S04-1: whether BottomSheet's built-in open animation exceeds 300ms; resolved i
 
 ## 13. Changelog
 
+- 1.2.0, 2026-11-12: ContactSheet gains the resume button (C-CON-RESUME, S09 1.7.0) after the mail button. No token change.
 - 1.1.0, 2026-11-01: W1 name clear zone (section 5) with titles sized to fit, readout clearance below the zone, toast layer decision (section 7.3, no layer.* tokens), whoami field-quiet (section 7.1). No keymap, sheet, or copy change.
 - 1.0.0, 2026-10-30: initial.

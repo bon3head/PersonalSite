@@ -49,6 +49,7 @@ export const C = {
   'C-CON-EMAIL': "justinf0829@gmail.com",
   'C-CON-COPY': "Copy email",
   'C-CON-MAIL': "Open mail app",
+  'C-CON-RESUME': { label: "Resume", href: "/resume.pdf" },
   'C-CON-LINK-LI': { label: "LinkedIn", href: "https://www.linkedin.com/in/justin-poli-15406030b" },
   'C-CON-GB': "Leave a mark",
   'C-GB-LABEL': "Guestbook",
