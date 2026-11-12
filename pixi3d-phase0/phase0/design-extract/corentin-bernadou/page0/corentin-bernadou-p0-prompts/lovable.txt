@@ -1,0 +1,9 @@
+Clone the design language of this landing page and build a fresh equivalent.
+Visual feel: flat. Tone: neutral · Headings: Title Case · CTA verbs: [object Object]
+Primary palette: #767676, #6d6d6d, #000000, #ff0000, #ff4401.
+Typography: system-ui.
+Corner radius vocabulary: 3.
+Shadow vocabulary: (none).
+Page structure:
+- feature-grid
+- pricing — heading: "Corentin Bernadou"

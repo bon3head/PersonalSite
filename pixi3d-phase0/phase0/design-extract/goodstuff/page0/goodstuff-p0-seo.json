@@ -1,0 +1,31 @@
+{
+  "openGraph": {
+    "title": "Good Stuff · PixiJS",
+    "description": "Demos, experiments and shiny little things, all running live in your browser.",
+    "type": "website"
+  },
+  "twitter": {},
+  "description": "Good Stuff by PixiJS: demos, experiments and shiny little things, all running live in your browser.",
+  "canonical": null,
+  "themeColor": "#0d0b16",
+  "viewport": "width=device-width, initial-scale=1",
+  "favicons": [
+    {
+      "rel": "icon",
+      "href": "https://goodstuff.pixijs.io/favicon.svg",
+      "sizes": "",
+      "type": "image/svg+xml"
+    }
+  ],
+  "manifest": null,
+  "structuredData": [],
+  "score": {
+    "hasOg": true,
+    "hasTwitter": false,
+    "hasDescription": true,
+    "hasCanonical": false,
+    "hasStructuredData": false,
+    "hasFavicon": true,
+    "hasThemeColor": true
+  }
+}

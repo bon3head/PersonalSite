@@ -1,0 +1,265 @@
+{
+  "colors": {
+    "all": [
+      {
+        "hex": "#767676",
+        "rgb": {
+          "r": 118,
+          "g": 118,
+          "b": 118,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 46
+        },
+        "count": 1108,
+        "areaShare": 0,
+        "contexts": [
+          "text",
+          "border"
+        ]
+      },
+      {
+        "hex": "#6d6d6d",
+        "rgb": {
+          "r": 109,
+          "g": 109,
+          "b": 109,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 43
+        },
+        "count": 584,
+        "areaShare": 0,
+        "contexts": [
+          "text",
+          "border"
+        ]
+      },
+      {
+        "hex": "#000000",
+        "rgb": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 0
+        },
+        "count": 84,
+        "areaShare": 0.798,
+        "contexts": [
+          "text",
+          "border",
+          "background"
+        ]
+      },
+      {
+        "hex": "#ff0000",
+        "rgb": {
+          "r": 255,
+          "g": 0,
+          "b": 0,
+          "a": 0.1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 100,
+          "l": 50
+        },
+        "count": 12,
+        "areaShare": 0.202,
+        "contexts": [
+          "background"
+        ]
+      },
+      {
+        "hex": "#ff4401",
+        "rgb": {
+          "r": 255,
+          "g": 68,
+          "b": 1,
+          "a": 1
+        },
+        "hsl": {
+          "h": 16,
+          "s": 100,
+          "l": 50
+        },
+        "count": 11,
+        "areaShare": 0,
+        "contexts": [
+          "text",
+          "border",
+          "background"
+        ]
+      },
+      {
+        "hex": "#141414",
+        "rgb": {
+          "r": 20,
+          "g": 20,
+          "b": 20,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 8
+        },
+        "count": 10,
+        "areaShare": 0,
+        "contexts": [
+          "text",
+          "border"
+        ]
+      },
+      {
+        "hex": "#858585",
+        "rgb": {
+          "r": 133,
+          "g": 133,
+          "b": 133,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 52
+        },
+        "count": 5,
+        "areaShare": 0,
+        "contexts": [
+          "text",
+          "border",
+          "background"
+        ]
+      }
+    ]
+  },
+  "regions": [
+    {
+      "role": "nav",
+      "tag": "header",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "w": 1280,
+        "h": 97.828125
+      },
+      "heading": null,
+      "buttonCount": 1,
+      "cardCount": 3,
+      "className": "header"
+    },
+    {
+      "role": "nav",
+      "tag": "nav",
+      "bounds": {
+        "x": 42.3125,
+        "y": 42.3125,
+        "w": 1195.375,
+        "h": 13.203125
+      },
+      "heading": null,
+      "buttonCount": 0,
+      "cardCount": 3,
+      "className": "header-navigation"
+    },
+    {
+      "role": "pricing",
+      "tag": "main",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "w": 1280,
+        "h": 2718.125
+      },
+      "heading": "Corentin Bernadou",
+      "buttonCount": 0,
+      "cardCount": 185,
+      "className": null
+    }
+  ],
+  "componentClusters": [
+    {
+      "kind": "button",
+      "structuralHash": "button>span",
+      "instanceCount": 1,
+      "variants": [
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(133, 133, 133)",
+            "padding": "0px 0px 0px 0px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(133, 133, 133)",
+            "fontSize": "10.1587px",
+            "fontWeight": "600"
+          },
+          "instanceCount": 1
+        }
+      ]
+    }
+  ],
+  "accessibility": {
+    "remediation": []
+  },
+  "cssHealth": {
+    "sheets": [
+      {
+        "url": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+        "totalBytes": 27230,
+        "usedBytes": 7924,
+        "unusedBytes": 19306,
+        "unusedPercent": 71
+      },
+      {
+        "url": "https://corentinbernadou.com/assets/css/index-BNWJ7Zcm.css",
+        "totalBytes": 457,
+        "usedBytes": 97,
+        "unusedBytes": 360,
+        "unusedPercent": 79
+      }
+    ],
+    "totalBytes": 27687,
+    "usedBytes": 8021,
+    "unusedBytes": 19666,
+    "unusedPercent": 71,
+    "importantCount": 2,
+    "duplicates": 543,
+    "vendorPrefixes": {
+      "webkit": 5,
+      "moz": 1,
+      "ms": 0,
+      "o": 0
+    },
+    "keyframes": [],
+    "specificity": {
+      "max": [
+        1,
+        4,
+        2
+      ],
+      "average": [
+        0,
+        0.95,
+        0.29
+      ],
+      "count": 286
+    },
+    "issues": [
+      "2 !important rules",
+      "543 duplicate declarations",
+      "71% unused CSS"
+    ]
+  }
+}

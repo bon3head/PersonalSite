@@ -1,0 +1,30 @@
+{
+ "pass": true,
+ "pairs": [
+  {
+   "role": "action.primary",
+   "bg": "#ff0000",
+   "fg": "#000000",
+   "stated": 5.25,
+   "recomputed": 5.25,
+   "substituted": false
+  },
+  {
+   "role": "action.secondary",
+   "bg": "#ff6a7c",
+   "fg": "#000000",
+   "stated": 7.6,
+   "recomputed": 7.6,
+   "substituted": false
+  },
+  {
+   "role": "action.accent",
+   "bg": "#251f2b",
+   "fg": "#ffffff",
+   "stated": 16.04,
+   "recomputed": 16.04,
+   "substituted": false
+  }
+ ],
+ "failures": []
+}

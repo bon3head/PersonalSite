@@ -1,0 +1,93 @@
+{
+ "components": [
+  {
+   "name": "Buttons",
+   "instances": 47,
+   "variants": 1,
+   "score": 50,
+   "tier": "supporting",
+   "rationale": "freq 25.0 (n=47); specificity 5 (generic chrome name); variants 5.0 (v=1); styled 15.0 (9 css lines)"
+  },
+  {
+   "name": "ProgressBars",
+   "instances": 1,
+   "variants": 0,
+   "score": 43,
+   "tier": "supporting",
+   "rationale": "freq 4.5 (n=1); specificity 30 (page-specific name); variants 0.0 (v=0); styled 8.3 (5 css lines)"
+  },
+  {
+   "name": "Tooltips",
+   "instances": 24,
+   "variants": 0,
+   "score": 39,
+   "tier": "supporting",
+   "rationale": "freq 20.8 (n=24); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 13.3 (8 css lines)"
+  },
+  {
+   "name": "Switches",
+   "instances": 2,
+   "variants": 0,
+   "score": 39,
+   "tier": "supporting",
+   "rationale": "freq 7.1 (n=2); specificity 25 (page-specific name); variants 0.0 (v=0); styled 6.7 (4 css lines)"
+  },
+  {
+   "name": "Navigation",
+   "instances": 12,
+   "variants": 0,
+   "score": 35,
+   "tier": "supporting",
+   "rationale": "freq 16.6 (n=12); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 13.3 (8 css lines)"
+  },
+  {
+   "name": "Links",
+   "instances": 19,
+   "variants": 0,
+   "score": 33,
+   "tier": "generic",
+   "rationale": "freq 19.3 (n=19); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 8.3 (5 css lines)"
+  },
+  {
+   "name": "Inputs",
+   "instances": 4,
+   "variants": 0,
+   "score": 29,
+   "tier": "generic",
+   "rationale": "freq 10.4 (n=4); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 13.3 (8 css lines)"
+  },
+  {
+   "name": "Tabs",
+   "instances": 3,
+   "variants": 0,
+   "score": 29,
+   "tier": "generic",
+   "rationale": "freq 9.0 (n=3); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 15.0 (9 css lines)"
+  },
+  {
+   "name": "Modals",
+   "instances": 5,
+   "variants": 0,
+   "score": 27,
+   "tier": "generic",
+   "rationale": "freq 11.6 (n=5); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 10.0 (6 css lines)"
+  },
+  {
+   "name": "Tables",
+   "instances": 5,
+   "variants": 0,
+   "score": 23,
+   "tier": "generic",
+   "rationale": "freq 11.6 (n=5); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 6.7 (4 css lines)"
+  },
+  {
+   "name": "Dropdowns",
+   "instances": 2,
+   "variants": 0,
+   "score": 20,
+   "tier": "generic",
+   "rationale": "freq 7.1 (n=2); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 8.3 (5 css lines)"
+  }
+ ],
+ "signatureCount": 0
+}

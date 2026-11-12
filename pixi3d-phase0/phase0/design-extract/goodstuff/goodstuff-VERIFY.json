@@ -1,0 +1,339 @@
+{
+ "tool": "design-extract fusion pipeline",
+ "name": "goodstuff",
+ "date": "2026-11-12T22:03:50.114Z",
+ "command": "/opt/hatch-image/bin/bun /home/hatch/workspace/custom-skills/local-design-extract/bin/fusion-run.js https://goodstuff.pixijs.io/ -o /home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff -n goodstuff",
+ "wallMs": 427591,
+ "exitCode": 0,
+ "outDir": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff",
+ "fileCount": 49,
+ "totalBytes": 1370486,
+ "motionRecall": {
+  "engineDurations": [
+   "250ms",
+   "300ms",
+   "450ms"
+  ],
+  "staticDurations": [
+   "0.01ms",
+   "3000ms",
+   "4000ms",
+   "5000ms",
+   "25000ms",
+   "35000ms",
+   "45000ms"
+  ],
+  "runtimeObserved": null
+ },
+ "screenshots": [
+  {
+   "file": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-viewport.png",
+   "sha256": "be1d3e32cabce49e27f84b6c83c2a688a1942d663f857d792cd91ae38de31518",
+   "kind": "viewport"
+  },
+  {
+   "file": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-brand.png",
+   "sha256": "a58ca0338b72a20f6c5ab9afa999762e89781ae5c752be9088909c3cce4ab750",
+   "kind": "brand-report"
+  }
+ ],
+ "bunProbe": {
+  "runtime": "bun",
+  "fullRun": true
+ },
+ "stages": [
+  {
+   "stage": 1,
+   "ok": true,
+   "detail": "relay on 127.0.0.1:18091, probe HTTP 200"
+  },
+  {
+   "stage": 2,
+   "ok": true,
+   "detail": "page 0: 15 declarations, 7 durations, 1 easings, 0 keyframes"
+  },
+  {
+   "stage": 4,
+   "ok": true,
+   "detail": "page 0: sampled 12, 0 deltas"
+  },
+  {
+   "stage": 3,
+   "ok": true,
+   "detail": "page 0: engine exit 0 in 53.4s"
+  },
+  {
+   "stage": 6,
+   "ok": true,
+   "detail": "page 0: 5 components, top=Links (supporting)"
+  },
+  {
+   "stage": 11,
+   "ok": true,
+   "detail": "page 0: contrast gate pass (4 pairs)"
+  },
+  {
+   "stage": 10,
+   "ok": true,
+   "detail": "page 0: evidence graph 103 nodes"
+  },
+  {
+   "stage": 9,
+   "ok": true,
+   "detail": "page 0: motion fusion written (engine 3 durations + static 7)"
+  },
+  {
+   "stage": 7,
+   "ok": true,
+   "detail": "single URL — no cross-page synthesis"
+  }
+ ],
+ "notes": [],
+ "files": [
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-prompts/v0.txt",
+   "bytes": 671,
+   "sha256": "7f327d66c9ded6b9476f9a83b3ebb1c09601bec6b58179945229cc9a0290243d"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-prompts/lovable.txt",
+   "bytes": 564,
+   "sha256": "82ed9fd1cccf7796797ee4debcf4f397ddedfacc34d2d19b785c7acb4ba43ae3"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-prompts/cursor.md",
+   "bytes": 623,
+   "sha256": "7a695b8f5e639f755a15e6ee514a8ee07c9727c1ce01ad70b20dd4571368cee3"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-prompts/claude-artifacts.md",
+   "bytes": 621,
+   "sha256": "320bd544b74b921a704551154513f1d4c843a94b4e176bee2cd7729a9871c984"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-prompts/recipe-button.md",
+   "bytes": 854,
+   "sha256": "f74ffaa569dfb2a9ad135765f224edc1dea1aff9915b16f3c849023572c68f94"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-prompts/recipe-card.md",
+   "bytes": 858,
+   "sha256": "07043ce17ce934d27c839ce4f1b5bc7ac7edc1e4563b9dcd969b64eadaaafd96"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-design-language.md",
+   "bytes": 16507,
+   "sha256": "a757f912044ae114f15b3a2f676a5e38d970e0a1484f69123117bef528713adb"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-design-tokens.json",
+   "bytes": 9175,
+   "sha256": "5e706a6dc5e93fd1ba55da65c8a51352427f83e46cf07137c049642dfc12438e"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-tailwind.config.js",
+   "bytes": 4374,
+   "sha256": "da71c1e698d76a8c2f46da2ebef2efbc13b6bb6ac8f6cb831df5ec0d1f4d2fba"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-tailwind-v4.css",
+   "bytes": 3157,
+   "sha256": "95b6533c979d40c4f277c7e39644fe9abf6d3483b2cab9a9efd070d8d0998c80"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-tokens.d.ts",
+   "bytes": 1651,
+   "sha256": "54e77c898c072e918e5a52a8daeced1d2e5928aa8ed8d1b7236a9986a7819e5f"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-reset.css",
+   "bytes": 2145,
+   "sha256": "91a886dd7af8a3f3c762bab923c66c8d5813813c79afdb30b29f7a5415ecafc8"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-gradients.css",
+   "bytes": 1373,
+   "sha256": "f020312b895e1ce051af4835f0221225acf87630b13dada0e08080950773a19b"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-gradients.json",
+   "bytes": 1412,
+   "sha256": "86e3d96817d4580ee6279fb1cd7b514f3d3b43d58e1828bd1fd74213318a88a8"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-AGENT.md",
+   "bytes": 3625,
+   "sha256": "f2d67a809e3bf39a6f0850500a58b9fc558e3399c47e428f25949c8903af7ef9"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-motion.html",
+   "bytes": 7161,
+   "sha256": "66e2d67d6495d982bdaf445058a10b29d9d6d2f48b1e9506f2993f0608117b2d"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-motion.framer.js",
+   "bytes": 2208,
+   "sha256": "0daa58196c6e81bd6543ccf344eb39aa4f9b8fdfd971b69381b7713924823ff3"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-motion.one.js",
+   "bytes": 2287,
+   "sha256": "94a4540a9853fda88bcf1074d9ce041f431a6dbfe5a7b8a47669985400cd83a7"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-motion.css",
+   "bytes": 1583,
+   "sha256": "a68cdc9a20c9bd02c6168011e472d013bfaff63d3347c6262d0a8b832ada82ec"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-motion.tailwind.js",
+   "bytes": 1799,
+   "sha256": "a3784ade49d2fa4a6d9be755c1c68041667782b9817c8e4545ca540c5dd66d81"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-motion.gsap.js",
+   "bytes": 2461,
+   "sha256": "09d805eb2b6d632d4c454a0ce71873cc26adf3d634513005823417bdce6257ad"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-motion.waapi.js",
+   "bytes": 2113,
+   "sha256": "43e765d1d0d0bf00fffed6d06b85b3befee4094b91532126744611db0dd057c9"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-variables.css",
+   "bytes": 3882,
+   "sha256": "a94f277a57e273f554109ce4d0f4cfe222b0e493261826294cba919d4593debe"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-preview.html",
+   "bytes": 20636,
+   "sha256": "2dbd65b281caba56a49ef65acd8c105a0164c8ccac9bea9e7e97c74d141e2c36"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-figma-variables.json",
+   "bytes": 9106,
+   "sha256": "eb3e62aea99e422889451b354910e34d12a25115a33a5380512da133bb80c842"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-theme.js",
+   "bytes": 3775,
+   "sha256": "8079e54f756ecf808b2bf967f9eecc9a366239ad13f0ab3a75c903d8097aa9aa"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-shadcn-theme.css",
+   "bytes": 493,
+   "sha256": "94d86e1e8d634566c8ed6b430055f5435c474aa209dfdcc1bd84781966e01301"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-wordpress-theme.json",
+   "bytes": 3733,
+   "sha256": "b9c7a79f9a9fc961039ca533c72d0f54786c355cffe4ea10f157ae44881892ca"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-mcp.json",
+   "bytes": 7647,
+   "sha256": "70cca35957f2e67bd9d92a02e7808db438b8201a84b39d1dcd10e65d94e57298"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-motion-tokens.json",
+   "bytes": 852,
+   "sha256": "e278cb1fa6c8ef1c9b1070f38a748927202e140d6279be622f9aed71824db854"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-anatomy.tsx",
+   "bytes": 477,
+   "sha256": "a4bc468200f2fa7064646eeac80a0d6a9e2e3aaaad9463cf569c65d472155971"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-voice.json",
+   "bytes": 450,
+   "sha256": "32acb982f055aeadbc8fa07cd1db025ac265fca09b8739ef24aeb326826e0bf8"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-DESIGN.md",
+   "bytes": 4919,
+   "sha256": "fc0ad854c988c5f6564712b31c5367d520a6f11e8d400e1941ebeec08195f209"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-intent.json",
+   "bytes": 3975,
+   "sha256": "9695ccde1802dec937c27f7a19ea98e7a43afbd432e169cd955ac9c61b3caa7d"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-visual-dna.json",
+   "bytes": 1165,
+   "sha256": "444ca6fe78091026ae7375b0f89e112b05fdc01f54a6662dfb984bff483460c4"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-library.json",
+   "bytes": 203,
+   "sha256": "a6731e05bf03adf7f1416948b060a36cb5f040e1288b74d351cc27f2e0637204"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-seo.json",
+   "bytes": 824,
+   "sha256": "abb8e1dd02da2773518df40b73ec5b1a548a8a074db94baca2f204751d04d61e"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-icon-system.json",
+   "bytes": 954,
+   "sha256": "c36ac9f48d0eb6ae1d94158a61d16de5ea7f84d9803fabf2991e867351b1ea05"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-stack-intel.json",
+   "bytes": 120,
+   "sha256": "1dd247beb4fc5f31faf271859c4a7c9d3be95fdd27f27aaf576dd19b9cc5967a"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0-form-states.json",
+   "bytes": 256,
+   "sha256": "a8453242d7238ca4cf2f50d74a4c7ddf39e52b69037a83847f595360390eb7a1"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/page0/goodstuff-p0.brand.html",
+   "bytes": 48591,
+   "sha256": "5236e4679305d4f3966a4dbccda6c4c5eaa529831e7b1c69f68315b942aa6315"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-motion-static.json",
+   "bytes": 7825,
+   "sha256": "8ff6b9bf9d773f8a764e6e431a09180b8725d6a52e77d9095a61429fc444e490"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-viewport.png",
+   "bytes": 425430,
+   "sha256": "be1d3e32cabce49e27f84b6c83c2a688a1942d663f857d792cd91ae38de31518"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-interactions.json",
+   "bytes": 33,
+   "sha256": "71e49a3afeff14ca39a98647cce515ac68c1b3399301d56855a457bbda7c0a1a"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-signature.json",
+   "bytes": 1170,
+   "sha256": "7df581bd0a968726dc76267b39a05ea9a76e76f5bf97b1c38600bc182cc9c703"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-contrast.json",
+   "bytes": 625,
+   "sha256": "216f76b6ed97703bba705acc172d50a09059b4029be4c6e16b171b3e1b1c2d77"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-brand.png",
+   "bytes": 728302,
+   "sha256": "a58ca0338b72a20f6c5ab9afa999762e89781ae5c752be9088909c3cce4ab750"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-evidence-graph.json",
+   "bytes": 19320,
+   "sha256": "38fcb5492d2ec491f354314f51535707b5e7a2cccf3de0caca46872a426e0166"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/goodstuff/goodstuff-p0-motion-fusion.json",
+   "bytes": 8501,
+   "sha256": "05c93f1ed41a40ac9f2dc29cdb9ead13dfab18713d34a4b5d8938e34311f9b87"
+  }
+ ]
+}

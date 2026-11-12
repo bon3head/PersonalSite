@@ -1,0 +1,326 @@
+{
+ "tool": "design-extract fusion pipeline",
+ "name": "bruno-simon",
+ "date": "2026-11-12T22:06:00.649Z",
+ "command": "/opt/hatch-image/bin/bun /home/hatch/workspace/custom-skills/local-design-extract/bin/fusion-run.js https://bruno-simon.com/ -o /home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon -n bruno-simon",
+ "wallMs": 125887,
+ "exitCode": 0,
+ "outDir": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon",
+ "fileCount": 47,
+ "totalBytes": 866148,
+ "motionRecall": {
+  "engineDurations": [
+   "150ms",
+   "300ms"
+  ],
+  "staticDurations": [
+   "100ms",
+   "150ms",
+   "200ms",
+   "250ms",
+   "1500ms"
+  ],
+  "runtimeObserved": null
+ },
+ "screenshots": [
+  {
+   "file": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-viewport.png",
+   "sha256": "9040a1093a8801f10b3cbd880ce98ff85649b49a140275856ed8b7d440d76630",
+   "kind": "viewport"
+  },
+  {
+   "file": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-brand.png",
+   "sha256": "758f6fcfb3fdcbadf214d7b2678c9c581aad8c241245e51ff7bbc10861c9e8df",
+   "kind": "brand-report"
+  }
+ ],
+ "bunProbe": {
+  "runtime": "bun",
+  "fullRun": true
+ },
+ "stages": [
+  {
+   "stage": 1,
+   "ok": true,
+   "detail": "relay on 127.0.0.1:18091, probe HTTP 200"
+  },
+  {
+   "stage": 2,
+   "ok": true,
+   "detail": "page 0: 11 declarations, 5 durations, 5 easings, 2 keyframes"
+  },
+  {
+   "stage": 4,
+   "ok": true,
+   "detail": "page 0: sampled 1, 0 deltas"
+  },
+  {
+   "stage": 3,
+   "ok": true,
+   "detail": "page 0: engine exit 0 in 92.3s"
+  },
+  {
+   "stage": 6,
+   "ok": true,
+   "detail": "page 0: 11 components, top=Buttons (supporting)"
+  },
+  {
+   "stage": 11,
+   "ok": true,
+   "detail": "page 0: contrast gate pass (3 pairs)"
+  },
+  {
+   "stage": 10,
+   "ok": true,
+   "detail": "page 0: evidence graph 107 nodes"
+  },
+  {
+   "stage": 9,
+   "ok": true,
+   "detail": "page 0: motion fusion written (engine 2 durations + static 5)"
+  },
+  {
+   "stage": 7,
+   "ok": true,
+   "detail": "single URL — no cross-page synthesis"
+  }
+ ],
+ "notes": [],
+ "files": [
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-prompts/v0.txt",
+   "bytes": 473,
+   "sha256": "b931c17caf142e31a12907cc56f2035ee73ca2a0226aa7487e3e293b47ad2803"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-prompts/lovable.txt",
+   "bytes": 365,
+   "sha256": "20f36e4fffd8bb321a1c038c93418cafb83392bbcce030398422d96a07e7180d"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-prompts/cursor.md",
+   "bytes": 415,
+   "sha256": "ad5e5ba84df1811e383e1cd9c1e6e5a7cbc47de5fe313ae9f2b4dacb13149a8b"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-prompts/claude-artifacts.md",
+   "bytes": 544,
+   "sha256": "105a9041ca69f70fb94ae0df5397f39146a5f3862bc9c940a846aae959f0bbbc"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-prompts/recipe-button.md",
+   "bytes": 670,
+   "sha256": "f81c306fd08baf3befc0d48b161fb403df441da60e19c7a0fc48b35e1584f5b2"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-design-language.md",
+   "bytes": 12905,
+   "sha256": "606023cafa9b58d3e15ac8c6c70f58ba6540026215a30681933bd2935664f845"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-design-tokens.json",
+   "bytes": 9470,
+   "sha256": "082446831ca4b7a121fbf5442036ddd7fc303bafebb2b4f976d7eddb50596aa8"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-tailwind.config.js",
+   "bytes": 3498,
+   "sha256": "ddd77ea005560b79909734d7b15f8627b7324152fa91ae1abcde53618131449a"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-tailwind-v4.css",
+   "bytes": 2722,
+   "sha256": "59de3d1510588dd9ce7d6f7d3b69cb9e990a82ab2d289ff598bc872cec8a9257"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-tokens.d.ts",
+   "bytes": 1593,
+   "sha256": "215a08e9a4dd61f959f4132a982311088635c658dd06c3fa0dec84a2c1d7f483"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-reset.css",
+   "bytes": 2131,
+   "sha256": "88979f0e84c8921accce79900db06ee956af38d3156046ab65e2ea209212d3f0"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-gradients.css",
+   "bytes": 2231,
+   "sha256": "b73afbd9b02ead2850cd5e9e966e2121c6d4d745d4010b4123e595569f1eb028"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-gradients.json",
+   "bytes": 2563,
+   "sha256": "ef60611c77bb854f6aaf08d1d51cde12b2153bd1552abca82ebff6de9b73536d"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-AGENT.md",
+   "bytes": 3564,
+   "sha256": "e58b03c9065c6bafd2d3780c2afb4a697ae5d54b2e0880f9ae3a24f376b1c399"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-motion.html",
+   "bytes": 5787,
+   "sha256": "e501c58bc2227ea1aeebff9f8842e863fe0a8ee234c7805500eba00b50f834a8"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-motion.framer.js",
+   "bytes": 2124,
+   "sha256": "fa33c16fed56c2fba2e377a83b7e69a244363d3fdbb205fc3f31ca2563f3d207"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-motion.one.js",
+   "bytes": 2202,
+   "sha256": "2e4fc4dd87a76c83b5a6941bd6cc9a9c5f367279d31591a3f28b2436a5731a60"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-motion.css",
+   "bytes": 1410,
+   "sha256": "f53b4641595085ad7ef9aa84242e9252e31ab5080e9f6c24e200efbd5b25f871"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-motion.tailwind.js",
+   "bytes": 1710,
+   "sha256": "0f1c77cb9567c20c7b5567e8b39c565253e77c053c39273d258266666c0682df"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-motion.gsap.js",
+   "bytes": 2374,
+   "sha256": "b90237caec867b192930598a63ef3103b9e7860fb6389eed13d2f9032c261a85"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-motion.waapi.js",
+   "bytes": 2015,
+   "sha256": "663cc2b139ebbaf3a8a18194a653fc7c80d82abce4b7201d93599decd6080a9f"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-variables.css",
+   "bytes": 3194,
+   "sha256": "397febc10d24089a57e56aeea69086ff1a6c84a29f64aa14885f519feec1172d"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-preview.html",
+   "bytes": 18930,
+   "sha256": "e54ca6a73389a829b9d047aa22bb093760cfc3d6c286f85216a7d612b913fc1a"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-figma-variables.json",
+   "bytes": 8394,
+   "sha256": "6ef80576fc6217411385cc7afd2ef3d2ebe708214f97a2a0da1d3df1f89b7df6"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-theme.js",
+   "bytes": 2901,
+   "sha256": "8be204cae5fd91881bc1e64ba5cb38a8d3bf2f5cdf4a0b14a913d7aa8bc26e4b"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-shadcn-theme.css",
+   "bytes": 454,
+   "sha256": "b12869e3c38b1582a5d37816042d1abfad36e8547628973f1fc7c387186ddd00"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-wordpress-theme.json",
+   "bytes": 4208,
+   "sha256": "02238f524d9ed05f0d07a7b46df0d42b888ee578138485cf047b21e05c379e3e"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-mcp.json",
+   "bytes": 5569,
+   "sha256": "67b1c716ce61d1f7e1a9ad77f517b491fcea28b63b034d059f627b62454bc1f8"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-motion-tokens.json",
+   "bytes": 351,
+   "sha256": "e9ac265beb7a206f9c97ba1259850fb2e3b07d46430badea90b0f6f77d0a7cc9"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-anatomy.tsx",
+   "bytes": 444,
+   "sha256": "9e6021765ddc4630daff7e335f28f97ca0882741599f568a9ebbed1a558a6632"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-voice.json",
+   "bytes": 234,
+   "sha256": "bdb2818523187db08b5b10ab23df03d9c39d527920f19014db43eaf5bce48e56"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-DESIGN.md",
+   "bytes": 4226,
+   "sha256": "8b89f995d3001bd129651a7e04a1dd6ce825329a32d2e94f088a565c7199d3f6"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-intent.json",
+   "bytes": 443,
+   "sha256": "5cb6f8910e0fc7c792e09e9da73228bfd003fec255d28ea7b190b28d0f0d18a8"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-visual-dna.json",
+   "bytes": 1094,
+   "sha256": "b1febd75fc46b189c4285c15b1fd54ae7cbb30ac3cbf0f1f3defc095832bf5a4"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-library.json",
+   "bytes": 204,
+   "sha256": "bc00b452012a41fb206ed8ffdb3b35ba710486f3999ecae78f16ff06d24daf68"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-seo.json",
+   "bytes": 1537,
+   "sha256": "56574e8128ff11624f1db7c88f8b395e271e140bc6759b510970d302e46635f0"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-stack-intel.json",
+   "bytes": 147,
+   "sha256": "772f56e6d45d248735e53c5c99405b863f20d8f84a3dee1f7b4f402644dd363c"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0-form-states.json",
+   "bytes": 299,
+   "sha256": "d12e9266832642a959336fce6a0cea8f8f8fe67ccce5b27633fca372297ead30"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/page0/bruno-simon-p0.brand.html",
+   "bytes": 43169,
+   "sha256": "4d153875a40f3c7e03aa08e2526be67f99fce1c209aa8b6c683259263b3c1535"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-motion-static.json",
+   "bytes": 5351,
+   "sha256": "7dd1c94f46252b62c316c1fef96ae391e3422aad54463f98fd62051de0699d26"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-viewport.png",
+   "bytes": 16938,
+   "sha256": "9040a1093a8801f10b3cbd880ce98ff85649b49a140275856ed8b7d440d76630"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-interactions.json",
+   "bytes": 32,
+   "sha256": "2cf0f5b04ece6cbda2a757ca7246b4cb00aa0c07f3cf81b7380627f61e92be79"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-signature.json",
+   "bytes": 2526,
+   "sha256": "1e92b69ed3c82954d3455d0d70b03b1ccf455103e0106546fb90e7b468d54e58"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-contrast.json",
+   "bytes": 482,
+   "sha256": "a377b73f6f268d508f5b7766188970f8cc53a6b4993e939c35ee890bfd12fac9"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-brand.png",
+   "bytes": 659301,
+   "sha256": "758f6fcfb3fdcbadf214d7b2678c9c581aad8c241245e51ff7bbc10861c9e8df"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-evidence-graph.json",
+   "bytes": 19109,
+   "sha256": "c75de94e23fa609ac3ecc95d45233f68625b4639be72021d7e3fa40d0bbde9b8"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon/bruno-simon-p0-motion-fusion.json",
+   "bytes": 5845,
+   "sha256": "faecd635e7b8bd2e1baa62473252a203688d69541942d436fb8d7811681852eb"
+  }
+ ]
+}

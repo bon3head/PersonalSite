@@ -1,0 +1,340 @@
+{
+ "source": "https://goodstuff.pixijs.io/",
+ "engine": {
+  "durations": [
+   "250ms",
+   "300ms",
+   "450ms"
+  ],
+  "easings": [
+   "cubic-bezier(0.34, 1.56, 0.64, 1)",
+   "cubic-bezier(0.215, 0.61, 0.355, 1)"
+  ],
+  "meta": {
+   "feel": "springy",
+   "scrollLinked": true
+  }
+ },
+ "staticInventory": {
+  "declarations": 15,
+  "inventory": [
+   {
+    "selector": ".skip-link",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".brand",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".github",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".github svg",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".round-button",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".round-button svg",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".cta",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".cta::before",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".cta::after",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".cta-arrow",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".cursor-label",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".shelf-card a",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".closing-title .accent",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".socials a",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": "*, ::before, ::after",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css",
+    "transitionDuration": "0.01ms",
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": null
+   }
+  ],
+  "keyframes": [],
+  "durations": [
+   {
+    "ms": 0.01,
+    "value": "0.01ms",
+    "count": 1,
+    "sources": [
+     {
+      "selector": "*, ::before, ::after",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     }
+    ]
+   },
+   {
+    "ms": 3000,
+    "value": "3000ms",
+    "count": 3,
+    "sources": [
+     {
+      "selector": ".skip-link",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".github",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".github",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     }
+    ]
+   },
+   {
+    "ms": 4000,
+    "value": "4000ms",
+    "count": 6,
+    "sources": [
+     {
+      "selector": ".brand",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".github",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".cta",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".cta::after",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".cta-arrow",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     }
+    ]
+   },
+   {
+    "ms": 5000,
+    "value": "5000ms",
+    "count": 3,
+    "sources": [
+     {
+      "selector": ".github svg",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".closing-title .accent",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".closing-title .accent",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     }
+    ]
+   },
+   {
+    "ms": 25000,
+    "value": "25000ms",
+    "count": 6,
+    "sources": [
+     {
+      "selector": ".round-button",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".round-button",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".cta",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".cursor-label",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".cursor-label",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     }
+    ]
+   },
+   {
+    "ms": 35000,
+    "value": "35000ms",
+    "count": 2,
+    "sources": [
+     {
+      "selector": ".cta::before",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".shelf-card a",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     }
+    ]
+   },
+   {
+    "ms": 45000,
+    "value": "45000ms",
+    "count": 3,
+    "sources": [
+     {
+      "selector": ".round-button",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".round-button svg",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     },
+     {
+      "selector": ".shelf-card a",
+      "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+     }
+    ]
+   }
+  ],
+  "easings": [
+   {
+    "value": "ease",
+    "type": "ease",
+    "count": 11
+   }
+  ],
+  "contexts": {
+   "other": {
+    "count": 11,
+    "durations": [
+     "4000ms",
+     "3000ms",
+     "5000ms"
+    ],
+    "easing": "ease",
+    "props": []
+   },
+   "button": {
+    "count": 2,
+    "durations": [
+     "45000ms",
+     "25000ms"
+    ],
+    "easing": "ease",
+    "props": []
+   },
+   "link": {
+    "count": 2,
+    "durations": [
+     "45000ms",
+     "35000ms",
+     "4000ms"
+    ],
+    "easing": "ease",
+    "props": []
+   }
+  }
+ },
+ "interactions": {
+  "sampled": 12,
+  "deltas": []
+ }
+}

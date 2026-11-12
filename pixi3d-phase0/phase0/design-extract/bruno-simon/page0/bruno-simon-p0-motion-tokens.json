@@ -1,0 +1,21 @@
+{
+  "$description": "Motion tokens extracted by designlang",
+  "duration": {
+    "xs": {
+      "$value": "150ms",
+      "$type": "duration",
+      "ms": 150
+    },
+    "md": {
+      "$value": "300ms",
+      "$type": "duration",
+      "ms": 300
+    }
+  },
+  "easing": {},
+  "spring": {},
+  "$meta": {
+    "feel": "mixed",
+    "scrollLinked": true
+  }
+}

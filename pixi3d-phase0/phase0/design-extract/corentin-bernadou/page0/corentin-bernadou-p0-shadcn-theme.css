@@ -1,0 +1,17 @@
+/* shadcn/ui Theme — extracted from https://corentinbernadou.com/ */
+/* Paste into your globals.css */
+
+@layer base {
+  :root {
+    --background: 345 40% 2%;
+    --foreground: 0 0% 0%;
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 16 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 52%;
+    --muted-foreground: 0 0% 46%;
+    --border: 0 0% 52%;
+    --radius: 3px;
+  }
+}

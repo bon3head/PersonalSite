@@ -1,0 +1,113 @@
+:root {
+  /* Colors — Primary */
+  --color-primary: #ff0000;
+  --color-secondary: #ff4401;
+
+  /* Ramp — primary (base is 500) */
+  --color-primary-50: #ffccb8;
+  --color-primary-100: #ffbba6;
+  --color-primary-200: #ffa28d;
+  --color-primary-300: #ff7c67;
+  --color-primary-400: #ff4535;
+  --color-primary-500: #ff0000;
+  --color-primary-600: #d60000;
+  --color-primary-700: #b40000;
+  --color-primary-800: #980000;
+  --color-primary-900: #7f0000;
+  --color-primary-950: #4e0000;
+
+  /* Ramp — secondary (base is 400) */
+  --color-secondary-50: #ffd3b6;
+  --color-secondary-100: #ffc3a3;
+  --color-secondary-200: #ffac89;
+  --color-secondary-300: #ff8a62;
+  --color-secondary-400: #ff4401;
+  --color-secondary-500: #eb2d00;
+  --color-secondary-600: #cc0900;
+  --color-secondary-700: #ab0000;
+  --color-secondary-800: #900000;
+  --color-secondary-900: #780000;
+  --color-secondary-950: #490000;
+
+  /* Ramp — neutral (base is 600) */
+  --color-neutral-50: #f5f5f5;
+  --color-neutral-100: #eaeaea;
+  --color-neutral-200: #d9d9d9;
+  --color-neutral-300: #c0c0c0;
+  --color-neutral-400: #9f9f9f;
+  --color-neutral-500: #828282;
+  --color-neutral-600: #767676;
+  --color-neutral-700: #575757;
+  --color-neutral-800: #464646;
+  --color-neutral-900: #393939;
+  --color-neutral-950: #1f1f1f;
+
+  /* Colors — Neutrals */
+  --color-neutral-50: #767676;
+  --color-neutral-100: #6d6d6d;
+  --color-neutral-200: #000000;
+  --color-neutral-300: #141414;
+  --color-neutral-400: #858585;
+
+  /* Colors — Backgrounds */
+  --color-bg: #070304;
+  --color-bg-1: #ff0000;
+
+  /* Colors — Text */
+  --color-text: #000000;
+  --color-text-1: #6d6d6d;
+  --color-text-2: #ff4401;
+  --color-text-3: #858585;
+  --color-text-4: #767676;
+
+  /* Semantic pairs */
+  --surface-page-bg: #070304;
+  --surface-page-fg: #ff4401; /* 5.94:1 AA */
+  --surface-raised-bg: #ff0000;
+  --surface-raised-fg: #000000; /* 5.25:1 AA */
+  --action-primary-bg: #ff0000;
+  --action-primary-fg: #000000; /* 5.25:1 AA */
+  --action-secondary-bg: #ff4401;
+  --action-secondary-fg: #000000; /* 6.08:1 AA */
+
+  /* Typography — Named scale */
+  --font-size-display: 13.545px;
+  --font-size-title-1: 11.8519px;
+  --font-size-h1: 10.1587px;
+  --font-size-body-sm: 9.31217px;
+  --font-size-micro: 8.46561px;
+  --font-size-sm-3: 5.92593px;
+
+  /* Layout */
+  --container-width: 692px;
+  --section-rhythm: 21px;
+  --grid-columns: 12;
+
+  /* Spacing */
+  --spacing-2: 2px;
+  --spacing-21: 21px;
+  --spacing-42: 42px;
+  --spacing-100: 100px;
+
+  /* Border Radius */
+  --radius-sm: 3px;
+
+  /* Original Site Variables */
+  /* — colors — */
+  --document-background-color: #070304;
+  --cross-color: #CACACA;
+  /* — other — */
+  --vh: 100vh;
+  --vw: 100vw;
+  --gutter: 3rem;
+  --canvas-z-index: 1;
+  --fs-mobile: 2.5vw;
+  --fs-tablet: calc(100vw / 768 * 10);
+  --fs-laptop: calc(100vw / 1512 * 10);
+  /* — semantic — */
+  success: [object Object];
+  warning: [object Object];
+  error: [object Object];
+  info: [object Object];
+
+}

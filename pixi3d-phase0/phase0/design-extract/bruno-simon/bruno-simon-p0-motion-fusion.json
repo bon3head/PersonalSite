@@ -1,0 +1,257 @@
+{
+ "source": "https://bruno-simon.com/",
+ "engine": {
+  "durations": [
+   "150ms",
+   "300ms"
+  ],
+  "easings": [],
+  "meta": {
+   "feel": "mixed",
+   "scrollLinked": true
+  }
+ },
+ "staticInventory": {
+  "declarations": 11,
+  "inventory": [
+   {
+    "selector": "button",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "150ms",
+    "transitionTimingFunction": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transitionProperty": "box-shadow",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": "#details",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "250ms",
+    "transitionTimingFunction": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": "#details.hidden, #main-content.hidden",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "0s",
+    "transitionTimingFunction": "ease",
+    "transitionProperty": "none",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": "#main-content",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "100ms",
+    "transitionTimingFunction": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".snackbar-show",
+    "stylesheet": "<inline style>",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": "show-snackbar, hide-snackbar",
+    "animationDuration": "250ms, 250ms"
+   },
+   {
+    "selector": "#sub-frame-error",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "200ms",
+    "transitionTimingFunction": "ease-in-out",
+    "transitionProperty": "background-color",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".offline",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "1.5s, 1.5s",
+    "transitionTimingFunction": "cubic-bezier(0.65, 0.05, 0.36, 1), cubic-bezier(0.65, 0.05, 0.36, 1)",
+    "transitionProperty": "filter, background-color",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".offline body",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "1.5s",
+    "transitionTimingFunction": "cubic-bezier(0.65, 0.05, 0.36, 1)",
+    "transitionProperty": "background-color",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".offline-runner-live-region",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "1.5s",
+    "transitionTimingFunction": "cubic-bezier(0.65, 0.05, 0.36, 1)",
+    "transitionProperty": "color",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".slow-speed-option .slow-speed-toggle::before, .slow-speed-option .slow-speed-toggle::after",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "100ms",
+    "transitionTimingFunction": "cubic-bezier(0.4, 0, 1, 1)",
+    "transitionProperty": "all",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".arcade-mode .runner-container",
+    "stylesheet": "<inline style>",
+    "transitionDuration": "250ms",
+    "transitionTimingFunction": "cubic-bezier(0.4, 0, 1, 1)",
+    "transitionProperty": "transform",
+    "animationName": null,
+    "animationDuration": null
+   }
+  ],
+  "keyframes": [
+   "show-snackbar",
+   "hide-snackbar"
+  ],
+  "durations": [
+   {
+    "ms": 100,
+    "value": "100ms",
+    "count": 2,
+    "sources": [
+     {
+      "selector": "#main-content",
+      "stylesheet": "<inline style>"
+     },
+     {
+      "selector": ".slow-speed-option .slow-speed-toggle::before, .slow-speed-option .slow-speed-toggle::after",
+      "stylesheet": "<inline style>"
+     }
+    ]
+   },
+   {
+    "ms": 150,
+    "value": "150ms",
+    "count": 1,
+    "sources": [
+     {
+      "selector": "button",
+      "stylesheet": "<inline style>"
+     }
+    ]
+   },
+   {
+    "ms": 200,
+    "value": "200ms",
+    "count": 1,
+    "sources": [
+     {
+      "selector": "#sub-frame-error",
+      "stylesheet": "<inline style>"
+     }
+    ]
+   },
+   {
+    "ms": 250,
+    "value": "250ms",
+    "count": 2,
+    "sources": [
+     {
+      "selector": "#details",
+      "stylesheet": "<inline style>"
+     },
+     {
+      "selector": ".arcade-mode .runner-container",
+      "stylesheet": "<inline style>"
+     }
+    ]
+   },
+   {
+    "ms": 1500,
+    "value": "1500ms",
+    "count": 4,
+    "sources": [
+     {
+      "selector": ".offline",
+      "stylesheet": "<inline style>"
+     },
+     {
+      "selector": ".offline",
+      "stylesheet": "<inline style>"
+     },
+     {
+      "selector": ".offline body",
+      "stylesheet": "<inline style>"
+     },
+     {
+      "selector": ".offline-runner-live-region",
+      "stylesheet": "<inline style>"
+     }
+    ]
+   }
+  ],
+  "easings": [
+   {
+    "value": "cubic-bezier(0.65, 0.05, 0.36, 1)",
+    "type": "custom",
+    "count": 4
+   },
+   {
+    "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "type": "custom",
+    "count": 3
+   },
+   {
+    "value": "cubic-bezier(0.4, 0, 1, 1)",
+    "type": "custom",
+    "count": 2
+   },
+   {
+    "value": "ease",
+    "type": "ease",
+    "count": 1
+   },
+   {
+    "value": "ease-in-out",
+    "type": "ease-in-out",
+    "count": 1
+   }
+  ],
+  "contexts": {
+   "button": {
+    "count": 1,
+    "durations": [
+     "150ms"
+    ],
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "props": [
+     "box-shadow"
+    ]
+   },
+   "other": {
+    "count": 10,
+    "durations": [
+     "1500ms",
+     "250ms",
+     "100ms"
+    ],
+    "easing": "cubic-bezier(0.65, 0.05, 0.36, 1)",
+    "props": [
+     "background-color",
+     "opacity",
+     "none",
+     "@keyframes show-snackbar, hide-snackbar"
+    ]
+   }
+  }
+ },
+ "interactions": {
+  "sampled": 1,
+  "deltas": []
+ }
+}

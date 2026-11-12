@@ -1,0 +1,24 @@
+{
+  "tone": "friendly",
+  "pronoun": "third-person",
+  "headingStyle": "Sentence case",
+  "headingLengthClass": "tight",
+  "ctaVerbs": [],
+  "buttonPatterns": [],
+  "sampleHeadings": [
+    "Good Stuff",
+    "Open to everyone",
+    "Mach 2",
+    "Through the clouds",
+    "The Backrooms",
+    "Good Stuff",
+    "Open to everyone",
+    "Mach 2",
+    "Through the clouds",
+    "The Backrooms"
+  ],
+  "stats": {
+    "buttons": 0,
+    "headings": 10
+  }
+}

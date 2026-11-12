@@ -1,0 +1,26 @@
+{
+  "tone": "neutral",
+  "pronoun": "third-person",
+  "headingStyle": "Title Case",
+  "headingLengthClass": "tight",
+  "ctaVerbs": [
+    {
+      "value": "px",
+      "count": 1
+    }
+  ],
+  "buttonPatterns": [
+    {
+      "value": "1280px × 800px",
+      "count": 1
+    }
+  ],
+  "sampleHeadings": [
+    "Corentin Bernadou",
+    "Freelance Developer"
+  ],
+  "stats": {
+    "buttons": 1,
+    "headings": 2
+  }
+}

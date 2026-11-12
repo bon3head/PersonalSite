@@ -1,0 +1,38 @@
+{
+ "pass": true,
+ "pairs": [
+  {
+   "role": "surface.page",
+   "bg": "#0d0b16",
+   "fg": "#ffffff",
+   "stated": 19.51,
+   "recomputed": 19.51,
+   "substituted": false
+  },
+  {
+   "role": "action.primary",
+   "bg": "#e91e63",
+   "fg": "#000000",
+   "stated": 4.83,
+   "recomputed": 4.83,
+   "substituted": true
+  },
+  {
+   "role": "action.secondary",
+   "bg": "#ffa838",
+   "fg": "#000000",
+   "stated": 10.91,
+   "recomputed": 10.91,
+   "substituted": true
+  },
+  {
+   "role": "action.accent",
+   "bg": "#ef4d95",
+   "fg": "#000000",
+   "stated": 6.17,
+   "recomputed": 6.17,
+   "substituted": true
+  }
+ ],
+ "failures": []
+}

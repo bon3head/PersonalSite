@@ -1,0 +1,22 @@
+{
+  "schema": "cipher-goal/v1",
+  "id": "pixijs-3d-portfolio-fork-phase-0-research-and-collection-20261112",
+  "outcome": "PixiJS 3D portfolio fork Phase 0 research and collection",
+  "verification": "ls /home/hatch/workspace/pixi3d-portfolio-fork/phase0/RESEARCH-INDEX.md && git -C /home/hatch/workspace/personalsite-pixi3d-phase0 rev-parse --abbrev-ref HEAD",
+  "constraints": [],
+  "boundaries": [],
+  "stop_when": "",
+  "subgoals": [],
+  "gates": [],
+  "skip_reasons": [],
+  "status": "active",
+  "turns_used": 0,
+  "turn_budget": 200,
+  "weight": 1,
+  "declared_files": [],
+  "merge_order": null,
+  "integrity_mode": "development",
+  "turns": [],
+  "created_at": "2026-11-12T16:46:02-05:00",
+  "receipt_seq": null
+}

@@ -1,0 +1,382 @@
+{
+ "source": "https://corentinbernadou.com/",
+ "engine": {
+  "durations": [
+   "300ms"
+  ],
+  "easings": [
+   "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+  ],
+  "meta": {
+   "feel": "responsive",
+   "scrollLinked": true
+  }
+ },
+ "staticInventory": {
+  "declarations": 19,
+  "inventory": [
+   {
+    "selector": ".lenis.lenis-autoToggle",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-BNWJ7Zcm.css",
+    "transitionDuration": "1ms",
+    "transitionTimingFunction": null,
+    "transitionProperty": "overflow",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".archive-index__nav",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".archive-index__list-item",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".archive-index__list-item > *",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.1s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "color",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".overview-header, .archive-header",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".view-switcher__nav",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".view-switcher__link",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.6s",
+    "transitionTimingFunction": "cubic-bezier(0.36, 0.33, 0, 1)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".view-switcher__mask",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.36, 0.33, 0, 1)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".availability__icon-square",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": "pulse",
+    "animationDuration": "0.75s"
+   },
+   {
+    "selector": ".availability:hover .availability__icon-square",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": null,
+    "animationDuration": "0.25s"
+   },
+   {
+    "selector": ".availability__infos",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "ease",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".content-block a span:not([class])",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s, 0.1s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94), cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "opacity, color",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".content-block__contents-link",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.25s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "color",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".fw-work__link",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".fw-work__link > *",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "color",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".grid-rules__guide",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.25s",
+    "transitionTimingFunction": "cubic-bezier(0.19, 1, 0.22, 1)",
+    "transitionProperty": "transform",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".next-work__link span",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": null,
+    "transitionTimingFunction": null,
+    "transitionProperty": null,
+    "animationName": "nw-marquee",
+    "animationDuration": "10s"
+   },
+   {
+    "selector": ".work-case__gallery-preview > *",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   },
+   {
+    "selector": ".overview-works__item-preview > *",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+    "transitionDuration": "0.3s",
+    "transitionTimingFunction": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "transitionProperty": "opacity",
+    "animationName": null,
+    "animationDuration": null
+   }
+  ],
+  "keyframes": [
+   "pulse",
+   "nw-marquee"
+  ],
+  "durations": [
+   {
+    "ms": 1,
+    "value": "1ms",
+    "count": 1,
+    "sources": [
+     {
+      "selector": ".lenis.lenis-autoToggle",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-BNWJ7Zcm.css"
+     }
+    ]
+   },
+   {
+    "ms": 100,
+    "value": "100ms",
+    "count": 2,
+    "sources": [
+     {
+      "selector": ".archive-index__list-item > *",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     },
+     {
+      "selector": ".content-block a span:not([class])",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     }
+    ]
+   },
+   {
+    "ms": 250,
+    "value": "250ms",
+    "count": 3,
+    "sources": [
+     {
+      "selector": ".availability:hover .availability__icon-square",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+      "via": "animation-duration"
+     },
+     {
+      "selector": ".content-block__contents-link",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     },
+     {
+      "selector": ".grid-rules__guide",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     }
+    ]
+   },
+   {
+    "ms": 300,
+    "value": "300ms",
+    "count": 11,
+    "sources": [
+     {
+      "selector": ".archive-index__nav",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     },
+     {
+      "selector": ".archive-index__list-item",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     },
+     {
+      "selector": ".overview-header, .archive-header",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     },
+     {
+      "selector": ".view-switcher__nav",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     },
+     {
+      "selector": ".view-switcher__mask",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     }
+    ]
+   },
+   {
+    "ms": 600,
+    "value": "600ms",
+    "count": 1,
+    "sources": [
+     {
+      "selector": ".view-switcher__link",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+     }
+    ]
+   },
+   {
+    "ms": 750,
+    "value": "750ms",
+    "count": 1,
+    "sources": [
+     {
+      "selector": ".availability__icon-square",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+      "via": "animation-duration"
+     }
+    ]
+   },
+   {
+    "ms": 10000,
+    "value": "10000ms",
+    "count": 1,
+    "sources": [
+     {
+      "selector": ".next-work__link span",
+      "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css",
+      "via": "animation-duration"
+     }
+    ]
+   }
+  ],
+  "easings": [
+   {
+    "value": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "type": "custom",
+    "count": 12
+   },
+   {
+    "value": "cubic-bezier(0.36, 0.33, 0, 1)",
+    "type": "custom",
+    "count": 2
+   },
+   {
+    "value": "ease",
+    "type": "ease",
+    "count": 1
+   },
+   {
+    "value": "cubic-bezier(0.19, 1, 0.22, 1)",
+    "type": "custom",
+    "count": 1
+   }
+  ],
+  "contexts": {
+   "other": {
+    "count": 12,
+    "durations": [
+     "300ms",
+     "250ms",
+     "1ms"
+    ],
+    "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "props": [
+     "opacity",
+     "color",
+     "overflow",
+     "@keyframes pulse"
+    ]
+   },
+   "nav": {
+    "count": 3,
+    "durations": [
+     "300ms"
+    ],
+    "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "props": [
+     "opacity"
+    ]
+   },
+   "card": {
+    "count": 3,
+    "durations": [
+     "300ms",
+     "100ms"
+    ],
+    "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "props": [
+     "opacity",
+     "color"
+    ]
+   },
+   "link": {
+    "count": 1,
+    "durations": [
+     "300ms",
+     "100ms"
+    ],
+    "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "props": [
+     "opacity",
+     "color"
+    ]
+   }
+  }
+ },
+ "interactions": {
+  "sampled": 4,
+  "deltas": []
+ }
+}

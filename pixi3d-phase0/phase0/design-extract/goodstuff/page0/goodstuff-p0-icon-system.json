@@ -1,0 +1,58 @@
+{
+  "library": "unknown",
+  "confidence": 0,
+  "alternates": [],
+  "stats": {
+    "count": 6,
+    "strokeOnly": 5,
+    "fillOnly": 1,
+    "mixed": 0,
+    "avgStrokeWidth": 2.2,
+    "gridDistribution": {
+      "16": 3,
+      "24": 3
+    },
+    "roundedCapsFraction": 0.33
+  },
+  "signals": [
+    "strokeDominant"
+  ],
+  "icons": [
+    {
+      "class": "",
+      "grid": 16,
+      "strokeWidth": null,
+      "style": "fill"
+    },
+    {
+      "class": "",
+      "grid": 16,
+      "strokeWidth": null,
+      "style": "stroke"
+    },
+    {
+      "class": "",
+      "grid": 16,
+      "strokeWidth": null,
+      "style": "stroke"
+    },
+    {
+      "class": "cta-arrow",
+      "grid": 24,
+      "strokeWidth": 2.2,
+      "style": "stroke"
+    },
+    {
+      "class": "",
+      "grid": 24,
+      "strokeWidth": null,
+      "style": "stroke"
+    },
+    {
+      "class": "cta-arrow",
+      "grid": 24,
+      "strokeWidth": 2.2,
+      "style": "stroke"
+    }
+  ]
+}

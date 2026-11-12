@@ -1,0 +1,108 @@
+{
+  "pageIntent": {
+    "type": "landing",
+    "confidence": 0.31,
+    "path": "/",
+    "title": "Corentin Bernadou · Freelance Developer",
+    "description": "Freelance creative developer Corentin Bernadou crafts expressive, animation-driven interactive experiences with clean visuals and precise motion.",
+    "signals": [
+      {
+        "kind": "dom",
+        "type": "blog-post",
+        "weight": 0.35,
+        "detail": "byline|min-read"
+      },
+      {
+        "kind": "url",
+        "type": "landing",
+        "weight": 0.45,
+        "detail": "root-path"
+      }
+    ],
+    "alternates": [
+      {
+        "type": "blog-post",
+        "score": 0.35
+      }
+    ],
+    "needsSmart": true
+  },
+  "sectionRoles": {
+    "sections": [
+      {
+        "index": 0,
+        "tag": "header",
+        "role": "feature-grid",
+        "subrole": null,
+        "confidence": 0.8,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "w": 1280,
+          "h": 97.828125
+        },
+        "buttonCount": 1,
+        "cardCount": 3,
+        "slots": {
+          "ctaCount": 1,
+          "lede": "1280px × 800px\nFeatured Works,\nArchive,\nAbout\nAvailable Q4, 2026\nCopy email?"
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 1,
+        "tag": "nav",
+        "role": "nav",
+        "subrole": null,
+        "confidence": 0.9,
+        "heading": null,
+        "bounds": {
+          "x": 42.3125,
+          "y": 42.3125,
+          "w": 1195.375,
+          "h": 13.203125
+        },
+        "buttonCount": 0,
+        "cardCount": 3,
+        "slots": {
+          "lede": "Featured Works,\nArchive,\nAbout"
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 2,
+        "tag": "main",
+        "role": "pricing",
+        "subrole": null,
+        "confidence": 0.4,
+        "heading": "Corentin Bernadou",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "w": 1280,
+          "h": 2718.125
+        },
+        "buttonCount": 0,
+        "cardCount": 185,
+        "slots": {
+          "heading": "Corentin Bernadou",
+          "subheadings": [
+            "Freelance Developer"
+          ]
+        },
+        "needsSmart": true
+      }
+    ],
+    "counts": {
+      "feature-grid": 1,
+      "nav": 1,
+      "pricing": 1
+    },
+    "readingOrder": [
+      "feature-grid",
+      "pricing",
+      "nav"
+    ]
+  }
+}

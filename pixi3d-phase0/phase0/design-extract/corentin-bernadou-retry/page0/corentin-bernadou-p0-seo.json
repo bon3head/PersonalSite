@@ -1,0 +1,47 @@
+{
+  "openGraph": {
+    "type": "website",
+    "url": "https://www.corentinbernadou.com",
+    "title": "Corentin Bernadou · Freelance Developer",
+    "description": "Freelance creative developer Corentin Bernadou crafts expressive, animation-driven interactive experiences with clean visuals and precise motion.",
+    "video": "https://www.corentinbernadou.com/opengraph-video.mp4",
+    "video:type": "video/mp4",
+    "video:width": "1280",
+    "video:height": "720",
+    "image:type": "image/png",
+    "image": "https://www.corentinbernadou.com/opengraph.png",
+    "image:width": "1200",
+    "image:height": "630",
+    "image:alt": "Corentin Bernadou · Freelance Developer"
+  },
+  "twitter": {
+    "card": "summary_large_image",
+    "image": "https://www.corentinbernadou.com/opengraph.png",
+    "title": "Corentin Bernadou · Freelance Developer",
+    "description": "Freelance creative developer Corentin Bernadou crafts expressive, animation-driven interactive experiences with clean visuals and precise motion.",
+    "image:alt": "Corentin Bernadou · Freelance Developer"
+  },
+  "description": "Freelance creative developer Corentin Bernadou crafts expressive, animation-driven interactive experiences with clean visuals and precise motion.",
+  "canonical": null,
+  "themeColor": "#ffffff",
+  "viewport": "width=device-width,initial-scale=1,viewport-fit=cover",
+  "favicons": [
+    {
+      "rel": "icon",
+      "href": "https://corentinbernadou.com/favicon.ico",
+      "sizes": "",
+      "type": "image/x-icon"
+    }
+  ],
+  "manifest": "https://corentinbernadou.com/site.webmanifest",
+  "structuredData": [],
+  "score": {
+    "hasOg": true,
+    "hasTwitter": true,
+    "hasDescription": true,
+    "hasCanonical": false,
+    "hasStructuredData": false,
+    "hasFavicon": true,
+    "hasThemeColor": true
+  }
+}

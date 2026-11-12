@@ -1,0 +1,145 @@
+:root {
+  /* Colors — Primary */
+  --color-primary: #e91e63;
+  --color-secondary: #ffa838;
+  --color-accent: #ef4d95;
+
+  /* Ramp — primary (base is 500) */
+  --color-primary-50: #ffcee1;
+  --color-primary-100: #ffbdd3;
+  --color-primary-200: #ffa6c0;
+  --color-primary-300: #ff82a4;
+  --color-primary-400: #ff5181;
+  --color-primary-500: #e91e63;
+  --color-primary-600: #ca004f;
+  --color-primary-700: #a9003d;
+  --color-primary-800: #8e0030;
+  --color-primary-900: #760025;
+  --color-primary-950: #480011;
+
+  /* Ramp — secondary (base is 300) */
+  --color-secondary-50: #ffeab1;
+  --color-secondary-100: #ffdd9e;
+  --color-secondary-200: #ffcb82;
+  --color-secondary-300: #ffa838;
+  --color-secondary-400: #dc8b13;
+  --color-secondary-500: #bd6b00;
+  --color-secondary-600: #a25600;
+  --color-secondary-700: #864200;
+  --color-secondary-800: #713400;
+  --color-secondary-900: #5d2800;
+  --color-secondary-950: #371300;
+
+  /* Ramp — accent (base is 400) */
+  --color-accent-50: #ffd2f7;
+  --color-accent-100: #ffc3eb;
+  --color-accent-200: #ffacda;
+  --color-accent-300: #ff8bc2;
+  --color-accent-400: #ef4d95;
+  --color-accent-500: #da3884;
+  --color-accent-600: #bc206d;
+  --color-accent-700: #9d0758;
+  --color-accent-800: #840048;
+  --color-accent-900: #6e003a;
+  --color-accent-950: #42001f;
+
+  /* Colors — Neutrals */
+  --color-neutral-50: #ffffff;
+
+  /* Colors — Backgrounds */
+  --color-bg: #0d0b16;
+
+  /* Colors — Text */
+  --color-text: #ffffff;
+  --color-text-1: #e91e63;
+
+  /* Semantic pairs */
+  --surface-page-bg: #0d0b16;
+  --surface-page-fg: #ffffff; /* 19.51:1 AAA */
+  --action-primary-bg: #e91e63;
+  --action-primary-fg: #000000; /* 4.83:1 AA */
+  --action-secondary-bg: #ffa838;
+  --action-secondary-fg: #000000; /* 10.91:1 AAA */
+  --action-accent-bg: #ef4d95;
+  --action-accent-fg: #000000; /* 6.17:1 AA */
+
+  /* Typography — Families */
+  --font-sans: 'Roboto', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+  --font-mono: 'Roboto Mono', sans-serif;
+
+  /* Typography — Named scale */
+  --font-size-h2: 115.2px;
+  --font-size-title-1: 76.8px;
+  --font-size-h1: 69.12px;
+  --font-size-title-2: 28px;
+  --font-size-title-3: 24px;
+  --font-size-title-4: 17.92px;
+  --font-size-title-5: 16px;
+  --font-size-title-6: 15px;
+  --font-size-title-7: 14px;
+  --font-size-title-8: 12px;
+  --font-size-body: 11px;
+
+  /* Layout */
+  --container-width: 1009px;
+  --container-gutter: 64px;
+  --section-rhythm: 176px;
+  --grid-columns: 2;
+
+  /* Spacing */
+  --spacing-5: 5px;
+  --spacing-38: 38px;
+  --spacing-56: 56px;
+  --spacing-64: 64px;
+  --spacing-72: 72px;
+  --spacing-112: 112px;
+  --spacing-176: 176px;
+  --spacing-192: 192px;
+  --spacing-208: 208px;
+  --spacing-234: 234px;
+  --spacing-258: 258px;
+  --spacing-338: 338px;
+
+  /* Border Radius */
+  --radius-lg: 16px;
+  --radius-full: 26px;
+  --radius-full: 44px;
+  --radius-full: 50px;
+  --radius-full: 999px;
+
+  /* Box Shadows */
+  --shadow-xs: rgba(255, 255, 255, 0.18) 3px 3px 0px 0px;
+  --shadow-sm: rgba(233, 30, 99, 0.35) 0px 8px 22px 0px;
+
+  /* Original Site Variables */
+  /* — colors — */
+  --spring: cubic-bezier(.34, 1.56, .64, 1);
+  /* — other — */
+  --pink: #e91e63;
+  --pink-deep: #c2185b;
+  --pink-light: #f06695;
+  --violet: #8b5cf6;
+  --lilac: #b79cf9;
+  --sky: #38bdf8;
+  --orange: #f2a65a;
+  --ground: #0d0b16;
+  --surface: #15151d;
+  --surface-raised: #1c1b27;
+  --line: rgba(255, 255, 255, .09);
+  --ink: #fff;
+  --ink-soft: rgba(255, 255, 255, .74);
+  --ink-faint: rgba(255, 255, 255, .5);
+  --display: "Outfit", system-ui, sans-serif;
+  --body: "Roboto", system-ui, sans-serif;
+  --mono: "Roboto Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(.215, .61, .355, 1);
+  --gutter: clamp(16px, 3.2vw, 44px);
+  --topbar: 76px;
+  /* — semantic — */
+  success: [object Object];
+  warning: [object Object];
+  error: [object Object];
+  info: [object Object];
+
+}

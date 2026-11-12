@@ -1,0 +1,45 @@
+{
+ "components": [
+  {
+   "name": "Links",
+   "instances": 183,
+   "variants": 0,
+   "score": 38,
+   "tier": "supporting",
+   "rationale": "freq 25.0 (n=183); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 8.3 (5 css lines)"
+  },
+  {
+   "name": "Navigation",
+   "instances": 10,
+   "variants": 0,
+   "score": 30,
+   "tier": "generic",
+   "rationale": "freq 11.5 (n=10); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 13.3 (8 css lines)"
+  },
+  {
+   "name": "Buttons",
+   "instances": 2,
+   "variants": 1,
+   "score": 29,
+   "tier": "generic",
+   "rationale": "freq 5.3 (n=2); specificity 5 (generic chrome name); variants 5.0 (v=1); styled 13.3 (8 css lines)"
+  },
+  {
+   "name": "Badges",
+   "instances": 2,
+   "variants": 0,
+   "score": 24,
+   "tier": "generic",
+   "rationale": "freq 5.3 (n=2); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 13.3 (8 css lines)"
+  },
+  {
+   "name": "Modals",
+   "instances": 1,
+   "variants": 0,
+   "score": 18,
+   "tier": "generic",
+   "rationale": "freq 3.3 (n=1); specificity 5 (generic chrome name); variants 0.0 (v=0); styled 10.0 (6 css lines)"
+  }
+ ],
+ "signatureCount": 0
+}

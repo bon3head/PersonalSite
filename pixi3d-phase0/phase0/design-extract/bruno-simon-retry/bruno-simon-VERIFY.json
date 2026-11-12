@@ -1,0 +1,70 @@
+{
+ "tool": "design-extract fusion pipeline",
+ "name": "bruno-simon",
+ "date": "2026-11-12T22:08:53.498Z",
+ "command": "/opt/hatch-image/bin/bun /home/hatch/workspace/custom-skills/local-design-extract/bin/fusion-run.js https://bruno-simon.com/ -o /home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon-retry -n bruno-simon",
+ "wallMs": 65386,
+ "exitCode": 2,
+ "outDir": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon-retry",
+ "fileCount": 3,
+ "totalBytes": 22321,
+ "motionRecall": null,
+ "screenshots": [
+  {
+   "file": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon-retry/bruno-simon-p0-viewport.png",
+   "sha256": "9040a1093a8801f10b3cbd880ce98ff85649b49a140275856ed8b7d440d76630",
+   "kind": "viewport"
+  }
+ ],
+ "bunProbe": {
+  "runtime": "bun",
+  "fullRun": true
+ },
+ "stages": [
+  {
+   "stage": 1,
+   "ok": true,
+   "detail": "relay on 127.0.0.1:18091, probe HTTP 200"
+  },
+  {
+   "stage": 2,
+   "ok": true,
+   "detail": "page 0: 11 declarations, 5 durations, 5 easings, 2 keyframes"
+  },
+  {
+   "stage": 4,
+   "ok": true,
+   "detail": "page 0: sampled 1, 0 deltas"
+  },
+  {
+   "stage": 3,
+   "ok": false,
+   "detail": "page 0: engine exit 2 in 38.8s"
+  },
+  {
+   "stage": 7,
+   "ok": true,
+   "detail": "single URL — no cross-page synthesis"
+  }
+ ],
+ "notes": [
+  "page 0: engine failed with exit 2; skipping post passes"
+ ],
+ "files": [
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon-retry/bruno-simon-p0-motion-static.json",
+   "bytes": 5351,
+   "sha256": "7dd1c94f46252b62c316c1fef96ae391e3422aad54463f98fd62051de0699d26"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon-retry/bruno-simon-p0-viewport.png",
+   "bytes": 16938,
+   "sha256": "9040a1093a8801f10b3cbd880ce98ff85649b49a140275856ed8b7d440d76630"
+  },
+  {
+   "path": "/home/hatch/workspace/pixi3d-portfolio-fork/phase0/design-extract/bruno-simon-retry/bruno-simon-p0-interactions.json",
+   "bytes": 32,
+   "sha256": "2cf0f5b04ece6cbda2a757ca7246b4cb00aa0c07f3cf81b7380627f61e92be79"
+  }
+ ]
+}

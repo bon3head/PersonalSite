@@ -1,0 +1,996 @@
+{
+ "source": "https://bruno-simon.com/",
+ "generatedAt": "2026-11-12T22:06:00.635Z",
+ "nodeCount": 107,
+ "kinds": [
+  "dtcg",
+  "stylesheet",
+  "component"
+ ],
+ "nodes": [
+  {
+   "id": "dtcg:color.brand.primary",
+   "kind": "dtcg",
+   "value": "#ff0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.brand.primary"
+   }
+  },
+  {
+   "id": "dtcg:color.brand.secondary",
+   "kind": "dtcg",
+   "value": "#ff6a7c",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.brand.secondary"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n100",
+   "kind": "dtcg",
+   "value": "#ffffff",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n100"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n200",
+   "kind": "dtcg",
+   "value": "#000000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n200"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n300",
+   "kind": "dtcg",
+   "value": "#555555",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n300"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n400",
+   "kind": "dtcg",
+   "value": "#141414",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n400"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n500",
+   "kind": "dtcg",
+   "value": "#767676",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n500"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text0",
+   "kind": "dtcg",
+   "value": "#000000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text0"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text1",
+   "kind": "dtcg",
+   "value": "#ffffff",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text1"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text2",
+   "kind": "dtcg",
+   "value": "#ffceca",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text2"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text3",
+   "kind": "dtcg",
+   "value": "#ff6a7c",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text3"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text4",
+   "kind": "dtcg",
+   "value": "#ff87a2",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text4"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text5",
+   "kind": "dtcg",
+   "value": "#555555",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text5"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.50",
+   "kind": "dtcg",
+   "value": "#ffccb8",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.100",
+   "kind": "dtcg",
+   "value": "#ffbba6",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.200",
+   "kind": "dtcg",
+   "value": "#ffa28d",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.300",
+   "kind": "dtcg",
+   "value": "#ff7c67",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.400",
+   "kind": "dtcg",
+   "value": "#ff4535",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.500",
+   "kind": "dtcg",
+   "value": "#ff0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.600",
+   "kind": "dtcg",
+   "value": "#d60000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.700",
+   "kind": "dtcg",
+   "value": "#b40000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.800",
+   "kind": "dtcg",
+   "value": "#980000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.900",
+   "kind": "dtcg",
+   "value": "#7f0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.950",
+   "kind": "dtcg",
+   "value": "#4e0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.950"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.50",
+   "kind": "dtcg",
+   "value": "#ffd8dd",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.100",
+   "kind": "dtcg",
+   "value": "#ffc9cf",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.200",
+   "kind": "dtcg",
+   "value": "#ffb3bb",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.300",
+   "kind": "dtcg",
+   "value": "#ff939f",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.400",
+   "kind": "dtcg",
+   "value": "#ff6a7c",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.500",
+   "kind": "dtcg",
+   "value": "#d8465d",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.600",
+   "kind": "dtcg",
+   "value": "#bb3149",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.700",
+   "kind": "dtcg",
+   "value": "#9b1e38",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.800",
+   "kind": "dtcg",
+   "value": "#83112b",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.900",
+   "kind": "dtcg",
+   "value": "#6d0621",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.950",
+   "kind": "dtcg",
+   "value": "#42000e",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.950"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.50",
+   "kind": "dtcg",
+   "value": "#f8f3fd",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.100",
+   "kind": "dtcg",
+   "value": "#ede7f2",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.200",
+   "kind": "dtcg",
+   "value": "#dcd6e2",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.300",
+   "kind": "dtcg",
+   "value": "#c4bdcb",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.400",
+   "kind": "dtcg",
+   "value": "#a39cab",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.500",
+   "kind": "dtcg",
+   "value": "#867e8d",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.600",
+   "kind": "dtcg",
+   "value": "#706977",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.700",
+   "kind": "dtcg",
+   "value": "#5a5460",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.800",
+   "kind": "dtcg",
+   "value": "#49444f",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.900",
+   "kind": "dtcg",
+   "value": "#3b3640",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.950",
+   "kind": "dtcg",
+   "value": "#251f2b",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.950"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.50",
+   "kind": "dtcg",
+   "value": "#f5f5f5",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.100",
+   "kind": "dtcg",
+   "value": "#eaeaea",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.200",
+   "kind": "dtcg",
+   "value": "#d9d9d9",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.300",
+   "kind": "dtcg",
+   "value": "#c0c0c0",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.400",
+   "kind": "dtcg",
+   "value": "#9f9f9f",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.500",
+   "kind": "dtcg",
+   "value": "#828282",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.600",
+   "kind": "dtcg",
+   "value": "#6c6c6c",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.700",
+   "kind": "dtcg",
+   "value": "#555555",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.800",
+   "kind": "dtcg",
+   "value": "#464646",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.900",
+   "kind": "dtcg",
+   "value": "#393939",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.950",
+   "kind": "dtcg",
+   "value": "#1f1f1f",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.950"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s0",
+   "kind": "dtcg",
+   "value": "3px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s0"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s1",
+   "kind": "dtcg",
+   "value": "8px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s1"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s2",
+   "kind": "dtcg",
+   "value": "20px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s2"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s3",
+   "kind": "dtcg",
+   "value": "25px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s3"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s4",
+   "kind": "dtcg",
+   "value": "30px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s4"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s5",
+   "kind": "dtcg",
+   "value": "34px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s5"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s6",
+   "kind": "dtcg",
+   "value": "38px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s6"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s7",
+   "kind": "dtcg",
+   "value": "50px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s7"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s8",
+   "kind": "dtcg",
+   "value": "80px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s8"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s9",
+   "kind": "dtcg",
+   "value": "90px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s9"
+   }
+  },
+  {
+   "id": "dtcg:radius.r0",
+   "kind": "dtcg",
+   "value": "4px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r0"
+   }
+  },
+  {
+   "id": "dtcg:radius.r1",
+   "kind": "dtcg",
+   "value": "8px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r1"
+   }
+  },
+  {
+   "id": "dtcg:radius.r2",
+   "kind": "dtcg",
+   "value": "15px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r2"
+   }
+  },
+  {
+   "id": "dtcg:fontFamily.f0",
+   "kind": "dtcg",
+   "value": "Nunito",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontFamily.f0"
+   }
+  },
+  {
+   "id": "dtcg:fontFamily.f1",
+   "kind": "dtcg",
+   "value": "Amatic SC",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontFamily.f1"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.display",
+   "kind": "dtcg",
+   "value": "64px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.display"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-1",
+   "kind": "dtcg",
+   "value": "50px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-1"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.h2",
+   "kind": "dtcg",
+   "value": "40px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.h2"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-2",
+   "kind": "dtcg",
+   "value": "34px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-2"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-3",
+   "kind": "dtcg",
+   "value": "30px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-3"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-4",
+   "kind": "dtcg",
+   "value": "25px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-4"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.body",
+   "kind": "dtcg",
+   "value": "20px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.body"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.body-sm",
+   "kind": "dtcg",
+   "value": "16px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.body-sm"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.micro",
+   "kind": "dtcg",
+   "value": "13px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.micro"
+   }
+  },
+  {
+   "id": "motion:duration:100:#main-content",
+   "kind": "stylesheet",
+   "value": "100ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": "#main-content",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:100:.slow-speed-option .slow-speed-toggle::before, .slow-speed-option .slow-speed-toggle::after",
+   "kind": "stylesheet",
+   "value": "100ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".slow-speed-option .slow-speed-toggle::before, .slow-speed-option .slow-speed-toggle::after",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:150:button",
+   "kind": "stylesheet",
+   "value": "150ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": "button",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:200:#sub-frame-error",
+   "kind": "stylesheet",
+   "value": "200ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": "#sub-frame-error",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:250:#details",
+   "kind": "stylesheet",
+   "value": "250ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": "#details",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:250:.arcade-mode .runner-container",
+   "kind": "stylesheet",
+   "value": "250ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".arcade-mode .runner-container",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:1500:.offline",
+   "kind": "stylesheet",
+   "value": "1500ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".offline",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:1500:.offline",
+   "kind": "stylesheet",
+   "value": "1500ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".offline",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:1500:.offline body",
+   "kind": "stylesheet",
+   "value": "1500ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".offline body",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:duration:1500:.offline-runner-live-region",
+   "kind": "stylesheet",
+   "value": "1500ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".offline-runner-live-region",
+    "stylesheet": "<inline style>"
+   }
+  },
+  {
+   "id": "motion:easing:cubic-bezier(0.65, 0.05, 0.36, 1)",
+   "kind": "stylesheet",
+   "value": "cubic-bezier(0.65, 0.05, 0.36, 1)",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 4 across inventoried declarations"
+   }
+  },
+  {
+   "id": "motion:easing:cubic-bezier(0.4, 0, 0.2, 1)",
+   "kind": "stylesheet",
+   "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 3 across inventoried declarations"
+   }
+  },
+  {
+   "id": "motion:easing:cubic-bezier(0.4, 0, 1, 1)",
+   "kind": "stylesheet",
+   "value": "cubic-bezier(0.4, 0, 1, 1)",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 2 across inventoried declarations"
+   }
+  },
+  {
+   "id": "motion:easing:ease",
+   "kind": "stylesheet",
+   "value": "ease",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 1 across inventoried declarations"
+   }
+  },
+  {
+   "id": "motion:easing:ease-in-out",
+   "kind": "stylesheet",
+   "value": "ease-in-out",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 1 across inventoried declarations"
+   }
+  },
+  {
+   "id": "component:Buttons",
+   "kind": "component",
+   "value": "50/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 47,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:ProgressBars",
+   "kind": "component",
+   "value": "43/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 1,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:Tooltips",
+   "kind": "component",
+   "value": "39/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 24,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:Switches",
+   "kind": "component",
+   "value": "39/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 2,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:Navigation",
+   "kind": "component",
+   "value": "35/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 12,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:Links",
+   "kind": "component",
+   "value": "33/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 19,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Inputs",
+   "kind": "component",
+   "value": "29/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 4,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Tabs",
+   "kind": "component",
+   "value": "29/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 3,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Modals",
+   "kind": "component",
+   "value": "27/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 5,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Tables",
+   "kind": "component",
+   "value": "23/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 5,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Dropdowns",
+   "kind": "component",
+   "value": "20/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 2,
+    "tier": "generic"
+   }
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+/* shadcn/ui Theme — extracted from https://bruno-simon.com/ */
+/* Paste into your globals.css */
+
+@layer base {
+  :root {
+    --foreground: 0 0% 0%;
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 353 100% 71%;
+    --secondary-foreground: 0 0% 0%;
+    --accent: 270 16% 15%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 0 0% 46%;
+    --muted-foreground: 0 0% 100%;
+    --border: 0 0% 46%;
+    --radius: 8px;
+  }
+}

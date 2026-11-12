@@ -1,0 +1,188 @@
+{
+  "pageIntent": {
+    "type": "landing",
+    "confidence": 0.61,
+    "path": "/",
+    "title": "Good Stuff · PixiJS",
+    "description": "Good Stuff by PixiJS: demos, experiments and shiny little things, all running live in your browser.",
+    "signals": [
+      {
+        "kind": "dom",
+        "type": "blog-post",
+        "weight": 0.35,
+        "detail": "byline|min-read"
+      },
+      {
+        "kind": "url",
+        "type": "landing",
+        "weight": 0.45,
+        "detail": "root-path"
+      },
+      {
+        "kind": "shape",
+        "type": "landing",
+        "weight": 0.3,
+        "detail": "features+hero+footer"
+      }
+    ],
+    "alternates": [
+      {
+        "type": "blog-post",
+        "score": 0.35
+      }
+    ],
+    "needsSmart": false
+  },
+  "sectionRoles": {
+    "sections": [
+      {
+        "index": 0,
+        "tag": "header",
+        "role": "nav",
+        "subrole": null,
+        "confidence": 0.9,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "w": 1280,
+          "h": 76
+        },
+        "buttonCount": 0,
+        "cardCount": 0,
+        "slots": {
+          "lede": "GitHub"
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 1,
+        "tag": "main",
+        "role": "logo-wall",
+        "subrole": null,
+        "confidence": 0.85,
+        "heading": "Good Stuff",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "w": 1280,
+          "h": 2243.390625
+        },
+        "buttonCount": 2,
+        "cardCount": 21,
+        "slots": {
+          "heading": "Good Stuff",
+          "subheadings": [
+            "Open to everyone",
+            "Mach 2",
+            "Through the clouds",
+            "The Backrooms"
+          ],
+          "ctaCount": 2
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 2,
+        "tag": "section",
+        "role": "logo-wall",
+        "subrole": null,
+        "confidence": 0.85,
+        "heading": "Good Stuff",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "w": 1280,
+          "h": 800
+        },
+        "buttonCount": 2,
+        "cardCount": 20,
+        "slots": {
+          "heading": "Good Stuff",
+          "subheadings": [
+            "Open to everyone",
+            "Mach 2",
+            "Through the clouds",
+            "The Backrooms"
+          ],
+          "ctaCount": 2
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 3,
+        "tag": "section",
+        "role": "content",
+        "subrole": null,
+        "confidence": 0.3,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 800,
+          "w": 1280,
+          "h": 692.609375
+        },
+        "buttonCount": 0,
+        "cardCount": 0,
+        "slots": {
+          "heading": ""
+        },
+        "needsSmart": true
+      },
+      {
+        "index": 4,
+        "tag": "section",
+        "role": "content",
+        "subrole": null,
+        "confidence": 0.3,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 1492.609375,
+          "w": 1280,
+          "h": 750.78125
+        },
+        "buttonCount": 0,
+        "cardCount": 1,
+        "slots": {
+          "heading": ""
+        },
+        "needsSmart": true
+      },
+      {
+        "index": 5,
+        "tag": "footer",
+        "role": "footer",
+        "subrole": null,
+        "confidence": 0.95,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 2243.390625,
+          "w": 1280,
+          "h": 275
+        },
+        "buttonCount": 0,
+        "cardCount": 0,
+        "slots": {
+          "lede": "© 2026 PixiJS. A labour of love from the PixiJS team."
+        },
+        "needsSmart": false
+      }
+    ],
+    "counts": {
+      "nav": 1,
+      "logo-wall": 2,
+      "content": 2,
+      "footer": 1
+    },
+    "readingOrder": [
+      "nav",
+      "logo-wall",
+      "logo-wall",
+      "content",
+      "content",
+      "footer"
+    ]
+  }
+}

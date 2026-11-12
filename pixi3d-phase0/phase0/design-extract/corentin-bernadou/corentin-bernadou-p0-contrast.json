@@ -1,0 +1,38 @@
+{
+ "pass": true,
+ "pairs": [
+  {
+   "role": "surface.page",
+   "bg": "#070304",
+   "fg": "#ff4401",
+   "stated": 5.94,
+   "recomputed": 5.94,
+   "substituted": false
+  },
+  {
+   "role": "surface.raised",
+   "bg": "#ff0000",
+   "fg": "#000000",
+   "stated": 5.25,
+   "recomputed": 5.25,
+   "substituted": false
+  },
+  {
+   "role": "action.primary",
+   "bg": "#ff0000",
+   "fg": "#000000",
+   "stated": 5.25,
+   "recomputed": 5.25,
+   "substituted": false
+  },
+  {
+   "role": "action.secondary",
+   "bg": "#ff4401",
+   "fg": "#000000",
+   "stated": 6.08,
+   "recomputed": 6.08,
+   "substituted": false
+  }
+ ],
+ "failures": []
+}

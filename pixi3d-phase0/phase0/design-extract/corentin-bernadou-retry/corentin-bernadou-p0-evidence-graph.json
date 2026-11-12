@@ -1,0 +1,769 @@
+{
+ "source": "https://corentinbernadou.com/",
+ "generatedAt": "2026-11-12T22:10:05.576Z",
+ "nodeCount": 82,
+ "kinds": [
+  "dtcg",
+  "stylesheet",
+  "component"
+ ],
+ "nodes": [
+  {
+   "id": "dtcg:color.brand.primary",
+   "kind": "dtcg",
+   "value": "#ff0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.brand.primary"
+   }
+  },
+  {
+   "id": "dtcg:color.brand.secondary",
+   "kind": "dtcg",
+   "value": "#ff4401",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.brand.secondary"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n100",
+   "kind": "dtcg",
+   "value": "#767676",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n100"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n200",
+   "kind": "dtcg",
+   "value": "#6d6d6d",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n200"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n300",
+   "kind": "dtcg",
+   "value": "#000000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n300"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n400",
+   "kind": "dtcg",
+   "value": "#141414",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n400"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n500",
+   "kind": "dtcg",
+   "value": "#858585",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n500"
+   }
+  },
+  {
+   "id": "dtcg:color.background.bg0",
+   "kind": "dtcg",
+   "value": "#070304",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.background.bg0"
+   }
+  },
+  {
+   "id": "dtcg:color.background.bg1",
+   "kind": "dtcg",
+   "value": "#ff0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.background.bg1"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text0",
+   "kind": "dtcg",
+   "value": "#000000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text0"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text1",
+   "kind": "dtcg",
+   "value": "#6d6d6d",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text1"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text2",
+   "kind": "dtcg",
+   "value": "#ff4401",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text2"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text3",
+   "kind": "dtcg",
+   "value": "#858585",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text3"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text4",
+   "kind": "dtcg",
+   "value": "#767676",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text4"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text5",
+   "kind": "dtcg",
+   "value": "#141414",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text5"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.50",
+   "kind": "dtcg",
+   "value": "#ffccb8",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.100",
+   "kind": "dtcg",
+   "value": "#ffbba6",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.200",
+   "kind": "dtcg",
+   "value": "#ffa28d",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.300",
+   "kind": "dtcg",
+   "value": "#ff7c67",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.400",
+   "kind": "dtcg",
+   "value": "#ff4535",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.500",
+   "kind": "dtcg",
+   "value": "#ff0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.600",
+   "kind": "dtcg",
+   "value": "#d60000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.700",
+   "kind": "dtcg",
+   "value": "#b40000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.800",
+   "kind": "dtcg",
+   "value": "#980000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.900",
+   "kind": "dtcg",
+   "value": "#7f0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.950",
+   "kind": "dtcg",
+   "value": "#4e0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.950"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.50",
+   "kind": "dtcg",
+   "value": "#ffd3b6",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.100",
+   "kind": "dtcg",
+   "value": "#ffc3a3",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.200",
+   "kind": "dtcg",
+   "value": "#ffac89",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.300",
+   "kind": "dtcg",
+   "value": "#ff8a62",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.400",
+   "kind": "dtcg",
+   "value": "#ff4401",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.500",
+   "kind": "dtcg",
+   "value": "#eb2d00",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.600",
+   "kind": "dtcg",
+   "value": "#cc0900",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.700",
+   "kind": "dtcg",
+   "value": "#ab0000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.800",
+   "kind": "dtcg",
+   "value": "#900000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.900",
+   "kind": "dtcg",
+   "value": "#780000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.950",
+   "kind": "dtcg",
+   "value": "#490000",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.950"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.50",
+   "kind": "dtcg",
+   "value": "#f5f5f5",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.100",
+   "kind": "dtcg",
+   "value": "#eaeaea",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.200",
+   "kind": "dtcg",
+   "value": "#d9d9d9",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.300",
+   "kind": "dtcg",
+   "value": "#c0c0c0",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.400",
+   "kind": "dtcg",
+   "value": "#9f9f9f",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.500",
+   "kind": "dtcg",
+   "value": "#828282",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.600",
+   "kind": "dtcg",
+   "value": "#767676",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.700",
+   "kind": "dtcg",
+   "value": "#575757",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.800",
+   "kind": "dtcg",
+   "value": "#464646",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.900",
+   "kind": "dtcg",
+   "value": "#393939",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.neutral.950",
+   "kind": "dtcg",
+   "value": "#1f1f1f",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.neutral.950"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s0",
+   "kind": "dtcg",
+   "value": "2px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s0"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s1",
+   "kind": "dtcg",
+   "value": "21px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s1"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s2",
+   "kind": "dtcg",
+   "value": "42px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s2"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s3",
+   "kind": "dtcg",
+   "value": "100px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s3"
+   }
+  },
+  {
+   "id": "dtcg:radius.r0",
+   "kind": "dtcg",
+   "value": "3px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r0"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.display",
+   "kind": "dtcg",
+   "value": "13.545px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.display"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-1",
+   "kind": "dtcg",
+   "value": "11.8519px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-1"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.h1",
+   "kind": "dtcg",
+   "value": "10.1587px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.h1"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.body-sm",
+   "kind": "dtcg",
+   "value": "9.31217px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.body-sm"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.micro",
+   "kind": "dtcg",
+   "value": "8.46561px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.micro"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.sm-3",
+   "kind": "dtcg",
+   "value": "5.92593px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.sm-3"
+   }
+  },
+  {
+   "id": "motion:duration:1:.lenis.lenis-autoToggle",
+   "kind": "stylesheet",
+   "value": "1ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".lenis.lenis-autoToggle",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-BNWJ7Zcm.css"
+   }
+  },
+  {
+   "id": "motion:duration:100:.archive-index__list-item > *",
+   "kind": "stylesheet",
+   "value": "100ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".archive-index__list-item > *",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:100:.content-block a span:not([class])",
+   "kind": "stylesheet",
+   "value": "100ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".content-block a span:not([class])",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:250:.availability:hover .availability__icon-square",
+   "kind": "stylesheet",
+   "value": "250ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".availability:hover .availability__icon-square",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:250:.content-block__contents-link",
+   "kind": "stylesheet",
+   "value": "250ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".content-block__contents-link",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:250:.grid-rules__guide",
+   "kind": "stylesheet",
+   "value": "250ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".grid-rules__guide",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:300:.archive-index__nav",
+   "kind": "stylesheet",
+   "value": "300ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".archive-index__nav",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:300:.archive-index__list-item",
+   "kind": "stylesheet",
+   "value": "300ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".archive-index__list-item",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:300:.overview-header, .archive-header",
+   "kind": "stylesheet",
+   "value": "300ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".overview-header, .archive-header",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:300:.view-switcher__nav",
+   "kind": "stylesheet",
+   "value": "300ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".view-switcher__nav",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:300:.view-switcher__mask",
+   "kind": "stylesheet",
+   "value": "300ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".view-switcher__mask",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:600:.view-switcher__link",
+   "kind": "stylesheet",
+   "value": "600ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".view-switcher__link",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:750:.availability__icon-square",
+   "kind": "stylesheet",
+   "value": "750ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".availability__icon-square",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:duration:10000:.next-work__link span",
+   "kind": "stylesheet",
+   "value": "10000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".next-work__link span",
+    "stylesheet": "https://corentinbernadou.com/assets/css/index-DnzqKqke.css"
+   }
+  },
+  {
+   "id": "motion:easing:cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+   "kind": "stylesheet",
+   "value": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 12 across inventoried declarations"
+   }
+  },
+  {
+   "id": "motion:easing:cubic-bezier(0.36, 0.33, 0, 1)",
+   "kind": "stylesheet",
+   "value": "cubic-bezier(0.36, 0.33, 0, 1)",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 2 across inventoried declarations"
+   }
+  },
+  {
+   "id": "motion:easing:ease",
+   "kind": "stylesheet",
+   "value": "ease",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 1 across inventoried declarations"
+   }
+  },
+  {
+   "id": "motion:easing:cubic-bezier(0.19, 1, 0.22, 1)",
+   "kind": "stylesheet",
+   "value": "cubic-bezier(0.19, 1, 0.22, 1)",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 1 across inventoried declarations"
+   }
+  },
+  {
+   "id": "component:Links",
+   "kind": "component",
+   "value": "38/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 183,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:Navigation",
+   "kind": "component",
+   "value": "30/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 10,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Buttons",
+   "kind": "component",
+   "value": "29/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 2,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Badges",
+   "kind": "component",
+   "value": "24/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 2,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Modals",
+   "kind": "component",
+   "value": "18/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 1,
+    "tier": "generic"
+   }
+  }
+ ]
+}

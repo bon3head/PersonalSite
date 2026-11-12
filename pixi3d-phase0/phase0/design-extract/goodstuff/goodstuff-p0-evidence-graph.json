@@ -1,0 +1,966 @@
+{
+ "source": "https://goodstuff.pixijs.io/",
+ "generatedAt": "2026-11-12T22:03:50.063Z",
+ "nodeCount": 103,
+ "kinds": [
+  "dtcg",
+  "stylesheet",
+  "component"
+ ],
+ "nodes": [
+  {
+   "id": "dtcg:color.brand.primary",
+   "kind": "dtcg",
+   "value": "#e91e63",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.brand.primary"
+   }
+  },
+  {
+   "id": "dtcg:color.brand.secondary",
+   "kind": "dtcg",
+   "value": "#ffa838",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.brand.secondary"
+   }
+  },
+  {
+   "id": "dtcg:color.neutral.n100",
+   "kind": "dtcg",
+   "value": "#ffffff",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.neutral.n100"
+   }
+  },
+  {
+   "id": "dtcg:color.background.bg0",
+   "kind": "dtcg",
+   "value": "#0d0b16",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.background.bg0"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text0",
+   "kind": "dtcg",
+   "value": "#ffffff",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text0"
+   }
+  },
+  {
+   "id": "dtcg:color.text.text1",
+   "kind": "dtcg",
+   "value": "#e91e63",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.text.text1"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.50",
+   "kind": "dtcg",
+   "value": "#ffcee1",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.100",
+   "kind": "dtcg",
+   "value": "#ffbdd3",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.200",
+   "kind": "dtcg",
+   "value": "#ffa6c0",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.300",
+   "kind": "dtcg",
+   "value": "#ff82a4",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.400",
+   "kind": "dtcg",
+   "value": "#ff5181",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.500",
+   "kind": "dtcg",
+   "value": "#e91e63",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.600",
+   "kind": "dtcg",
+   "value": "#ca004f",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.700",
+   "kind": "dtcg",
+   "value": "#a9003d",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.800",
+   "kind": "dtcg",
+   "value": "#8e0030",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.900",
+   "kind": "dtcg",
+   "value": "#760025",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.primary.950",
+   "kind": "dtcg",
+   "value": "#480011",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.primary.950"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.50",
+   "kind": "dtcg",
+   "value": "#ffeab1",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.100",
+   "kind": "dtcg",
+   "value": "#ffdd9e",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.200",
+   "kind": "dtcg",
+   "value": "#ffcb82",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.300",
+   "kind": "dtcg",
+   "value": "#ffa838",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.400",
+   "kind": "dtcg",
+   "value": "#dc8b13",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.500",
+   "kind": "dtcg",
+   "value": "#bd6b00",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.600",
+   "kind": "dtcg",
+   "value": "#a25600",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.700",
+   "kind": "dtcg",
+   "value": "#864200",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.800",
+   "kind": "dtcg",
+   "value": "#713400",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.900",
+   "kind": "dtcg",
+   "value": "#5d2800",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.secondary.950",
+   "kind": "dtcg",
+   "value": "#371300",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.secondary.950"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.50",
+   "kind": "dtcg",
+   "value": "#ffd2f7",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.50"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.100",
+   "kind": "dtcg",
+   "value": "#ffc3eb",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.100"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.200",
+   "kind": "dtcg",
+   "value": "#ffacda",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.200"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.300",
+   "kind": "dtcg",
+   "value": "#ff8bc2",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.300"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.400",
+   "kind": "dtcg",
+   "value": "#ef4d95",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.400"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.500",
+   "kind": "dtcg",
+   "value": "#da3884",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.500"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.600",
+   "kind": "dtcg",
+   "value": "#bc206d",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.600"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.700",
+   "kind": "dtcg",
+   "value": "#9d0758",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.700"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.800",
+   "kind": "dtcg",
+   "value": "#840048",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.800"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.900",
+   "kind": "dtcg",
+   "value": "#6e003a",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.900"
+   }
+  },
+  {
+   "id": "dtcg:color.ramp.accent.950",
+   "kind": "dtcg",
+   "value": "#42001f",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "color.ramp.accent.950"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s0",
+   "kind": "dtcg",
+   "value": "5px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s0"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s1",
+   "kind": "dtcg",
+   "value": "38px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s1"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s2",
+   "kind": "dtcg",
+   "value": "56px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s2"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s3",
+   "kind": "dtcg",
+   "value": "64px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s3"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s4",
+   "kind": "dtcg",
+   "value": "72px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s4"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s5",
+   "kind": "dtcg",
+   "value": "112px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s5"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s6",
+   "kind": "dtcg",
+   "value": "176px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s6"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s7",
+   "kind": "dtcg",
+   "value": "192px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s7"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s8",
+   "kind": "dtcg",
+   "value": "208px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s8"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s9",
+   "kind": "dtcg",
+   "value": "234px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s9"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s10",
+   "kind": "dtcg",
+   "value": "258px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s10"
+   }
+  },
+  {
+   "id": "dtcg:spacing.s11",
+   "kind": "dtcg",
+   "value": "338px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "spacing.s11"
+   }
+  },
+  {
+   "id": "dtcg:radius.r0",
+   "kind": "dtcg",
+   "value": "16px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r0"
+   }
+  },
+  {
+   "id": "dtcg:radius.r1",
+   "kind": "dtcg",
+   "value": "26px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r1"
+   }
+  },
+  {
+   "id": "dtcg:radius.r2",
+   "kind": "dtcg",
+   "value": "44px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r2"
+   }
+  },
+  {
+   "id": "dtcg:radius.r3",
+   "kind": "dtcg",
+   "value": "50px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r3"
+   }
+  },
+  {
+   "id": "dtcg:radius.r4",
+   "kind": "dtcg",
+   "value": "999px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "radius.r4"
+   }
+  },
+  {
+   "id": "dtcg:shadow.sh0",
+   "kind": "dtcg",
+   "value": "rgb(233, 30, 99) 0px 0px 0px 2px inset",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "shadow.sh0"
+   }
+  },
+  {
+   "id": "dtcg:shadow.sh1",
+   "kind": "dtcg",
+   "value": "rgb(255, 255, 255) 0px 0px 0px 2px inset",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "shadow.sh1"
+   }
+  },
+  {
+   "id": "dtcg:shadow.sh2",
+   "kind": "dtcg",
+   "value": "rgba(255, 255, 255, 0.18) 3px 3px 0px 0px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "shadow.sh2"
+   }
+  },
+  {
+   "id": "dtcg:shadow.sh3",
+   "kind": "dtcg",
+   "value": "rgba(233, 30, 99, 0.35) 0px 8px 22px 0px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "shadow.sh3"
+   }
+  },
+  {
+   "id": "dtcg:shadow.sh4",
+   "kind": "dtcg",
+   "value": "rgba(255, 255, 255, 0.12) 0px 1px 0px 0px inset, rgba(4, 2, 12, 0.9) 0px 40px 80px -30px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "shadow.sh4"
+   }
+  },
+  {
+   "id": "dtcg:fontFamily.f0",
+   "kind": "dtcg",
+   "value": "Roboto",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontFamily.f0"
+   }
+  },
+  {
+   "id": "dtcg:fontFamily.f1",
+   "kind": "dtcg",
+   "value": "Outfit",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontFamily.f1"
+   }
+  },
+  {
+   "id": "dtcg:fontFamily.f2",
+   "kind": "dtcg",
+   "value": "Roboto Mono",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontFamily.f2"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.h2",
+   "kind": "dtcg",
+   "value": "115.2px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.h2"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-1",
+   "kind": "dtcg",
+   "value": "76.8px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-1"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.h1",
+   "kind": "dtcg",
+   "value": "69.12px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.h1"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-2",
+   "kind": "dtcg",
+   "value": "28px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-2"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-3",
+   "kind": "dtcg",
+   "value": "24px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-3"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-4",
+   "kind": "dtcg",
+   "value": "17.92px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-4"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-5",
+   "kind": "dtcg",
+   "value": "16px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-5"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-6",
+   "kind": "dtcg",
+   "value": "15px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-6"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-7",
+   "kind": "dtcg",
+   "value": "14px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-7"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.title-8",
+   "kind": "dtcg",
+   "value": "12px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.title-8"
+   }
+  },
+  {
+   "id": "dtcg:fontSize.body",
+   "kind": "dtcg",
+   "value": "11px",
+   "provenance": {
+    "kind": "dtcg",
+    "path": "fontSize.body"
+   }
+  },
+  {
+   "id": "motion:duration:0.01:*, ::before, ::after",
+   "kind": "stylesheet",
+   "value": "0.01ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": "*, ::before, ::after",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:3000:.skip-link",
+   "kind": "stylesheet",
+   "value": "3000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".skip-link",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:3000:.github",
+   "kind": "stylesheet",
+   "value": "3000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".github",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:3000:.github",
+   "kind": "stylesheet",
+   "value": "3000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".github",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:4000:.brand",
+   "kind": "stylesheet",
+   "value": "4000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".brand",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:4000:.github",
+   "kind": "stylesheet",
+   "value": "4000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".github",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:4000:.cta",
+   "kind": "stylesheet",
+   "value": "4000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".cta",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:4000:.cta::after",
+   "kind": "stylesheet",
+   "value": "4000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".cta::after",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:4000:.cta-arrow",
+   "kind": "stylesheet",
+   "value": "4000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".cta-arrow",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:5000:.github svg",
+   "kind": "stylesheet",
+   "value": "5000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".github svg",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:5000:.closing-title .accent",
+   "kind": "stylesheet",
+   "value": "5000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".closing-title .accent",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:5000:.closing-title .accent",
+   "kind": "stylesheet",
+   "value": "5000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".closing-title .accent",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:25000:.round-button",
+   "kind": "stylesheet",
+   "value": "25000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".round-button",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:25000:.round-button",
+   "kind": "stylesheet",
+   "value": "25000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".round-button",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:25000:.cta",
+   "kind": "stylesheet",
+   "value": "25000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".cta",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:25000:.cursor-label",
+   "kind": "stylesheet",
+   "value": "25000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".cursor-label",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:25000:.cursor-label",
+   "kind": "stylesheet",
+   "value": "25000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".cursor-label",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:35000:.cta::before",
+   "kind": "stylesheet",
+   "value": "35000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".cta::before",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:35000:.shelf-card a",
+   "kind": "stylesheet",
+   "value": "35000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".shelf-card a",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:45000:.round-button",
+   "kind": "stylesheet",
+   "value": "45000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".round-button",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:45000:.round-button svg",
+   "kind": "stylesheet",
+   "value": "45000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".round-button svg",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:duration:45000:.shelf-card a",
+   "kind": "stylesheet",
+   "value": "45000ms",
+   "provenance": {
+    "kind": "stylesheet",
+    "selector": ".shelf-card a",
+    "stylesheet": "https://goodstuff.pixijs.io/assets/index-BjujimQg.css"
+   }
+  },
+  {
+   "id": "motion:easing:ease",
+   "kind": "stylesheet",
+   "value": "ease",
+   "provenance": {
+    "kind": "stylesheet",
+    "note": "count 11 across inventoried declarations"
+   }
+  },
+  {
+   "id": "component:Links",
+   "kind": "component",
+   "value": "38/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 21,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:Buttons",
+   "kind": "component",
+   "value": "38/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 4,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:Cards",
+   "kind": "component",
+   "value": "37/100 supporting",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 7,
+    "tier": "supporting"
+   }
+  },
+  {
+   "id": "component:Navigation",
+   "kind": "component",
+   "value": "24/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 1,
+    "tier": "generic"
+   }
+  },
+  {
+   "id": "component:Footer",
+   "kind": "component",
+   "value": "22/100 generic",
+   "provenance": {
+    "kind": "component-inventory",
+    "instances": 1,
+    "tier": "generic"
+   }
+  }
+ ]
+}

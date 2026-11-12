@@ -1,0 +1,192 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "color": {
+      "palette": [
+        {
+          "slug": "primary",
+          "color": "#ff0000",
+          "name": "Primary"
+        },
+        {
+          "slug": "secondary",
+          "color": "#ff6a7c",
+          "name": "Secondary"
+        },
+        {
+          "slug": "accent",
+          "color": "#251f2b",
+          "name": "Accent"
+        },
+        {
+          "slug": "neutral-1",
+          "color": "#ffffff",
+          "name": "Neutral 1"
+        },
+        {
+          "slug": "neutral-2",
+          "color": "#000000",
+          "name": "Neutral 2"
+        },
+        {
+          "slug": "neutral-3",
+          "color": "#555555",
+          "name": "Neutral 3"
+        },
+        {
+          "slug": "neutral-4",
+          "color": "#141414",
+          "name": "Neutral 4"
+        },
+        {
+          "slug": "neutral-5",
+          "color": "#767676",
+          "name": "Neutral 5"
+        }
+      ],
+      "gradients": [
+        {
+          "slug": "gradient-1",
+          "gradient": "radial-gradient(farthest-side at 0px 0px, rgb(37, 31, 43), rgb(29, 23, 33))",
+          "name": "Gradient 1"
+        },
+        {
+          "slug": "gradient-2",
+          "gradient": "linear-gradient(rgba(29, 23, 33, 0), rgba(29, 23, 33, 0.6))",
+          "name": "Gradient 2"
+        },
+        {
+          "slug": "gradient-3",
+          "gradient": "radial-gradient(at 100% 0px, rgb(194, 21, 21), rgb(70, 18, 59))",
+          "name": "Gradient 3"
+        },
+        {
+          "slug": "gradient-4",
+          "gradient": "radial-gradient(at 100% 0px, rgb(37, 31, 43), rgb(29, 23, 33))",
+          "name": "Gradient 4"
+        },
+        {
+          "slug": "gradient-5",
+          "gradient": "radial-gradient(at 0px 0px, rgb(37, 31, 43), rgb(29, 23, 33))",
+          "name": "Gradient 5"
+        }
+      ]
+    },
+    "typography": {
+      "fontFamilies": [
+        {
+          "fontFamily": "Nunito",
+          "slug": "nunito",
+          "name": "Nunito"
+        },
+        {
+          "fontFamily": "Amatic SC",
+          "slug": "amatic-sc",
+          "name": "Amatic SC"
+        }
+      ],
+      "fontSizes": [
+        {
+          "size": "64px",
+          "slug": "size-64",
+          "name": "64px"
+        },
+        {
+          "size": "50px",
+          "slug": "size-50",
+          "name": "50px"
+        },
+        {
+          "size": "40px",
+          "slug": "size-40",
+          "name": "40px"
+        },
+        {
+          "size": "34px",
+          "slug": "size-34",
+          "name": "34px"
+        },
+        {
+          "size": "30px",
+          "slug": "size-30",
+          "name": "30px"
+        },
+        {
+          "size": "25px",
+          "slug": "size-25",
+          "name": "25px"
+        },
+        {
+          "size": "20px",
+          "slug": "size-20",
+          "name": "20px"
+        },
+        {
+          "size": "16px",
+          "slug": "size-16",
+          "name": "16px"
+        }
+      ]
+    },
+    "spacing": {
+      "spacingSizes": [
+        {
+          "size": "3px",
+          "slug": "spacing-3",
+          "name": "3px"
+        },
+        {
+          "size": "8px",
+          "slug": "spacing-8",
+          "name": "8px"
+        },
+        {
+          "size": "20px",
+          "slug": "spacing-20",
+          "name": "20px"
+        },
+        {
+          "size": "25px",
+          "slug": "spacing-25",
+          "name": "25px"
+        },
+        {
+          "size": "30px",
+          "slug": "spacing-30",
+          "name": "30px"
+        },
+        {
+          "size": "34px",
+          "slug": "spacing-34",
+          "name": "34px"
+        },
+        {
+          "size": "38px",
+          "slug": "spacing-38",
+          "name": "38px"
+        },
+        {
+          "size": "50px",
+          "slug": "spacing-50",
+          "name": "50px"
+        }
+      ]
+    },
+    "layout": {
+      "contentSize": "1200px",
+      "wideSize": "1400px"
+    }
+  },
+  "styles": {
+    "color": {
+      "text": "#000000"
+    },
+    "typography": {
+      "fontSize": "20px",
+      "lineHeight": "normal",
+      "fontFamily": "Nunito"
+    },
+    "spacing": {}
+  }
+}

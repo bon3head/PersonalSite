@@ -1,0 +1,120 @@
+:root {
+  /* Colors — Primary */
+  --color-primary: #ff0000;
+  --color-secondary: #ff6a7c;
+  --color-accent: #251f2b;
+
+  /* Ramp — primary (base is 500) */
+  --color-primary-50: #ffccb8;
+  --color-primary-100: #ffbba6;
+  --color-primary-200: #ffa28d;
+  --color-primary-300: #ff7c67;
+  --color-primary-400: #ff4535;
+  --color-primary-500: #ff0000;
+  --color-primary-600: #d60000;
+  --color-primary-700: #b40000;
+  --color-primary-800: #980000;
+  --color-primary-900: #7f0000;
+  --color-primary-950: #4e0000;
+
+  /* Ramp — secondary (base is 400) */
+  --color-secondary-50: #ffd8dd;
+  --color-secondary-100: #ffc9cf;
+  --color-secondary-200: #ffb3bb;
+  --color-secondary-300: #ff939f;
+  --color-secondary-400: #ff6a7c;
+  --color-secondary-500: #d8465d;
+  --color-secondary-600: #bb3149;
+  --color-secondary-700: #9b1e38;
+  --color-secondary-800: #83112b;
+  --color-secondary-900: #6d0621;
+  --color-secondary-950: #42000e;
+
+  /* Ramp — accent (base is 950) */
+  --color-accent-50: #f8f3fd;
+  --color-accent-100: #ede7f2;
+  --color-accent-200: #dcd6e2;
+  --color-accent-300: #c4bdcb;
+  --color-accent-400: #a39cab;
+  --color-accent-500: #867e8d;
+  --color-accent-600: #706977;
+  --color-accent-700: #5a5460;
+  --color-accent-800: #49444f;
+  --color-accent-900: #3b3640;
+  --color-accent-950: #251f2b;
+
+  /* Ramp — neutral (base is 700) */
+  --color-neutral-50: #f5f5f5;
+  --color-neutral-100: #eaeaea;
+  --color-neutral-200: #d9d9d9;
+  --color-neutral-300: #c0c0c0;
+  --color-neutral-400: #9f9f9f;
+  --color-neutral-500: #828282;
+  --color-neutral-600: #6c6c6c;
+  --color-neutral-700: #555555;
+  --color-neutral-800: #464646;
+  --color-neutral-900: #393939;
+  --color-neutral-950: #1f1f1f;
+
+  /* Colors — Neutrals */
+  --color-neutral-50: #ffffff;
+  --color-neutral-100: #000000;
+  --color-neutral-200: #555555;
+  --color-neutral-300: #141414;
+  --color-neutral-400: #767676;
+
+  /* Colors — Text */
+  --color-text: #000000;
+  --color-text-1: #ffffff;
+  --color-text-2: #ffceca;
+  --color-text-3: #ff6a7c;
+  --color-text-4: #ff87a2;
+
+  /* Semantic pairs */
+  --action-primary-bg: #ff0000;
+  --action-primary-fg: #000000; /* 5.25:1 AA */
+  --action-secondary-bg: #ff6a7c;
+  --action-secondary-fg: #000000; /* 7.6:1 AAA */
+  --action-accent-bg: #251f2b;
+  --action-accent-fg: #ffffff; /* 16.04:1 AAA */
+
+  /* Typography — Families */
+  --font-body: 'Nunito', sans-serif;
+  --font-heading: 'Amatic SC', sans-serif;
+
+  /* Typography — Named scale */
+  --font-size-display: 64px;
+  --font-size-title-1: 50px;
+  --font-size-h2: 40px;
+  --font-size-title-2: 34px;
+  --font-size-title-3: 30px;
+  --font-size-title-4: 25px;
+  --font-size-body: 20px;
+  --font-size-body-sm: 16px;
+  --font-size-micro: 13px;
+
+  /* Spacing */
+  --spacing-3: 3px;
+  --spacing-8: 8px;
+  --spacing-20: 20px;
+  --spacing-25: 25px;
+  --spacing-30: 30px;
+  --spacing-34: 34px;
+  --spacing-38: 38px;
+  --spacing-50: 50px;
+  --spacing-80: 80px;
+  --spacing-90: 90px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 15px;
+
+  /* Original Site Variables */
+  /* — semantic — */
+  success: [object Object];
+  warning: [object Object];
+  error: [object Object];
+  info: [object Object];
+
+}

@@ -1,0 +1,10 @@
+Clone the design language of this landing page and build a fresh equivalent.
+Visual feel: material-you. Tone: friendly · Headings: Sentence case
+Primary palette: #ffffff, #e91e63, #0c0b12, #ef4d95, #8b5cf6.
+Typography: [object Object], [object Object], [object Object].
+Corner radius vocabulary: 16, 26, 44, 50, 999.
+Shadow vocabulary: rgb(233, 30, 99) 0px 0px 0px 2px inset | rgb(255, 255, 255) 0px 0px 0px 2px inset | rgba(255, 255, 255, 0.18) 3px 3px 0px 0px.
+Page structure:
+- logo-wall — heading: "Good Stuff"
+- logo-wall — heading: "Good Stuff"
+- footer
