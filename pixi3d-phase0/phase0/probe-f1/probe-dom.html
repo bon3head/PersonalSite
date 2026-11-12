@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>pixi3d probe f1</title>  <script type="module" crossorigin="" src="/assets/index-U0AuYtK9.js"></script>
+<link rel="modulepreload" as="script" crossorigin="" href="/assets/WebGLRenderer-D2zb1ttC.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/RenderTargetSystem-CDg0t5-G.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/RenderTexture-CTBhk6z9.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/Shader-BmOho6yl.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/CanvasPool-B8U8c3kJ.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/getTexelRangeRects-CyeBRMwT.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/browserAll-BzHgbUOd.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/webworkerAll-4o1T1Bwu.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/canvasUtils-C0cRL_mb.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/init-BUkuOJ3y.js"><link rel="modulepreload" as="script" crossorigin="" href="/assets/View3DGlobalData-D02KO88i.js"></head>
+  <body>
+    <div id="app"><canvas width="640" height="360" style="touch-action: none;"></canvas></div>
+    <pre id="probe-result">{
+  "steps": [
+    {
+      "mechanism": "app.init webgl",
+      "verdict": "PASS",
+      "detail": "renderer type: 1"
+    },
+    {
+      "mechanism": "View3D + Camera3D",
+      "verdict": "PASS",
+      "detail": "new View3D({width,height,camera}), added to app.stage"
+    },
+    {
+      "mechanism": "RGBA32F texture",
+      "verdict": "PASS",
+      "detail": "BufferImageSource Float32Array 256x24 format=rgba32float (pixi.js defaults Float32Array to rgba32float)"
+    },
+    {
+      "mechanism": "BatchedMesh3D + per-instance attributes",
+      "verdict": "PASS",
+      "detail": "size=100, setMatrixAt x100, setInstanceDataAt x100, instanceData stride=4 fields={\"tint\":0}, update() ok"
+    },
+    {
+      "mechanism": "warmup / precompile",
+      "verdict": "ABSENT",
+      "detail": "No public warmup API in @pixi/3d 0.1.0 docs or dist/index.d.ts; compileShader is @internal and returns shader source text, not a GPU program"
+    },
+    {
+      "mechanism": "off-center projection",
+      "verdict": "ABSENT",
+      "detail": "No shift/offset option in Camera3DOptions (scene.Camera3DOptions.html.md); projection is readonly Matrix4; computeProjection(aspect, out) recomputes from fov/near/far/mode only. No public API to inject elements [8]/[9] as three.js does."
+    },
+    {
+      "mechanism": "renderer statistics",
+      "verdict": "PASS",
+      "detail": "No renderer.info equivalent; programmatic stats path is GraphDebugOverlay / captureGraphDebugSnapshot (extras, debug-only, adds CPU time per frame per extras_debug guide). Overlay constructed and destroyed without error."
+    },
+    {
+      "mechanism": "render 10 frames (WebGL2, SwiftShader)",
+      "verdict": "PASS",
+      "detail": "10 renders in 0.0ms; 34397/230400 pixels differ from background 0x0d0b16, 31371 reddish (control cube is 0xff3355)"
+    },
+    {
+      "mechanism": "batch alone (custom ShaderBit, control hidden)",
+      "verdict": "PASS",
+      "detail": "28149/230400 pixels differ from background, 24967 reddish; 0 means the custom-bit batch drew nothing (shader may have failed to compile silently)"
+    },
+    {
+      "mechanism": "batch alone (stock material, no custom bit)",
+      "verdict": "PASS",
+      "detail": "28025/230400 pixels differ from background, 0 reddish; PASS here + FAIL above isolates the failure to the custom ShaderBit"
+    }
+  ],
+  "console": []
+}</pre>
+  
+
+</body></html>
