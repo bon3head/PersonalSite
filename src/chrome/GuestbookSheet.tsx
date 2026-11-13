@@ -67,6 +67,10 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
         liftRef.current = lift;
         root.style.setProperty('--jp-gb-lift', `${lift}px`);
       }
+      // Compact (DESIGN 6.14 Keyboard, 1.9.0): while the keyboard is up
+      // the panel condenses so the pin stays in view while typing.
+      const kb = lift > 0 ? 'true' : 'false';
+      if (root.dataset.kb !== kb) root.dataset.kb = kb;
       directorRef.current?.reframe();
     };
     update();
@@ -258,7 +262,7 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
       onKeyDown={onKeyDown}
     >
       <div className="jp-gb-catch" aria-hidden="true" onClick={props.onRequestClose} />
-      <div className="jp-gb-glyphs" aria-hidden="true" ref={glyphRef} />
+      <div className="jp-gb-signing" aria-hidden="true" ref={glyphRef} />
       <form className="jp-gb-panel" ref={panelRef} onSubmit={(e) => void lockIn(e)} noValidate>
         {stage !== 'done' && (
           <>

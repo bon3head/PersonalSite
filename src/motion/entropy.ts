@@ -30,7 +30,8 @@ export type EntropyChannel =
   | 'pulse-swirl'
   | 'glitter-swirl'
   | 'guestbook-open'
-  | 'guestbook-sign';
+  | 'guestbook-sign'
+  | 'server-node';
 
 const CHANNEL_ID: Record<EntropyChannel, number> = {
   'morph-bow': 1,
@@ -40,6 +41,7 @@ const CHANNEL_ID: Record<EntropyChannel, number> = {
   'glitter-swirl': 5,
   'guestbook-open': 6,
   'guestbook-sign': 7,
+  'server-node': 8,
 };
 
 export interface MorphEntropy {
@@ -79,6 +81,12 @@ export function freshSeed(channel: 'guestbook-open' | 'guestbook-sign'): number 
     return crypto.getRandomValues(new Uint32Array(1))[0] >>> 0;
   }
   return hash32(entropySeed(), CHANNEL_ID[channel], n);
+}
+
+// Server node groups (DESIGN 6.15, 1.8.0): the n-th group's seed is
+// hash32(sessionSeed, server-node, n), so ?seed replays the scene.
+export function serverNodeSeed(n: number): number {
+  return hash32(entropySeed(), CHANNEL_ID['server-node'], n);
 }
 
 // Pure draw in [0, 1) for a given seed, channel, and index.

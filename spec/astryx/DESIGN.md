@@ -1,6 +1,6 @@
 # DESIGN.md: Justin Poli personal site, Astryx Keystone
 
-Version 1.7.0, 2026-11-10. Single token home. Owner: the spec package in `spec/astryx/`.
+Version 1.9.0, 2026-11-13. Single token home. Owner: the spec package in `spec/astryx/`.
 
 **Rule zero.** If a value is not in this file, it does not exist. Every color, size, duration, easing, count, coordinate and camera pose the build uses is in the `design-tokens` JSON block in section 12. The build reads that block (`tools/extract-tokens.mjs`, spec S00) and generates `src/tokens.generated.ts` and `themes/lane/tokens.generated.json`. Source code imports values from the generated module. A hex literal, a `ms` literal, or a bare geometry number in `src/` outside generated files fails the token lint (S11, gate G-TOKENS). To change a value, change it here, bump the version, add a changelog line.
 
@@ -10,7 +10,7 @@ Version 1.7.0, 2026-11-10. Single token home. Owner: the spec package in `spec/a
 
 The whole site is one field of **6,144 lanes**. That number is not chosen for looks: the RTX 3070 Ti in Justin's inference server has 48 streaming multiprocessors with 128 CUDA cores each, 6,144 in total (NVIDIA GA104 public spec; receipt R-GPU in UNKNOWNS.md). Every line drawn anywhere on the site is one of those 6,144 lanes, rearranged.
 
-- **Server** (home, `/`): the lanes run parallel and fire in lockstep, 32 at a time, the way warps do. They converge at one output point where the words of the stack come out and cool.
+- **Server** (home, `/`): the lanes run parallel and fire in lockstep, 32 at a time, the way warps do. They converge at one output point where nodes leave on the lanes and cool.
 - **LeafLink** (`/leaflink`): the same lanes fall flat and become the streets of a neighborhood drawn in ink on paper. Requests and offers land as pins; a match is a route traced along the streets between them.
 - **SideQuests** (`/sidequests`): the same lanes loosen into a chalk plan of a campus on blueprint blue: building outlines, hatching, walkways, and three dashed quest trails that light when you go to them.
 
@@ -122,7 +122,6 @@ Scale: Astryx `typography.scale` with base 16, ratio 1.25 (verified output of `a
 | `--text-body` (Astryx) | 16px | 400 | 1.5 | 0 | Readout prose, max 52ch |
 | `--text-supporting` (Astryx) | 13px | 400 | 1.54 | 0 | Facts lines, captions |
 | `--jp-text-key` | 13px | 700 | 1 | 0 | Keymap key glyphs |
-| `--jp-text-scene` | world units, see 12 | 400 | 1 | 0 | troika in-scene words |
 
 Rules: 700 for titles and keys, 400 for the name and everything else (name thickened from 200 per Justin's critique, 2026-10-30: the hairline name did not pop). No all-caps text anywhere. No letter-spaced eyebrows. No text smaller than 13px. Numbers use `font-variant-numeric: tabular-nums`.
 
@@ -160,7 +159,7 @@ Durations (Astryx motion config `{fast: 150, medium: 300, ratio: 0.67}`, verifie
 | `--duration-medium-max` | 450ms | Not used. Defined by Astryx; any use fails G-TOKENS. |
 | `--jp-duration-travel` | 700ms | Scene travel (geometry and camera). Engine token from the measured set. |
 | `--jp-duration-ripple` | 900ms | LeafLink pin ripple (ambient) |
-| `--jp-duration-word` | 2600ms | Server output word life (ambient) |
+| `--jp-duration-word` | 2600ms | Server output node life (ambient) |
 
 ### 6.2 How travel obeys "nothing over 250ms"
 
@@ -181,7 +180,7 @@ Feedback is never over 250ms: the keymap item turns accent in 150ms and the lane
 | Normal | Reduced |
 |---|---|
 | Travel 700ms morph and camera | Cut: lanes and camera jump to target; DOM crossfade 150ms `ease` |
-| Server pulses and words | Frozen: one static frame, pulses drawn at fixed phases, three words placed at rest |
+| Server pulses and nodes | Frozen: one static frame, pulses drawn at fixed phases, three node groups placed at rest |
 | LeafLink event stream | Static: 6 pins and 3 completed routes placed; no new events |
 | SideQuests bob and spring | Off; tapping a marker lights its trail instantly |
 | Camera idle drift and parallax | Off |
@@ -285,39 +284,56 @@ The guestbook is a sheet in the router's sense (S03 section 2: sheets are not ro
 | Beat | When | Camera | Lanes | Curve |
 |---|---|---|---|---|
 | Open | `motion.ms.travel` 700 | Dolly toward the target by `guestbook.camera.dollyIn` of the target distance, seeded yaw up to `guestbook.camera.yawDeg`, seeded rise up to `guestbook.camera.riseFrac` | Lanes inside `guestbook.part.radiusFrac` part outward by `pushFrac` and move to a per-lane seeded height up to `depthFrac` (y, toward or away from the camera); the three depth bands start `guestbook.ms.bandStagger` apart | Lusion main |
-| Type | each character, `guestbook.ms.letter` 400 in, `letterOut` 300 out | Held | One lane per character bends toward the camera (bend weight `(k / 7)^guestbook.mark.bendPower`) to a seeded height in `heightFrac`, on a baseline with seeded wobble `wobbleFrac`; the glyph rides the lane tip at its true depth. Until lock-in every letter lane carries seeded noise `noiseFrac`, redrawn every `guestbook.ms.noiseStep` | Lusion main |
-| Lock in | `guestbook.ms.lockIn` 400 | Push in a further `pushIn` | Noise goes to zero, heights snap to the sign seed's values, glyphs resolve left to right: noise becomes identity | Lusion soft |
+| Type | each character, `guestbook.ms.letter` 400 | Held | The signing pin (Pins, below) sits on the lane tip nearest the well; its label shows the name as typed, one straight line. No lane moves per character. The `pin.linkLanes` lanes nearest the pin bend their tips into it over `ms.letter` on open | Lusion main |
+| Lock in | `guestbook.ms.lockIn` 400 | Push in a further `pushIn` | The label resolves left to right (each character shows seeded hex noise, redrawn every `ms.noiseStep`, until its turn); pin, label and link lanes move to the mark color | Lusion soft |
 | Hold | `guestbook.ms.hold` 300 | Held | Held | none |
-| Pull back | `motion.ms.wordCadence` 1600 | Out to `pullBack` (past rest, wide), seeded drift up to `driftYawDeg` | The mark settles at a seeded offset in `settleRadiusFrac` of the part radius and a seeded height scale in `settleScale`; the part relaxes to `part.residual` | Lusion soft |
-| Close | `motion.ms.travel` 700 | Back to rest | Every guestbook offset returns to zero | Lusion main |
+| Pull back | `motion.ms.wordCadence` 1600 | Out to `pullBack` (past rest, wide), seeded drift up to `driftYawDeg` | The pin holds where it stands, its link lanes with it; the part relaxes to `part.residual` | Lusion soft |
+| Close | `motion.ms.travel` 700 | Back to rest | Every guestbook offset returns to zero; the pins layer takes the pin where it stands and glides it to its rest spot (Pins) | Lusion main |
 
-The well (part center and mark baseline center) is the scene camera's ground target, where the lanes are. On open the camera's principal-point shift moves with the dolly from the scene value to `guestbook.shiftNdc` (the well rises to the upper middle of the viewport, above the prompt), and the dolly translates the camera along the ray to the well. The readout and hero are hidden while the sheet is open, so the mark has the field to itself. All world fractions are fractions of the camera to well distance at open, so the same mark reads the same size on every scene; letter spacing shrinks when needed so the dollied-in mark fits `guestbook.fitWidthFrac` of the viewport width. Two curves only, both from the Lusion extract (`guestbook.easeMain` `0.35, 0, 0, 1`; `guestbook.easeSoft` `0.4, 0, 0.1, 1`); no spring. Motion is transform: camera, lane positions, glyph translate and perspective scale. The DOM panel moves on translateZ under perspective, never on opacity.
+The well (part center and the signing pin's start) is the scene camera's ground target, where the lanes are. On open the camera's principal-point shift moves with the dolly from the scene value to `guestbook.shiftNdc` (the well rises to the upper middle of the viewport, above the prompt), and the dolly translates the camera along the ray to the well. The readout and hero are hidden while the sheet is open, so the mark has the field to itself. All world fractions are fractions of the camera to well distance at open (`restFrame().distance`), so the same spot reads the same on every scene. The pin and its label are DOM at fixed CSS sizes, so they read the same size at every camera distance. Two curves only, both from the Lusion extract (`guestbook.easeMain` `0.35, 0, 0, 1`; `guestbook.easeSoft` `0.4, 0, 0.1, 1`); no spring. Motion is transform: camera, lane positions, pin translate. The DOM panel moves on translateZ under perspective, never on opacity.
 
-**Phone frame (1.6.0).** Every guestbook measurement reads the screen the visitor actually sees, so the mark and the panel land in the same place in Safari and in in-app browsers. The field's projection uses the canvas's own CSS box (it is drawn at `100vw` by `100dvh`), never `innerWidth` and `innerHeight`, which disagree with it on phones. The free region is the visual viewport (`window.visualViewport`, falling back to the layout viewport) above the panel's top edge; the well lands at the free region's center offset by `guestbook.shiftNdc` in that region's NDC, and fit width (`fitWidthFrac`) is a fraction of the free region's width. The director recomputes this on every frame while the visitor writes; from lock-in on the frame holds, so the lock-in, settle and pull-back camera is exactly as before. When it changes (the keyboard opening, a toolbar collapsing) the shift eases to the new value over `guestbook.ms.panel` on the Lusion main curve, never a jump.
+**Part per scene (1.8.0).** The part (push and seeded height) is scaled by `guestbook.part.layoutScale` for the scene under the sheet: 1 on server, 0 on leaflink, sidequests and scatter. On the flat ground scenes the camera looks down at the plan from close, so the part read as one huge ring that swallowed the scene (the bulge in Justin's Nov 12 iPhone screenshots, critique brief item 4); there the lanes stay where they are and the pin sits on them, with the same dolly, lock-in and pull-back. Server keeps the part, where the lanes are a horn in depth and it reads as a part.
 
-**Keyboard.** While the sheet is open the panel listens to visual viewport resize and scroll. When the keyboard covers the bottom of the layout viewport, the panel lifts on translateY so its bottom edge sits `--jp-gutter` above the keyboard (lift = covered height + gutter - the panel's resting gap to the layout bottom) and both prompt lines and the lock in pill stay fully visible. The lift moves on the panel transition (`guestbook.ms.panel`, Lusion main). The focused prompt line carries an inset rule of `guestbook.focusRulePx` in `accent` along its bottom edge; unfocused lines carry a 1px `hairline`. No outline box, no fill.
+**Phone frame (1.6.0). Every guestbook measurement reads the screen the visitor actually sees, so the mark and the panel land in the same place in Safari and in in-app browsers. The field's projection uses the canvas's own CSS box (it is drawn at `100vw` by `100dvh`), never `innerWidth` and `innerHeight`, which disagree with it on phones. The free region is the visual viewport (`window.visualViewport`, falling back to the layout viewport) above the panel's top edge; the well lands at the free region's center offset by `guestbook.shiftNdc` in that region's NDC, and the label flips to the left of the node when it would cross the free region's right edge. The director recomputes this on every frame while the visitor writes; from lock-in on the frame holds, so the lock-in, settle and pull-back camera is exactly as before. When it changes (the keyboard opening, a toolbar collapsing) the shift eases to the new value over `guestbook.ms.panel` on the Lusion main curve, never a jump.
 
-**Contrast.** The lanes behind the panel dim while the sheet is open, so the field itself dims and no surface is drawn: the lane shader multiplies lane alpha by `1 - guestbook.dim.amount` inside the panel's box grown by `guestbook.dim.padPx`, feathering back to full over `guestbook.dim.featherPx` outside it (a rounded falloff, not an edge). Letter lanes dim too where their bodies pass behind the panel (an undimmed letter lane crossing the text measured 2.2:1); the mark itself sits above the panel in the free region, so it is never dimmed. The dim rides the panel's on-screen box every frame (it follows the lift and the depth move) and its amount moves with the panel on open and close. Floor: typed text, placeholder, seed readout and done copy each hold at least 4.5:1 against the brightest pixel behind them, measured over the densest lanes at 390px; the placeholder meets the same floor as typed text. No card, no white surface, no gradient, no shadow.
+**Keyboard.** While the sheet is open the panel listens to visual viewport resize and scroll. When the keyboard covers the bottom of the layout viewport, the panel lifts on translateY so its bottom edge sits `--jp-gutter` above the keyboard (lift = covered height + gutter - the panel's resting gap to the layout bottom) and both prompt lines and the lock in pill stay fully visible. The lift moves on the panel transition (`guestbook.ms.panel`, Lusion main). Compact (1.9.0): while the keyboard is up (lift above zero) the panel condenses so the free region above it is as tall as it can be and the pin and its label stay in view while typing: the name line drops from display-1 to the line prompt's size (`--text-large-size`), the panel gap and the row margin drop to `--spacing-2`, and the seed readout hides; everything returns when the keyboard closes. The focused prompt line carries an inset rule of `guestbook.focusRulePx` in `accent` along its bottom edge; unfocused lines carry a 1px `hairline`. No outline box, no fill.
 
-**Scene words.** The server scene's in-scene words (S05, formed from lanes per 6.15) hide while the sheet is open (they fade out over `motion.ms.fast` like a travel pause, their lanes relaxing with them, and do not spawn; under reduced motion they clear at once, since no loop carries a fade), so the mark has the field to itself; they resume on close. T-GB-6 covers the words, the dim box, the keyboard lift and the focus rule under reduced motion.
+**Contrast.** The lanes behind the panel dim while the sheet is open, so the field itself dims and no surface is drawn: the lane shader multiplies lane alpha by `1 - guestbook.dim.amount` inside the panel's box grown by `guestbook.dim.padPx`, feathering back to full over `guestbook.dim.featherPx` outside it (a rounded falloff, not an edge). Link lanes dim too where their bodies pass behind the panel; the pin itself sits above the panel in the free region, so it is never dimmed. The dim rides the panel's on-screen box every frame (it follows the lift and the depth move) and its amount moves with the panel on open and close. Floor: typed text, placeholder, seed readout and done copy each hold at least 4.5:1 against the brightest pixel behind them, measured over the densest lanes at 390px; the placeholder meets the same floor as typed text. No card, no white surface, no gradient, no shadow.
 
-**Entropy.** Two fresh 32-bit seeds per sign: an open seed at open (part heights, camera yaw and rise, baseline wobble, typing noise) and a sign seed at lock-in (lock-in heights, settle offset and scale, pull-back drift, and the hex shown in the seed readout). Source: `crypto.getRandomValues`. With `?seed` in the URL (6.11), each seed is instead `hash32(sessionSeed, channel, n)` for channels `guestbook-open` and `guestbook-sign`, so a run replays. Values derive from a seed by `hash32(seed, param, index)`.
+**Scene nodes.** The server scene's nodes (S05, on lanes per 6.15) hide while the sheet is open (they fade out over `motion.ms.fast` like a travel pause, their lanes relaxing with them, their lanes held by nothing; under reduced motion they clear at once, since no loop carries a fade), so the signing pin has the field to itself; they resume on close. T-GB-6 covers the nodes, the dim box, the keyboard lift and the focus rule under reduced motion.
 
-**Engine cost.** One extra RGBA32F data texture the size of the activity texture (256 by 24, 98,304 bytes): per lane xyz offset plus a bend flag, written only while the guestbook moves. Twelve uniforms (that texture, bend power, part center, radius, push, depth, seed, band progress, letter color, and from 1.6.0 the dim box, dim amount and dim feather). Same mesh, same draw call, same WebGL context. Letter lanes skip the ring and silhouette so the glyph and the lane tip agree. Letter lanes draw in `signalHot` on void and field, `ink` on paper.
+**Entropy.** Two fresh 32-bit seeds per sign: an open seed at open (part heights, camera yaw and rise) and a sign seed at lock-in (the pin's rest spot, the label's resolve noise, pull-back drift, the mark color, and the hex shown in the seed readout). Source: `crypto.getRandomValues`. With `?seed` in the URL (6.11), each seed is instead `hash32(sessionSeed, channel, n)` for channels `guestbook-open` and `guestbook-sign`, so a run replays. Values derive from a seed by `hash32(seed, param, index)`.
 
-**Reduced motion.** No camera move, no noise, no part motion: the field renders once per change with the mark at its seeded resting position and height. Same content, same 3D mark.
+**Engine cost.** One extra RGBA32F data texture the size of the activity texture (256 by 24, 98,304 bytes): per lane xyz offset plus a bend flag, written while the guestbook or the pins layer holds link lanes (1.9.0: at most `pin.linkLanes x ledgerMax` lanes). Twelve uniforms (that texture, bend power, part center, radius, push, depth, seed, band progress, letter color, and from 1.6.0 the dim box, dim amount and dim feather). Same mesh, same draw call, same WebGL context. Link lanes skip the ring and silhouette so the pin and the lane tips agree. Until lock-in, link lanes, the signing pin and its label draw in `signalHot` on void and field, `ink` on paper.
 
-**No WebGL.** The sheet works without the field: the name, line, lock in, and storage are DOM; the mark has no 3D.
+**Pins (1.9.0, supersede the letter lanes and glyphs).** Justin's Nov 13 QA on the PR #11 preview (iPhone): the letters rode lane tips lifted off the ground, so on the flat map scenes the name floated in the middle of nowhere; the spray of letters across the lines read badly to a hiring manager; and the mark vanished when whoami or contact closed the sheet. A mark is now a pin: a node where lines end, with the name beside it as one straight label, and it stays.
+
+- Pin. A filled disc of `guestbook.pin.radiusPx` CSS px in the mark color, centered on a lane tip projected to the screen, so it always sits on a line, at ground level on the flat scenes and on the horn on server. The label is the name in the body type (`--text-body-size`, weight 700, the mark color), on one line, `pin.gapPx` right of the disc and vertically centered on it; it flips to the left when it would cross the viewport's right edge minus `--jp-gutter`. No glyph scale, no per-letter lane, no height.
+- Link lanes. The `pin.linkLanes` lanes whose resting tips are nearest the pin (ground distance, the pin's own lane first) bend their tips exactly into the pin point through the guestbook offset texture, bend weight `(k / 7)^mark.bendPower` along each lane as before, so lines run into the node. They ease in over `ms.letter` and out over `ms.letterOut`, both on the Lusion main curve. Link lanes wear the guestbook lane color (default `signalHot` on dark, `ink` on paper; the mark color while the sheet holds a locked mark).
+- Signing pin. While the sheet is open the pin starts on the lane tip nearest the well, inside the free region (Phone frame), and its label follows the name field as typed; with no name it is the disc alone. Under reduced motion the camera does not move, so when the well's tip falls outside the free region (on server the tips converge at the output point, low on a phone, under the keyboard) the signing pin starts on the ground under the free region's center instead, and its link lanes bend into it from their tips. Under reduced motion the ground point comes first; where the ground is out of view (server) it sits on the plane through the well facing the camera. Lock-in and pull-back leave it where it stands; on close the pins layer takes it from that point and glides it to its rest spot over `motion.ms.travel` on Lusion main, and its link lanes ease in again on its rest lanes.
+- Rest spot. Each signature's spot on a scene is decided by its sign seed and the scene's rest camera: candidate k (k from 0 to `pin.tries` - 1) is the ground point at angle `2 pi u(hash32(seed, pinAngle, k))` and radius `restFrame().distance x lerp(pin.restRadiusFrac, u(hash32(seed, pinRadius, k)))` from the scene's camera target, snapped to the lane tip nearest it that no earlier pin and no server node holds. A candidate is accepted when its screen point and label sit inside `--jp-gutter`, above the keymap, off the readout, the readout slip, the wordmark and the hero, and its disc and label clear every earlier pin's disc and label by `pin.gapPx`. The first accepted candidate at least `pin.minGapFrac x distance` from every earlier pin (measured in 3D, since server tips stack in height) wins; failing that, the first accepted candidate; failing that, the last candidate. A pin is shown only once placed. Pins are placed newest first, so the newest signature takes the spot the signing pin moved to. Same ledger, same scene, same viewport, same rest camera and the same boxes kept clear: same spots.
+- Pins layer. Every signature stored in this browser (at most `ledgerMax`) is a pin on every scene, all the time: through whoami, contact, scene travel and reloads. The layer sits above the field and below every sheet, and hides only while the guestbook sheet is open (where the signing pin and the ledger list show). Each pin is a `button` whose text is the name; activating it toggles the signature's line under the label (`aria-expanded`); with no line it does nothing else. The hit box is at least `pin.hitPx` square. The layer is a list labelled `C-GB-LEDGER`. Pins follow the camera every frame (idle yaw, pointer parallax, travel); during travel they ride their lanes through the morph; spots are re-picked when the rest frame or the viewport changes, once that change has held for a frame, and at rest whenever a pin that passed the accept test when picked now overlaps a kept-clear box by more than `pin.gapPx` (a readout that lays out late; the idle sway alone never moves a pin), then each moved pin glides to its new spot over `motion.ms.travel` on Lusion main and its link lanes ease in again. Under reduced motion the re-pick is immediate. On close the layer's link lanes ease in over `ms.letter`, so nothing snaps when the sheet hands its pin over.
+- Reduced motion: pins and link lanes sit at their spots, no easing; the layer re-renders on every field render. No WebGL: no pins (the ledger list in the sheet still shows every signature).
+
+**Mark color (1.8.0).** Every signature gets its own color from a set pool, so no two marks look alike. At lock-in the sign seed picks one entry of `guestbook.mark.colorPool` for the current regime, `pool[hash32(signSeed, color, 0) mod pool length]` (`dark` on void and field, `paper` on paper), and the link lanes, the pin and its label move to it over `guestbook.ms.lockIn` on the Lusion soft curve. Every pool entry is a name of an existing color in section 12, so no new hue exists: the pool is the blue family and the two chalks on dark ground, the ink family on paper. Same sign seed, same color. Sign again returns to the default color; a stored pin keeps its color on every scene, picked from the pool of that scene's regime by the same rule. Reduced motion takes the color at once.
+
+**Reduced motion.** No camera move, no noise, no part motion: the field renders once per change with the pin at its spot. Same content, same pin.
+
+**No WebGL.** The sheet works without the field: the name, line, lock in, and storage are DOM; there is no pin.
 
 **Storage.** Decided by Justin, 2026-11-10: browser-local only. Signatures are stored in this browser through one named hook, `storeSignature` in `src/lib/guestbookStore.ts`, key `guestbook.storageKey`, at most `guestbook.ledgerMax` kept, and the sheet says so (`C-GB-LOCAL`).
 
-### 6.15 Server words formed from lanes (1.7.0)
+### 6.15 Server nodes on the lanes (1.8.0, supersedes the 1.7.0 words; resting from 1.9.0)
 
-The server scene's stack words (S05) are carried by the field, never floated over it. Every non-space character of a word rides the tip of its own lane, the way the guestbook mark does (6.14). At spawn each character takes the nearest free lane by tip (3D distance from the lane's resting tip to the character's spawn point at the focus); a lane is never shared by two words on screen and never taken while the guestbook holds it. Each frame that lane's offset bends its tip from rest to the character's point, `tip = rest + bend x (point - rest)`, with the guestbook bend weight `(k / 7)^guestbook.mark.bendPower` along the lane, root anchored, skipping the ring, pull and part, and the glyph sits exactly on the bent tip at its true depth, billboarded. Characters sit on the word's drift point at the Commit Mono advance (measured from the loaded font, as titles are), centered.
+The server scene shows no words. Justin's pick, 2026-11-12 (critique brief item 3): nodes only, no stack names anywhere in the scene. This replaces the 1.7.0 rule, which formed the stack words from lanes.
 
-Bend is the word's opacity: 1 while the word is lit, then down with the fade after `world.server.wordFadeFrom`, so the lane draws its letter back into the horn and is exactly at rest when the word ends. No lane ever snaps. The lane wears the word: its color mixes to the word's current color and its alpha lifts toward the tip (`max(alpha, u)`), both by the word's opacity, so lane and letter cool and fade together, and the lockstep pulses keep running under it. Pause, travel exit and the guestbook (6.14) fade the words over `motion.ms.fast` with their lanes relaxing, then release every word lane. Reduced motion: the three statics sit on lanes bent and tinted at their `reducedWordAt` points.
+Resting nodes (1.9.0): Justin's Nov 13 QA found the cycling groups read like the old words (they came and went). The scene now holds three groups at rest, lit, at `world.server.nodes.restAt` fractions of their drift paths, and they stay: no spawn cadence, no fade with age. A group is `world.server.nodes.count` nodes (the count is seeded), each the tip of its own lane, the same lane carry as the guestbook mark (6.14): at placement each node takes the nearest free lane by tip (3D distance from the lane's resting tip to the node's start point at the focus); a lane is never shared by two nodes on screen and never taken while the guestbook holds it. Each frame that lane's offset bends its tip from rest to the node's point, `tip = rest + bend x (point - rest)`, with the guestbook bend weight `(k / 7)^guestbook.mark.bendPower` along the lane, root anchored, skipping the ring, pull and part. A node is a flat disc of radius `nodes.radius` world units, billboarded, sitting exactly on the bent tip at its true depth: a point where the line ends, never text.
 
-Engine: word lanes share the guestbook offset texture (texel alpha 1 is a guestbook letter lane; alpha 2 plus the slot index is a word lane, slot below `world.server.wordPool`) and one `vec4` tint per slot (color, opacity), the slot count passed to the shader as a define from `world.server.wordPool`. One lane draw call, unchanged. Glyphs are one troika Text per character, at most `wordPool` times the longest word in `world.server.words`. No new tokens.
+Entropy: each group has a seed, `hash32(sessionSeed, server-node, n)` for group n (0, 1, 2) (6.11, so `?seed` replays it). The seed decides the count, each node's offset from the group's drift point (in the camera's right and up plane, inside a disc of `nodes.spreadFrac` of the drift length, no two nodes closer than `nodes.minGap` world units, drawn by seeded rejection so the group never crowds), and the group's color: one entry of `guestbook.mark.colorPool.dark` (the server is void), the same pool and the same rule as the guestbook mark. Group n rests at `restAt[n]` of the drift path `wordDrift` from the focus toward the viewer (y sign alternates per group). Nodes are re-posed every frame against the camera (billboard and camera-plane offsets) so they hold through idle yaw.
+
+Bend is the group's opacity: 1 at rest. Groups fade in over `motion.ms.fast` when placed (scene arrival, guestbook close) and out over `motion.ms.fast` on pause, travel exit and guestbook open, the lane drawing its node back into the horn as they go, so no lane ever snaps. The lane wears the group's color, and its alpha lifts toward the tip (`max(alpha, u)`), both by the group's opacity, so lane and node fade together while the lockstep pulses keep running under them. After a fade out every node lane is released. Reduced motion: the same three groups, placed at once with no fade.
+
+Engine: node lanes share the guestbook offset texture (texel alpha 1 is a guestbook link lane; alpha 2 plus the slot index is a node lane, slot below `world.server.nodes.pool`) and one `vec4` tint per slot (color, opacity), the slot count passed to the shader as a define. One lane draw call, unchanged. Nodes are plain three.js meshes, one per node, at most `nodes.pool` times the top of `nodes.count`; no font, no glyphs.
 
 ## 7. Component signatures
 
@@ -396,7 +412,7 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
 
 ```json design-tokens
 {
-  "version": "1.6.0",
+  "version": "1.8.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -612,14 +628,17 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
         "sweepPeriodSec": 6.0,
         "peakAlpha": 1.0
       },
-      "words": ["Go TUI", "Ollama", "Tailscale", "Docker", "Open WebUI", "WSL2 Ubuntu", "Windows 11", "RTX 3070 Ti", "Smithtown, NY"],
-      "wordSize": 0.22,
       "wordDrift": [-1.0, 0.5, 1.0],
-      "wordPool": 4,
       "wordSpawnOffsetZ": 0.2,
-      "wordColorStops": [0.0, 0.4, 1.0],
-      "wordFadeFrom": 0.55,
-      "reducedWordAt": [0.2, 0.5, 0.8],
+      "nodes": {
+        "pool": 4,
+        "count": [3, 6],
+        "radius": 0.035,
+        "segments": 16,
+        "spreadFrac": 0.22,
+        "minGap": 0.12,
+        "restAt": [0.2, 0.5, 0.8]
+      },
       "fog": [7.0, 30.0]
     },
     "leaflink": {
@@ -985,24 +1004,34 @@ The `field` regime is a site-level override on `[data-regime=field]` that re-poi
       "radiusFrac": 0.6,
       "pushFrac": 0.12,
       "depthFrac": 0.07,
-      "residual": 0.4
+      "residual": 0.4,
+      "layoutScale": {
+        "server": 1.0,
+        "leaflink": 0.0,
+        "sidequests": 0.0,
+        "scatter": 0.0
+      }
     },
     "mark": {
-      "spacingFrac": 0.05,
-      "heightFrac": [0.075, 0.095],
-      "wobbleFrac": 0.012,
-      "glyphFrac": 0.055,
-      "noiseFrac": 0.02,
       "bendPower": 2,
-      "settleRadiusFrac": [0.05, 0.15],
-      "settleScale": [0.55, 0.85],
-      "glyphPx": [14, 96]
+      "colorPool": {
+        "dark": ["signalHot", "signal", "inkTint", "chalk", "chalk2"],
+        "paper": ["ink", "signalDim", "paper.text", "paper.text2"]
+      }
+    },
+    "pin": {
+      "radiusPx": 6,
+      "gapPx": 8,
+      "hitPx": 44,
+      "linkLanes": 6,
+      "restRadiusFrac": [0.06, 0.24],
+      "minGapFrac": 0.07,
+      "tries": 32
     },
     "shiftNdc": {
       "fine": [0.0, 0.02],
       "coarse": [0.0, 0.08]
     },
-    "fitWidthFrac": 0.8,
     "dim": {
       "amount": 0.94,
       "padPx": 24,
@@ -1085,6 +1114,8 @@ Scene specs restate some of these numbers inside formulas so a reviewer can chec
 
 ## 13. Changelog
 
+- 1.9.0, 2026-11-13: marks become pins (Justin's Nov 13 QA of the PR #11 preview on iPhone). Section 6.14 Pins supersedes the letter lanes and glyphs: a signature is a node on a lane tip with its name as one straight label, linked into the lines by `guestbook.pin.linkLanes` lanes, at a seeded rest spot per scene, and every stored signature stays on every scene as a pins layer (through whoami, contact, travel and reloads); tapping a pin shows its line. Keyboard compact: the panel condenses while the keyboard is up so the pin stays visible while typing. Section 6.15: the server node groups rest and stay instead of cycling (`nodes.reducedAt` renamed `restAt`, `nodes.fadeFrom` removed). Removed tokens: `guestbook.mark.spacingFrac`, `heightFrac`, `wobbleFrac`, `glyphFrac`, `noiseFrac`, `settleRadiusFrac`, `settleScale`, `glyphPx`, `guestbook.fitWidthFrac`. New: `guestbook.pin.*`. No new copy, no new color.
+- 1.8.0, 2026-11-12: nodes only (Justin's Nov 12 critique, brief `guestbook/critique-2026-11-12-brief.md`). Section 6.15 is rewritten and supersedes the 1.7.0 words: the server stack words are removed entirely (`world.server.words`, `wordSize`, `wordColorStops`, `wordPool`, `wordFadeFrom`, `reducedWordAt` and the `--jp-text-scene` row are gone) and seeded node groups ride the lane tips instead (`world.server.nodes.*`, new). New `guestbook.mark.colorPool`: each signature takes a color from the pool by its sign seed (6.14 Mark color); pool entries name existing colors only, no new hue. Section 1, 6.1, 6.4 and 6.14 wording follows. This deliberately reverses Justin's Nov 9 pick (words formed from lanes). New `guestbook.part.layoutScale` (6.14 Part per scene): the part is off on the flat ground scenes, which fixes the LeafLink and SideQuests bulge (critique item 4).
 - 1.7.0, 2026-11-10: server words formed from lanes (section 6.15, S05 1.3.0), Justin's pick for fix 4b of the guestbook phone brief over removing them, since C-SRV-P2 no longer carries the stack names. Each character rides its own lane tip; bend and tint follow the word's opacity so lanes never snap. Word lanes reuse the guestbook offset texture (alpha 2 plus slot) with one tint per `wordPool` slot; lane draw calls unchanged; no new tokens, no copy change.
 - 1.6.0, 2026-11-10: guestbook on real phones (Justin's iPhone demo, Safari and an in-app browser). Section 6.14 gains phone frame, keyboard, contrast and scene-word rules; tokens `guestbook.dim.*` (amount 0.94, pad 24px, feather 64px) and `guestbook.focusRulePx` 2 are new and proposed until a device run confirms them. Contrast is the lane-dim option because G-TOKENS bans gradients in CSS (a CSS radial scrim would fail the lint). The projection now reads the canvas's CSS box, which was `100dvh` tall while the camera aspect used `innerHeight`. Uniforms nine to twelve; draw calls unchanged. Lock-in choreography unchanged.
 - 1.5.0, 2026-11-09: guestbook (section 6.14, `guestbook.*` new). Brief: `guestbook/prompt.md` on astryx-polish-r2 (entropic and 3D). Two Lusion beziers enter as guestbook-only curves (`guestbook.easeMain`, `guestbook.easeSoft`, from `guestbook/references/lusion-style-brief.md`); the site curves are unchanged. Pill radius 88 from the same extract. Engine adds one RGBA32F 256 by 24 texture (98,304 bytes) and nine uniforms; draw calls unchanged. Proposed values: every `guestbook.*` number is proposed until a device run confirms it. Storage: browser-local only (Justin, 2026-11-10); a shared store, if ever wanted, is a separate change.

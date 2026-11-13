@@ -1,6 +1,6 @@
 # S09 Copy deck: every visible string
 
-Version 1.6.0, 2026-11-09. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+Version 1.7.0, 2026-11-12. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
 1.5.0: C-SQ-P1 rewritten (Justin-approved 2026-11-05): the "three trails / small adventures" line described the site visual, not the app ethos. New line names the ethos (anyone can host, each community runs its own instance) and what it is built on (ActivityPub).
 
 ## 1. Purpose
@@ -43,7 +43,7 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-SRV-H1 | Server readout heading | `Justin Poli` | BRIEF |
 | C-SRV-P1 | Server readout | `Computer science senior at SUNY New Paltz. I like to build my own tools.` | BRIEF |
 | C-SRV-P2 | Server readout | `LeafLink and SideQuests both took 2nd place at their hackathons, and I run my own LLM inference server at home.` | BRIEF |
-| C-SRV-ALT | `aria-label` of the Server canvas region | `Rendering of the inference server: 6,144 lanes, one per CUDA core on the RTX 3070 Ti, firing 32 at a time.` | BRIEF + R-GPU |
+| C-SRV-ALT | `aria-label` of the Server canvas region | `Rendering of the inference server: 6,144 lanes, one per CUDA core on its GPU, firing 32 at a time.` | BRIEF + R-GPU |
 | C-LL-H1 | LeafLink readout heading | `LeafLink` | BRIEF |
 | C-LL-P1 | LeafLink readout | `Mutual aid on a live map. When a neighbor needs what you have, the map connects you as it happens.` | BRIEF |
 | C-LL-FACTS | LeafLink readout, supporting | `Week-long hackathon build. Team of four: Justin Poli, Julian Shuster, Devin Perez, Colton A. 2nd place.` | BRIEF |
@@ -118,6 +118,7 @@ None open. D-SQ-VENUE (shown), D-LEAFLINK-KIND (mutual aid) and D-PHONE (hidden)
 
 ## 8. Changelog
 
+- 1.7.0, 2026-11-12: C-SRV-ALT no longer names the GPU model ("on the RTX 3070 Ti" becomes "on its GPU"). Justin approved in the critique thread, 2026-11-12 ("don't name the gpu"), so no stack name ships anywhere in the scene (critique brief item 3). No other string changed.
 - 1.6.0, 2026-11-09: guestbook strings (C-CON-GB, C-GB-*), for the guestbook brief on astryx-polish-r2. No existing string changed. Proposed; Justin approves before ship.
 
 - 1.0.0, 2026-10-30: initial deck from CONTENT-BRIEF.md.

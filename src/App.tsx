@@ -68,6 +68,7 @@ import { C } from './copy';
 import Keymap from './chrome/Keymap';
 import Wordmark from './chrome/Wordmark';
 import Readout from './chrome/Readout';
+import PinsLayer from './chrome/PinsLayer';
 // Sheets load on demand: the BottomSheet closure is the largest
 // astryx cost not needed for first paint, and both sheets start
 // closed. A mount effect preloads them on idle so the first open
@@ -75,6 +76,7 @@ import Readout from './chrome/Readout';
 const WhoamiSheet = lazy(() => import('./chrome/WhoamiSheet'));
 const ContactSheet = lazy(() => import('./chrome/ContactSheet'));
 const GuestbookSheet = lazy(() => import('./chrome/GuestbookSheet'));
+
 import { entropySeed } from './motion/entropy';
 
 // Polish item 5: read ?seed before the router's first pushState drops
@@ -318,7 +320,7 @@ export default function App(props: AppProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Guestbook open (DESIGN 6.14, S05 1.2.0): the server words step out
+  // Guestbook open (DESIGN 6.14, S05 1.4.0): the server nodes step out
   // of the field so the mark has it to itself.
   useEffect(() => {
     const server = controllersRef.current.get('server') as ServerController | undefined;
@@ -404,6 +406,9 @@ export default function App(props: AppProps): JSX.Element {
             <div role="img" aria-label={alt} />
           )}
         </main>
+        {/* Pins (DESIGN 6.14, 1.9.0): every stored signature, on every
+            scene, above the field and below every sheet. */}
+        <PinsLayer field={wired?.field ?? null} />
         <Keymap
           scene={scene}
           sheet={sheet}

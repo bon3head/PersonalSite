@@ -513,26 +513,133 @@
     pointer-events: auto;
   }
 
-  .jp-gb-glyphs {
+  /* The signing pin's layer (DESIGN 6.14 Pins, 1.9.0). */
+  .jp-gb-signing {
     position: absolute;
     inset: 0;
     overflow: hidden;
     pointer-events: none;
   }
 
-  /* One glyph per letter lane, riding the lane tip. Font size is the
-   * token maximum; the director scales it down by perspective. */
-  .jp-gb-glyph {
+  /* A pin: its box origin is the disc center on the lane tip; the
+   * director or the pins controller sets translate3d. */
+  .jp-pin {
     position: absolute;
     left: 0;
     top: 0;
-    font-size: var(--jp-gb-glyph-max);
-    font-weight: 700;
-    line-height: 1;
     color: var(--jp-accent);
-    transform-origin: 50% 100%;
-    white-space: pre;
     will-change: transform;
+  }
+
+  /* A layer pin is laid out but unseen until the controller places it
+   * (its label width is measured before it shows). */
+  .jp-pins .jp-pin:not([data-placed="true"]) {
+    visibility: hidden;
+  }
+
+  .jp-pin-dot {
+    position: absolute;
+    left: calc(-1 * var(--jp-gb-pin-radius));
+    top: calc(-1 * var(--jp-gb-pin-radius));
+    width: calc(2 * var(--jp-gb-pin-radius));
+    height: calc(2 * var(--jp-gb-pin-radius));
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .jp-pin-label {
+    font-size: var(--text-body-size);
+    line-height: var(--text-body-leading);
+    font-weight: 700;
+    white-space: pre;
+  }
+
+  /* The signing pin: the label sits beside the disc, one line. */
+  .jp-pin > .jp-pin-label {
+    position: absolute;
+    left: calc(var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
+    top: 0;
+    transform: translateY(-50%);
+  }
+
+  .jp-pin[data-flip="true"] > .jp-pin-label {
+    left: auto;
+    right: calc(var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
+  }
+
+
+  /* The pins layer: every stored signature, on every scene. */
+  .jp-pins {
+    position: fixed;
+    inset: 0 0 var(--jp-keymap-h) 0;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    list-style: none;
+    pointer-events: none;
+    font-family: var(--jp-font-family);
+  }
+
+  .jp-pins[hidden],
+  :root[data-gb="open"] .jp-pins {
+    visibility: hidden;
+  }
+
+  /* The hit box spans the disc and the name, at least pin.hitPx tall. */
+  .jp-pin-hit {
+    position: absolute;
+    left: calc(-1 * var(--jp-gb-pin-hit) / 2);
+    top: calc(-1 * var(--jp-gb-pin-hit) / 2);
+    display: flex;
+    align-items: center;
+    height: var(--jp-gb-pin-hit);
+    min-width: var(--jp-gb-pin-hit);
+    margin: 0;
+    padding: 0 0 0 calc(var(--jp-gb-pin-hit) / 2 + var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
+    border: 0;
+    border-radius: var(--jp-gb-pill-radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .jp-pin[data-flip="true"] .jp-pin-hit {
+    left: auto;
+    right: calc(-1 * var(--jp-gb-pin-hit) / 2);
+    padding: 0 calc(var(--jp-gb-pin-hit) / 2 + var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap)) 0 0;
+  }
+
+  .jp-pin-hit:focus-visible {
+    outline: var(--jp-gb-focus-rule) solid currentColor;
+  }
+
+  /* The signature's line, under the name when the pin is open. It wraps
+   * inside the room the controller leaves on the label's side. */
+  .jp-pin-line {
+    position: absolute;
+    top: calc(var(--jp-gb-pin-hit) / 2);
+    left: calc(var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
+    margin: 0;
+    max-width: min(var(--jp-readout-max-width), var(--jp-pin-room, var(--jp-readout-max-width)));
+    width: max-content;
+    font-size: var(--text-supporting-size);
+    line-height: var(--text-supporting-leading);
+    font-weight: 400;
+    text-align: left;
+    color: var(--jp-text-2);
+  }
+
+  .jp-pin[data-flip="true"] .jp-pin-line {
+    left: auto;
+    right: calc(var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
+    text-align: right;
+  }
+
+  .jp-pin-line[hidden] {
+    display: none;
   }
 
   .jp-gb-panel {
@@ -738,5 +845,21 @@
 
   .jp-gb-ledger-line {
     color: var(--jp-text-2);
+  }
+
+  /* Keyboard compact (DESIGN 6.14 Keyboard, 1.9.0): while the keyboard
+   * is up the panel condenses so the pin stays in view while typing. */
+  .jp-gb[data-kb="true"] .jp-gb-panel {
+    gap: var(--spacing-2);
+  }
+
+  .jp-gb[data-kb="true"] .jp-gb-prompt--name {
+    font-size: var(--text-large-size);
+    line-height: var(--text-large-leading);
+    letter-spacing: normal;
+  }
+
+  .jp-gb[data-kb="true"] .jp-gb-seed {
+    display: none;
   }
 }

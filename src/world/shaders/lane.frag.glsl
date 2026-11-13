@@ -25,7 +25,7 @@ uniform float uLightMix;      // 0 outgoing mode, 1 incoming mode // lit-ok: sha
 uniform float uLightRadius;   // scene gradient light radius // lit-ok: shader constant
 uniform float uLightGain;     // scene gradient light gain // lit-ok: shader constant
 uniform vec3 uGbColor;        // guestbook letter lane color: signalHot, ink on paper // lit-ok: shader constant
-uniform vec4 uWordTint[WORD_SLOTS]; // server word lanes: sRGB color, opacity per pool slot (DESIGN 6.15) // lit-ok: shader constant
+uniform vec4 uWordTint[WORD_SLOTS]; // server node lanes: sRGB color, opacity per pool slot (DESIGN 6.15) // lit-ok: shader constant
 uniform vec4 uGbDimBox;       // guestbook contrast box, buffer px, x0 y0 x1 y1 // lit-ok: shader constant
 uniform float uGbDim;         // dim amount behind the panel, 0 off // lit-ok: shader constant
 uniform float uGbDimFeather;  // feather outside the box, buffer px // lit-ok: shader constant
@@ -124,7 +124,7 @@ void main() {
     a = mix(a, 1.0, on); // lit-ok: shader constant
   }
 
-  if (vGb > 1.5) {                              // server word lanes: alpha 2 plus slot // lit-ok: shader constant
+  if (vGb > 1.5) {                              // server node lanes: alpha 2 plus slot // lit-ok: shader constant
     vec4 tint = uWordTint[int(vGb - 2.0 + 0.5)]; // lit-ok: shader constant
     col = mix(col, tint.rgb, tint.a); // lit-ok: shader constant
     a = mix(a, max(a, vU), tint.a); // lit-ok: shader constant

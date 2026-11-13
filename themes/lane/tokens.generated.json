@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.8.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -364,36 +364,28 @@
         "sweepPeriodSec": 6,
         "peakAlpha": 1
       },
-      "words": [
-        "Go TUI",
-        "Ollama",
-        "Tailscale",
-        "Docker",
-        "Open WebUI",
-        "WSL2 Ubuntu",
-        "Windows 11",
-        "RTX 3070 Ti",
-        "Smithtown, NY"
-      ],
-      "wordSize": 0.22,
       "wordDrift": [
         -1,
         0.5,
         1
       ],
-      "wordPool": 4,
       "wordSpawnOffsetZ": 0.2,
-      "wordColorStops": [
-        0,
-        0.4,
-        1
-      ],
-      "wordFadeFrom": 0.55,
-      "reducedWordAt": [
-        0.2,
-        0.5,
-        0.8
-      ],
+      "nodes": {
+        "pool": 4,
+        "count": [
+          3,
+          6
+        ],
+        "radius": 0.035,
+        "segments": 16,
+        "spreadFrac": 0.22,
+        "minGap": 0.12,
+        "restAt": [
+          0.2,
+          0.5,
+          0.8
+        ]
+      },
       "fog": [
         7,
         30
@@ -1004,30 +996,43 @@
       "radiusFrac": 0.6,
       "pushFrac": 0.12,
       "depthFrac": 0.07,
-      "residual": 0.4
+      "residual": 0.4,
+      "layoutScale": {
+        "server": 1,
+        "leaflink": 0,
+        "sidequests": 0,
+        "scatter": 0
+      }
     },
     "mark": {
-      "spacingFrac": 0.05,
-      "heightFrac": [
-        0.075,
-        0.095
-      ],
-      "wobbleFrac": 0.012,
-      "glyphFrac": 0.055,
-      "noiseFrac": 0.02,
       "bendPower": 2,
-      "settleRadiusFrac": [
-        0.05,
-        0.15
+      "colorPool": {
+        "dark": [
+          "signalHot",
+          "signal",
+          "inkTint",
+          "chalk",
+          "chalk2"
+        ],
+        "paper": [
+          "ink",
+          "signalDim",
+          "paper.text",
+          "paper.text2"
+        ]
+      }
+    },
+    "pin": {
+      "radiusPx": 6,
+      "gapPx": 8,
+      "hitPx": 44,
+      "linkLanes": 6,
+      "restRadiusFrac": [
+        0.06,
+        0.24
       ],
-      "settleScale": [
-        0.55,
-        0.85
-      ],
-      "glyphPx": [
-        14,
-        96
-      ]
+      "minGapFrac": 0.07,
+      "tries": 32
     },
     "shiftNdc": {
       "fine": [
@@ -1039,7 +1044,6 @@
         0.08
       ]
     },
-    "fitWidthFrac": 0.8,
     "dim": {
       "amount": 0.94,
       "padPx": 24,
