@@ -332,3 +332,19 @@ notes:
 - Finding, not fixed (out of scope): at 390px with a fine pointer (narrow desktop window) the keymap overflows; whoami and contact sit at x 402 to 607, off screen, so Contact and Leave a mark cannot be reached there. Phones (coarse) are fine.
 - Full gates 2026-11-13 (local Chromium config, run in parts after two container restarts): build, lint, theme:check, banned-scan dist PASS; Playwright 176 of 177 PASS. T-S02-5 (principal shift) fails, as on base (SwiftShader, recorded in the guestbook build notes). T-LL-3 (tap within 300ms) failed once in the long run and passed on rerun with its file (8/8). Logs: /tmp gate logs, not kept.
 - T-GB-4 failed once in the targeted run (letters 0 after a 3s wait on SwiftShader) and passed alone; timing, not logic.
+
+## QA round 2, 2026-11-13 (Justin's iPhone QA of the PR #11 preview)
+status: review (draft PR #11), needs Justin's approval for the DESIGN 1.9.0 / S05 1.5.0 design change
+agent: cloud thread "Fix guestbook after Nov 12 critique"
+commits: 9d3cfd5, 95433de, 92bdde5 and the round-2 spec commit (spec); 1044b9b, 6190790 and the round-2 code commit (code)
+tests:
+- Guestbook, server, chrome, travel files: 39 of 39 PASS (exit 0) after the last code change. T-GB-10 alone 8 of 8 PASS.
+- Full Playwright run on 6190790: 175 of 178 PASS, 1 skipped. T-S02-5 (principal shift) fails as on base (SwiftShader). T-GB-10 failed there and was fixed after (below).
+receipts: qa/critique-2026-11-13/ (phone screenshots: typing, signed, closed, contact over the pin, server with two pins)
+notes:
+- Marks are pins (DESIGN 6.14 Pins): disc on a lane tip plus a one-line name, link lanes bend in; every stored signature is a pin on every scene, through whoami, contact, travel and reload; tap shows the line. Server node groups rest and stay (6.15). Panel compacts while the keyboard is up.
+- Bugs found by the new tests and fixed: lanefield laneTip read the zeroed initial layout (every pick was lane 0); server tips stack in height, so the pin gap is 3D; spots never re-picked after travel; spots picked before the readout laid out; idle sway re-picked pins at rest (at-rest recheck now only for kept-clear boxes, with pin.gapPx slack); labels of two pins could touch (screen check against earlier pins).
+- K-SRV-4 exception (S05 1.5.0): visitor names show on server as pins. Needs Justin.
+- Finding, not fixed: React hydration error #418 on every page load of the production build; present on astryx-polish-r2 too (checked in a worktree), so not from this PR.
+- Finding, still open: the keymap overflows at 390px (contact cut at the right edge) in the phone screenshots too.
+- Item 1 (desktop restart on name focus) still BLOCKED, see above.
