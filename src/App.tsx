@@ -68,6 +68,7 @@ import { C } from './copy';
 import Keymap from './chrome/Keymap';
 import Wordmark from './chrome/Wordmark';
 import Readout from './chrome/Readout';
+import PinsLayer from './chrome/PinsLayer';
 // Sheets load on demand: the BottomSheet closure is the largest
 // astryx cost not needed for first paint, and both sheets start
 // closed. A mount effect preloads them on idle so the first open
@@ -75,6 +76,7 @@ import Readout from './chrome/Readout';
 const WhoamiSheet = lazy(() => import('./chrome/WhoamiSheet'));
 const ContactSheet = lazy(() => import('./chrome/ContactSheet'));
 const GuestbookSheet = lazy(() => import('./chrome/GuestbookSheet'));
+
 import { entropySeed } from './motion/entropy';
 
 // Polish item 5: read ?seed before the router's first pushState drops
@@ -404,6 +406,9 @@ export default function App(props: AppProps): JSX.Element {
             <div role="img" aria-label={alt} />
           )}
         </main>
+        {/* Pins (DESIGN 6.14, 1.9.0): every stored signature, on every
+            scene, above the field and below every sheet. */}
+        <PinsLayer field={wired?.field ?? null} />
         <Keymap
           scene={scene}
           sheet={sheet}

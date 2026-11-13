@@ -7,6 +7,10 @@
 import { T } from '../tokens.generated';
 import { safeStorage } from './safeStorage';
 
+// Fired on window after a signature is stored, so the pins layer
+// (DESIGN 6.14 Pins) redraws from the ledger.
+export const SIGNATURES_EVENT = 'jp:signatures';
+
 export interface Signature {
   name: string;
   line: string;
@@ -53,5 +57,6 @@ export function makeSignature(name: string, line: string, seed: number): Signatu
 export async function storeSignature(sig: Signature): Promise<StoreResult> {
   const list = [sig, ...readSignatures()].slice(0, T.guestbook.ledgerMax);
   const ok = safeStorage.set(T.guestbook.storageKey, JSON.stringify(list));
+  window.dispatchEvent(new Event(SIGNATURES_EVENT));
   return { ok, where: 'browser' };
 }

@@ -1,16 +1,17 @@
 // Guestbook director (DESIGN 6.14). Drives the lane field while the
-// guestbook sheet is open: the camera dolly, the 3D part, one lane per
-// typed character bending toward the camera, the lock-in, and the
-// pull-back. Everything here is motion of the existing field through
-// field.guestbook (same mesh, same draw call, same WebGL context).
+// guestbook sheet is open: the camera dolly, the 3D part, the signing pin
+// (DESIGN 6.14 Pins, 1.9.0: a disc on a lane tip with the name as one
+// straight label, linked into the lines), the lock-in, and the
+// pull-back that moves the pin to its rest spot. Everything here is
+// motion of the existing field through field.guestbook (same mesh,
+// same draw call, same WebGL context) plus one DOM pin.
 //
 // Entropy: two fresh seeds per sign, both from freshSeed (entropy.ts,
 // crypto.getRandomValues, or hash32 of the session seed under ?seed).
-//   open seed: part heights (shader, uGbSeed), camera yaw and rise,
-//              baseline wobble, letter heights while typing, noise.
-//   sign seed: lock-in heights, settle offset and scale, pull-back
-//              drift, the mark color from guestbook.mark.colorPool
-//              (1.8.0), and the hex in the seed readout.
+//   open seed: part heights (shader, uGbSeed), camera yaw and rise.
+//   sign seed: the pin's rest spot (pins.ts), the label's resolve
+//              noise, pull-back drift, the mark color from
+//              guestbook.mark.colorPool (1.8.0), and the readout hex.
 // Each value is hash32(seed, PARAM, index), so a seed fully decides it.
 //
 // Curves: the two Lusion beziers only (T.guestbook.easeMain, easeSoft).
@@ -19,7 +20,8 @@ import type { Lanefield } from '../world/types';
 import { cubicBezier } from '../world/tween';
 import { currentVariant } from '../world/camera';
 import { freshSeed, hash32 } from './entropy';
-import { markPoolHex, type MarkRegime } from './markPool';
+import { markPoolHex } from './markPool';
+import { placePin, pushLinks, regimeNow, setHandoff, spotNear, type PinSpot, type Vec3 } from './pins';
 import { parsePath, SCENE_LAYOUT } from '../router';
 
 const easeMain = cubicBezier(...T.guestbook.easeMain);
@@ -30,19 +32,14 @@ const UINT32 = 4294967296;
 const DEG = Math.PI / 180;
 const NOISE_GLYPHS = '0123456789ABCDEF';
 
-// Parameter ids for hash32(seed, PARAM, index).
+
+// Parameter ids for hash32(seed, PARAM, index). 9 and 10 are the pin's
+// rest spot candidates (pins.ts PIN_PARAM); the retired letter ids
+// (3 to 7, 11) stay unused so replayed seeds keep their meaning.
 const P = {
   yaw: 1,
   rise: 2,
-  wobblePhase: 3,
-  wobbleFreq: 4,
-  wobbleJitter: 5,
-  height: 6,
-  noise: 7,
   scramble: 8,
-  settleAngle: 9,
-  settleRadius: 10,
-  settleScale: 11,
   drift: 12,
   partSeed: 13,
   readout: 14,
@@ -54,10 +51,6 @@ function u(seed: number, param: number, index = 0): number {
 
 function s(seed: number, param: number, index = 0): number {
   return u(seed, param, index) * 2 - 1;
-}
-
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t;
 }
 
 class Tween {
@@ -88,20 +81,16 @@ class Tween {
   }
 }
 
-interface Letter {
-  char: string;
-  index: number;
-  lane: number;
-  x: Tween;
-  z: Tween;
-  h: Tween;
-  rise: Tween;
-  dying: boolean;
-  resolveAt: number;
-  span: HTMLSpanElement | null;
-}
-
 export type GuestbookPhase = 'closed' | 'open' | 'locking' | 'settled' | 'closing';
+
+export interface GuestbookPinDebug {
+  lane: number;
+  point: Vec3;
+  screen: [number, number];
+  label: string;
+  links: number[];
+  link: number;
+}
 
 export interface GuestbookDebug {
   phase: GuestbookPhase;
@@ -111,7 +100,8 @@ export interface GuestbookDebug {
   dolly: number;
   yawDeg: number;
   bands: [number, number, number];
-  letters: { char: string; lane: number; h: number; x: number; z: number }[];
+  // The signing pin (1.9.0), null without a field.
+  pin: GuestbookPinDebug | null;
   well: [number, number, number] | null;
   dim: number;
   dimBox: [number, number, number, number] | null;
@@ -162,11 +152,6 @@ function partScale(): number {
   return T.guestbook.part.layoutScale[SCENE_LAYOUT[parsePath(window.location.pathname)]];
 }
 
-// Regime of the scene under the sheet (travel.applyRegime sets it).
-function regimeNow(): MarkRegime {
-  return document.documentElement.dataset.regime === 'paper' ? 'paper' : 'dark';
-}
-
 function hexRgb(hex: string): [number, number, number] {
   const c = (i: number): number => parseInt(hex.slice(i, i + 2), 16) / 255;
   return [c(1), c(3), c(5)];
@@ -178,7 +163,7 @@ function hex8(n: number): string {
 
 export function createGuestbookDirector(
   field: Lanefield | null,
-  glyphLayer: HTMLElement | null,
+  pinLayer: HTMLElement | null,
   panelSrc: GuestbookPanelSource | null = null,
 ): GuestbookDirector {
   const g = T.guestbook;
@@ -191,7 +176,6 @@ export function createGuestbookDirector(
   let openSeed = 0;
   let signSeed: number | null = null;
   const signs: number[] = [];
-  let letters: Letter[] = [];
   let text = '';
   let readoutCb: ((hex: string) => void) | null = null;
   let lastReadout = '';
@@ -202,47 +186,56 @@ export function createGuestbookDirector(
 
   // Geometry at open.
   let well: [number, number, number] = [0, 0, 0];
-  let dist = 1;
-  let right: [number, number] = [1, 0];
-  let forward: [number, number] = [0, -1];
-  let spacing = 1;
-  let glyphWorld = 1;
-  let pxPerUnitIn = 1;
-  let targetPx: [number, number] = [0, 0];
-  let baseWell: [number, number, number] = [0, 0, 0];
-  let shiftTo: [number, number] = [0, 0];
-  let regionW = window.innerWidth;
-  let regionL = 0;
   let lastDimBox: [number, number, number, number] | null = null;
+  let spot: PinSpot | null = null;
+  let lastScreen: [number, number] = [NaN, NaN];
+  let lastLabel = '';
 
   const dolly = new Tween();
   const yaw = new Tween();
   const rise = new Tween();
   const bands = [new Tween(), new Tween(), new Tween()];
-  const shiftX = new Tween();
-  const shiftZ = new Tween();
-  const scale = new Tween(1);
-  const noise = new Tween();
   const shiftMix = new Tween();
   // The phone-frame shift eases when the free region changes.
   const frameX = new Tween();
   const frameY = new Tween();
   const dim = new Tween();
+  // Link lanes into the pin: 0 none, 1 tips exactly at the pin.
+  const link = new Tween();
+  // The pin's point, from its start spot to its rest spot.
+  const pinX = new Tween();
+  const pinY = new Tween();
+  const pinZ = new Tween();
   // Mark color (1.8.0): 0 is the regime default, 1 the pool color.
   const colorMix = new Tween();
   let markHex: string | null = null;
   let markRgb: [number, number, number] | null = null;
+  let shiftTo: [number, number] = [0, 0];
+  const tipNow: Vec3 = [0, 0, 0];
 
-  const tip: [number, number, number] = [0, 0, 0];
-  const glyphPos: [number, number, number] = [0, 0, 0];
+  // The signing pin's DOM: a disc and the label (DESIGN 6.14 Pins).
+  let pinEl: HTMLElement | null = null;
+  let labelEl: HTMLElement | null = null;
+
+  function makePin(): void {
+    if (!pinLayer || pinEl) return;
+    const el = document.createElement('div');
+    el.className = 'jp-pin jp-pin--signing';
+    const dot = document.createElement('span');
+    dot.className = 'jp-pin-dot';
+    const label = document.createElement('span');
+    label.className = 'jp-pin-label';
+    el.append(dot, label);
+    pinLayer.appendChild(el);
+    pinEl = el;
+    labelEl = label;
+  }
 
   // Canvas NDC that puts the well at the free region's center offset by
   // shiftNdc in that region's NDC (DESIGN 6.14 phone frame).
   function frameShift(): [number, number] {
     const [sx, sy] = g.shiftNdc[currentVariant()];
     const r = freeRegion(panelSrc);
-    regionW = r.width;
-    regionL = r.left;
     if (!field) return [sx, sy];
     const [vw, vh] = field.viewportCss();
     const px = r.left + (r.width / 2) * (1 + sx);
@@ -263,79 +256,65 @@ export function createGuestbookDirector(
     shiftTo = [frameX.value(t), frameY.value(t)];
   }
 
-  function measureWell(): void {
+  // The well and the signing pin's start spot: the lane tip nearest the
+  // scene camera's ground target.
+  function measureWell(t: number): void {
     if (!field || !gb) return;
-    updateFrame(nowMs(), true);
+    updateFrame(t, true);
+    measureSpot(t);
+  }
+
+  function measureSpot(t: number): void {
+    if (!gb) return;
     const frame = gb.restFrame();
     well = [...frame.target];
-    dist = Math.hypot(frame.pos[0] - well[0], frame.pos[1] - well[1], frame.pos[2] - well[2]) || 1;
-    right = frame.right;
-    forward = frame.forward;
-    // Fit: the dollied-in mark spans at most fitWidthFrac of the width.
-    const a = field.worldToScreen(well);
-    const b = field.worldToScreen([well[0] + right[0], well[1], well[2] + right[1]]);
-    const pxRest = Math.max(1, Math.hypot(b[0] - a[0], b[1] - a[1]));
-    pxPerUnitIn = reduced() ? pxRest : pxRest / (1 - g.camera.dollyIn);
-    targetPx = [a[0], a[1]];
-    baseWell = [...well];
-    fitSpacing(Array.from(text).length);
-  }
-
-  // Reduced motion: the camera does not move, so the scene's own
-  // framing stands (on fine server the target sits right of center).
-  // Slide the well along the target's screen row until n letters fit
-  // inside the viewport; the mark stays in the field, at rest.
-  function reframeStill(n: number): void {
-    if (!field) return;
-    const w = regionW;
-    const half = (n * spacing * pxPerUnitIn) / 2;
-    const margin = (w * (1 - g.fitWidthFrac)) / 2;
-    const x = Math.max(regionL + margin + half, Math.min(targetPx[0], regionL + w - margin - half));
-    const ground = x === targetPx[0] ? null : field.screenToGround(x, targetPx[1]);
-    well = ground ? [ground[0], baseWell[1], ground[1]] : [...baseWell];
-  }
-
-  // Letter spacing: the token spacing, shrunk so n letters fit
-  // fitWidthFrac of the viewport width at the dollied-in camera.
-  function fitSpacing(n: number): void {
-    const fitWorld = (regionW * g.fitWidthFrac) / pxPerUnitIn;
-    spacing = Math.min(dist * g.mark.spacingFrac, fitWorld / Math.max(1, n));
-    glyphWorld = Math.min(dist * g.mark.glyphFrac, spacing * 1.1);
-  }
-
-  function heightFor(seed: number, i: number): number {
-    const [lo, hi] = g.mark.heightFrac;
-    return dist * lerp(lo, hi, u(seed, P.height, i));
-  }
-
-  // Slot i of n on the baseline, ground coordinates, with seeded wobble.
-  function slot(i: number, n: number): [number, number] {
-    const along = (i - (n - 1) / 2) * spacing;
-    const phase0 = u(openSeed, P.wobblePhase) * Math.PI * 2;
-    const freq = lerp(0.35, 0.9, u(openSeed, P.wobbleFreq));
-    const wob = dist * g.mark.wobbleFrac * (Math.sin(phase0 + i * freq) + 0.5 * s(openSeed, P.wobbleJitter, i));
-    return [
-      well[0] + right[0] * along + forward[0] * wob,
-      well[2] + right[1] * along + forward[1] * wob,
-    ];
-  }
-
-  function relayout(t: number): void {
-    const all = letters.filter((l) => !l.dying);
-    const n = all.length;
-    all.forEach((l, i) => {
-      const [x, z] = slot(i, n);
-      l.x.go(t, x, dur(g.ms.letter), easeMain);
-      l.z.go(t, z, dur(g.ms.letter), easeMain);
-    });
-  }
-
-  function makeSpan(): HTMLSpanElement | null {
-    if (!glyphLayer) return null;
-    const span = document.createElement('span');
-    span.className = 'jp-gb-glyph';
-    glyphLayer.appendChild(span);
-    return span;
+    spot = spotNear(gb, well[0], well[2]);
+    // Reduced motion: the camera does not move, so the well may sit under
+    // the panel or the keyboard. Then the pin starts in the free region's
+    // center instead (below), so it is in view while typing.
+    if (reduced() && field && spot) {
+      const r = freeRegion(panelSrc);
+      const [x, y] = field.worldToScreen(spot.point);
+      const m = T.space.gutterPx.base;
+      if (x < r.left + m || x > r.left + r.width - m || y < r.top + m || y > r.top + r.height - m) {
+        // The lane tips can all sit out of view (on server they converge
+        // at the output point, low on a phone): put the pin in the plane
+        // through the well that faces the camera (its ground right and
+        // world up), under the region's center, and bend the nearest
+        // lanes into it. The screen map is linear to first order there.
+        const frame0 = gb.restFrame();
+        const rx = frame0.right[0];
+        const rz = frame0.right[1];
+        const s0 = field.worldToScreen(well);
+        const sr = field.worldToScreen([well[0] + rx, well[1], well[2] + rz]);
+        const su = field.worldToScreen([well[0], well[1] + 1, well[2]]);
+        const ax = sr[0] - s0[0];
+        const ay = sr[1] - s0[1];
+        const bx = su[0] - s0[0];
+        const by = su[1] - s0[1];
+        const det = ax * by - ay * bx;
+        if (Math.abs(det) > 1e-6) { // lit-ok: degenerate projection guard
+          const dx = r.left + r.width / 2 - s0[0];
+          const dy = r.top + r.height / 2 - s0[1];
+          const a = (dx * by - dy * bx) / det;
+          const b = (ax * dy - ay * dx) / det;
+          const point: Vec3 = [well[0] + rx * a, well[1] + b, well[2] + rz * a];
+          const links: number[] = [];
+          const ex = new Set<number>();
+          while (links.length < g.pin.linkLanes) {
+            const l = gb.nearestLane(point[0], point[2], ex);
+            if (l < 0) break;
+            links.push(l);
+            ex.add(l);
+          }
+          spot = { lane: -1, point, links };
+        }
+      }
+    }
+    const p = spot ? spot.point : well;
+    pinX.go(t, p[0], 0, easeMain);
+    pinY.go(t, p[1], 0, easeMain);
+    pinZ.go(t, p[2], 0, easeMain);
   }
 
   function setText(next: string): void {
@@ -343,45 +322,23 @@ export function createGuestbookDirector(
       text = next;
       return;
     }
-    const t = nowMs();
-    const chars = Array.from(next.slice(0, g.nameMaxChars));
-    const alive = letters.filter((l) => !l.dying);
-    // Keep the common prefix; retire the rest; add new letters.
-    let keep = 0;
-    while (keep < alive.length && keep < chars.length && alive[keep].char === chars[keep]) keep++;
-    for (let i = keep; i < alive.length; i++) {
-      alive[i].dying = true;
-      alive[i].rise.go(t, 0, dur(g.ms.letterOut), easeMain);
-    }
-    text = chars.join('');
-    fitSpacing(chars.length);
-    if (reduced()) reframeStill(chars.length);
-    const used = new Set(letters.map((l) => l.lane));
-    const n = chars.length;
-    for (let i = keep; i < n; i++) {
-      const [x, z] = slot(i, n);
-      const lane = chars[i] === ' ' || !gb ? -1 : gb.nearestLane(x, z, used);
-      if (lane >= 0) used.add(lane);
-      const l: Letter = {
-        char: chars[i],
-        index: i,
-        lane,
-        x: new Tween(x),
-        z: new Tween(z),
-        h: new Tween(heightFor(openSeed, i)),
-        rise: new Tween(0),
-        dying: false,
-        resolveAt: 0,
-        span: chars[i] === ' ' ? null : makeSpan(),
-      };
-      l.rise.go(t, 1, dur(g.ms.letter), easeMain);
-      letters.push(l);
-    }
-    letters.forEach((l) => {
-      if (!l.dying) l.index = letters.filter((m) => !m.dying).indexOf(l);
-    });
-    relayout(t);
+    text = Array.from(next.slice(0, g.nameMaxChars)).join('');
     kick();
+  }
+
+  // The label: the name as typed; after lock-in each character shows
+  // seeded hex noise until its turn, left to right (DESIGN 6.14 Lock in).
+  function labelText(t: number, step: number): string {
+    const chars = Array.from(text);
+    if (signSeed === null || reduced()) return chars.join('');
+    const n = Math.max(1, chars.length);
+    return chars
+      .map((ch, i) => {
+        if (ch === ' ') return ch;
+        const at = lockStart + (g.ms.lockIn * (i + 1)) / n;
+        return t < at ? NOISE_GLYPHS[hash32(signSeed as number, P.scramble, step * 64 + i) % NOISE_GLYPHS.length] : ch;
+      })
+      .join('');
   }
 
   function frame(): void {
@@ -397,6 +354,7 @@ export function createGuestbookDirector(
       gb.setDim(lastDimBox, dim.value(t));
     }
     // Camera and part.
+    const dist = gb.restFrame().distance;
     if (!reduced()) {
       gb.setCamera({
         center: well,
@@ -409,52 +367,33 @@ export function createGuestbookDirector(
     } else {
       gb.setCamera(null);
     }
-    const partRadius = dist * g.part.radiusFrac;
     const ps = partScale();
     gb.setPart({
       center: [well[0], well[2]],
-      radius: partRadius,
+      radius: dist * g.part.radiusFrac,
       push: dist * g.part.pushFrac * ps,
       depth: dist * g.part.depthFrac * ps,
       seedUnit: u(openSeed, P.partSeed),
       bands: [bands[0].value(t), bands[1].value(t), bands[2].value(t)],
     });
-    // Letters.
+    // The pin and its link lanes. While writing, the start spot follows
+    // its lane: if the lanes moved under it (the layouts arrived after a
+    // deep link opened the sheet, a resize), re-pick the nearest tip.
+    if (phase === 'open' && spot && spot.lane >= 0) {
+      gb.laneTip(spot.lane, tipNow);
+      const eps = 1e-4; // lit-ok: world units, below a pixel
+      if (Math.abs(tipNow[0] - spot.point[0]) + Math.abs(tipNow[1] - spot.point[1]) + Math.abs(tipNow[2] - spot.point[2]) > eps) {
+        measureSpot(t);
+      }
+    }
     const step = Math.floor(t / g.ms.noiseStep);
-    const amp = noise.value(t);
-    const sc = scale.value(t);
-    const sx = shiftX.value(t);
-    const sz = shiftZ.value(t);
+    const point: Vec3 = [pinX.value(t), pinY.value(t), pinZ.value(t)];
     const lanes: number[] = [];
     const offsets: number[] = [];
-    for (const l of letters) {
-      const r = l.rise.value(t);
-      if (l.lane < 0) continue;
-      gb.laneTip(l.lane, tip);
-      const n1 = amp * s(openSeed, P.noise, step * 64 + l.index);
-      const n2 = amp * 0.5 * s(openSeed, P.noise, step * 64 + l.index + 32);
-      const ox = (l.x.value(t) + sx + right[0] * n2 - tip[0]) * r;
-      const oz = (l.z.value(t) + sz + right[1] * n2 - tip[2]) * r;
-      const oy = (l.h.value(t) * sc + n1) * r;
-      if (r > 0) {
-        lanes.push(l.lane);
-        offsets.push(ox, oy, oz);
-      }
-      glyphPos[0] = tip[0] + ox;
-      glyphPos[1] = tip[1] + oy;
-      glyphPos[2] = tip[2] + oz;
-      placeGlyph(l, glyphPos, r, step);
-    }
+    if (spot) pushLinks(gb, spot.links, point, link.value(t), lanes, offsets);
     gb.writeLanes(lanes, new Float32Array(offsets));
     gb.setColor(markRgb, colorMix.value(t));
-    // Retire finished dying letters.
-    letters = letters.filter((l) => {
-      if (l.dying && l.rise.done(t)) {
-        l.span?.remove();
-        return false;
-      }
-      return true;
-    });
+    placeLive(point, t, step);
     // Seed readout: rolling until lock-in, then resolving digit by digit.
     if (readoutCb) {
       let hex: string;
@@ -475,24 +414,19 @@ export function createGuestbookDirector(
     if (phase === 'closing' && t >= closeAt) finishClose();
   }
 
-  function placeGlyph(l: Letter, p: [number, number, number], r: number, step: number): void {
-    const span = l.span;
-    if (!span || !field) return;
-    const a = field.worldToScreen(p);
-    const b = field.worldToScreen([p[0] + right[0] * glyphWorld, p[1], p[2] + right[1] * glyphWorld]);
-    const [lo, hi] = g.mark.glyphPx;
-    const size = Math.max(lo, Math.min(hi, Math.hypot(b[0] - a[0], b[1] - a[1])));
-    const k = (size / hi) * Math.max(r, 0);
-    let ch = l.char;
-    if (signSeed !== null && !reduced()) {
-      const t = nowMs();
-      if (t < l.resolveAt) ch = NOISE_GLYPHS[hash32(signSeed, P.scramble, step * 64 + l.index) % NOISE_GLYPHS.length];
-    }
-    if (span.textContent !== ch) span.textContent = ch;
-    const mix = colorMix.value(nowMs());
+  function placeLive(point: Vec3, t: number, step: number): void {
+    if (!field) return;
+    makePin();
+    if (!pinEl || !labelEl) return;
+    const label = labelText(t, step);
+    if (labelEl.textContent !== label) labelEl.textContent = label;
+    lastLabel = label;
+    const mix = colorMix.value(t);
     const color = markHex && mix > 0 ? `color-mix(in srgb, ${markHex} ${(mix * 100).toFixed(1)}%, var(--jp-accent))` : '';
-    if (span.style.color !== color) span.style.color = color;
-    span.style.transform = `translate3d(${a[0].toFixed(1)}px, ${a[1].toFixed(1)}px, 0) translate(-50%, -100%) scale(${k.toFixed(4)})`;
+    if (pinEl.style.color !== color) pinEl.style.color = color;
+    const [vw] = field.viewportCss();
+    const [x, y] = field.worldToScreen(point);
+    lastScreen = placePin(pinEl, x, y, vw);
   }
 
   function publish(t: number): void {
@@ -504,7 +438,16 @@ export function createGuestbookDirector(
       dolly: dolly.value(t),
       yawDeg: yaw.value(t) / DEG,
       bands: [bands[0].value(t), bands[1].value(t), bands[2].value(t)],
-      letters: letters.filter((l) => !l.dying).map((l) => ({ char: l.char, lane: l.lane, h: l.h.value(t), x: l.x.value(t), z: l.z.value(t) })),
+      pin: spot
+        ? {
+            lane: spot.lane,
+            point: [pinX.value(t), pinY.value(t), pinZ.value(t)],
+            screen: [...lastScreen],
+            label: lastLabel,
+            links: [...spot.links],
+            link: link.value(t),
+          }
+        : null,
       well: field ? [...well] : null,
       dim: dim.value(t),
       dimBox: lastDimBox,
@@ -533,7 +476,7 @@ export function createGuestbookDirector(
     openSeed = freshSeed('guestbook-open');
     signSeed = null;
     lastReadout = '';
-    measureWell();
+    measureWell(t);
     const yawTo = s(openSeed, P.yaw) * g.camera.yawDeg * DEG;
     const riseTo = s(openSeed, P.rise) * g.camera.riseFrac;
     dolly.go(t, g.camera.dollyIn, dur(T.motion.ms.travel), easeMain);
@@ -541,11 +484,9 @@ export function createGuestbookDirector(
     yaw.go(t, yawTo, dur(T.motion.ms.travel), easeMain);
     rise.go(t, riseTo, dur(T.motion.ms.travel), easeMain);
     bands.forEach((b, i) => b.go(t, 1, dur(T.motion.ms.travel), easeMain, dur(i * g.ms.bandStagger)));
-    shiftX.go(t, 0, dur(T.motion.ms.travel), easeMain);
-    shiftZ.go(t, 0, dur(T.motion.ms.travel), easeMain);
-    scale.go(t, 1, dur(T.motion.ms.travel), easeMain);
-    noise.go(t, reduced() ? 0 : dist * g.mark.noiseFrac, dur(T.motion.ms.travel), easeMain);
     dim.go(t, 1, dur(g.ms.panel), easeMain);
+    link.go(t, 0, 0, easeMain);
+    link.go(t, 1, dur(g.ms.letter), easeMain);
     // A fresh open (and sign again) starts from the default color.
     colorMix.go(t, 0, 0, easeMain);
     markHex = null;
@@ -570,15 +511,8 @@ export function createGuestbookDirector(
     setText,
     reframe(): void {
       if (phase === 'closed' || phase === 'closing') return;
-      if (phase !== 'open') {
-        kick();
-        return;
-      }
-      const n = Array.from(text).length;
-      updateFrame(nowMs(), false);
-      fitSpacing(n);
-      if (reduced()) reframeStill(n);
-      relayout(nowMs());
+      if (phase === 'open') updateFrame(nowMs(), false);
+      if (phase === 'open' && reduced()) measureSpot(nowMs());
       kick();
     },
     lock(): Promise<number> {
@@ -589,32 +523,19 @@ export function createGuestbookDirector(
       const seed = signSeed;
       lockStart = t;
       phase = 'locking';
-      const alive = letters.filter((l) => !l.dying);
-      const n = Math.max(1, alive.length);
-      alive.forEach((l, i) => {
-        l.h.go(t, heightFor(seed, i), dur(g.ms.lockIn), easeSoft);
-        l.resolveAt = t + (g.ms.lockIn * (i + 1)) / n;
-      });
-      noise.go(t, 0, dur(g.ms.lockIn), easeSoft);
       // Mark color (DESIGN 6.14, 1.8.0): the sign seed picks the pool color.
       markHex = markPoolHex(regimeNow(), seed);
       markRgb = hexRgb(markHex);
       colorMix.go(t, 1, dur(g.ms.lockIn), easeSoft);
       if (!reduced()) dolly.go(t, g.camera.dollyIn + g.camera.pushIn, g.ms.lockIn, easeSoft);
-      // Pull back to wide after the hold, and settle the mark.
+      // Pull back to wide after the hold. The pin holds where it stands;
+      // on close the pins layer glides it to its rest spot (pins.ts).
       const back = dur(g.ms.lockIn + g.ms.hold);
       const pull = dur(T.motion.ms.wordCadence);
-      const angle = u(seed, P.settleAngle) * Math.PI * 2;
-      const [r0, r1] = g.mark.settleRadiusFrac;
-      const radius = dist * g.part.radiusFrac * lerp(r0, r1, u(seed, P.settleRadius));
-      const [k0, k1] = g.mark.settleScale;
       if (!reduced()) {
         dolly.go(t, g.camera.pullBack, pull, easeSoft, back);
         yaw.go(t, yaw.to + s(seed, P.drift) * g.camera.driftYawDeg * DEG, pull, easeSoft, back);
       }
-      shiftX.go(t, Math.cos(angle) * radius, pull, easeSoft, back);
-      shiftZ.go(t, Math.sin(angle) * radius, pull, easeSoft, back);
-      scale.go(t, lerp(k0, k1, u(seed, P.settleScale)), pull, easeSoft, back);
       bands.forEach((b) => b.go(t, g.part.residual, pull, easeSoft, back));
       kick();
       const total = back + pull;
@@ -630,10 +551,6 @@ export function createGuestbookDirector(
     },
     again(): void {
       const t = nowMs();
-      for (const l of letters) {
-        l.dying = true;
-        l.rise.go(t, 0, dur(g.ms.letterOut), easeMain);
-      }
       text = '';
       phase = 'open';
       openFresh(t);
@@ -644,11 +561,8 @@ export function createGuestbookDirector(
       const t = nowMs();
       phase = 'closing';
       const d = dur(T.motion.ms.travel);
-      for (const tw of [dolly, yaw, rise, shiftX, shiftZ, noise, shiftMix, dim, ...bands]) tw.go(t, 0, d, easeMain);
-      for (const l of letters) {
-        l.dying = true;
-        l.rise.go(t, 0, d, easeMain);
-      }
+      for (const tw of [dolly, yaw, rise, shiftMix, dim, ...bands]) tw.go(t, 0, d, easeMain);
+      link.go(t, 0, dur(g.ms.letterOut), easeMain);
       closeAt = t + d;
       return new Promise((resolve) => {
         closeResolve = resolve;
@@ -669,11 +583,15 @@ export function createGuestbookDirector(
   };
 
   function finishClose(): void {
+    // Hand the signed pin to the pins layer where it stands.
+    if (signSeed !== null && spot) setHandoff(signSeed, [pinX.value(nowMs()), pinY.value(nowMs()), pinZ.value(nowMs())]);
+    signSeed = null;
     phase = 'closed';
     unsubscribe?.();
     unsubscribe = null;
-    for (const l of letters) l.span?.remove();
-    letters = [];
+    pinEl?.remove();
+    pinEl = null;
+    labelEl = null;
     text = '';
     if (gb) {
       gb.setCamera(null);

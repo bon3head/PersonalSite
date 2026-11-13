@@ -1,10 +1,10 @@
-// Server scene controller (S05 1.4.0, DESIGN 6.15). Nodes only: the // lit-ok: spec section reference
-// scene carries no words. Every wordCadence one seeded node group leaves
-// the horn; each node rides the tip of its own lane, which bends out of
-// the horn to carry it and draws it back as the group fades. Groups drift
-// from the focus toward the viewer and fade after nodes.fadeFrom; the
-// lane's bend and tint follow the group's opacity, so a lane is exactly
-// at rest when its group ends and never snaps.
+// Server scene controller (S05 1.5.0, DESIGN 6.15). Nodes only: the // lit-ok: spec section reference
+// scene carries no words. Three seeded node groups rest out of the horn
+// and stay (DESIGN 1.9.0: no spawn cadence, no fade with age); each node rides // lit-ok: spec version
+// the tip of its own lane, which bends out of the horn to carry it.
+// Groups fade in over motion.ms.fast when placed and out over the same
+// on pause, travel exit and guestbook open; the lane's bend and tint
+// follow the group's opacity, so a lane never snaps.
 // The group seed is hash32(sessionSeed, server-node, n) and decides the
 // node count, the offsets (seeded rejection, never crowded) and the
 // color (guestbook.mark.colorPool.dark, the same pool as the guestbook
@@ -43,12 +43,12 @@ export interface NodeGroupDebug {
 
 export interface ServerController extends SceneController {
   setReducedMotion(on: boolean): void;
-  // Guestbook open (S05 guestbook row): nodes fade out and none spawn.
+  // Guestbook open (S05 guestbook row): nodes fade out, back in on close.
   setHidden(on: boolean): void;
   dispose(): void;
-  /** Groups currently visible (animated actives plus reduced statics). */
+  /** Groups currently visible (the resting groups). */
   activeGroups(): NodeGroupDebug[];
-  /** Full spawn history, in order (collected over the test window). */
+  /** Every placement, in order (each rest placement appends its groups). */
   spawnedGroups(): NodeGroupDebug[];
   isPaused(): boolean;
   /** Every lit node with its lane (T-SRV-7). */ // lit-ok: spec section reference
@@ -83,7 +83,6 @@ type Rgb = [number, number, number];
 const S = T.world.server;
 const N = S.nodes;
 const DURATION_SEC = T.motion.ms.word / 1000; // lit-ok: ms to seconds
-const CADENCE_SEC = T.motion.ms.wordCadence / 1000; // lit-ok: ms to seconds
 const FAST_SEC = T.motion.ms.fast / 1000; // lit-ok: ms to seconds
 const NODES_PER_SLOT = N.count[1];
 const UINT32 = 4294967296; // lit-ok: 2^32, hash to unit
@@ -131,12 +130,6 @@ export function nodeGroup(seed: number): { count: number; color: string; offsets
   return { count: offsets.length, color: markPoolHex('dark', seed), offsets };
 }
 
-function opacityAt(t: number): number {
-  if (t <= N.fadeFrom) return 1;
-  const f = (t - N.fadeFrom) / (1 - N.fadeFrom);
-  return 1 - easePlain(f);
-}
-
 function positionAt(t: number, ySign: number, out: THREE.Vector3): THREE.Vector3 {
   const d = S.wordDrift;
   const f = S.focus;
@@ -177,9 +170,8 @@ export function createServerController(
   let hidden = false;
   let reduced = opts?.reducedMotion ?? false;
   let disposed = false;
-  let spawnCount = 0;
-  let accSec = CADENCE_SEC;
   let fadeStartSec: number | null = null;
+  let fadeInStartSec: number | null = null;
   const actives: ActiveGroup[] = [];
   const spawned: NodeGroupDebug[] = [];
   const tmpPos = new THREE.Vector3();
@@ -348,7 +340,7 @@ export function createServerController(
 
   // Pose one group at life t with an extra fade factor (pause, hide).
   function poseGroup(g: ActiveGroup, t: number, fade: number): void {
-    const op = opacityAt(t) * fade;
+    const op = fade;
     g.t = t;
     g.opacity = op;
     materials[g.slot].opacity = op;
@@ -392,25 +384,19 @@ export function createServerController(
     lanes.words.writeLanes(ids, offsets, slots); // reads ids.length lanes, so the whole scratch is safe
   }
 
-  function spawnGroup(): void {
-    if (paused || hidden || reduced || disposed) return;
-    const ySign = spawnCount % 2 === 0 ? 1 : -1;
-    const g = placeGroup(spawnCount, ySign, 0);
-    if (!g) return;
-    spawnCount += 1;
-    spawned.push(debugOf(g));
-    poseGroup(g, 0, 1);
-    writeLanes();
-  }
-
-  function placeReducedStatics(): void {
-    // Three groups at rest at nodes.reducedAt fractions of their drift
-    // path, with opacity and lane bend at those points (S05 motion).
-    const at = N.reducedAt;
+  // The three resting groups (S05 idle nodes), group n at restAt[n] of
+  // its drift path. fadeIn eases them in over motion.ms.fast; reduced
+  // motion places them at once.
+  function placeStatics(fadeIn: boolean): void {
+    const at = N.restAt;
     for (let i = 0; i < at.length; i++) {
       const g = placeGroup(i, i % 2 === 0 ? 1 : -1, at[i]);
-      if (g) poseGroup(g, at[i], 1);
+      if (g) {
+        spawned.push(debugOf(g));
+        poseGroup(g, at[i], fadeIn ? 0 : 1);
+      }
     }
+    fadeInStartSec = fadeIn ? field.now() : null;
     writeLanes();
     f.guestbook?.render();
   }
@@ -422,10 +408,11 @@ export function createServerController(
       lanes?.words.setTint(g.slot, g.rgb, 0);
     }
     actives.length = 0;
+    fadeInStartSec = null;
     lanes?.words.writeLanes([], new Float32Array(0), []);
   }
 
-  function onFrame(_tSec: number, dtSec: number): void {
+  function onFrame(): void {
     if (disposed) return;
     const now = field.now();
     if (fadeStartSec !== null) {
@@ -435,103 +422,73 @@ export function createServerController(
         fadeStartSec = null;
       } else {
         cameraAxes();
-        for (const g of actives) poseGroup(g, g.t, 1 - k);
+        for (const g of actives) poseGroup(g, g.t, Math.min(g.opacity, 1 - k));
         writeLanes();
       }
       return;
     }
-    if (reduced) return;
-    if (!paused && !hidden) {
-      accSec += dtSec;
-      if (accSec >= CADENCE_SEC) {
-        accSec -= CADENCE_SEC;
-        spawnGroup();
-      }
+    if (reduced || actives.length === 0) return;
+    let k = 1;
+    if (fadeInStartSec !== null) {
+      k = Math.min(1, (now - fadeInStartSec) / FAST_SEC);
+      if (k >= 1) fadeInStartSec = null;
     }
-    if (actives.length === 0) return;
+    // Re-pose every frame against the camera (idle yaw, parallax).
     cameraAxes();
-    for (let i = actives.length - 1; i >= 0; i--) {
-      const g = actives[i];
-      const t = (now - g.startSec) / DURATION_SEC;
-      if (t >= 1) {
-        for (const nd of g.nodes) nd.mesh.visible = false;
-        lanes?.words.setTint(g.slot, g.rgb, 0);
-        actives.splice(i, 1);
-        continue;
-      }
-      poseGroup(g, t, 1);
-    }
+    for (const g of actives) poseGroup(g, g.t, easePlain(k));
     writeLanes();
   }
 
   const off = field.onFrame(onFrame);
 
-  if (reduced) placeReducedStatics();
+  // Visible now: place the resting groups (fade in unless reduced).
+  function rest(): void {
+    fadeStartSec = null;
+    clearGroups();
+    placeStatics(!reduced);
+  }
+
+  // Hide: fade out (reduced motion has no loop to carry it: clear now).
+  function fadeOut(): void {
+    if (reduced) {
+      fadeStartSec = null;
+      clearGroups();
+      f.guestbook?.render();
+    } else if (actives.length > 0 && fadeStartSec === null) {
+      fadeStartSec = field.now();
+    }
+  }
+
+  rest();
 
   return {
     pause(): void {
       if (paused || disposed) return;
       paused = true;
-      // Reduced motion runs no loop to carry a fade: release now.
-      if (reduced) {
-        fadeStartSec = null;
-        clearGroups();
-        f.guestbook?.render();
-      } else if (actives.length > 0 && fadeStartSec === null) {
-        fadeStartSec = field.now();
-      }
+      fadeOut();
     },
     resume(): void {
       if (disposed) return;
       paused = false;
       if (hidden) return;
-      // A running fade finishes first (lanes never snap); the cadence
-      // restarts once it releases the nodes.
-      if (fadeStartSec !== null && !reduced) {
-        accSec = CADENCE_SEC;
-        return;
-      }
-      fadeStartSec = null;
-      clearGroups();
-      if (reduced) {
-        placeReducedStatics();
-      } else {
-        accSec = CADENCE_SEC;
-      }
+      rest();
     },
     setHidden(on: boolean): void {
       if (hidden === on || disposed) return;
       hidden = on;
       if (on) {
-        // Reduced motion runs no loop to carry a fade: clear and render now.
-        if (reduced) {
-          fadeStartSec = null;
-          clearGroups();
-          f.guestbook?.render();
-        } else if (actives.length > 0 && fadeStartSec === null) {
-          fadeStartSec = field.now();
-        }
+        fadeOut();
         return;
       }
-      if (paused) return;
-      if (fadeStartSec !== null && !reduced) {
-        accSec = CADENCE_SEC;
-        return;
-      }
-      fadeStartSec = null;
-      clearGroups();
-      if (reduced) placeReducedStatics();
-      else accSec = CADENCE_SEC;
+      if (!paused) rest();
     },
     setReducedMotion(on: boolean): void {
       if (reduced === on || disposed) return;
       reduced = on;
-      fadeStartSec = null;
-      clearGroups();
-      if (on && !hidden && !paused) {
-        placeReducedStatics();
-      } else if (!paused) {
-        accSec = CADENCE_SEC;
+      if (!hidden && !paused) rest();
+      else {
+        fadeStartSec = null;
+        clearGroups();
       }
     },
     dispose(): void {

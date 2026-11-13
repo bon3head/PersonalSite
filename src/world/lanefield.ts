@@ -1468,6 +1468,10 @@ export function createLanefield(
       },
       laneTip(lane: number, out: [number, number, number]): [number, number, number] {
         const tipK = T.world.segmentsPerLane;
+        // The worker's layouts replace the texture's data array on
+        // arrival, so read the texture's current array, never the
+        // zeroed one it was created with.
+        const layoutNow = (layoutTex.image as { data: Float32Array }).data;
         let sx = 0;
         let sy = 0;
         let sz = 0;
@@ -1479,12 +1483,12 @@ export function createLanefield(
           if (w <= 0) continue;
           const s0 = (lane * LANE_STRIDE + l * POINTS_PER_LAYOUT) * TEXEL_FLOATS;
           const s1 = s0 + tipK * TEXEL_FLOATS;
-          sx += w * layoutData[s0];
-          sy += w * layoutData[s0 + 1];
-          sz += w * layoutData[s0 + 2];
-          tx += w * layoutData[s1];
-          ty += w * layoutData[s1 + 1];
-          tz += w * layoutData[s1 + 2];
+          sx += w * layoutNow[s0];
+          sy += w * layoutNow[s0 + 1];
+          sz += w * layoutNow[s0 + 2];
+          tx += w * layoutNow[s1];
+          ty += w * layoutNow[s1 + 1];
+          tz += w * layoutNow[s1 + 2];
         }
         const len = 1 + (hash11(lane * 0.013 + 7) - 0.5) * 2 * variance.lengthVariance; // lit-ok: shader lenScale constants
         out[0] = sx + (tx - sx) * len;

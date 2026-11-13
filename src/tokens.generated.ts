@@ -381,8 +381,7 @@ export const T = {
         "segments": 16,
         "spreadFrac": 0.22,
         "minGap": 0.12,
-        "fadeFrom": 0.55,
-        "reducedAt": [
+        "restAt": [
           0.2,
           0.5,
           0.8
@@ -1007,27 +1006,7 @@ export const T = {
       }
     },
     "mark": {
-      "spacingFrac": 0.05,
-      "heightFrac": [
-        0.075,
-        0.095
-      ],
-      "wobbleFrac": 0.012,
-      "glyphFrac": 0.055,
-      "noiseFrac": 0.02,
       "bendPower": 2,
-      "settleRadiusFrac": [
-        0.05,
-        0.15
-      ],
-      "settleScale": [
-        0.55,
-        0.85
-      ],
-      "glyphPx": [
-        14,
-        96
-      ],
       "colorPool": {
         "dark": [
           "signalHot",
@@ -1044,6 +1023,18 @@ export const T = {
         ]
       }
     },
+    "pin": {
+      "radiusPx": 6,
+      "gapPx": 8,
+      "hitPx": 44,
+      "linkLanes": 6,
+      "restRadiusFrac": [
+        0.06,
+        0.24
+      ],
+      "minGapFrac": 0.07,
+      "tries": 32
+    },
     "shiftNdc": {
       "fine": [
         0,
@@ -1054,7 +1045,6 @@ export const T = {
         0.08
       ]
     },
-    "fitWidthFrac": 0.8,
     "dim": {
       "amount": 0.94,
       "padPx": 24,

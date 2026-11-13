@@ -230,13 +230,14 @@ for (const vp of [
   });
 }
 
-// ---- T-SRV-4: nodes, no words (S05 1.4.0, DESIGN 6.15). Drive the
-// real controller against a stub field for 16s: groups spawn, each
-// count sits inside nodes.count, no two nodes of a group closer than
-// nodes.minGap, every color is a colorPool.dark entry, two seeds give
-// different groups, and the same seed gives the same group. The scene
-// holds no text mesh (the controller adds only node meshes).
-test('T-SRV-4: node groups, seeded and uncrowded, no words', async ({ page }) => {
+// S05 1.5.0 idle nodes (DESIGN 6.15, resting from 1.9.0): with a stub
+// field over 8s, the controller places three groups and they stay (the
+// same seeds, counts and offsets, nothing else spawned). Every count is
+// inside nodes.count, no two nodes of a group closer than nodes.minGap,
+// every color is a colorPool.dark entry, the groups differ, and the same
+// seed gives the same group. The scene holds no text mesh (the
+// controller adds only node meshes).
+test('T-SRV-4: three resting node groups, seeded and uncrowded, no words', async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(`${DEV}/?world=0`);
   const r = await page.evaluate(async () => {
@@ -257,24 +258,31 @@ test('T-SRV-4: node groups, seeded and uncrowded, no words', async ({ page }) =>
       },
     };
     const ctl = serverMod.createServerController(field as never);
-    await new Promise<void>((resolve) => {
-      const step = 0.05;
-      const timer = setInterval(() => {
-        clock += step;
-        for (const cb of [...cbs]) cb(clock, step);
-        if (clock >= 16) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 50);
-    });
+    const tick = (until: number): Promise<void> =>
+      new Promise<void>((resolve) => {
+        const step = 0.05;
+        const timer = setInterval(() => {
+          clock += step;
+          for (const cb of [...cbs]) cb(clock, step);
+          if (clock >= until) {
+            clearInterval(timer);
+            resolve();
+          }
+        }, 20);
+      });
+    await tick(1);
+    const early = ctl.activeGroups();
+    await tick(8);
+    const late = ctl.activeGroups();
     const groups = ctl.spawnedGroups();
     const again = groups.map((g) => ctl.groupFor(g.seed));
     ctl.dispose();
-    return { groups, again, added: [...new Set(added)] };
+    return { early, late, groups, again, added: [...new Set(added)] };
   });
   expect(r.added).toEqual(['Mesh']);
-  expect(r.groups.length).toBeGreaterThanOrEqual(8);
+  expect(r.groups.length).toBe(T.world.server.nodes.restAt.length);
+  expect(r.early).toEqual(r.groups);
+  expect(r.late).toEqual(r.groups);
   const dark = T.guestbook.mark.colorPool.dark.map((n) => n.split('.').reduce((o: unknown, k) => (o as Record<string, unknown>)[k], T.color) as string);
   const shapes = new Set<string>();
   r.groups.forEach((g, i) => {

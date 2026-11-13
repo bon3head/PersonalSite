@@ -100,10 +100,16 @@ interface GbDebug {
   phase: string;
   dolly: number;
   signSeed: number | null;
-  letters: { lane: number }[];
+  pin: { lane: number; label: string; links: number[]; point: number[]; screen: number[] } | null;
 }
 
-async function engineFlow(page: Page): Promise<{ rest: number; open: number; settled: number; letters: number; dbg: GbDebug }> {
+interface PinTyped {
+  label: string;
+  links: number;
+  onTip: boolean;
+}
+
+async function engineFlow(page: Page): Promise<{ rest: number; open: number; settled: number; typed: PinTyped; dbg: GbDebug }> {
   await page.goto(PREVIEW + '/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
   // Camera to well distance, read after two more frames have rendered
@@ -132,9 +138,15 @@ async function engineFlow(page: Page): Promise<{ rest: number; open: number; set
   const open = await dist();
   await page.keyboard.type('Ada L');
   await page.waitForTimeout(3000);
-  const letters = await page.evaluate(
-    () => (window as unknown as { __guestbook: GbDebug }).__guestbook.letters.filter((l) => l.lane >= 0).length,
-  );
+  // DESIGN 6.14 Pins (1.9.0): one pin on a lane tip, the name as one
+  // label, linkLanes lanes into it; no lane per character.
+  const typed = await page.evaluate(() => {
+    const g = (window as unknown as { __guestbook: GbDebug }).__guestbook;
+    const f = (window as unknown as { __lanefieldReady: { guestbook: { laneTip(l: number, o: number[]): number[] } } }).__lanefieldReady;
+    const tip = f.guestbook.laneTip(g.pin!.lane, [0, 0, 0]);
+    const onTip = tip.every((v, i) => Math.abs(v - g.pin!.point[i]) < 1e-3);
+    return { label: g.pin!.label, links: new Set(g.pin!.links).size, onTip };
+  });
   await page.keyboard.press('Enter');
   await page.keyboard.press('Enter');
   await page.waitForSelector('.jp-gb-done', { timeout: 60000 });
@@ -143,7 +155,7 @@ async function engineFlow(page: Page): Promise<{ rest: number; open: number; set
   expect(await page.evaluate(() => document.querySelectorAll('canvas').length)).toBe(1);
   expect(await page.evaluate(() => window.__lanefield!.laneCount)).toBe(6144);
   expect(await page.evaluate(() => window.__lanefield!.info().calls)).toBeLessThanOrEqual(12);
-  return { rest, open, settled, letters, dbg };
+  return { rest, open, settled, typed, dbg };
 }
 
 test('T-GB-4 camera dollies in on open and pulls back wide on sign', async ({ page }) => {
@@ -151,7 +163,7 @@ test('T-GB-4 camera dollies in on open and pulls back wide on sign', async ({ pa
   const r = await engineFlow(page);
   expect(r.open).toBeLessThan(r.rest * 0.9);
   expect(r.settled).toBeGreaterThan(r.rest);
-  expect(r.letters).toBe(4);
+  expect(r.typed).toEqual({ label: 'Ada L', links: T.guestbook.pin.linkLanes, onTip: true });
   expect(r.dbg.phase).toBe('settled');
 });
 
@@ -162,7 +174,7 @@ test('T-GB-5 reduced motion keeps the camera still and the mark', async ({ brows
   const r = await engineFlow(page);
   expect(Math.abs(r.open - r.rest)).toBeLessThan(0.01);
   expect(Math.abs(r.settled - r.rest)).toBeLessThan(0.01);
-  expect(r.letters).toBe(4);
+  expect(r.typed).toEqual({ label: 'Ada L', links: T.guestbook.pin.linkLanes, onTip: true });
   await context.close();
 });
 
@@ -228,6 +240,26 @@ test('T-GB-6 phone polish: nodes hide, dim follows the panel, keyboard lift, foc
   await page.focus('.jp-gb-input--line');
   await page.evaluate((kb) => (window as unknown as { __setKb: (px: number) => void }).__setKb(kb), KB);
   await page.waitForTimeout(1000);
+  // Compact (1.9.0): the name type drops to the line size, the seed
+  // readout hides, and the signing pin sits in view above the panel.
+  await page.keyboard.type('Ada');
+  await page.waitForTimeout(500);
+  const compact = await page.evaluate(() => {
+    const root = document.querySelector('.jp-gb') as HTMLElement;
+    const name = getComputedStyle(document.querySelector('.jp-gb-prompt--name')!).fontSize;
+    const line = getComputedStyle(document.querySelector('.jp-gb-prompt--line')!).fontSize;
+    const seed = getComputedStyle(document.querySelector('.jp-gb-seed')!).display;
+    const pin = (document.querySelector('.jp-pin--signing .jp-pin-dot') as HTMLElement).getBoundingClientRect();
+    const panelTop = document.querySelector('.jp-gb-panel')!.getBoundingClientRect().top;
+    return { kb: root.dataset.kb, name, line, seed, pinY: pin.top + pin.height / 2, pinX: pin.left + pin.width / 2, panelTop };
+  });
+  expect(compact.kb).toBe('true');
+  expect(compact.name).toBe(compact.line);
+  expect(compact.seed).toBe('none');
+  expect(compact.pinY).toBeGreaterThan(0);
+  expect(compact.pinY).toBeLessThan(compact.panelTop);
+  expect(compact.pinX).toBeGreaterThan(0);
+  expect(compact.pinX).toBeLessThan(390);
   const lifted = await page.evaluate(() => {
     const vvH = window.visualViewport!.height;
     const bottom = (s: string): number => document.querySelector(s)!.getBoundingClientRect().bottom;
@@ -260,9 +292,9 @@ test('T-GB-6 phone polish: nodes hide, dim follows the panel, keyboard lift, foc
 
 // DESIGN 6.14 Mark color (1.8.0), critique brief item 2: each sign takes
 // a color from guestbook.mark.colorPool by its sign seed. Two signs with
-// different seeds differ (color, or heights when the pool repeats); the
-// color is reproducible from the seed (markPoolHex is pure); it is a
-// pool entry for the regime; and the lane uniform and glyphs carry it.
+// different seeds get their own seeds (and so their own rest spots,
+// T-GB-10); the color is reproducible from the seed (markPoolHex is
+// pure); it is a pool entry for the regime; and the pin's label carries it.
 test('T-GB-7 every mark takes a seeded pool color', async ({ page }) => {
   test.setTimeout(300000);
   await page.goto(PREVIEW + '/', { waitUntil: 'domcontentloaded' });
@@ -271,7 +303,7 @@ test('T-GB-7 every mark takes a seeded pool color', async ({ page }) => {
     location.hash = '#guestbook';
   });
   await page.waitForSelector('.jp-gb[data-shown="true"]', { timeout: 60000 });
-  type Dbg = { signSeed: number | null; color: string | null; colorMix: number; letters: { h: number }[]; phase: string };
+  type Dbg = { signSeed: number | null; color: string | null; colorMix: number; phase: string };
   const signs: Dbg[] = [];
   for (let i = 0; i < 2; i++) {
     await page.waitForFunction(() => document.activeElement?.classList.contains('jp-gb-input--name'), null, { timeout: 30000 });
@@ -282,7 +314,7 @@ test('T-GB-7 every mark takes a seeded pool color', async ({ page }) => {
     await page.waitForFunction(() => (window as unknown as { __guestbook: Dbg }).__guestbook.colorMix >= 1, null, { timeout: 60000 });
     signs.push(await page.evaluate(() => JSON.parse(JSON.stringify((window as unknown as { __guestbook: Dbg }).__guestbook))));
     const glyph = await page.evaluate(() => {
-      const el = document.querySelector('.jp-gb-glyph') as HTMLElement | null;
+      const el = document.querySelector('.jp-pin--signing .jp-pin-label') as HTMLElement | null;
       return el ? getComputedStyle(el).color : '';
     });
     const hex = signs[i].color!;
@@ -295,9 +327,6 @@ test('T-GB-7 every mark takes a seeded pool color', async ({ page }) => {
   expect(signs[0].signSeed).not.toBe(signs[1].signSeed);
   const dark = T.guestbook.mark.colorPool.dark.map((n) => n.split('.').reduce((o: unknown, k) => (o as Record<string, unknown>)[k], T.color) as string);
   for (const x of signs) expect(dark).toContain(x.color);
-  const sameColor = signs[0].color === signs[1].color;
-  const sameHeights = signs[0].letters.every((l, i) => Math.abs(l.h - signs[1].letters[i].h) < 1e-6);
-  expect(sameColor && sameHeights).toBe(false);
   // Same seed, same color: the pure helper replays each sign.
   expect(markPoolAll('dark')).toEqual(dark);
   for (const x of signs) expect(markPoolHex('dark', x.signSeed!)).toBe(x.color);
@@ -384,3 +413,84 @@ for (const [w, h] of [[390, 844], [1440, 900]] as const) {
     await context.close();
   });
 }
+
+// DESIGN 6.14 Pins (1.9.0), Justin's Nov 13 QA: a signed mark is a pin
+// that stays. On a phone on LeafLink: sign with a line, close; the pin
+// shows with its name, sits on its lane tip, inside the clear part of
+// the screen (off the readout), and survives whoami, travel to
+// SideQuests and a reload; tapping it shows the line.
+test('T-GB-10 pins stay on every scene and open to their line', async ({ browser }) => {
+  test.setTimeout(600000);
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  type PinsDbg = { active: boolean; pins: { seed: number; lane: number; point: number[]; screen: number[] }[] };
+  const pins = (): Promise<PinsDbg | undefined> => page.evaluate(() => (window as unknown as { __pins?: PinsDbg }).__pins);
+  // One pin, at rest: on its lane tip, inside the gutter above the
+  // keymap, and clear of the readout.
+  const check = async (): Promise<void> => {
+    await page.waitForFunction(() => {
+      const p = (window as unknown as { __pins?: { active: boolean; pins: unknown[] } }).__pins;
+      return !!p && p.active && p.pins.length === 1;
+    }, null, { timeout: 120000 });
+    await page.waitForTimeout(1500);
+    const r = await page.evaluate(() => {
+      const p = (window as unknown as { __pins: PinsDbg }).__pins.pins[0];
+      const f = (window as unknown as { __lanefieldReady: { guestbook: { laneTip(l: number, o: number[]): number[] } } }).__lanefieldReady;
+      const tip = f.guestbook.laneTip(p.lane, [0, 0, 0]);
+      const el = document.querySelector('.jp-pins [data-pin]') as HTMLElement;
+      const dot = el.querySelector('.jp-pin-dot')!.getBoundingClientRect();
+      const label = el.querySelector('.jp-pin-label')!.getBoundingClientRect();
+      const slip = document.querySelector('.jp-readout-slip')?.getBoundingClientRect() ?? null;
+      const keymapTop = document.querySelector('.jp-keymap')!.getBoundingClientRect().top;
+      const overlap = (a: DOMRect, b: DOMRect | null): boolean =>
+        !!b && !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+      return {
+        onTip: tip.every((v, i) => Math.abs(v - p.point[i]) < 1e-3),
+        name: el.textContent,
+        visible: getComputedStyle(el).visibility === 'visible' && !el.hidden,
+        inView: dot.left >= 0 && label.right <= innerWidth && dot.top >= 0 && dot.bottom <= keymapTop,
+        clear: !overlap(dot, slip) && !overlap(label, slip),
+      };
+    });
+    expect(r).toEqual({ onTip: true, name: 'Ada', visible: true, inView: true, clear: true });
+  };
+  await page.goto(`${PREVIEW}/leaflink`, { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
+  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => {
+    location.hash = '#guestbook';
+  });
+  await page.waitForSelector('.jp-gb[data-shown="true"]', { timeout: 60000 });
+  await page.waitForFunction(() => document.activeElement?.classList.contains('jp-gb-input--name'), null, { timeout: 30000 });
+  await page.keyboard.type('Ada');
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('hi from the map');
+  await page.click('.jp-gb-pill--primary');
+  await page.waitForSelector('.jp-gb-done', { timeout: 120000 });
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('.jp-gb', { state: 'detached', timeout: 60000 });
+  await check();
+  // whoami over the scene: the pin is still there underneath.
+  await page.click('.jp-keymap button[aria-haspopup="dialog"] >> text=whoami');
+  await page.waitForTimeout(2000);
+  expect(await page.evaluate(() => {
+    const el = document.querySelector('.jp-pins [data-pin]') as HTMLElement | null;
+    return !!el && !el.hidden && getComputedStyle(el).visibility === 'visible';
+  })).toBe(true);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(1000);
+  // Tap: the line shows under the name.
+  await page.click('.jp-pins .jp-pin-hit');
+  await expect(page.locator('.jp-pins .jp-pin-line')).toHaveText('hi from the map');
+  await expect(page.locator('.jp-pins .jp-pin-hit')).toHaveAttribute('aria-expanded', 'true');
+  // Travel and reload: the pin stays.
+  await page.goto(`${PREVIEW}/sidequests`, { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
+  await check();
+  const seed = (await pins())!.pins[0].seed;
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
+  await check();
+  expect((await pins())!.pins[0].seed).toBe(seed);
+  await context.close();
+});
