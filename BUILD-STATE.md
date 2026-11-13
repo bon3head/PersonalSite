@@ -334,7 +334,7 @@ notes:
 - T-GB-4 failed once in the targeted run (letters 0 after a 3s wait on SwiftShader) and passed alone; timing, not logic.
 
 ## QA round 2, 2026-11-13 (Justin's iPhone QA of the PR #11 preview)
-status: review (draft PR #11), needs Justin's approval for the DESIGN 1.9.0 / S05 1.5.0 design change
+status: review (draft PR #11). Design change (DESIGN 1.9.0 pins, S05 1.5.0 visitor names on server) APPROVED by Justin 2026-11-13 ("that's perfect"). Copy (S09) unchanged by this round.
 agent: cloud thread "Fix guestbook after Nov 12 critique"
 commits: 9d3cfd5, 95433de, 92bdde5 and the round-2 spec commit (spec); 1044b9b, 6190790 and the round-2 code commit (code)
 tests:
