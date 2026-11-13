@@ -317,7 +317,7 @@ receipts:
 notes:
 
 ## Critique 2026-11-12 (guestbook/critique-2026-11-12-brief.md)
-status: in progress
+status: review (draft PR), item 1 BLOCKED
 agent: cloud thread "Fix guestbook after Nov 12 critique"
 commit: c237d1f (spec), d59c8db (code items 2 and 3), c8c762e (T-GB-8)
 tests:
@@ -330,4 +330,5 @@ notes:
 - Item 4 RESOLVED 2026-11-12 from Justin's iPhone screenshots (qa/critique-2026-11-12/justin-iphone-*.png): the bulge is the guestbook part on the flat ground scenes (one huge ring of pushed lanes), not page overflow; page height was always equal to the viewport. Fix: DESIGN 6.14 Part per scene, guestbook.part.layoutScale (server 1, others 0). T-GB-9 PASS at 390px and 1440px on leaflink, sidequests, server. Before/after: qa/critique-2026-11-12/before-leaflink-430-open.png, after-*-430-open.png.
 - C-SRV-ALT: Justin said "don't name the gpu" (2026-11-12); S09 1.7.0 reads "one per CUDA core on its GPU". T-SRV-4b now also checks RTX 3070. C-WHO-PLACE (Smithtown, NY) stays: whoami is out of scope per the brief.
 - Finding, not fixed (out of scope): at 390px with a fine pointer (narrow desktop window) the keymap overflows; whoami and contact sit at x 402 to 607, off screen, so Contact and Leave a mark cannot be reached there. Phones (coarse) are fine.
+- Full gates 2026-11-13 (local Chromium config, run in parts after two container restarts): build, lint, theme:check, banned-scan dist PASS; Playwright 176 of 177 PASS. T-S02-5 (principal shift) fails, as on base (SwiftShader, recorded in the guestbook build notes). T-LL-3 (tap within 300ms) failed once in the long run and passed on rerun with its file (8/8). Logs: /tmp gate logs, not kept.
 - T-GB-4 failed once in the targeted run (letters 0 after a 3s wait on SwiftShader) and passed alone; timing, not logic.
