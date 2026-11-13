@@ -1,0 +1,22 @@
+{
+  "schema": "cipher-goal/v1",
+  "id": "pixijs-3d-portfolio-fork-masterspec-synthesis-20261112",
+  "outcome": "PixiJS 3D portfolio fork masterspec synthesis",
+  "verification": "test -f /home/hatch/workspace/personalsite-pixi3d-phase0/pixi3d-phase0/MASTERSPEC.md && git -C /home/hatch/workspace/personalsite-pixi3d-phase0 log --oneline -1 | grep -q MASTERSPEC",
+  "constraints": [],
+  "boundaries": [],
+  "stop_when": "",
+  "subgoals": [],
+  "gates": [],
+  "skip_reasons": [],
+  "status": "active",
+  "turns_used": 0,
+  "turn_budget": 200,
+  "weight": 1,
+  "declared_files": [],
+  "merge_order": null,
+  "integrity_mode": "development",
+  "turns": [],
+  "created_at": "2026-11-12T18:30:31-05:00",
+  "receipt_seq": null
+}
