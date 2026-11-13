@@ -136,6 +136,7 @@ async function engineFlow(page: Page): Promise<{ rest: number; open: number; set
   await page.waitForFunction(() => (window as unknown as { __guestbook?: GbDebug }).__guestbook?.phase === 'open', null, { timeout: 60000 });
   await page.waitForTimeout(1000);
   const open = await dist();
+  await page.waitForFunction(() => document.activeElement?.classList.contains('jp-gb-input--name'), null, { timeout: 30000 });
   await page.keyboard.type('Ada L');
   await page.waitForTimeout(3000);
   // DESIGN 6.14 Pins (1.9.0): one pin on a lane tip, the name as one
@@ -341,7 +342,7 @@ test('T-GB-7 every mark takes a seeded pool color', async ({ page }) => {
   const two = await page.evaluate(() => (window as unknown as { __pins: { pins: { seed: number; lane: number; point: number[] }[] } }).__pins.pins);
   expect(new Set(two.map((p) => p.seed))).toEqual(new Set(signs.map((x) => x.signSeed)));
   expect(two[0].lane).not.toBe(two[1].lane);
-  expect(Math.hypot(two[0].point[0] - two[1].point[0], two[0].point[2] - two[1].point[2])).toBeGreaterThan(0);
+  expect(Math.hypot(two[0].point[0] - two[1].point[0], two[0].point[1] - two[1].point[1], two[0].point[2] - two[1].point[2])).toBeGreaterThan(0);
 });
 
 // Critique brief item 5 (show the box): the "Leave a mark" entry is
@@ -446,6 +447,21 @@ test('T-GB-10 pins stay on every scene and open to their line', async ({ browser
     }, null, { timeout: 120000 });
     // Settled: the pin's screen point holds still for half a second (after
     // travel it rides its lane through the morph, then glides to its spot).
+    await page.waitForFunction(() => {
+      const p = (window as unknown as { __pins: PinsDbg }).__pins.pins[0];
+      const f = (window as unknown as { __lanefieldReady: { guestbook: { laneTip(l: number, o: number[]): number[] } } }).__lanefieldReady;
+      const tip = f.guestbook.laneTip(p.lane, [0, 0, 0]);
+      return tip.every((v, i) => Math.abs(v - p.point[i]) < 1e-3);
+    }, null, { timeout: 60000 });
+    // After travel the pin rides its lane through the morph, then the
+    // re-pick glides it into view: wait for it to arrive.
+    await page.waitForFunction(() => {
+      const el = document.querySelector('.jp-pins [data-pin] .jp-pin-dot');
+      if (!el) return false;
+      const d = el.getBoundingClientRect();
+      const k = document.querySelector('.jp-keymap')!.getBoundingClientRect().top;
+      return d.left >= 0 && d.right <= innerWidth && d.top >= 0 && d.bottom <= k;
+    }, null, { timeout: 60000 });
     let last = '';
     for (let i = 0; i < 60; i++) {
       await page.waitForTimeout(500);
@@ -479,7 +495,11 @@ test('T-GB-10 pins stay on every scene and open to their line', async ({ browser
       };
     }, [T.guestbook.pin.linkLanes, T.guestbook.pin.hitPx] as const);
     const { at, ...rest } = r;
-    expect(rest).toEqual({ links: true, hit: true, onTip: true, name: 'Ada', visible: true, inView: true, clear: true });
+    const rp = await page.evaluate(() => {
+      const p = (window as unknown as { __pins: { repicks: number; why: string } }).__pins;
+      return `repicks ${p.repicks}, last ${p.why}`;
+    });
+    expect(rest, rp).toEqual({ links: true, hit: true, onTip: true, name: 'Ada', visible: true, inView: true, clear: true });
     return at;
   };
   await page.goto(`${PREVIEW}/leaflink`, { waitUntil: 'domcontentloaded' });
@@ -523,6 +543,9 @@ test('T-GB-10 pins stay on every scene and open to their line', async ({ browser
   // In-app travel to SideQuests from the keymap: the pin stays.
   await page.click('.jp-keymap-item[data-scene="sidequests"]');
   await page.waitForURL('**/sidequests', { timeout: 60000 });
+  // Travel is over when the morph rests on the SideQuests layout (index 2,
+  // as tests/travel.spec.ts reads it).
+  await page.waitForFunction(() => (window.__lanefield?.weights() ?? [])[2] === 1, null, { timeout: 60000 });
   await check();
   const seed = (await pins())!.pins[0].seed;
   // Reload: same pin, same spot.

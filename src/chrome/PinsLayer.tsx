@@ -18,7 +18,9 @@ export interface PinsLayerProps {
 }
 
 export default function PinsLayer({ field }: PinsLayerProps): JSX.Element | null {
-  const [sigs, setSigs] = useState<Signature[]>(() => readSignatures());
+  // Read after mount: the prerendered HTML has no ledger, so the first
+  // client render must match it (hydration), then the pins arrive.
+  const [sigs, setSigs] = useState<Signature[]>([]);
   const [openAt, setOpenAt] = useState<string | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
   const ctlRef = useRef<PinsController | null>(null);
@@ -26,6 +28,7 @@ export default function PinsLayer({ field }: PinsLayerProps): JSX.Element | null
   // The ledger changes on sign (this tab) and in other tabs (storage).
   useEffect(() => {
     const reload = (): void => setSigs(readSignatures());
+    reload();
     const onStorage = (e: StorageEvent): void => {
       if (e.key === null || e.key === T.guestbook.storageKey) reload();
     };

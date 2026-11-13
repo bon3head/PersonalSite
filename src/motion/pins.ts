@@ -63,13 +63,14 @@ export function spotNear(gb: GuestbookHooks, x: number, z: number): PinSpot | nu
 }
 
 // Rest spots for seeds given newest first (DESIGN 6.14 Pins: rest spot).
-// accept(point, i) is the screen test for pin i; the first candidate
+// accept(point, i, earlier) is the screen test for pin i against the
+// spots already placed; the first candidate
 // that passes it and keeps the gap wins, else the first that passes it,
 // else the last candidate.
 export function pinSpots(
   gb: GuestbookHooks,
   seeds: readonly number[],
-  accept: (point: Vec3, index: number) => boolean = () => true,
+  accept: (point: Vec3, index: number, earlier: readonly Vec3[]) => boolean = () => true,
   blocked: ReadonlySet<number> = new Set(),
 ): PinSpot[] {
   const f = gb.restFrame();
@@ -94,12 +95,12 @@ export function pinSpots(
       const p: Vec3 = [tipTmp[0], tipTmp[1], tipTmp[2]];
       lane = l;
       point = p;
-      if (!accept(p, index)) continue;
+      if (!accept(p, index, out.map((o) => o.point))) continue;
       if (clearLane < 0) {
         clearLane = l;
         clearPoint = p;
       }
-      if (out.every((o) => Math.hypot(o.point[0] - p[0], o.point[2] - p[2]) >= gap)) {
+      if (out.every((o) => Math.hypot(o.point[0] - p[0], o.point[1] - p[1], o.point[2] - p[2]) >= gap)) {
         clearLane = l;
         clearPoint = p;
         break;
@@ -195,6 +196,9 @@ export interface PinDebug {
 export interface PinsDebug {
   active: boolean;
   link: number;
+  // Re-picks so far, and why the last one ran (frame, fit).
+  repicks: number;
+  why: string;
   pins: PinDebug[];
 }
 
@@ -223,6 +227,10 @@ export function createPinsLayer(field: Lanefield, list: HTMLElement): PinsLayer 
   let wroteLanes = false;
   let gutter: number = T.space.gutterPx.base;
   const glides = new Map<number, { from: Vec3; start: number }>();
+  // Whether each spot passed the accept test when it was picked.
+  let fit: boolean[] = [];
+  let repicks = 0;
+  let why = '';
   const pt: Vec3 = [0, 0, 0];
 
   const nowMs = (): number => field.now() * 1000; // lit-ok: seconds to ms
@@ -246,7 +254,10 @@ export function createPinsLayer(field: Lanefield, list: HTMLElement): PinsLayer 
       .filter((r) => r.width > 0 && r.height > 0);
   }
 
-  function accepter(): (point: Vec3, index: number) => boolean {
+  // loose: the at-rest recheck. It skips the edges (the idle sway moves a
+  // pin a few px) and shrinks the pin's box by pin.gapPx, so only a box
+  // that really lands on a pin (a readout laid out late) moves it.
+  function accepter(loose = false): (point: Vec3, index: number, earlier?: readonly Vec3[]) => boolean {
     const [vw, vh] = field.viewportCss();
     const m = gutter;
     const keymap = list.getBoundingClientRect().bottom;
@@ -254,18 +265,33 @@ export function createPinsLayer(field: Lanefield, list: HTMLElement): PinsLayer 
     // Labels are laid out (visibility hidden until placed), so widths are real.
     const items = list.querySelectorAll<HTMLElement>('[data-pin] .jp-pin-label');
     const half = PN.hitPx / 2;
-    return (point, index) => {
+    // The pin's box: disc plus name, label on the side that fits; tall is
+    // the hit box, short is what shows (disc and label line).
+    const box = (point: Vec3, index: number, tall: boolean): [number, number, number, number] => {
       const [x, y] = field.worldToScreen(point);
       const w = items[index]?.offsetWidth ?? 0;
-      // The pin's box: disc plus name, label on the side that fits.
       const right = x + PN.radiusPx + PN.gapPx + w;
       const flip = right > vw - m;
       const x0 = flip ? x - PN.radiusPx - PN.gapPx - w : x - PN.radiusPx;
       const x1 = flip ? x + PN.radiusPx : right;
-      const y0 = y - half;
-      const y1 = y + half;
+      const h = tall ? half : Math.max(PN.radiusPx, (items[index]?.offsetHeight ?? 0) / 2);
+      return [x0, y - h, x1, y + h];
+    };
+    return (point, index, earlier = []) => {
+      const [x0, y0, x1, y1] = box(point, index, true);
+      if (loose) {
+        const g = PN.gapPx;
+        return boxes.every((b) => x1 - g < b.left || x0 + g > b.right || y1 - g < b.top || y0 + g > b.bottom);
+      }
       if (x0 < m || x1 > vw - m || y0 < m || y1 > Math.min(vh, keymap) - m) return false;
-      return boxes.every((b) => x1 < b.left || x0 > b.right || y1 < b.top || y0 > b.bottom);
+      if (!boxes.every((b) => x1 < b.left || x0 > b.right || y1 < b.top || y0 > b.bottom)) return false;
+      // Off every earlier pin's visible box, by pin.gapPx.
+      const [s0, t0, s1, t1] = box(point, index, false);
+      const g = PN.gapPx;
+      return earlier.every((e, j) => {
+        const [e0, f0, e1, f1] = box(e, j, false);
+        return s1 + g < e0 || s0 - g > e1 || t1 + g < f0 || t0 - g > f1;
+      });
     };
   }
 
@@ -283,7 +309,9 @@ export function createPinsLayer(field: Lanefield, list: HTMLElement): PinsLayer 
     const before = new Map<number, Vec3>();
     spots.forEach((s, i) => before.set(seeds[i] ?? -1, [...s.point]));
     const prevLanes = spots.map((s) => s.links.join(','));
-    spots = pinSpots(gb, seeds, accepter(), nodeLanes());
+    const acc = accepter();
+    spots = pinSpots(gb, seeds, acc, nodeLanes());
+    fit = spots.map((s, i) => acc(s.point, i, spots.slice(0, i).map((o) => o.point)));
     // A pin that moved glides from where it was; link lanes that changed
     // ease in again, so nothing snaps.
     let relinked = false;
@@ -310,6 +338,8 @@ export function createPinsLayer(field: Lanefield, list: HTMLElement): PinsLayer 
   function publish(link: number, screens: [number, number][]): void {
     const dbg: PinsDebug = {
       active,
+      repicks,
+      why,
       link,
       pins: spots.map((s, i) => ({
         seed: seeds[i],
@@ -345,10 +375,22 @@ export function createPinsLayer(field: Lanefield, list: HTMLElement): PinsLayer 
     if (k !== key && (k === seen || reduced() || key === '')) {
       const first = key === '';
       key = k;
+      repicks++;
+      why = 'frame';
       recompute(t);
       if (first) glides.clear();
     }
     seen = k;
+    // At rest, a pin that fit when picked but no longer does (the readout
+    // laid out late on a deep link, a font swapped in) re-picks.
+    if (k === key && glides.size === 0 && fit.some(Boolean)) {
+      const acc = accepter(true);
+      if (spots.some((s, i) => fit[i] && !acc(s.point, i))) {
+        repicks++;
+        why = 'fit';
+        recompute(t);
+      }
+    }
     // The pin the sheet just signed glides from where it stood.
     if (handoff) {
       const i = seeds.indexOf(handoff.seed);
