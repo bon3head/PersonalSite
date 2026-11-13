@@ -330,6 +330,18 @@ test('T-GB-7 every mark takes a seeded pool color', async ({ page }) => {
   // Same seed, same color: the pure helper replays each sign.
   expect(markPoolAll('dark')).toEqual(dark);
   for (const x of signs) expect(markPoolHex('dark', x.signSeed!)).toBe(x.color);
+  // Both signatures stay as pins with their own spots.
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('.jp-gb', { state: 'detached', timeout: 60000 });
+  await page.waitForFunction(() => {
+    const p = (window as unknown as { __pins?: { active: boolean; pins: unknown[] } }).__pins;
+    return !!p && p.active && p.pins.length === 2;
+  }, null, { timeout: 120000 });
+  await page.waitForTimeout(1500);
+  const two = await page.evaluate(() => (window as unknown as { __pins: { pins: { seed: number; lane: number; point: number[] }[] } }).__pins.pins);
+  expect(new Set(two.map((p) => p.seed))).toEqual(new Set(signs.map((x) => x.signSeed)));
+  expect(two[0].lane).not.toBe(two[1].lane);
+  expect(Math.hypot(two[0].point[0] - two[1].point[0], two[0].point[2] - two[1].point[2])).toBeGreaterThan(0);
 });
 
 // Critique brief item 5 (show the box): the "Leave a mark" entry is
@@ -427,13 +439,21 @@ test('T-GB-10 pins stay on every scene and open to their line', async ({ browser
   const pins = (): Promise<PinsDbg | undefined> => page.evaluate(() => (window as unknown as { __pins?: PinsDbg }).__pins);
   // One pin, at rest: on its lane tip, inside the gutter above the
   // keymap, and clear of the readout.
-  const check = async (): Promise<void> => {
+  const check = async (): Promise<number[]> => {
     await page.waitForFunction(() => {
       const p = (window as unknown as { __pins?: { active: boolean; pins: unknown[] } }).__pins;
       return !!p && p.active && p.pins.length === 1;
     }, null, { timeout: 120000 });
-    await page.waitForTimeout(1500);
-    const r = await page.evaluate(() => {
+    // Settled: the pin's screen point holds still for half a second (after
+    // travel it rides its lane through the morph, then glides to its spot).
+    let last = '';
+    for (let i = 0; i < 60; i++) {
+      await page.waitForTimeout(500);
+      const now = await page.evaluate(() => JSON.stringify((window as unknown as { __pins: { pins: { lane: number; screen: number[] }[] } }).__pins.pins[0].screen.map((v) => Math.round(v))));
+      if (now === last) break;
+      last = now;
+    }
+    const r = await page.evaluate(([T_LINKS, T_HIT]) => {
       const p = (window as unknown as { __pins: PinsDbg }).__pins.pins[0];
       const f = (window as unknown as { __lanefieldReady: { guestbook: { laneTip(l: number, o: number[]): number[] } } }).__lanefieldReady;
       const tip = f.guestbook.laneTip(p.lane, [0, 0, 0]);
@@ -444,15 +464,23 @@ test('T-GB-10 pins stay on every scene and open to their line', async ({ browser
       const keymapTop = document.querySelector('.jp-keymap')!.getBoundingClientRect().top;
       const overlap = (a: DOMRect, b: DOMRect | null): boolean =>
         !!b && !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+      const words = (window as unknown as { __lanefieldReady: { words: { texel(l: number): number[] } } }).__lanefieldReady.words;
+      const hit = el.querySelector('.jp-pin-hit')!.getBoundingClientRect();
+      const pinsDbg = (window as unknown as { __pins: { pins: { links: number[] }[] } }).__pins.pins[0];
       return {
+        links: pinsDbg.links.length === T_LINKS && pinsDbg.links.every((l) => words.texel(l)[3] === 1),
+        hit: hit.width >= T_HIT && hit.height >= T_HIT,
         onTip: tip.every((v, i) => Math.abs(v - p.point[i]) < 1e-3),
-        name: el.textContent,
+        name: el.querySelector('.jp-pin-label')!.textContent,
         visible: getComputedStyle(el).visibility === 'visible' && !el.hidden,
         inView: dot.left >= 0 && label.right <= innerWidth && dot.top >= 0 && dot.bottom <= keymapTop,
         clear: !overlap(dot, slip) && !overlap(label, slip),
+        at: [p.lane, ...p.point],
       };
-    });
-    expect(r).toEqual({ onTip: true, name: 'Ada', visible: true, inView: true, clear: true });
+    }, [T.guestbook.pin.linkLanes, T.guestbook.pin.hitPx] as const);
+    const { at, ...rest } = r;
+    expect(rest).toEqual({ links: true, hit: true, onTip: true, name: 'Ada', visible: true, inView: true, clear: true });
+    return at;
   };
   await page.goto(`${PREVIEW}/leaflink`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
@@ -483,14 +511,29 @@ test('T-GB-10 pins stay on every scene and open to their line', async ({ browser
   await page.click('.jp-pins .jp-pin-hit');
   await expect(page.locator('.jp-pins .jp-pin-line')).toHaveText('hi from the map');
   await expect(page.locator('.jp-pins .jp-pin-hit')).toHaveAttribute('aria-expanded', 'true');
-  // Travel and reload: the pin stays.
-  await page.goto(`${PREVIEW}/sidequests`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
+  // Contact over the scene: the pin is still there underneath.
+  await page.click('.jp-keymap-item >> text=contact');
+  await page.waitForTimeout(2000);
+  expect(await page.evaluate(() => {
+    const el = document.querySelector('.jp-pins [data-pin]') as HTMLElement | null;
+    return !!el && !el.hidden && getComputedStyle(el).visibility === 'visible';
+  })).toBe(true);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(1000);
+  // In-app travel to SideQuests from the keymap: the pin stays.
+  await page.click('.jp-keymap-item[data-scene="sidequests"]');
+  await page.waitForURL('**/sidequests', { timeout: 60000 });
   await check();
   const seed = (await pins())!.pins[0].seed;
+  // Reload: same pin, same spot.
+  const before = await check();
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__lanefield?.ready, null, { timeout: 120000 });
-  await check();
+  const after = await check();
   expect((await pins())!.pins[0].seed).toBe(seed);
+  // Same spot: the same lane tip on the ground (the screen point sways
+  // with the idle camera, which pins follow by design).
+  expect(after[0]).toBe(before[0]);
+  for (let i = 1; i < 4; i++) expect(Math.abs(after[i] - before[i])).toBeLessThan(1e-3);
   await context.close();
 });

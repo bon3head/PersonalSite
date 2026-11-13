@@ -125,6 +125,8 @@ export interface LaneWordHooks {
   // Raw sRGB components (0 to 1) and opacity for one pool slot.
   setTint(slot: number, rgb: readonly [number, number, number], opacity: number): void;
   held(lane: number): boolean;
+  // A server node holds this lane (pins skip it, DESIGN 6.14 Pins, 1.9.0). // lit-ok: spec section reference
+  nodeHeld(lane: number): boolean;
   // Debug read of one lane's offset texel (T-SRV-7). // lit-ok: spec section reference
   texel(lane: number): [number, number, number, number];
 }

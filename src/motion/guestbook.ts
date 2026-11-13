@@ -21,7 +21,7 @@ import { cubicBezier } from '../world/tween';
 import { currentVariant } from '../world/camera';
 import { freshSeed, hash32 } from './entropy';
 import { markPoolHex } from './markPool';
-import { placePin, pushLinks, regimeNow, setHandoff, spotNear, type PinSpot, type Vec3 } from './pins';
+import { gutterPx, placePin, pushLinks, regimeNow, setHandoff, spotNear, type PinSpot, type Vec3 } from './pins';
 import { parsePath, SCENE_LAYOUT } from '../router';
 
 const easeMain = cubicBezier(...T.guestbook.easeMain);
@@ -212,6 +212,7 @@ export function createGuestbookDirector(
   let markRgb: [number, number, number] | null = null;
   let shiftTo: [number, number] = [0, 0];
   const tipNow: Vec3 = [0, 0, 0];
+  let gutter: number = T.space.gutterPx.base;
 
   // The signing pin's DOM: a disc and the label (DESIGN 6.14 Pins).
   let pinEl: HTMLElement | null = null;
@@ -260,6 +261,7 @@ export function createGuestbookDirector(
   // scene camera's ground target.
   function measureWell(t: number): void {
     if (!field || !gb) return;
+    gutter = gutterPx();
     updateFrame(t, true);
     measureSpot(t);
   }
@@ -275,13 +277,18 @@ export function createGuestbookDirector(
     if (reduced() && field && spot) {
       const r = freeRegion(panelSrc);
       const [x, y] = field.worldToScreen(spot.point);
-      const m = T.space.gutterPx.base;
+      const m = gutter;
       if (x < r.left + m || x > r.left + r.width - m || y < r.top + m || y > r.top + r.height - m) {
         // The lane tips can all sit out of view (on server they converge
-        // at the output point, low on a phone): put the pin in the plane
-        // through the well that faces the camera (its ground right and
-        // world up), under the region's center, and bend the nearest
-        // lanes into it. The screen map is linear to first order there.
+        // at the output point, low on a phone). Put the pin on the ground
+        // under the region's center; where no ground is under it (server),
+        // in the plane through the well that faces the camera (its ground
+        // right and world up), where the screen map is linear to first
+        // order. The nearest lanes bend into it.
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const ground = field.screenToGround(cx, cy);
+        let point: Vec3 | null = ground ? [ground[0], well[1], ground[1]] : null;
         const frame0 = gb.restFrame();
         const rx = frame0.right[0];
         const rz = frame0.right[1];
@@ -293,12 +300,14 @@ export function createGuestbookDirector(
         const bx = su[0] - s0[0];
         const by = su[1] - s0[1];
         const det = ax * by - ay * bx;
-        if (Math.abs(det) > 1e-6) { // lit-ok: degenerate projection guard
-          const dx = r.left + r.width / 2 - s0[0];
-          const dy = r.top + r.height / 2 - s0[1];
+        if (!point && Math.abs(det) > 1e-6) { // lit-ok: degenerate projection guard
+          const dx = cx - s0[0];
+          const dy = cy - s0[1];
           const a = (dx * by - dy * bx) / det;
           const b = (ax * dy - ay * dx) / det;
-          const point: Vec3 = [well[0] + rx * a, well[1] + b, well[2] + rz * a];
+          point = [well[0] + rx * a, well[1] + b, well[2] + rz * a];
+        }
+        if (point) {
           const links: number[] = [];
           const ex = new Set<number>();
           while (links.length < g.pin.linkLanes) {
@@ -426,7 +435,7 @@ export function createGuestbookDirector(
     if (pinEl.style.color !== color) pinEl.style.color = color;
     const [vw] = field.viewportCss();
     const [x, y] = field.worldToScreen(point);
-    lastScreen = placePin(pinEl, x, y, vw);
+    lastScreen = placePin(pinEl, x, y, vw, gutter);
   }
 
   function publish(t: number): void {

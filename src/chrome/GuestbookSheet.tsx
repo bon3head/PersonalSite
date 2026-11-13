@@ -69,7 +69,7 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
       }
       // Compact (DESIGN 6.14 Keyboard, 1.9.0): while the keyboard is up
       // the panel condenses so the pin stays in view while typing.
-      const kb = covered > 0 ? 'true' : 'false';
+      const kb = lift > 0 ? 'true' : 'false';
       if (root.dataset.kb !== kb) root.dataset.kb = kb;
       directorRef.current?.reframe();
     };

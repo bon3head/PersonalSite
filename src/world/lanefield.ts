@@ -1576,6 +1576,9 @@ export function createLanefield(
       held(lane: number): boolean {
         return gbWritten.has(lane);
       },
+      nodeHeld(lane: number): boolean {
+        return wordWritten.has(lane);
+      },
       texel(lane: number): [number, number, number, number] {
         const b = lane * TEXEL_FLOATS;
         return [gbData[b], gbData[b + 1], gbData[b + 2], gbData[b + 3]]; // lit-ok: texel channels

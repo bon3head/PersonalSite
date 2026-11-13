@@ -16,7 +16,6 @@ import * as THREE from 'three';
 import { T } from '../tokens.generated';
 import type { Lanefield } from './types';
 import type { SceneController } from '../travel';
-import { easePlain } from './tween';
 import { currentVariant } from './camera';
 import { hash32, serverNodeSeed } from '../motion/entropy';
 import { markPoolHex } from '../motion/markPool';
@@ -433,16 +432,25 @@ export function createServerController(
       k = Math.min(1, (now - fadeInStartSec) / FAST_SEC);
       if (k >= 1) fadeInStartSec = null;
     }
-    // Re-pose every frame against the camera (idle yaw, parallax).
+    // Re-pose every frame against the camera (idle yaw, parallax). The
+    // fade in is linear like the fade out, so a reversal never jumps.
     cameraAxes();
-    for (const g of actives) poseGroup(g, g.t, easePlain(k));
+    for (const g of actives) poseGroup(g, g.t, k);
     writeLanes();
   }
 
   const off = field.onFrame(onFrame);
 
-  // Visible now: place the resting groups (fade in unless reduced).
+  // Visible now: place the resting groups (fade in unless reduced). A
+  // fade out still running turns around from where it is, so the lanes
+  // never jump (K-SRV-7). // lit-ok: spec rule id
   function rest(): void {
+    if (fadeStartSec !== null && !reduced && actives.length > 0) {
+      const op = actives[0].opacity;
+      fadeStartSec = null;
+      fadeInStartSec = field.now() - op * FAST_SEC;
+      return;
+    }
     fadeStartSec = null;
     clearGroups();
     placeStatics(!reduced);

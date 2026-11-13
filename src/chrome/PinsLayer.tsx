@@ -1,9 +1,10 @@
 // PinsLayer (DESIGN 6.14 Pins, 1.9.0). Every signature stored in this
 // browser is a pin on every scene: a disc on a lane tip with the name
-// beside it. Each pin is a button; activating it shows the signature's
-// line under the name. The layer sits above the field and below every
-// sheet, and hides only while the guestbook sheet is open. Positions,
-// colors and link lanes come from the controller in src/motion/pins.ts.
+// beside it. Each pin is a button whose text is the name; activating it
+// shows the signature's line under it (aria-expanded, aria-controls).
+// The layer sits above the field and below every sheet, and hides only
+// while the guestbook sheet is open. Positions, colors and link lanes
+// come from the controller in src/motion/pins.ts.
 import type { JSX } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { C } from '../copy';
@@ -57,19 +58,25 @@ export default function PinsLayer({ field }: PinsLayerProps): JSX.Element | null
     <ul className="jp-pins" ref={listRef} aria-label={C['C-GB-LEDGER']}>
       {sigs.map((sig) => {
         const id = `${sig.at}-${sig.seed}`;
+        const lineId = `jp-pin-line-${sig.seed.toString(16)}`;
         const expanded = openAt === id;
         return (
-          <li key={id} className="jp-pin" data-pin hidden>
+          <li key={id} className="jp-pin" data-pin>
             <span className="jp-pin-dot" aria-hidden="true" />
             <button
               type="button"
               className="jp-pin-hit"
               aria-expanded={sig.line ? expanded : undefined}
+              aria-controls={sig.line ? lineId : undefined}
               onClick={() => setOpenAt(expanded ? null : id)}
             >
               <span className="jp-pin-label">{sig.name}</span>
-              {sig.line && expanded && <span className="jp-pin-line">{sig.line}</span>}
             </button>
+            {sig.line && (
+              <p className="jp-pin-line" id={lineId} hidden={!expanded}>
+                {sig.line}
+              </p>
+            )}
           </li>
         );
       })}

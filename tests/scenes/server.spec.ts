@@ -272,17 +272,20 @@ test('T-SRV-4: three resting node groups, seeded and uncrowded, no words', async
       });
     await tick(1);
     const early = ctl.activeGroups();
-    await tick(8);
+    await tick(9);
     const late = ctl.activeGroups();
+    const ops = ctl.nodeLanes().map((n) => n.opacity);
     const groups = ctl.spawnedGroups();
     const again = groups.map((g) => ctl.groupFor(g.seed));
     ctl.dispose();
-    return { early, late, groups, again, added: [...new Set(added)] };
+    return { early, late, ops, groups, again, added: [...new Set(added)] };
   });
   expect(r.added).toEqual(['Mesh']);
   expect(r.groups.length).toBe(T.world.server.nodes.restAt.length);
   expect(r.early).toEqual(r.groups);
   expect(r.late).toEqual(r.groups);
+  expect(r.ops.length).toBeGreaterThan(0);
+  for (const o of r.ops) expect(o).toBe(1);
   const dark = T.guestbook.mark.colorPool.dark.map((n) => n.split('.').reduce((o: unknown, k) => (o as Record<string, unknown>)[k], T.color) as string);
   const shapes = new Set<string>();
   r.groups.forEach((g, i) => {

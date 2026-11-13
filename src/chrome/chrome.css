@@ -531,8 +531,10 @@
     will-change: transform;
   }
 
-  .jp-pin[hidden] {
-    display: none;
+  /* A layer pin is laid out but unseen until the controller places it
+   * (its label width is measured before it shows). */
+  .jp-pins .jp-pin:not([data-placed="true"]) {
+    visibility: hidden;
   }
 
   .jp-pin-dot {
@@ -614,12 +616,14 @@
     outline: var(--jp-gb-focus-rule) solid currentColor;
   }
 
-  /* The signature's line, under the name when the pin is open. */
+  /* The signature's line, under the name when the pin is open. It wraps
+   * inside the room the controller leaves on the label's side. */
   .jp-pin-line {
     position: absolute;
-    top: 100%;
-    left: calc(var(--jp-gb-pin-hit) / 2 + var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
-    max-width: var(--jp-readout-max-width);
+    top: calc(var(--jp-gb-pin-hit) / 2);
+    left: calc(var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
+    margin: 0;
+    max-width: min(var(--jp-readout-max-width), var(--jp-pin-room, var(--jp-readout-max-width)));
     width: max-content;
     font-size: var(--text-supporting-size);
     line-height: var(--text-supporting-leading);
@@ -630,8 +634,12 @@
 
   .jp-pin[data-flip="true"] .jp-pin-line {
     left: auto;
-    right: calc(var(--jp-gb-pin-hit) / 2 + var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
+    right: calc(var(--jp-gb-pin-radius) + var(--jp-gb-pin-gap));
     text-align: right;
+  }
+
+  .jp-pin-line[hidden] {
+    display: none;
   }
 
   .jp-gb-panel {

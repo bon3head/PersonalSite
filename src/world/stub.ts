@@ -214,6 +214,9 @@ export function createLanefield(
       held(): boolean {
         return false;
       },
+      nodeHeld(): boolean {
+        return false;
+      },
       texel(): [number, number, number, number] {
         return [0, 0, 0, 0];
       },
