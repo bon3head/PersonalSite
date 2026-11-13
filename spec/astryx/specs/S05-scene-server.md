@@ -85,7 +85,7 @@ S09 IDs: C-TITLE-SERVER, C-SRV-H1, C-SRV-P1, C-SRV-P2, C-SRV-P3, C-SRV-ALT. The 
 - K-SRV-1: any number, gauge, percentage, model name, "online", "live", or status shown in DOM or scene.
 - K-SRV-2: any lane pixel inside the readout box (contrast violation by construction).
 - K-SRV-3: the scene reads as a circuit board or as a "matrix rain" screensaver to a blind reviewer (S11 G-ANTI asks this question verbatim).
-- K-SRV-4: any word, stack name or other text drawn in the scene (1.4.0). Exception (1.5.0, needs Justin's approval): visitor guestbook pins (DESIGN 6.14 Pins) are DOM marks over the scene, not scene text; their names show on server as on every scene.
+- K-SRV-4: any word, stack name or other text drawn in the scene (1.4.0). Exception (1.5.0, approved by Justin 2026-11-13): visitor guestbook pins (DESIGN 6.14 Pins) are DOM marks over the scene, not scene text; their names show on server as on every scene.
 - K-SRV-7: a node that is not on its lane tip, a lane that jumps when its group fades, or a group that leaves or changes while the scene is idle (1.5.0).
 - K-SRV-5: pulses in a warp are not in lockstep (any of the 32 lanes of a warp out of phase).
 - K-SRV-6: frame p95 above 16.7ms on the reference phone (S11 G-PERF-DEVICE).
