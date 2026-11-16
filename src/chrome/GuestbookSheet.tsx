@@ -5,15 +5,33 @@
 // the field (src/motion/guestbook.ts); this panel moves in depth on
 // translateZ under perspective, never on opacity.
 //
-// Storage is browser-local only (Justin, 2026-11-10). storeSignature
-// (src/lib/guestbookStore) is the single hook, and the sheet says so.
+// Storage (DESIGN 6.14, 1.10.0): lock-in keeps the mark in this browser
+// at once, then publishes it; the done note says how that went. The
+// count control opens every shared mark in place of the ledger.
 import type { FormEvent, JSX, KeyboardEvent as ReactKeyboardEvent, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { C } from '../copy';
 import { T } from '../tokens.generated';
 import type { Lanefield } from '../world/types';
 import { createGuestbookDirector, type GuestbookDirector, type GuestbookPanelSource } from '../motion/guestbook';
-import { makeSignature, readSignatures, storeSignature, type Signature } from '../lib/guestbookStore';
+import {
+  makeSignature,
+  mergeMarks,
+  publishSignature,
+  readShared,
+  readSignatures,
+  storeSignature,
+  type PublishResult,
+  type SharedMarks,
+  type Signature,
+} from '../lib/guestbookStore';
+
+const NOTE: Record<PublishResult, 'C-GB-PUBLIC' | 'C-GB-HELD' | 'C-GB-LIMIT' | 'C-GB-OFFLINE'> = {
+  public: 'C-GB-PUBLIC',
+  held: 'C-GB-HELD',
+  limit: 'C-GB-LIMIT',
+  offline: 'C-GB-OFFLINE',
+};
 
 export interface GuestbookSheetProps {
   isOpen: boolean;
@@ -35,6 +53,11 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
   const [line, setLine] = useState('');
   const [seedHex, setSeedHex] = useState('');
   const [ledger, setLedger] = useState<Signature[]>([]);
+  const [shared, setShared] = useState<SharedMarks>({ count: 0, marks: [] });
+  const [listOpen, setListOpen] = useState(false);
+  const [note, setNote] = useState<PublishResult | null>(null);
+  const openedAt = useRef(0);
+  const trapRef = useRef<HTMLInputElement | null>(null);
   const glyphRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLFormElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
@@ -139,6 +162,10 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
     setName('');
     setLine('');
     setLedger(readSignatures());
+    setNote(null);
+    setListOpen(false);
+    openedAt.current = performance.now();
+    void readShared().then(setShared);
     document.documentElement.setAttribute('data-gb', 'open');
     director.open();
 
@@ -150,7 +177,7 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
   // motion has no loop, so this is its only render of the final box).
   useEffect(() => {
     directorRef.current?.reframe();
-  }, [stage, ledger, shown]);
+  }, [stage, ledger, shown, note, listOpen, shared]);
 
   // One frame after mount the panel moves from depth to 0.
   useEffect(() => {
@@ -217,15 +244,22 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
     }
     setStage('locking');
     const seed = await director.lock();
-    await storeSignature(makeSignature(name, line, seed));
+    const sig = makeSignature(name, line, seed);
+    await storeSignature(sig);
     setLedger(readSignatures());
+    setNote(null);
     setStage('done');
     setTimeout(() => doneRef.current?.focus(), 0);
+    // The shared copy never holds up the done stage (6.14 Storage).
+    const fillMs = performance.now() - openedAt.current;
+    void publishSignature(sig, { hp: trapRef.current?.value ?? '', fillMs }).then(setNote);
   }
 
   function again(): void {
     setName('');
     setLine('');
+    setNote(null);
+    openedAt.current = performance.now();
     setStage('write');
     directorRef.current?.again();
     setTimeout(() => nameRef.current?.focus(), 0);
@@ -250,6 +284,30 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
   }
 
   const locked = stage !== 'write';
+  const all = mergeMarks(ledger, shared.marks);
+  const countLabel = `${shared.count} ${shared.count === 1 ? C['C-GB-COUNT-ONE'] : C['C-GB-COUNT']}`;
+  const countControl =
+    shared.count > 0 ? (
+      <button
+        type="button"
+        className="jp-gb-count"
+        aria-expanded={listOpen}
+        aria-controls="jp-gb-all"
+        onClick={() => setListOpen((v) => !v)}
+      >
+        {countLabel}
+      </button>
+    ) : null;
+  const allList = listOpen && shared.count > 0 ? (
+    <ul className="jp-gb-ledger jp-gb-ledger--all" id="jp-gb-all" aria-label={C['C-GB-ALL']}>
+      {all.map((sig) => (
+        <li key={`${sig.at}-${sig.seed}`}>
+          <span className="jp-gb-ledger-name">{sig.name}</span>
+          {sig.line && <span className="jp-gb-ledger-line">{sig.line}</span>}
+        </li>
+      ))}
+    </ul>
+  ) : null;
 
   return (
     <div
@@ -304,6 +362,16 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
                 onChange={(e) => setLine(e.target.value)}
               />
             </div>
+            <input
+              ref={trapRef}
+              className="jp-gb-trap"
+              name="website"
+              defaultValue=""
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
+            {allList}
             <div className="jp-gb-row">
               <button
                 type="submit"
@@ -316,6 +384,7 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
               <span className="jp-gb-seed">
                 <span>{C['C-GB-SEED']}</span> <span className="jp-gb-seed-hex">{seedHex}</span>
               </span>
+              {countControl}
             </div>
           </>
         )}
@@ -324,15 +393,19 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
             <p className="jp-gb-done" role="status" tabIndex={-1} data-gb-focus ref={doneRef}>
               {C['C-GB-DONE']}
             </p>
-            <p className="jp-gb-note">{C['C-GB-LOCAL']}</p>
-            <ul className="jp-gb-ledger" aria-label={C['C-GB-LEDGER']}>
-              {ledger.map((sig) => (
-                <li key={`${sig.at}-${sig.seed}`}>
-                  <span className="jp-gb-ledger-name">{sig.name}</span>
-                  {sig.line && <span className="jp-gb-ledger-line">{sig.line}</span>}
-                </li>
-              ))}
-            </ul>
+            <p className="jp-gb-note" aria-live="polite">
+              {note ? C[NOTE[note]] : ''}
+            </p>
+            {allList ?? (
+              <ul className="jp-gb-ledger" aria-label={C['C-GB-LEDGER']}>
+                {ledger.map((sig) => (
+                  <li key={`${sig.at}-${sig.seed}`}>
+                    <span className="jp-gb-ledger-name">{sig.name}</span>
+                    {sig.line && <span className="jp-gb-ledger-line">{sig.line}</span>}
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="jp-gb-row">
               <button type="button" className="jp-gb-pill jp-gb-pill--primary" onClick={again}>
                 <span className="jp-gb-dot" aria-hidden="true" />
@@ -344,6 +417,7 @@ export default function GuestbookSheet(props: GuestbookSheetProps): JSX.Element 
               <span className="jp-gb-seed">
                 <span>{C['C-GB-SEED']}</span> <span className="jp-gb-seed-hex">{seedHex}</span>
               </span>
+              {countControl}
             </div>
           </>
         )}

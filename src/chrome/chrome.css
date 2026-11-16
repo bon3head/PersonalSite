@@ -847,6 +847,39 @@
     color: var(--jp-text-2);
   }
 
+  /* Shared marks (DESIGN 6.14, 1.10.0): the count is a text control in
+   * the row; the full list scrolls inside the panel. */
+  .jp-gb-count {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: var(--text-supporting-size);
+    line-height: var(--text-supporting-leading);
+    color: var(--jp-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .jp-gb-ledger--all {
+    max-height: 30vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Honeypot: off screen, never focused, hidden from assistive tech. */
+  .jp-gb-trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   /* Keyboard compact (DESIGN 6.14 Keyboard, 1.9.0): while the keyboard
    * is up the panel condenses so the pin stays in view while typing. */
   .jp-gb[data-kb="true"] .jp-gb-panel {
