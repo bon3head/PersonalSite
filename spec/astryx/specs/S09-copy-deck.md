@@ -1,6 +1,6 @@
 # S09 Copy deck: every visible string
 
-Version 1.7.0, 2026-11-12. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
+Version 1.8.0, 2026-11-16. Depends on: `baseline/content/CONTENT-BRIEF.md` (the factual boundary). Blocks: S04, S05, S06, S07, S08, S10.
 1.5.0: C-SQ-P1 rewritten (Justin-approved 2026-11-05): the "three trails / small adventures" line described the site visual, not the app ethos. New line names the ethos (anyone can host, each community runs its own instance) and what it is built on (ActivityPub).
 
 ## 1. Purpose
@@ -85,10 +85,16 @@ C-SQ-VENUE ("Built at Hack New Paltz. Working MVP in 24 hours.") is not in the b
 | C-GB-LOCK | Guestbook lock-in control | `Lock in` | n/a |
 | C-GB-SEED | Guestbook seed readout prefix | `seed` | n/a |
 | C-GB-DONE | Guestbook result line after lock-in | `Your mark is in the field.` | n/a |
-| C-GB-LOCAL | Guestbook storage note | `Saved in this browser only.` | n/a |
+| C-GB-PUBLIC | Guestbook note after lock-in when the mark was filed (DESIGN 6.14 Storage) | `Everyone will see it in a few minutes.` | n/a |
+| C-GB-HELD | Guestbook note when the filter refused the mark | `Kept in this browser. Links and some words stay off the shared field.` | n/a |
+| C-GB-LIMIT | Guestbook note when a daily cap is reached | `Kept in this browser. The shared field takes a few marks a day.` | n/a |
+| C-GB-OFFLINE | Guestbook note when the mark could not be sent | `Kept in this browser for now.` | n/a |
+| C-GB-COUNT | Guestbook count control, after the number (n other than 1) | `marks` | n/a |
+| C-GB-COUNT-ONE | Guestbook count control, after the number 1 | `mark` | n/a |
+| C-GB-ALL | Guestbook full marks list `aria-label` | `All marks` | n/a |
 | C-GB-AGAIN | Guestbook control to sign again | `Sign again` | n/a |
 | C-GB-CLOSE | Guestbook close control | `Close` | n/a |
-| C-GB-LEDGER | Guestbook ledger `aria-label` | `Marks in this browser` | n/a |
+| C-GB-LEDGER | Guestbook ledger and pins layer `aria-label` | `Marks` | n/a |
 | C-TOAST-OK | CopyConfirm info | `Copied.` | n/a |
 | C-TOAST-FAIL | CopyConfirm error | `Copy failed. The address is selected.` | n/a |
 | C-404-H1 | 404 readout | `Nothing at this address.` | n/a |
@@ -118,6 +124,7 @@ None open. D-SQ-VENUE (shown), D-LEAFLINK-KIND (mutual aid) and D-PHONE (hidden)
 
 ## 8. Changelog
 
+- 1.8.0, 2026-11-16: shared marks (DESIGN 1.10.0, 6.14 Storage and Shared marks). New C-GB-PUBLIC, C-GB-HELD, C-GB-LIMIT, C-GB-OFFLINE, C-GB-COUNT, C-GB-COUNT-ONE, C-GB-ALL. C-GB-LOCAL removed (marks are no longer browser-only). C-GB-LEDGER reworded from `Marks in this browser` to `Marks`. Proposed; Justin approves before ship.
 - 1.7.0, 2026-11-12: C-SRV-ALT no longer names the GPU model ("on the RTX 3070 Ti" becomes "on its GPU"). Justin approved in the critique thread, 2026-11-12 ("don't name the gpu"), so no stack name ships anywhere in the scene (critique brief item 3). No other string changed.
 - 1.6.0, 2026-11-09: guestbook strings (C-CON-GB, C-GB-*), for the guestbook brief on astryx-polish-r2. No existing string changed. Proposed; Justin approves before ship.
 
