@@ -84,6 +84,19 @@ writeFileSync(
   `${JSON.stringify(tokens, null, 2)}\n`,
 );
 
+// Guestbook shared marks (DESIGN 6.14): the Vercel Function and the
+// build pull are plain Node, outside src/, so they read this module.
+mkdirSync(join(root, 'api'), { recursive: true });
+const gb = tokens.guestbook;
+writeFileSync(
+  join(root, 'api/_guestbook.generated.js'),
+  `${tsHeader}export const G = ${JSON.stringify(
+    { nameMaxChars: gb.nameMaxChars, lineMaxChars: gb.lineMaxChars, ...gb.shared },
+    null,
+    2,
+  )};\n`,
+);
+
 // CSS custom properties: regime colors as --jp-void-ground etc., type
 // display tokens, gutters, keymap heights, durations, easings.
 const lines = [`/* GENERATED from spec/astryx/DESIGN.md v${version}. Do not edit. */`, ':root {'];

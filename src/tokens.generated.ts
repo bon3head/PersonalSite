@@ -1,6 +1,6 @@
-// GENERATED from spec/astryx/DESIGN.md v1.8.0. Do not edit.
+// GENERATED from spec/astryx/DESIGN.md v1.10.0. Do not edit.
 export const T = {
-  "version": "1.8.0",
+  "version": "1.10.0",
   "color": {
     "void": {
       "ground": "#0A0C0F",
@@ -964,6 +964,23 @@ export const T = {
     "nameMaxChars": 24,
     "lineMaxChars": 80,
     "ledgerMax": 5,
+    "shared": {
+      "endpoint": "/api/sign",
+      "file": "/guestbook.json",
+      "label": "guestbook",
+      "pinsShown": 5,
+      "perVisitorPerDay": 3,
+      "globalPerDay": 30,
+      "minFillMs": 1500,
+      "bodyMaxBytes": 2048,
+      "listMax": 500,
+      "timeoutMs": 6000,
+      "deployWaitSec": 60,
+      "waf": {
+        "windowSec": 600,
+        "requests": 5
+      }
+    },
     "easeMain": [
       0.35,
       0,

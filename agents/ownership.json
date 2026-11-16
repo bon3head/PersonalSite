@@ -162,6 +162,16 @@
    "tests": ["node tools/agent-map.mjs seat AGENTS.md"],
    "needsJustin": false,
    "notes": "Keep AGENTS.md under 200 lines (Claude Code memory docs)."
+  },
+  {
+   "id": "guestbook-shared",
+   "discipline": "guestbook shared marks (function, build pull, redeploy)",
+   "paths": ["api/**", "tools/pull-guestbook.mjs", ".github/workflows/guestbook-deploy.yml", "public/guestbook.json", "guestbook/shared/**", "tests/guestbook.shared.spec.ts"],
+   "specs": ["spec/astryx/DESIGN.md section 6.14 Storage and Shared marks", "guestbook/shared/DOCS-INGEST.md", "guestbook/shared/SETUP.md"],
+   "gates": ["G-BUILD"],
+   "tests": ["npx playwright test tests/guestbook.shared.spec.ts", "npm run build"],
+   "needsJustin": true,
+   "notes": "A public write path with a secret token. Security rules: DESIGN 6.14 Shared marks; block lists: api/_words.js. Justin sets the env vars, Deploy Hook and WAF rule (guestbook/shared/SETUP.md)."
   }
  ]
 }

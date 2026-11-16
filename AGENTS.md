@@ -63,7 +63,7 @@ The five gates are named in `guestbook/references/routing.md`. Their full defini
 - No value outside DESIGN.md. No hex, ms or geometry literal in `src/` outside generated files. Never hand-edit `*.generated.*` or `src/copy.ts`; run `npm run gen`.
 - No string outside S09. Copy changes need Justin's approval. Never invent a fact, a receipt, a number or a quote; unknowns go in `spec/astryx/UNKNOWNS.md`.
 - No em or en dashes and no italics in people-facing copy. Banned words: `tools/banned.txt` and S09.
-- Decided, do not reopen: LeafLink is mutual aid; phone hidden; GPA cut; Codeberg is the code host; guestbook signatures are browser-local; GLITTERBOX is not in the guestbook; the PCB direction and cipher/ember theme are dead.
+- Decided, do not reopen: LeafLink is mutual aid; phone hidden; GPA cut; Codeberg is the code host; guestbook marks are shared and auto-publish (Justin, 2026-11-15; DESIGN 6.14); GLITTERBOX is not in the guestbook; the PCB direction and cipher/ember theme are dead.
 - Never lower a gate, skip or quarantine a test, or edit a budget to get green.
 - Blocked means written down: `BLOCKED: <question> (<spec section>)` in BUILD-STATE.md, then stop. Do not work around a spec.
 - Never use HeyGen hosted cloud render, paid services, or new dependencies without Justin's explicit approval.

@@ -1,0 +1,35 @@
+# Guestbook redeploy (DESIGN 6.14 Shared marks; guestbook/shared/SETUP.md 4).
+# A mark is a GitHub issue labeled "guestbook". Opening, closing or
+# relabeling one redeploys the site so public/guestbook.json follows.
+# Issue workflows run only from the default branch (DOCS-INGEST 7).
+name: guestbook deploy
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, deleted]
+
+permissions: {}
+
+# One group: a new event cancels the waiting run, so a burst of marks
+# inside the wait gives one deploy (DOCS-INGEST 7).
+concurrency:
+  group: guestbook-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: contains(github.event.issue.labels.*.name, 'guestbook') || github.event.label.name == 'guestbook'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wait for more marks (guestbook.shared.deployWaitSec)
+        run: sleep 60
+      - name: Call the Vercel Deploy Hook
+        env:
+          HOOK: ${{ secrets.VERCEL_GUESTBOOK_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "VERCEL_GUESTBOOK_HOOK is not set; skipping."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK" -o /dev/null -w "deploy hook %{http_code}\n"

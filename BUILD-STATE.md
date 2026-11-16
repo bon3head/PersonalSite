@@ -348,3 +348,16 @@ notes:
 - Finding, not fixed: React hydration error #418 on every page load of the production build; present on astryx-polish-r2 too (checked in a worktree), so not from this PR.
 - Finding, still open: the keymap overflows at 390px (contact cut at the right edge) in the phone screenshots too.
 - Item 1 (desktop restart on name focus) still BLOCKED, see above.
+
+## Shared guestbook marks (DESIGN 1.10.0, 2026-11-16)
+status: draft PR, waiting on Justin (copy approval, setup)
+branch: claude/project-thread-bhlf0v (base claude/project-thread-a4xxhr, PR #11)
+tests:
+- tests/guestbook.shared.spec.ts T-GBS-1..6: PASS 9 of 9 (filter, function with GitHub faked, build pull, sheet notes and count, pins cap and dedupe).
+- tests/guestbook.spec.ts + tests/chrome.spec.ts: 18 of 19 in one run; T-GB-2 timed out waiting for the second sign under SwiftShader load and passes alone, on this branch and on the base.
+- npm run build, npm run lint, npx tsc --noEmit: PASS, exit 0.
+notes:
+- Docs ingest: guestbook/shared/DOCS-INGEST.md. Setup: guestbook/shared/SETUP.md.
+- S09 1.8.0 strings (C-GB-PUBLIC, C-GB-HELD, C-GB-LIMIT, C-GB-OFFLINE, C-GB-COUNT, C-GB-COUNT-ONE, C-GB-ALL, C-GB-LEDGER reworded) are proposed until Justin approves.
+- Not verified from the sandbox: a live function run, issue filing, Action run and deploy hook (no deploy; Justin runs SETUP.md section 6).
+- Not run: the judge seat and npm run gates (the PR stays draft until both).
